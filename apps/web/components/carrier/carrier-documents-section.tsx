@@ -10,11 +10,11 @@ import { DocumentCard } from "@/components/ui/document-card"
 import { useFileUpload } from "@/hooks/use-file-upload"
 import { notifySuccess, notifyError } from "@/lib/toast"
 import {
-    CarrierDocumentType,
-    CARRIER_DOCUMENT_LABELS,
+    TransportadoraDocumentType,
+    TRANSPORTADORA_DOCUMENT_LABELS,
     CARRIER_DOCS_WITH_EXPIRY,
-    REQUIRED_CARRIER_DOCUMENTS,
-    CarrierDocument,
+    REQUIRED_TRANSPORTADORA_DOCUMENTS,
+    TransportadoraDocument,
 } from "@/types/documents"
 import {
     Select,
@@ -24,7 +24,7 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 
-interface CarrierDocumentsSectionProps {
+interface TransportadoraDocumentsSectionProps {
     carrierId: string | undefined
     isEditing: boolean
     compact?: boolean
@@ -37,10 +37,10 @@ export function CarrierDocumentsSection({
     carrierId,
     isEditing,
     compact = false,
-}: CarrierDocumentsSectionProps) {
-    const [documents, setDocuments] = useState<CarrierDocument[]>([])
+}: TransportadoraDocumentsSectionProps) {
+    const [documents, setDocuments] = useState<TransportadoraDocument[]>([])
     const [loading, setLoading] = useState(false)
-    const [selectedType, setSelectedType] = useState<CarrierDocumentType>("cnpj_card")
+    const [selectedType, setSelectedType] = useState<TransportadoraDocumentType>("cnpj_card")
     const [expiryDate, setExpiryDate] = useState("")
     const [documentNumber, setDocumentNumber] = useState("")
     const [fileToUpload, setFileToUpload] = useState<File | null>(null)
@@ -144,11 +144,11 @@ export function CarrierDocumentsSection({
         }
     }
 
-    const getDocumentByType = (type: CarrierDocumentType) => {
+    const getDocumentByType = (type: TransportadoraDocumentType) => {
         return documents.find((d) => d.document_type === type)
     }
 
-    const documentTypes = (Object.keys(CARRIER_DOCUMENT_LABELS) as CarrierDocumentType[])
+    const documentTypes = (Object.keys(TRANSPORTADORA_DOCUMENT_LABELS) as TransportadoraDocumentType[])
         .filter(t => t !== 'legal_rep_cnh')
 
     if (!isEditing || !carrierId) {
@@ -181,13 +181,13 @@ export function CarrierDocumentsSection({
 
                 {documentTypes.slice(0, 6).map((type) => {
                     const doc = getDocumentByType(type)
-                    const isRequired = REQUIRED_CARRIER_DOCUMENTS.includes(type)
+                    const isRequired = REQUIRED_TRANSPORTADORA_DOCUMENTS.includes(type)
 
                     return (
                         <DocumentCard
                             key={type}
                             documentType={type}
-                            documentLabel={CARRIER_DOCUMENT_LABELS[type]}
+                            documentLabel={TRANSPORTADORA_DOCUMENT_LABELS[type]}
                             fileUrl={doc?.file_url}
                             fileName={doc?.file_name}
                             expiryDate={doc?.expiry_date}
@@ -217,7 +217,7 @@ export function CarrierDocumentsSection({
                         <Label>Tipo de Documento</Label>
                         <Select
                             value={selectedType}
-                            onValueChange={(v) => setSelectedType(v as CarrierDocumentType)}
+                            onValueChange={(v) => setSelectedType(v as TransportadoraDocumentType)}
                         >
                             <SelectTrigger>
                                 <SelectValue />
@@ -225,8 +225,8 @@ export function CarrierDocumentsSection({
                             <SelectContent>
                                 {documentTypes.map((type) => (
                                     <SelectItem key={type} value={type}>
-                                        {CARRIER_DOCUMENT_LABELS[type]}
-                                        {REQUIRED_CARRIER_DOCUMENTS.includes(type) && " *"}
+                                        {TRANSPORTADORA_DOCUMENT_LABELS[type]}
+                                        {REQUIRED_TRANSPORTADORA_DOCUMENTS.includes(type) && " *"}
                                     </SelectItem>
                                 ))}
                             </SelectContent>
@@ -300,14 +300,14 @@ export function CarrierDocumentsSection({
                             <DocumentCard
                                 key={doc.id}
                                 documentType={doc.document_type}
-                                documentLabel={CARRIER_DOCUMENT_LABELS[doc.document_type as CarrierDocumentType] || doc.document_type}
+                                documentLabel={TRANSPORTADORA_DOCUMENT_LABELS[doc.document_type as TransportadoraDocumentType] || doc.document_type}
                                 fileUrl={doc.file_url}
                                 fileName={doc.file_name}
                                 fileSize={doc.file_size}
                                 expiryDate={doc.expiry_date}
                                 status={doc.status}
                                 documentNumber={doc.document_number}
-                                required={REQUIRED_CARRIER_DOCUMENTS.includes(doc.document_type as CarrierDocumentType)}
+                                required={REQUIRED_TRANSPORTADORA_DOCUMENTS.includes(doc.document_type as TransportadoraDocumentType)}
                                 onDelete={() => handleDelete(doc.id)}
                             />
                         ))}

@@ -159,17 +159,17 @@ function validateSyncData(
       break
 
     case 'maintenance':
-      if (!data.vehicle_id) errors.push('ID do veículo é obrigatório')
+      if (!data.veiculo_id) errors.push('ID do veículo é obrigatório')
       if (!data.type) errors.push('Tipo de manutenção é obrigatório')
       break
 
     case 'checklist':
-      if (!data.vehicle_id) errors.push('ID do veículo é obrigatório')
-      if (!data.driver_id) errors.push('ID do motorista é obrigatório')
+      if (!data.veiculo_id) errors.push('ID do veículo é obrigatório')
+      if (!data.motorista_id) errors.push('ID do motorista é obrigatório')
       break
 
     case 'document':
-      if (!data.driver_id) errors.push('ID do motorista é obrigatório')
+      if (!data.motorista_id) errors.push('ID do motorista é obrigatório')
       if (!data.type) errors.push('Tipo de documento é obrigatório')
       break
 
@@ -307,7 +307,7 @@ async function executeSyncWithRetry(
       motorista: 'users',
       route: 'routes',
       maintenance: 'gf_vehicle_maintenance',
-      checklist: 'gf_vehicle_checklists',
+      checklist: 'gf_veiculo_checklists',
       document: 'gf_driver_documents',
       operador: 'users',
       company: 'companies',

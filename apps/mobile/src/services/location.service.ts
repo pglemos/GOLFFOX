@@ -133,9 +133,9 @@ export class LocationService {
       }
 
       // Enviar para Supabase
-      const { error } = await supabase.from('driver_positions').insert({
+      const { error } = await supabase.from('motorista_positions').insert({
         trip_id: tripId,
-        vehicle_id: vehicleId,
+        veiculo_id: vehicleId,
         latitude: locationData.latitude,
         longitude: locationData.longitude,
         accuracy: locationData.accuracy,

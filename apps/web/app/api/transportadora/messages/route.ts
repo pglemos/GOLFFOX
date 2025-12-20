@@ -13,27 +13,27 @@ export async function GET(request: NextRequest) {
         const supabase = getSupabaseAdmin();
         const { searchParams } = new URL(request.url);
 
-        const driverId = searchParams.get('driver_id');
-        const carrierId = searchParams.get('carrier_id');
+        const driverId = searchParams.get('motorista_id');
+        const carrierId = searchParams.get('transportadora_id');
         const isEmergency = searchParams.get('emergency') === 'true';
         const unreadOnly = searchParams.get('unread') === 'true';
         const limit = parseInt(searchParams.get('limit') || '100');
 
         let query = supabase
-            .from('driver_messages' as any)
+            .from('motorista_messages' as any)
             .select(`
                 *,
-                motorista:users!driver_id(id, name, phone)
+                motorista:users!motorista_id(id, name, phone)
             `)
             .order('created_at', { ascending: false })
             .limit(limit);
 
         if (driverId) {
-            query = query.eq('driver_id', driverId);
+            query = query.eq('motorista_id', driverId);
         }
 
         if (carrierId) {
-            query = query.eq('carrier_id', carrierId);
+            query = query.eq('transportadora_id', carrierId);
         }
 
         if (isEmergency) {
@@ -77,20 +77,20 @@ export async function POST(request: NextRequest) {
     try {
         const supabase = getSupabaseAdmin();
         const body = await request.json();
-        const { driver_id, carrier_id, message, message_type = 'text' } = body;
+        const { motorista_id, transportadora_id, message, message_type = 'text' } = body;
 
-        if (!driver_id || !message) {
+        if (!motorista_id || !message) {
             return NextResponse.json(
-                { error: 'driver_id e message são obrigatórios' },
+                { error: 'motorista_id e message são obrigatórios' },
                 { status: 400 }
             );
         }
 
         const { data, error } = await supabase
-            .from('driver_messages' as any)
+            .from('motorista_messages' as any)
             .insert({
-                driver_id,
-                carrier_id,
+                motorista_id,
+                transportadora_id,
                 sender: 'central',
                 message,
                 message_type,
@@ -133,7 +133,7 @@ export async function PUT(request: NextRequest) {
         }
 
         const { data, error } = await supabase
-            .from('driver_messages' as any)
+            .from('motorista_messages' as any)
             .update({ read_at: new Date().toISOString() } as any)
             .in('id', ids)
             .select();

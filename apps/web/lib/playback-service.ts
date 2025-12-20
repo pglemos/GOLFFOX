@@ -6,8 +6,8 @@
 export interface HistoricalPosition {
   position_id: string
   trip_id: string
-  vehicle_id: string
-  driver_id: string
+  veiculo_id: string
+  motorista_id: string
   route_id: string
   lat: number
   lng: number
@@ -74,8 +74,8 @@ export class PlaybackService {
     this.positions = (data || []).map((p: any) => ({
       position_id: p.position_id,
       trip_id: p.trip_id,
-      vehicle_id: p.vehicle_id,
-      driver_id: p.driver_id,
+      veiculo_id: p.veiculo_id,
+      motorista_id: p.motorista_id,
       route_id: p.route_id,
       lat: p.lat,
       lng: p.lng,
@@ -282,7 +282,7 @@ export class PlaybackService {
     >()
 
     this.positions.forEach((pos, index) => {
-      const vehicleId = pos.vehicle_id
+      const vehicleId = pos.veiculo_id
       if (!grouped.has(vehicleId)) {
         grouped.set(vehicleId, [])
       }

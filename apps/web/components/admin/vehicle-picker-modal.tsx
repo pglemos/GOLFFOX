@@ -25,7 +25,7 @@ interface veiculo {
   is_active: boolean
 }
 
-interface VehiclePickerModalProps {
+interface VeiculoPickerModalProps {
   isOpen: boolean
   onClose: () => void
   onSelect: (veiculo: veiculo) => void
@@ -39,7 +39,7 @@ export function VehiclePickerModal({
   onSelect,
   companyId,
   requiredCapacity
-}: VehiclePickerModalProps) {
+}: VeiculoPickerModalProps) {
   const [vehicles, setVehicles] = useState<veiculo[]>([])
   const [loading, setLoading] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")

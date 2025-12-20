@@ -40,11 +40,11 @@ export async function GET(
     if (authErrorResponse) return authErrorResponse
 
     // Selecionar apenas colunas necessárias para listagem (otimização de performance)
-    const examColumns = 'id,driver_id,exam_type,exam_date,expiry_date,result,file_url,file_name,clinic_name,doctor_name,doctor_crm,notes,created_at,updated_at'
+    const examColumns = 'id,motorista_id,exam_type,exam_date,expiry_date,result,file_url,file_name,clinic_name,doctor_name,doctor_crm,notes,created_at,updated_at'
     const { data, error } = await supabaseServiceRole
       .from('driver_medical_exams')
       .select(examColumns)
-      .eq('driver_id', params.driverId)
+      .eq('motorista_id', params.driverId)
       .order('exam_date', { ascending: false })
 
     if (error) {
@@ -80,7 +80,7 @@ export async function POST(
     const { data, error } = await supabaseServiceRole
       .from('driver_medical_exams')
       .insert({
-        driver_id: params.driverId,
+        motorista_id: params.driverId,
         ...validated,
       })
       .select()

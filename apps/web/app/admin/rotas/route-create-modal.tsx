@@ -241,8 +241,8 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
         days_of_week: formData.days_of_week || [],
         exceptions: formData.exceptions || [],
         is_active: formData.is_active ?? true,
-        driver_id: selectedDriver.id,
-        vehicle_id: selectedVehicle.id,
+        motorista_id: selectedDriver.id,
+        veiculo_id: selectedVehicle.id,
         polyline: optimizationResult?.polyline || null,
       } as any
       const insertQuery = supabase.from("routes").insert(insertPayload) as any

@@ -15,7 +15,7 @@ import { debug, warn, error as logError } from '@/lib/logger'
 import { isValidPolyline, filterValidCoordinates, isValidCoordinate } from '@/lib/coordinate-validator'
 
 export interface HistoricalTrajectory {
-  vehicle_id: string
+  veiculo_id: string
   trip_id: string
   positions: Array<{ lat: number; lng: number; timestamp: Date }>
   color?: string // Opcional para diferenciação
@@ -179,7 +179,7 @@ export const MapLayers = memo(function MapLayers({
       if (!isValidCoordinate(veiculo.lat, veiculo.lng)) {
         // Veículo sem coordenadas GPS - não criar marcador no mapa
         // Mas o veículo ainda estará disponível na lista de veículos
-        debug('Veículo sem coordenadas GPS — exibido só na lista', { plate: veiculo.plate, vehicle_id: veiculo.vehicle_id }, 'AdminMapLayers')
+        debug('Veículo sem coordenadas GPS — exibido só na lista', { plate: veiculo.plate, veiculo_id: veiculo.veiculo_id }, 'AdminMapLayers')
         return
       }
 
@@ -218,7 +218,7 @@ export const MapLayers = memo(function MapLayers({
             <div style="padding: 8px; min-width: 200px; font-family: system-ui;">
               <div style="font-weight: bold; margin-bottom: 4px;">${veiculo.plate}</div>
               <div style="font-size: 12px; color: #666;">${veiculo.route_name}</div>
-              <div style="font-size: 12px; color: #666;">${veiculo.driver_name}</div>
+              <div style="font-size: 12px; color: #666;">${veiculo.motorista_name}</div>
               <div style="font-size: 11px; color: #999; margin-top: 4px;">
                 ${veiculo.speed ? `${(veiculo.speed * 3.6).toFixed(0)} km/h` : 'Parado'}
               </div>
@@ -236,14 +236,14 @@ export const MapLayers = memo(function MapLayers({
         })
 
         markers.push(marker)
-        vehicleMarkersRef.current.set(veiculo.vehicle_id, marker)
+        vehicleMarkersRef.current.set(veiculo.veiculo_id, marker)
 
         // Usar MarkerManager para virtualização se ativo
         if (useVirtualization && markerManagerRef.current) {
-          markerManagerRef.current.addMarker(veiculo.vehicle_id, marker)
+          markerManagerRef.current.addMarker(veiculo.veiculo_id, marker)
         }
       } catch (error) {
-        logError('Erro ao criar marcador para veículo', { vehicle_id: veiculo.vehicle_id, error }, 'AdminMapLayers')
+        logError('Erro ao criar marcador para veículo', { veiculo_id: veiculo.veiculo_id, error }, 'AdminMapLayers')
         return // Pular este veículo
       }
     })
@@ -348,7 +348,7 @@ export const MapLayers = memo(function MapLayers({
       // Validar e filtrar posições
       const validPositions = filterValidCoordinates(trajectory.positions)
       if (validPositions.length < 2) {
-        warn(`Trajetória ${trajectory.vehicle_id} tem menos de 2 posições válidas`, { vehicle_id: trajectory.vehicle_id }, 'AdminMapLayers')
+        warn(`Trajetória ${trajectory.veiculo_id} tem menos de 2 posições válidas`, { veiculo_id: trajectory.veiculo_id }, 'AdminMapLayers')
         return
       }
 
@@ -379,7 +379,7 @@ export const MapLayers = memo(function MapLayers({
       polyline.setMap(map)
 
       trajectoryPolylinesRef.current.set(
-        `${trajectory.vehicle_id}-${trajectory.trip_id}`,
+        `${trajectory.veiculo_id}-${trajectory.trip_id}`,
         polyline
       )
     })

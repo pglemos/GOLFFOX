@@ -35,7 +35,7 @@ export async function PUT(
       year,
       capacity,
       is_active,
-      vehicle_type,
+      veiculo_type,
       renavam,
       chassis
     } = body
@@ -57,7 +57,7 @@ export async function PUT(
         year: year || null,
         capacity: capacity || null,
         is_active: is_active ?? true,
-        vehicle_type: vehicle_type || 'bus',
+        veiculo_type: veiculo_type || 'bus',
         renavam: renavam || null,
         chassis: chassis || null
       } as any)

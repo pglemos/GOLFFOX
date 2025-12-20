@@ -1,6 +1,6 @@
 import { create } from "zustand"
 
-export interface OperatorFilters {
+export interface OperadorFilters {
   companyId: string | null
   dateRange: { start: Date | null; end: Date | null }
   shift: 'manha' | 'tarde' | 'noite' | null
@@ -26,7 +26,7 @@ const initialState = {
   routeId: null,
 }
 
-export const useOperatorFilters = create<OperatorFilters>((set) => ({
+export const useOperatorFilters = create<OperadorFilters>((set) => ({
   ...initialState,
   setCompanyId: (id) => set({ companyId: id }),
   setDateRange: (range) => set({ dateRange: range }),

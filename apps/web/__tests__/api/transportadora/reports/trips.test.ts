@@ -26,7 +26,7 @@ describe('GET /api/transportadora/reports/trips', () => {
     mockSupabaseClient.setTableData('users', [
       { id: 'motorista-1', name: 'Motorista Teste', email: 'motorista@test.com' },
     ])
-    mockSupabaseClient.setTableData('trip_passengers', [])
+    mockSupabaseClient.setTableData('trip_passageiros', [])
 
     const req = createTransportadoraRequest({
       method: 'GET',
@@ -48,7 +48,7 @@ describe('GET /api/transportadora/reports/trips', () => {
     mockSupabaseClient.setTableData('routes', [route])
     mockSupabaseClient.setTableData('trips', [])
     mockSupabaseClient.setTableData('users', [])
-    mockSupabaseClient.setTableData('trip_passengers', [])
+    mockSupabaseClient.setTableData('trip_passageiros', [])
 
     const req = createTransportadoraRequest({
       method: 'GET',
@@ -70,7 +70,7 @@ describe('GET /api/transportadora/reports/trips', () => {
     mockSupabaseClient.setTableData('routes', [route])
     mockSupabaseClient.setTableData('trips', [trip])
     mockSupabaseClient.setTableData('users', [])
-    mockSupabaseClient.setTableData('trip_passengers', [
+    mockSupabaseClient.setTableData('trip_passageiros', [
       { trip_id: trip.id },
       { trip_id: trip.id },
     ])

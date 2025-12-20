@@ -74,11 +74,11 @@ export async function PUT(
     if (body.route_id !== undefined || body.routeId !== undefined) {
       updateData.route_id = body.route_id || body.routeId
     }
-    if (body.vehicle_id !== undefined || body.vehicleId !== undefined) {
-      updateData.vehicle_id = body.vehicle_id || body.vehicleId || null
+    if (body.veiculo_id !== undefined || body.vehicleId !== undefined) {
+      updateData.veiculo_id = body.veiculo_id || body.vehicleId || null
     }
-    if (body.driver_id !== undefined || body.driverId !== undefined) {
-      updateData.driver_id = body.driver_id || body.driverId || null
+    if (body.motorista_id !== undefined || body.driverId !== undefined) {
+      updateData.motorista_id = body.motorista_id || body.driverId || null
     }
     if (body.status !== undefined) updateData.status = body.status
     if (body.scheduled_date !== undefined || body.scheduledDate !== undefined) {

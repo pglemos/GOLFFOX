@@ -14,7 +14,7 @@ import { Label } from "@/components/ui/label"
 import { Loader2, UserPlus } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 
-interface AssociateOperatorModalProps {
+interface AssociateOperadorModalProps {
   isOpen: boolean
   onClose: () => void
   onSave: () => void
@@ -28,7 +28,7 @@ export function AssociateOperatorModal({
   onSave,
   companyId,
   companyName,
-}: AssociateOperatorModalProps) {
+}: AssociateOperadorModalProps) {
   const [loading, setLoading] = useState(false)
   const [operatorEmail, setOperatorEmail] = useState("")
   const [operators, setOperators] = useState<any[]>([])

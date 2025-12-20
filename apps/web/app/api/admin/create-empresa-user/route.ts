@@ -526,7 +526,7 @@ export async function POST(request: NextRequest) {
       try {
         const { error: auditError } = await supabaseAdmin.from('gf_audit_log').insert({
           actor_id: actorId,
-          action_type: 'create_operator',
+          action_type: 'create_operador',
           resource_type: 'company',
           resource_id: finalCompanyId,
           details: {

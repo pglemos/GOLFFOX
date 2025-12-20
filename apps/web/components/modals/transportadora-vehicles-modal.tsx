@@ -34,7 +34,7 @@ export function TransportadoraVehiclesModal({ transportadora, isOpen, onClose }:
     year: "",
     capacity: "",
     is_active: true,
-    vehicle_type: "bus",
+    veiculo_type: "bus",
     renavam: "",
     chassis: ""
   })
@@ -71,7 +71,7 @@ export function TransportadoraVehiclesModal({ transportadora, isOpen, onClose }:
       year: "",
       capacity: "",
       is_active: true,
-      vehicle_type: "bus",
+      veiculo_type: "bus",
       renavam: "",
       chassis: ""
     })
@@ -181,7 +181,7 @@ export function TransportadoraVehiclesModal({ transportadora, isOpen, onClose }:
       year: veiculo.year?.toString() || "",
       capacity: veiculo.capacity?.toString() || "",
       is_active: veiculo.is_active ?? true,
-      vehicle_type: veiculo.vehicle_type || "bus",
+      veiculo_type: veiculo.veiculo_type || "bus",
       renavam: veiculo.renavam || "",
       chassis: veiculo.chassis || ""
     })
@@ -377,10 +377,10 @@ export function TransportadoraVehiclesModal({ transportadora, isOpen, onClose }:
                   />
                 </div>
                 <div>
-                  <Label htmlFor="vehicle_type">Tipo de Veículo</Label>
+                  <Label htmlFor="veiculo_type">Tipo de Veículo</Label>
                   <Select 
-                    value={formData.vehicle_type} 
-                    onValueChange={(value) => setFormData({ ...formData, vehicle_type: value })}
+                    value={formData.veiculo_type} 
+                    onValueChange={(value) => setFormData({ ...formData, veiculo_type: value })}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Selecione o tipo" />

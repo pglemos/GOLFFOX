@@ -14,7 +14,7 @@ import { motion } from 'framer-motion'
 import { modalContent } from '@/lib/animations'
 import type { veiculo, RoutePolyline, Alert } from './admin-map'
 
-interface VehiclePanelProps {
+interface VeiculoPanelProps {
   veiculo: veiculo
   onClose: () => void
   onFollow: () => void
@@ -28,7 +28,7 @@ export const VehiclePanel = memo(function VehiclePanel({
   onFollow,
   onDispatch,
   onViewHistory,
-}: VehiclePanelProps) {
+}: VeiculoPanelProps) {
   return (
     <motion.div
       initial="hidden"
@@ -51,7 +51,7 @@ export const VehiclePanel = memo(function VehiclePanel({
         <div className="space-y-3 sm:space-y-4 text-sm">
           <div>
             <span className="text-ink-muted block mb-1">Motorista:</span>
-            <p className="font-semibold truncate">{veiculo.driver_name}</p>
+            <p className="font-semibold truncate">{veiculo.motorista_name}</p>
           </div>
 
           <div>

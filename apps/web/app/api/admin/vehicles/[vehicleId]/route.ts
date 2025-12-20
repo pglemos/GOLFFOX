@@ -83,7 +83,7 @@ export async function DELETE(
     const { count: tripsCount, error: tripsError } = await supabaseServiceRole
       .from("trips")
       .select("id", { head: true, count: "exact" })
-      .eq("vehicle_id", vehicleId)
+      .eq("veiculo_id", vehicleId)
 
     if (tripsError) {
       logError("Erro ao verificar viagens associadas ao veículo", { vehicleId, error: tripsError }, CONTEXT)
@@ -112,7 +112,7 @@ export async function DELETE(
     const { error: maintenanceError } = await supabaseServiceRole
       .from("gf_vehicle_maintenance")
       .delete()
-      .eq("vehicle_id", vehicleId)
+      .eq("veiculo_id", vehicleId)
 
     if (maintenanceError) {
       logError("Erro ao excluir manutenções vinculadas ao veículo", { vehicleId, error: maintenanceError }, CONTEXT)
@@ -120,9 +120,9 @@ export async function DELETE(
     }
 
     const { error: checklistError } = await supabaseServiceRole
-      .from("gf_vehicle_checklists")
+      .from("gf_veiculo_checklists")
       .delete()
-      .eq("vehicle_id", vehicleId)
+      .eq("veiculo_id", vehicleId)
 
     if (checklistError) {
       logError("Erro ao excluir checklists vinculados ao veículo", { vehicleId, error: checklistError }, CONTEXT)
@@ -142,7 +142,7 @@ export async function DELETE(
         const { count: blockingTrips } = await supabaseServiceRole
           .from("trips")
           .select("id", { head: true, count: "exact" })
-          .eq("vehicle_id", vehicleId)
+          .eq("veiculo_id", vehicleId)
 
         const { error: archiveAfterFailure } = await supabaseServiceRole
           .from("vehicles")
@@ -195,7 +195,7 @@ export async function PATCH(
 
     // Campos permitidos para atualização
     const allowedFields = new Set([
-      'plate', 'model', 'year', 'capacity', 'prefix', 'company_id', 'carrier_id', 'transportadora_id', 'is_active', 'photo_url'
+      'plate', 'model', 'year', 'capacity', 'prefix', 'company_id', 'transportadora_id', 'is_active', 'photo_url'
     ])
 
     for (const [key, value] of Object.entries(body)) {

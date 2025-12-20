@@ -53,11 +53,11 @@ async function handleDelete(request: NextRequest) {
     
     logger.log(`🗑️ Tentando excluir usuário: ${userId}`)
     
-    // Primeiro, setar driver_id para NULL em trips se o usuário for motorista
+    // Primeiro, setar motorista_id para NULL em trips se o usuário for motorista
     await supabaseAdmin
       .from('trips')
-      .update({ driver_id: null })
-      .eq('driver_id', userId)
+      .update({ motorista_id: null })
+      .eq('motorista_id', userId)
     
     // Agora excluir o usuário
     const { data, error } = await supabaseAdmin

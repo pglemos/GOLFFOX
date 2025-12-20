@@ -44,8 +44,8 @@ export type RouteFormData = {
   days_of_week: number[]
   exceptions: string[]
   is_active: boolean
-  driver_id?: string
-  vehicle_id?: string
+  motorista_id?: string
+  veiculo_id?: string
   selected_employees: string[]
 }
 

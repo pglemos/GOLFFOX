@@ -28,7 +28,7 @@ interface Route {
     destination: string
     status: 'pending' | 'active' | 'completed' | 'cancelled'
     scheduled_date?: string
-    driver_name?: string
+    motorista_name?: string
     vehicle_plate?: string
     passengers_count?: number
     distance_km?: number
@@ -73,7 +73,7 @@ export default function TransportadoraRotasPage() {
 
             const formattedRoutes = (data || []).map((r: any) => ({
                 ...r,
-                driver_name: r.motorista?.name,
+                motorista_name: r.motorista?.name,
                 vehicle_plate: r.veiculo?.plate,
             }))
 
@@ -99,7 +99,7 @@ export default function TransportadoraRotasPage() {
                 r.name?.toLowerCase().includes(query) ||
                 r.origin?.toLowerCase().includes(query) ||
                 r.destination?.toLowerCase().includes(query) ||
-                r.driver_name?.toLowerCase().includes(query) ||
+                r.motorista_name?.toLowerCase().includes(query) ||
                 r.vehicle_plate?.toLowerCase().includes(query)
             )
         }
@@ -194,10 +194,10 @@ export default function TransportadoraRotasPage() {
                                                                 {new Date(route.scheduled_date).toLocaleDateString('pt-BR')}
                                                             </span>
                                                         )}
-                                                        {route.driver_name && (
+                                                        {route.motorista_name && (
                                                             <span className="flex items-center gap-1">
                                                                 <Users className="h-3 w-3" />
-                                                                {route.driver_name}
+                                                                {route.motorista_name}
                                                             </span>
                                                         )}
                                                         {route.vehicle_plate && (

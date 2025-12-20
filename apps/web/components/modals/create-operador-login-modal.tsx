@@ -16,7 +16,7 @@ import { globalSyncManager } from "@/lib/global-sync"
 import { useCep } from "@/hooks/use-cep"
 import { formatCPF, formatPhone, formatCEP } from "@/lib/format-utils"
 
-interface CreateOperatorLoginModalProps {
+interface CreateOperadorLoginModalProps {
   isOpen: boolean
   onClose: () => void
   onSave: () => void
@@ -30,7 +30,7 @@ export function CreateUserModal({
   onSave,
   companyId: initialCompanyId,
   companyName: initialCompanyName,
-}: CreateOperatorLoginModalProps) {
+}: CreateOperadorLoginModalProps) {
   const [loading, setLoading] = useState(false)
   const { fetchCep, loading: loadingCep } = useCep()
   const [companies, setCompanies] = useState<any[]>([])

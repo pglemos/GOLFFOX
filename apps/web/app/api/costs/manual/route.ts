@@ -7,10 +7,10 @@ import { logger, logError } from '@/lib/logger'
 
 const costSchema = z.object({
   company_id: z.string().uuid(),
-  carrier_id: z.string().uuid().optional().nullable(),
+  transportadora_id: z.string().uuid().optional().nullable(),
   route_id: z.string().uuid().optional().nullable(),
-  vehicle_id: z.string().uuid().optional().nullable(),
-  driver_id: z.string().uuid().optional().nullable(),
+  veiculo_id: z.string().uuid().optional().nullable(),
+  motorista_id: z.string().uuid().optional().nullable(),
   cost_category_id: z.string().uuid(),
   cost_center_id: z.string().uuid().optional().nullable(),
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(), // Aceitar date (será mapeado para cost_date)
@@ -239,10 +239,10 @@ async function createManualCostHandler(request: NextRequest) {
     // Inserir custo - mapear date para cost_date
     const costData: any = {
       company_id: validated.company_id,
-      carrier_id: validated.carrier_id || null,
+      transportadora_id: validated.transportadora_id || null,
       route_id: validated.route_id || null,
-      vehicle_id: validated.vehicle_id || null,
-      driver_id: validated.driver_id || null,
+      veiculo_id: validated.veiculo_id || null,
+      motorista_id: validated.motorista_id || null,
       cost_category_id: validated.cost_category_id,
       cost_center_id: validated.cost_center_id || null,
       cost_date: finalCostDate, // Sempre usar cost_date (nome da coluna no banco)
@@ -344,7 +344,7 @@ async function listManualCostsHandler(request: NextRequest) {
     }
 
     const routeId = searchParams.get('route_id')
-    const vehicleId = searchParams.get('vehicle_id')
+    const vehicleId = searchParams.get('veiculo_id')
     const startDate = searchParams.get('start_date')
     const endDate = searchParams.get('end_date')
     // Aceitar tanto category_id quanto cost_category_id (alias)
@@ -366,7 +366,7 @@ async function listManualCostsHandler(request: NextRequest) {
       query = query.eq('route_id', routeId)
     }
     if (vehicleId) {
-      query = query.eq('vehicle_id', vehicleId)
+      query = query.eq('veiculo_id', vehicleId)
     }
     if (startDate) {
       query = query.gte('cost_date', startDate) // Usar cost_date em vez de date

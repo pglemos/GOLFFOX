@@ -24,7 +24,7 @@ interface motorista {
   rating?: number
 }
 
-interface DriverPickerModalProps {
+interface MotoristaPickerModalProps {
   isOpen: boolean
   onClose: () => void
   onSelect: (motorista: motorista) => void
@@ -36,7 +36,7 @@ export function DriverPickerModal({
   onClose,
   onSelect,
   companyId
-}: DriverPickerModalProps) {
+}: MotoristaPickerModalProps) {
   const [drivers, setDrivers] = useState<motorista[]>([])
   const [loading, setLoading] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")

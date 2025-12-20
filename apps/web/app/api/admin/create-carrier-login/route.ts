@@ -7,10 +7,7 @@ export async function POST(req: NextRequest) {
     const newUrl = new URL('/api/admin/create-transportadora-login', req.url)
     const body = await req.json()
     
-    // Converter carrier_id para transportadora_id se necessário
-    if (body.carrier_id && !body.transportadora_id) {
-      body.transportadora_id = body.carrier_id
-    }
+    // Rota de compatibilidade - redireciona para create-transportadora-login
     
     const response = await fetch(newUrl.toString(), {
       method: req.method,

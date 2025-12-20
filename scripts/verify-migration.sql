@@ -45,9 +45,9 @@ FROM information_schema.tables
 WHERE table_schema = 'public' 
   AND table_type = 'BASE TABLE'
   AND table_name IN (
-    'passenger_checkins', 'vehicle_checklists', 'driver_locations',
-    'driver_messages', 'passenger_cancellations', 'trip_evaluations',
-    'announcements', 'driver_positions', 'gf_vehicle_checklists'
+    'passageiro_checkins', 'veiculo_checklists', 'motorista_locations',
+    'motorista_messages', 'passageiro_cancellations', 'trip_evaluations',
+    'announcements', 'motorista_positions', 'gf_veiculo_checklists'
   )
 ORDER BY table_name;
 

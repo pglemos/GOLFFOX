@@ -23,7 +23,7 @@ interface Alert {
   severity?: string | null
   status?: string | null
   route_id?: string | null
-  vehicle_id?: string | null
+  veiculo_id?: string | null
 }
 
 interface EditAlertModalProps {

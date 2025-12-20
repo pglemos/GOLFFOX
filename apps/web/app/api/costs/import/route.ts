@@ -140,8 +140,8 @@ async function importHandler(request: NextRequest) {
         costsToInsert.push({
           company_id: companyId,
           route_id: routeId,
-          vehicle_id: vehicleId,
-          driver_id: driverId,
+          veiculo_id: vehicleId,
+          motorista_id: driverId,
           cost_category_id: categoryId,
           date: row.date,
           amount: parseFloat(row.amount.toString()),

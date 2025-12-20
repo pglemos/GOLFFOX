@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Clock, MapPin, Phone, Mail, AlertCircle } from 'lucide-react'
 
-interface PassengerInfo {
+interface PassageiroInfo {
   id: string
   name: string
   phone?: string
@@ -22,7 +22,7 @@ interface StopInfo {
   address: string
   scheduledTime: string
   type: 'pickup' | 'dropoff'
-  passageiro: PassengerInfo
+  passageiro: PassageiroInfo
   coordinates: { lat: number; lng: number }
 }
 

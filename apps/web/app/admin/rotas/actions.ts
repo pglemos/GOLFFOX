@@ -22,8 +22,8 @@ const routeSchema = z.object({
   days_of_week: z.array(z.number()),
   exceptions: z.array(z.string()),
   is_active: z.boolean(),
-  driver_id: z.string().uuid(),
-  vehicle_id: z.string().uuid(),
+  motorista_id: z.string().uuid(),
+  veiculo_id: z.string().uuid(),
   selected_employees: z.array(z.string().uuid()),
 })
 
@@ -49,8 +49,8 @@ export async function createRoute(data: RouteFormData) {
         days_of_week: validated.days_of_week,
         exceptions: validated.exceptions,
         is_active: validated.is_active,
-        driver_id: validated.driver_id,
-        vehicle_id: validated.vehicle_id,
+        motorista_id: validated.motorista_id,
+        veiculo_id: validated.veiculo_id,
       })
       .select()
       .single()

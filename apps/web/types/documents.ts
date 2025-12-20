@@ -7,7 +7,7 @@
 // DOCUMENT TYPES
 // ====================================================
 
-export type VehicleDocumentType =
+export type VeiculoDocumentType =
     | 'crlv'                    // CRLV do Ano
     | 'antt_license'            // Licença ANTT
     | 'inmetro_certificate'     // Certificado Inmetro
@@ -22,7 +22,7 @@ export type VehicleDocumentType =
     | 'vehicle_photo_side'      // Foto Lateral do Veículo
     | 'vehicle_photo_rear'      // Foto Traseira do Veículo
 
-export type DriverDocumentType =
+export type MotoristaDocumentType =
     | 'cnh'                     // CNH
     | 'residencia'              // Comprovante de Endereço
     | 'toxico'                  // Exame Toxicológico
@@ -34,7 +34,7 @@ export type DriverDocumentType =
     | 'selfie'                  // Selfie
     | 'outros'                  // Outros
 
-export type CarrierDocumentType =
+export type TransportadoraDocumentType =
     | 'service_contract'        // Contrato de Prestação de Serviços
     | 'cnpj_card'               // Cartão CNPJ
     | 'social_contract'         // Contrato Social da Empresa
@@ -56,7 +56,7 @@ export type AlertLevel = 'ok' | 'warning' | 'critical' | 'expired'
 // LABELS EM PORTUGUÊS
 // ====================================================
 
-export const VEHICLE_DOCUMENT_LABELS: Record<VehicleDocumentType, string> = {
+export const VEICULO_DOCUMENT_LABELS: Record<VeiculoDocumentType, string> = {
     crlv: 'CRLV do Ano',
     antt_license: 'Licença ANTT',
     inmetro_certificate: 'Certificado Inmetro',
@@ -72,7 +72,7 @@ export const VEHICLE_DOCUMENT_LABELS: Record<VehicleDocumentType, string> = {
     vehicle_photo_rear: 'Foto Traseira do Veículo',
 }
 
-export const DRIVER_DOCUMENT_LABELS: Record<DriverDocumentType, string> = {
+export const MOTORISTA_DOCUMENT_LABELS: Record<MotoristaDocumentType, string> = {
     cnh: 'CNH',
     residencia: 'Comprovante de Endereço',
     toxico: 'Exame Toxicológico',
@@ -85,7 +85,7 @@ export const DRIVER_DOCUMENT_LABELS: Record<DriverDocumentType, string> = {
     outros: 'Outros',
 }
 
-export const CARRIER_DOCUMENT_LABELS: Record<CarrierDocumentType, string> = {
+export const TRANSPORTADORA_DOCUMENT_LABELS: Record<TransportadoraDocumentType, string> = {
     service_contract: 'Contrato de Prestação de Serviços',
     cnpj_card: 'Cartão CNPJ',
     social_contract: 'Contrato Social da Empresa',
@@ -135,21 +135,21 @@ export interface BaseDocument {
     updated_at: string
 }
 
-export interface VehicleDocument extends BaseDocument {
-    vehicle_id: string
-    document_type: VehicleDocumentType
+export interface VeiculoDocument extends BaseDocument {
+    veiculo_id: string
+    document_type: VeiculoDocumentType
 }
 
-export interface DriverDocument extends BaseDocument {
-    driver_id: string
-    document_type: DriverDocumentType
+export interface MotoristaDocument extends BaseDocument {
+    motorista_id: string
+    document_type: MotoristaDocumentType
     is_valid?: boolean
     expires_at?: string | null // Campo legado
 }
 
-export interface CarrierDocument extends BaseDocument {
-    carrier_id: string
-    document_type: CarrierDocumentType
+export interface TransportadoraDocument extends BaseDocument {
+    transportadora_id: string
+    document_type: TransportadoraDocumentType
 }
 
 // ====================================================
@@ -172,9 +172,9 @@ export const CONTRACT_TYPE_LABELS: Record<ContractType, string> = {
     temporario: 'Temporário',
 }
 
-export interface DriverCompensation {
+export interface MotoristaCompensation {
     id: string
-    driver_id: string
+    motorista_id: string
     // Salary
     base_salary?: number | null
     currency: string
@@ -245,7 +245,7 @@ export const PIX_KEY_TYPE_LABELS: Record<PixKeyType, string> = {
     aleatoria: 'Chave Aleatória',
 }
 
-export interface CarrierBankingData {
+export interface TransportadoraBankingData {
     bank_name?: string | null
     bank_code?: string | null
     bank_agency?: string | null
@@ -255,7 +255,7 @@ export interface CarrierBankingData {
     pix_key_type?: PixKeyType | null
 }
 
-export interface CarrierLegalRepData {
+export interface TransportadoraLegalRepData {
     legal_rep_name?: string | null
     legal_rep_cpf?: string | null
     legal_rep_rg?: string | null
@@ -284,18 +284,18 @@ export interface ExpiringDocument {
 // CONSTANTS FOR REQUIRED DOCUMENTS
 // ====================================================
 
-export const REQUIRED_VEHICLE_DOCUMENTS: VehicleDocumentType[] = [
+export const REQUIRED_VEICULO_DOCUMENTS: VeiculoDocumentType[] = [
     'crlv',
     'antt_license',
 ]
 
-export const REQUIRED_DRIVER_DOCUMENTS: DriverDocumentType[] = [
+export const REQUIRED_MOTORISTA_DOCUMENTS: MotoristaDocumentType[] = [
     'cnh',
     'residencia',
     'toxico',
 ]
 
-export const REQUIRED_CARRIER_DOCUMENTS: CarrierDocumentType[] = [
+export const REQUIRED_TRANSPORTADORA_DOCUMENTS: TransportadoraDocumentType[] = [
     'cnpj_card',
     'social_contract',
 ]
@@ -304,7 +304,7 @@ export const REQUIRED_CARRIER_DOCUMENTS: CarrierDocumentType[] = [
 // DOCUMENTS WITH EXPIRY DATE
 // ====================================================
 
-export const VEHICLE_DOCS_WITH_EXPIRY: VehicleDocumentType[] = [
+export const VEHICLE_DOCS_WITH_EXPIRY: VeiculoDocumentType[] = [
     'crlv',
     'antt_license',
     'inmetro_certificate',
@@ -316,7 +316,7 @@ export const VEHICLE_DOCS_WITH_EXPIRY: VehicleDocumentType[] = [
     'tachograph_certificate',
 ]
 
-export const DRIVER_DOCS_WITH_EXPIRY: DriverDocumentType[] = [
+export const DRIVER_DOCS_WITH_EXPIRY: MotoristaDocumentType[] = [
     'cnh',
     'toxico',
     'certificado_transporte',
@@ -324,7 +324,7 @@ export const DRIVER_DOCS_WITH_EXPIRY: DriverDocumentType[] = [
     'antecedentes',
 ]
 
-export const CARRIER_DOCS_WITH_EXPIRY: CarrierDocumentType[] = [
+export const CARRIER_DOCS_WITH_EXPIRY: TransportadoraDocumentType[] = [
     'service_contract',
     'art_certificate',
     'insurance_certificate',

@@ -66,11 +66,10 @@ export const updateTransportadoraSchema = createTransportadoraSchema.partial().e
 
 export const transportadoraLoginSchema = z.object({
   transportadora_id: uuidSchema.optional(),
-  carrier_id: uuidSchema.optional(), // Compatibilidade
   email: emailSchema,
   name: nameSchema,
   password: passwordSchema,
-}).refine(data => data.transportadora_id || data.carrier_id, {
+}).refine(data => data.transportadora_id, {
   message: 'ID da transportadora é obrigatório'
 })
 
@@ -87,7 +86,6 @@ export const createVehicleSchema = z.object({
   capacity: z.number().int().min(1).optional().nullable(),
   company_id: uuidSchema.optional().nullable(),
   transportadora_id: uuidSchema.optional().nullable(),
-  carrier_id: uuidSchema.optional().nullable(), // Compatibilidade
   is_active: z.boolean().default(true),
 })
 
@@ -102,7 +100,7 @@ export const updateVehicleSchema = createVehicleSchema.partial().extend({
 export const createRouteSchema = z.object({
   name: nameSchema,
   company_id: uuidSchema.optional().nullable(),
-  carrier_id: uuidSchema.optional().nullable(),
+  transportadora_id: uuidSchema.optional().nullable(),
   origin: z.string().min(1, 'Origem é obrigatória'),
   destination: z.string().min(1, 'Destino é obrigatório'),
   origin_lat: z.number().min(-90).max(90).optional().nullable(),
@@ -154,8 +152,8 @@ export const createCostSchema = z.object({
   amount: z.number().min(0, 'Valor deve ser positivo'),
   cost_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Data inválida (use YYYY-MM-DD)'),
   route_id: uuidSchema.optional().nullable(),
-  vehicle_id: uuidSchema.optional().nullable(),
-  driver_id: uuidSchema.optional().nullable(),
+  veiculo_id: uuidSchema.optional().nullable(),
+  motorista_id: uuidSchema.optional().nullable(),
   is_recurring: z.boolean().default(false),
   recurring_interval: z.enum(['daily', 'weekly', 'monthly', 'yearly']).optional().nullable(),
   attachment_url: z.string().url().optional().nullable(),
@@ -173,7 +171,7 @@ export const updateCostSchema = createCostSchema.partial().extend({
 
 export const budgetSchema = z.object({
   company_id: uuidSchema.optional().nullable(),
-  carrier_id: uuidSchema.optional().nullable(),
+  transportadora_id: uuidSchema.optional().nullable(),
   category_id: uuidSchema.optional().nullable(),
   period_month: z.number().min(1).max(12),
   period_year: z.number().min(2020),

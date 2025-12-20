@@ -68,9 +68,9 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
         // Buscar compensação ativa
         const { data: compensation, error } = await supabaseAdmin
-            .from('gf_driver_compensation')
-            .select('id, driver_id, base_salary, currency, payment_frequency, contract_type, has_meal_allowance, meal_allowance_value, has_transport_allowance, transport_allowance_value, has_health_insurance, health_insurance_value, has_dental_insurance, dental_insurance_value, has_life_insurance, life_insurance_value, has_fuel_card, fuel_card_limit, other_benefits, start_date, end_date, is_active, notes, created_at, updated_at')
-            .eq('driver_id', driverId)
+            .from('gf_motorista_compensation')
+            .select('id, motorista_id, base_salary, currency, payment_frequency, contract_type, has_meal_allowance, meal_allowance_value, has_transport_allowance, transport_allowance_value, has_health_insurance, health_insurance_value, has_dental_insurance, dental_insurance_value, has_life_insurance, life_insurance_value, has_fuel_card, fuel_card_limit, other_benefits, start_date, end_date, is_active, notes, created_at, updated_at')
+            .eq('motorista_id', driverId)
             .eq('is_active', true)
             .single()
 
@@ -143,16 +143,16 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
         // Verificar se já existe compensação ativa
         const { data: existing } = await supabaseAdmin
-            .from('gf_driver_compensation')
+            .from('gf_motorista_compensation')
             .select('id')
-            .eq('driver_id', driverId)
+            .eq('motorista_id', driverId)
             .eq('is_active', true)
             .single()
 
         if (existing) {
             // Atualizar compensação existente
             const { data: updated, error: updateError } = await (supabaseAdmin
-                .from('gf_driver_compensation') as any)
+                .from('gf_motorista_compensation') as any)
                 .update({
                     ...compensationData,
                     updated_at: new Date().toISOString(),
@@ -174,9 +174,9 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
         // Criar nova compensação
         const { data: created, error: createError } = await (supabaseAdmin
-            .from('gf_driver_compensation') as any)
+            .from('gf_motorista_compensation') as any)
             .insert({
-                driver_id: driverId,
+                motorista_id: driverId,
                 ...compensationData,
                 is_active: true,
             })
@@ -221,13 +221,13 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
 
         // Desativar compensação (soft delete)
         const { error: updateError } = await (supabaseAdmin
-            .from('gf_driver_compensation') as any)
+            .from('gf_motorista_compensation') as any)
             .update({
                 is_active: false,
                 end_date: new Date().toISOString().split('T')[0],
                 updated_at: new Date().toISOString(),
             })
-            .eq('driver_id', driverId)
+            .eq('motorista_id', driverId)
             .eq('is_active', true)
 
         if (updateError) {

@@ -245,7 +245,7 @@ describe('Operational Alerts', () => {
           message: expect.stringContaining('route-1'),
           details: expect.objectContaining({
             route_id: 'route-1',
-            vehicle_id: 'veiculo-1',
+            veiculo_id: 'veiculo-1',
             deviation_meters: 1000,
             expectedLat: -19.916681,
             actualLat: -19.917681,

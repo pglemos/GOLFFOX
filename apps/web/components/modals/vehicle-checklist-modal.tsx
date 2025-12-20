@@ -24,10 +24,10 @@ import {
 import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"
 
-interface VehicleChecklist {
+interface VeiculoChecklist {
   id?: string
-  vehicle_id: string
-  driver_id?: string
+  veiculo_id: string
+  motorista_id?: string
   filled_at: string
   status: string
   issues: any
@@ -35,7 +35,7 @@ interface VehicleChecklist {
 }
 
 interface VehicleChecklistModalProps {
-  checklist: VehicleChecklist | null
+  checklist: VeiculoChecklist | null
   vehicleId: string
   isOpen: boolean
   onClose: () => void
@@ -69,9 +69,9 @@ export function VehicleChecklistModal({
   const [loading, setLoading] = useState(false)
   const { sync } = useSupabaseSync({ showToast: false })
   const [drivers, setDrivers] = useState<any[]>([])
-  const [formData, setFormData] = useState<VehicleChecklist>({
-    vehicle_id: vehicleId,
-    driver_id: '',
+  const [formData, setFormData] = useState<VeiculoChecklist>({
+    veiculo_id: vehicleId,
+    motorista_id: '',
     filled_at: new Date().toISOString().split('T')[0],
     status: 'pending',
     issues: {},
@@ -90,8 +90,8 @@ export function VehicleChecklistModal({
       })
     } else {
       setFormData({
-        vehicle_id: vehicleId,
-        driver_id: '',
+        veiculo_id: vehicleId,
+        motorista_id: '',
         filled_at: new Date().toISOString().split('T')[0],
         status: 'pending',
         issues: {},
@@ -130,14 +130,14 @@ export function VehicleChecklistModal({
     setLoading(true)
 
     try {
-      if (!formData.driver_id || !formData.status) {
+      if (!formData.motorista_id || !formData.status) {
         notifyError('', undefined, { i18n: { ns: 'common', key: 'validation.driverStatusRequired' } })
         return
       }
 
       const checklistData = {
-        vehicle_id: formData.vehicle_id,
-        driver_id: formData.driver_id,
+        veiculo_id: formData.veiculo_id,
+        motorista_id: formData.motorista_id,
         filled_at: formData.filled_at,
         status: formData.status,
         issues: formData.issues,
@@ -147,7 +147,7 @@ export function VehicleChecklistModal({
       if (checklist?.id) {
         // Atualizar
         const { error } = await (supabase as any)
-          .from("gf_vehicle_checklists")
+          .from("gf_veiculo_checklists")
           .update(checklistData)
           .eq("id", checklist.id)
 
@@ -165,7 +165,7 @@ export function VehicleChecklistModal({
       } else {
         // Criar
         const { data, error } = await (supabase as any)
-          .from("gf_vehicle_checklists")
+          .from("gf_veiculo_checklists")
           .insert(checklistData)
           .select()
           .single()
@@ -192,9 +192,9 @@ export function VehicleChecklistModal({
           await (supabase as any).from('gf_audit_log').insert({
             actor_id: session.user.id,
             action_type: checklist?.id ? 'update' : 'create',
-            resource_type: 'vehicle_checklist',
+            resource_type: 'veiculo_checklist',
             resource_id: checklist?.id || null,
-            details: { vehicle_id: vehicleId, status: formData.status, issues_count: Object.keys(formData.issues).length }
+            details: { veiculo_id: vehicleId, status: formData.status, issues_count: Object.keys(formData.issues).length }
           })
         }
       } catch (auditError) {
@@ -224,10 +224,10 @@ export function VehicleChecklistModal({
         <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
           {/* Motorista */}
           <div className="space-y-2">
-            <Label htmlFor="driver_id" className="text-base font-medium">Motorista *</Label>
+            <Label htmlFor="motorista_id" className="text-base font-medium">Motorista *</Label>
             <Select
-              value={formData.driver_id || ''}
-              onValueChange={(value) => setFormData({ ...formData, driver_id: value })}
+              value={formData.motorista_id || ''}
+              onValueChange={(value) => setFormData({ ...formData, motorista_id: value })}
               required
             >
               <SelectTrigger className="h-11 sm:h-12 text-base">

@@ -32,7 +32,7 @@ import { Textarea } from "@/components/ui/textarea"
 
 interface Maintenance {
     id: string
-    vehicle_id: string
+    veiculo_id: string
     maintenance_type: string
     description?: string
     status: 'scheduled' | 'in_progress' | 'completed' | 'cancelled'
@@ -88,7 +88,7 @@ export default function ManutencaoPage() {
     const [viewMode, setViewMode] = useState<'list' | 'kanban'>('list')
     const [saving, setSaving] = useState(false)
     const [formData, setFormData] = useState({
-        vehicle_id: "",
+        veiculo_id: "",
         maintenance_type: "preventive",
         description: "",
         status: "scheduled",
@@ -109,7 +109,7 @@ export default function ManutencaoPage() {
     useEffect(() => {
         if (selectedMaintenance) {
             setFormData({
-                vehicle_id: selectedMaintenance.vehicle_id || "",
+                veiculo_id: selectedMaintenance.veiculo_id || "",
                 maintenance_type: selectedMaintenance.maintenance_type || "preventive",
                 description: selectedMaintenance.description || "",
                 status: selectedMaintenance.status || "scheduled",
@@ -120,7 +120,7 @@ export default function ManutencaoPage() {
                 notes: selectedMaintenance.notes || "",
             })
         } else {
-            setFormData({ vehicle_id: "", maintenance_type: "preventive", description: "", status: "scheduled", scheduled_date: "", cost_parts_brl: "", cost_labor_brl: "", workshop_name: "", notes: "" })
+            setFormData({ veiculo_id: "", maintenance_type: "preventive", description: "", status: "scheduled", scheduled_date: "", cost_parts_brl: "", cost_labor_brl: "", workshop_name: "", notes: "" })
         }
     }, [selectedMaintenance])
 
@@ -166,7 +166,7 @@ export default function ManutencaoPage() {
         }
 
         if (filterVehicle !== "all") {
-            result = result.filter(m => m.vehicle_id === filterVehicle)
+            result = result.filter(m => m.veiculo_id === filterVehicle)
         }
 
         if (debouncedSearchQuery) {
@@ -183,7 +183,7 @@ export default function ManutencaoPage() {
     }, [maintenances, debouncedSearchQuery, filterStatus, filterVehicle])
 
     const handleSave = async () => {
-        if (!formData.vehicle_id || !formData.scheduled_date) {
+        if (!formData.veiculo_id || !formData.scheduled_date) {
             notifyError(new Error("Campos obrigatórios"), "Selecione veículo e data")
             return
         }
@@ -191,7 +191,7 @@ export default function ManutencaoPage() {
         setSaving(true)
         try {
             const payload = {
-                vehicle_id: formData.vehicle_id,
+                veiculo_id: formData.veiculo_id,
                 maintenance_type: formData.maintenance_type,
                 description: formData.description || null,
                 status: formData.status,
@@ -468,7 +468,7 @@ export default function ManutencaoPage() {
                         <div className="grid grid-cols-2 gap-4">
                             <div className="col-span-2 space-y-2">
                                 <Label>Veículo *</Label>
-                                <Select value={formData.vehicle_id} onValueChange={(v) => setFormData({ ...formData, vehicle_id: v })}>
+                                <Select value={formData.veiculo_id} onValueChange={(v) => setFormData({ ...formData, veiculo_id: v })}>
                                     <SelectTrigger>
                                         <SelectValue placeholder="Selecione o veículo" />
                                     </SelectTrigger>

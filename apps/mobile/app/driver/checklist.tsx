@@ -120,7 +120,7 @@ export default function ChecklistScreen() {
         try {
             // Salvar localmente (evita erro de tabela inexistente)
             const checklistData = {
-                driver_id: profile?.id,
+                motorista_id: profile?.id,
                 items: items.reduce((acc, item) => ({ ...acc, [item.id]: item.value }), {}),
                 photos: photos.reduce((acc, photo) => ({ ...acc, [photo.id]: photo.uri }), {}),
                 observations,

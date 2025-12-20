@@ -28,7 +28,7 @@ export async function GET(req: NextRequest) {
     // Buscar viagens em andamento para filtrar motoristas ocupados
     const { data: activeTrips, error: tripsError } = await supabase
       .from('trips')
-      .select('driver_id')
+      .select('motorista_id')
       .eq('status', 'inProgress')
 
     if (tripsError) {
@@ -36,7 +36,7 @@ export async function GET(req: NextRequest) {
     }
 
     const activeDriverIds = new Set(
-      (activeTrips || []).map((t: any) => t.driver_id).filter(Boolean)
+      (activeTrips || []).map((t: any) => t.motorista_id).filter(Boolean)
     )
 
     // Filtrar motoristas disponíveis (não estão em viagem)

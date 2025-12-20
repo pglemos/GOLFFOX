@@ -78,7 +78,7 @@ export interface UserProfile {
     role: UserRole;
     name?: string;
     company_id?: string;
-    carrier_id?: string;
+    transportadora_id?: string;
     phone?: string;
 }
 
@@ -220,8 +220,8 @@ export async function getSession() {
 export interface Trip {
     id: string;
     route_id: string;
-    driver_id: string;
-    vehicle_id: string;
+    motorista_id: string;
+    veiculo_id: string;
     status: 'scheduled' | 'inProgress' | 'completed' | 'cancelled';
     scheduled_date: string;
     scheduled_start_time: string;
@@ -258,7 +258,7 @@ export async function getDriverTrips(driverId: string, date?: string) {
             route:routes(*),
             veiculo:vehicles(*)
         `)
-        .eq('driver_id', driverId)
+        .eq('motorista_id', driverId)
         .gte('scheduled_date', today)
         .order('scheduled_start_time', { ascending: true });
 
@@ -298,11 +298,11 @@ export interface ChecklistItem {
     notes?: string;
 }
 
-export interface VehicleChecklist {
+export interface VeiculoChecklist {
     id?: string;
     trip_id: string;
-    driver_id: string;
-    vehicle_id: string;
+    motorista_id: string;
+    veiculo_id: string;
     items: ChecklistItem[];
     photos?: string[];
     odometer_reading?: number;
@@ -310,9 +310,9 @@ export interface VehicleChecklist {
     status: 'pending' | 'approved' | 'rejected' | 'incomplete';
 }
 
-export async function saveVehicleChecklist(checklist: VehicleChecklist) {
+export async function saveVehicleChecklist(checklist: VeiculoChecklist) {
     const { data, error } = await supabase
-        .from('vehicle_checklists')
+        .from('veiculo_checklists')
         .upsert({
             ...checklist,
             completed_at: new Date().toISOString(),
@@ -334,8 +334,8 @@ export async function saveVehicleChecklist(checklist: VehicleChecklist) {
 
 export interface PassengerCheckin {
     trip_id?: string;
-    passenger_id?: string;
-    driver_id: string;
+    passageiro_id?: string;
+    motorista_id: string;
     type: 'boarding' | 'dropoff';
     method: 'qr' | 'nfc' | 'manual';
     passenger_identifier?: string;
@@ -346,7 +346,7 @@ export interface PassengerCheckin {
 
 export async function createPassengerCheckin(checkin: PassengerCheckin) {
     const { data, error } = await supabase
-        .from('passenger_checkins')
+        .from('passageiro_checkins')
         .insert(checkin)
         .select()
         .single();
@@ -361,10 +361,10 @@ export async function createPassengerCheckin(checkin: PassengerCheckin) {
 
 export async function getTripCheckins(tripId: string) {
     const { data, error } = await supabase
-        .from('passenger_checkins')
+        .from('passageiro_checkins')
         .select(`
             *,
-            passageiro:users!passenger_id(id, name, email)
+            passageiro:users!passageiro_id(id, name, email)
         `)
         .eq('trip_id', tripId)
         .order('created_at', { ascending: true });
@@ -394,9 +394,9 @@ export async function updateDriverLocation(
     }
 ) {
     const { error } = await supabase
-        .from('driver_locations')
+        .from('motorista_locations')
         .insert({
-            driver_id: driverId,
+            motorista_id: driverId,
             trip_id: tripId,
             ...location,
         });
@@ -406,9 +406,9 @@ export async function updateDriverLocation(
 
 export async function getDriverLastLocation(driverId: string) {
     const { data, error } = await supabase
-        .from('driver_locations')
+        .from('motorista_locations')
         .select('*')
-        .eq('driver_id', driverId)
+        .eq('motorista_id', driverId)
         .order('recorded_at', { ascending: false })
         .limit(1)
         .single();
@@ -425,8 +425,8 @@ export async function getDriverLastLocation(driverId: string) {
 // ====================================================
 
 export interface DriverMessage {
-    driver_id: string;
-    carrier_id?: string;
+    motorista_id: string;
+    transportadora_id?: string;
     sender: 'motorista' | 'central';
     message: string;
     message_type?: 'text' | 'location' | 'emergency' | 'delay' | 'system';
@@ -436,7 +436,7 @@ export interface DriverMessage {
 
 export async function sendDriverMessage(msg: DriverMessage) {
     const { data, error } = await supabase
-        .from('driver_messages')
+        .from('motorista_messages')
         .insert(msg)
         .select()
         .single();
@@ -451,9 +451,9 @@ export async function sendDriverMessage(msg: DriverMessage) {
 
 export async function getDriverMessages(driverId: string, limit = 50) {
     const { data, error } = await supabase
-        .from('driver_messages')
+        .from('motorista_messages')
         .select('*')
-        .eq('driver_id', driverId)
+        .eq('motorista_id', driverId)
         .order('created_at', { ascending: false })
         .limit(limit);
 
@@ -477,7 +477,7 @@ export async function getPassengerTrips(passengerId: string) {
             *,
             route:routes(*),
             veiculo:vehicles(*),
-            motorista:users!driver_id(id, name, phone)
+            motorista:users!motorista_id(id, name, phone)
         `)
         .gte('scheduled_date', new Date().toISOString().split('T')[0])
         .order('scheduled_start_time', { ascending: true })
@@ -514,7 +514,7 @@ export async function getAnnouncements(companyId?: string) {
 }
 
 export async function createPassengerCancellation(cancellation: {
-    passenger_id: string;
+    passageiro_id: string;
     trip_id?: string;
     scheduled_date: string;
     reason: 'home_office' | 'folga' | 'ferias' | 'medico' | 'outro';
@@ -523,7 +523,7 @@ export async function createPassengerCancellation(cancellation: {
     pause_until?: string;
 }) {
     const { data, error } = await supabase
-        .from('passenger_cancellations')
+        .from('passageiro_cancellations')
         .insert(cancellation)
         .select()
         .single();
@@ -538,8 +538,8 @@ export async function createPassengerCancellation(cancellation: {
 
 export async function createTripEvaluation(evaluation: {
     trip_id?: string;
-    passenger_id: string;
-    driver_id?: string;
+    passageiro_id: string;
+    motorista_id?: string;
     nps_score: number;
     tags?: string[];
     comment?: string;

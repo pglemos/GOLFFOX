@@ -17,7 +17,7 @@ import {
   ChevronRight
 } from 'lucide-react'
 
-interface PassengerDetails {
+interface PassageiroDetails {
   id: string
   name: string
   photo?: string
@@ -32,7 +32,7 @@ interface StopDetails {
   type: 'pickup' | 'dropoff'
   address: string
   scheduledTime: string
-  passageiro: PassengerDetails
+  passageiro: PassageiroDetails
   coordinates: { lat: number; lng: number }
   stopNumber: number
   isCompleted: boolean

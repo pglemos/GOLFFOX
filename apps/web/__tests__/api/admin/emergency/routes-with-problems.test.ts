@@ -63,8 +63,8 @@ describe('GET /api/admin/emergency/routes-with-problems', () => {
       {
         id: 'trip-1',
         route_id: route.id,
-        vehicle_id: veiculo.id,
-        driver_id: motorista.id,
+        veiculo_id: veiculo.id,
+        motorista_id: motorista.id,
         status: 'inProgress',
       },
     ])

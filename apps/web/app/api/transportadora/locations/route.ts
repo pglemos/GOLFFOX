@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
         const supabase = getSupabaseAdmin();
         const { searchParams } = new URL(request.url);
 
-        const driverId = searchParams.get('driver_id');
+        const driverId = searchParams.get('motorista_id');
         const tripId = searchParams.get('trip_id');
         const lastOnly = searchParams.get('last_only') === 'true';
         const since = searchParams.get('since'); // ISO timestamp
@@ -21,10 +21,10 @@ export async function GET(request: NextRequest) {
         if (lastOnly) {
             // Buscar última localização de cada motorista ativo
             const { data, error } = await supabase
-                .from('driver_locations' as any)
+                .from('motorista_locations' as any)
                 .select(`
                     *,
-                    motorista:users!driver_id(id, name, phone),
+                    motorista:users!motorista_id(id, name, phone),
                     trip:trips(id, status, route:routes(name))
                 `)
                 .order('recorded_at', { ascending: false });
@@ -36,8 +36,8 @@ export async function GET(request: NextRequest) {
             // Agrupar por motorista e pegar apenas a última
             const latestByDriver = new Map();
             data?.forEach((location: any) => {
-                if (!latestByDriver.has(location.driver_id)) {
-                    latestByDriver.set(location.driver_id, location);
+                if (!latestByDriver.has(location.motorista_id)) {
+                    latestByDriver.set(location.motorista_id, location);
                 }
             });
 
@@ -49,16 +49,16 @@ export async function GET(request: NextRequest) {
 
         // Busca com filtros
         let query = supabase
-            .from('driver_locations' as any)
+            .from('motorista_locations' as any)
             .select(`
                 *,
-                motorista:users!driver_id(id, name)
+                motorista:users!motorista_id(id, name)
             `)
             .order('recorded_at', { ascending: false })
             .limit(500);
 
         if (driverId) {
-            query = query.eq('driver_id', driverId);
+            query = query.eq('motorista_id', driverId);
         }
 
         if (tripId) {

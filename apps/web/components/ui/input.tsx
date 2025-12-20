@@ -1,22 +1,59 @@
 import * as React from "react"
+import { cva, type VariantProps } from "class-variance-authority"
 
 import { cn } from "@/lib/utils"
 
+const inputVariants = cva(
+  // Base styles - Mobile-first: altura mínima 44px, font-size 16px (previne zoom iOS)
+  "flex min-h-[44px] w-full rounded-md border border-input bg-background px-3 py-2 text-base shadow-xs transition-all duration-300 placeholder:text-muted-foreground touch-manipulation",
+  {
+    variants: {
+      focus: {
+        default:
+          "focus-visible:outline-none focus-visible:ring-brand/50 focus-visible:ring-[3px] focus-visible:border-brand focus-visible:shadow-lg focus-visible:shadow-brand/10",
+      },
+      state: {
+        default: "",
+        disabled: "disabled:cursor-not-allowed disabled:opacity-50",
+        invalid:
+          "aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
+      },
+      size: {
+        mobile: "", // Mobile-first (default)
+        desktop: "sm:h-9 sm:text-sm sm:py-1",
+      },
+      hover: {
+        default: "",
+        enabled: "lg:hover:border-strong",
+      },
+    },
+    defaultVariants: {
+      focus: "default",
+      state: "default",
+      size: "mobile",
+      hover: "enabled",
+    },
+  }
+)
+
 export interface InputProps
-  extends React.InputHTMLAttributes<HTMLInputElement> {}
+  extends React.InputHTMLAttributes<HTMLInputElement>,
+    VariantProps<typeof inputVariants> {}
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ className, type, ...props }, ref) => {
+  ({ className, type, focus, state, size, hover, ...props }, ref) => {
+    // Auto-detect state based on props
+    const inputState = props.disabled
+      ? "disabled"
+      : props["aria-invalid"]
+      ? "invalid"
+      : state
+
     return (
       <input
         type={type}
         className={cn(
-          // Mobile-first: altura mínima 44px, font-size 16px (previne zoom iOS)
-          "flex min-h-[44px] w-full rounded-md border border-input bg-background px-3 py-2 text-base shadow-xs transition-all duration-300 placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-brand/50 focus-visible:ring-[3px] focus-visible:border-brand focus-visible:shadow-lg focus-visible:shadow-brand/10 disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive touch-manipulation",
-          // Desktop: altura menor, font-size menor
-          "sm:h-9 sm:text-sm sm:py-1",
-          // Desktop: hover states
-          "lg:hover:border-strong",
+          inputVariants({ focus, state: inputState, size, hover }),
           className
         )}
         ref={ref}
@@ -27,4 +64,4 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 )
 Input.displayName = "Input"
 
-export { Input }
+export { Input, inputVariants }

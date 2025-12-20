@@ -6,7 +6,7 @@ import { z } from 'zod'
 export const runtime = 'nodejs'
 
 const vehicleCostSchema = z.object({
-  vehicle_id: z.string().uuid(),
+  veiculo_id: z.string().uuid(),
   cost_category: z.enum(['combustivel', 'manutencao', 'seguro', 'ipva', 'depreciacao', 'pneus', 'lavagem', 'pedagio', 'multas', 'outros']),
   cost_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   amount_brl: z.number().positive(),
@@ -39,7 +39,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
     }
 
-    const vehicleId = req.nextUrl.searchParams.get('vehicle_id')
+    const vehicleId = req.nextUrl.searchParams.get('veiculo_id')
     const startDate = req.nextUrl.searchParams.get('start_date')
     const endDate = req.nextUrl.searchParams.get('end_date')
 
@@ -58,10 +58,10 @@ export async function GET(req: NextRequest) {
       `)
 
     // Filtrar apenas veículos da transportadora do usuário
-    // Nota: O filtro será feito após o join através da relação vehicle_id
+    // Nota: O filtro será feito após o join através da relação veiculo_id
     // Verificar se o veículo pertence à transportadora ao processar resultados
 
-    if (vehicleId) query = query.eq('vehicle_id', vehicleId)
+    if (vehicleId) query = query.eq('veiculo_id', vehicleId)
     if (startDate) query = query.gte('cost_date', startDate)
     if (endDate) query = query.lte('cost_date', endDate)
 
@@ -108,7 +108,7 @@ export async function POST(req: NextRequest) {
     const { data: veiculo } = await supabaseServiceRole
       .from('vehicles')
       .select('transportadora_id')
-      .eq('id', validated.vehicle_id)
+      .eq('id', validated.veiculo_id)
       .single()
 
     if (!veiculo) {

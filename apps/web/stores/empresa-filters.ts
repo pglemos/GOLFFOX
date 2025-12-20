@@ -2,7 +2,7 @@ import { create } from "zustand"
 
 /**
  * EmpresaFilters - Filtros do painel da Empresa Contratante
- * @deprecated Preferir EmpresaFilters ao invés de OperatorFilters
+ * @deprecated Preferir EmpresaFilters ao invés de OperadorFilters
  */
 export interface EmpresaFilters {
     companyId: string | null
@@ -22,7 +22,7 @@ export interface EmpresaFilters {
 }
 
 // Alias para compatibilidade com código legado
-export type OperatorFilters = EmpresaFilters
+export type OperadorFilters = EmpresaFilters
 
 const initialState = {
     companyId: null,

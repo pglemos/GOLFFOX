@@ -52,7 +52,7 @@ async function exportHandler(request: NextRequest) {
 
     // Buscar custos com filtros
     const columns = [
-      'date','group_name','category','subcategory','route_name','vehicle_plate','driver_email','amount','qty','unit','source','notes','company_id','route_id','vehicle_id','driver_id','cost_category_id'
+      'date','group_name','category','subcategory','route_name','vehicle_plate','driver_email','amount','qty','unit','source','notes','company_id','route_id','veiculo_id','motorista_id','cost_category_id'
     ]
     let query = getSupabaseAdmin()
       .from('v_costs_secure')
@@ -68,8 +68,8 @@ async function exportHandler(request: NextRequest) {
     if (filters.route_id) {
       query = query.eq('route_id', filters.route_id)
     }
-    if (filters.vehicle_id) {
-      query = query.eq('vehicle_id', filters.vehicle_id)
+    if (filters.veiculo_id) {
+      query = query.eq('veiculo_id', filters.veiculo_id)
     }
     if (filters.category_id) {
       query = query.eq('cost_category_id', filters.category_id)

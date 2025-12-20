@@ -327,7 +327,7 @@ export interface AdminFinancialKPIs {
     recurringCostsCount: number;
 }
 
-export interface VehicleCostSummary {
+export interface VeiculoCostSummary {
     carrierId: string;
     vehicleId: string;
     vehiclePlate: string;

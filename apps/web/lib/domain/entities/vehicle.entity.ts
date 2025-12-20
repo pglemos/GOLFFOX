@@ -4,7 +4,7 @@
  * Entidade de domínio para veiculo
  */
 
-export interface VehicleProps {
+export interface VeiculoProps {
   id: string
   plate: string
   model: string
@@ -20,9 +20,9 @@ export interface VehicleProps {
 }
 
 export class veiculo {
-  private constructor(private props: VehicleProps) {}
+  private constructor(private props: VeiculoProps) {}
 
-  static create(props: Omit<VehicleProps, 'id' | 'created_at' | 'updated_at'>): veiculo {
+  static create(props: Omit<VeiculoProps, 'id' | 'created_at' | 'updated_at'>): veiculo {
     // Validações de negócio
     if (!props.plate || props.plate.trim().length === 0) {
       throw new Error('Placa do veículo é obrigatória')
@@ -55,7 +55,7 @@ export class veiculo {
     })
   }
 
-  static fromDatabase(props: VehicleProps): veiculo {
+  static fromDatabase(props: VeiculoProps): veiculo {
     return new veiculo(props)
   }
 
@@ -127,12 +127,12 @@ export class veiculo {
   }
 
   // Serializar para banco de dados
-  toDatabase(): VehicleProps {
+  toDatabase(): VeiculoProps {
     return { ...this.props }
   }
 
   // Serializar para API
-  toJSON(): Omit<VehicleProps, 'created_at' | 'updated_at'> & {
+  toJSON(): Omit<VeiculoProps, 'created_at' | 'updated_at'> & {
     created_at: string
     updated_at: string
   } {

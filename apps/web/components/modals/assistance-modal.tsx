@@ -28,8 +28,8 @@ interface AssistanceRequest {
   id: string
   trip_id?: string
   route_id?: string
-  vehicle_id?: string
-  driver_id?: string
+  veiculo_id?: string
+  motorista_id?: string
   request_type: string
   description?: string
   latitude?: number
@@ -74,10 +74,10 @@ export function AssistanceModal({ request, isOpen, onClose, onSave }: Assistance
         // Filtrar motoristas que não estão em viagem
         const { data: activeTrips } = await supabase
           .from("trips")
-          .select("driver_id")
+          .select("motorista_id")
           .eq("status", "inProgress")
 
-        const activeDriverIds = new Set(activeTrips?.map((t: any) => t.driver_id) || [])
+        const activeDriverIds = new Set(activeTrips?.map((t: any) => t.motorista_id) || [])
         setAvailableDrivers(drivers.filter((d: any) => !activeDriverIds.has(d.id)))
       }
 
@@ -90,10 +90,10 @@ export function AssistanceModal({ request, isOpen, onClose, onSave }: Assistance
       if (vehicles) {
         const { data: activeTrips } = await supabase
           .from("trips")
-          .select("vehicle_id")
+          .select("veiculo_id")
           .eq("status", "inProgress")
 
-        const activeVehicleIds = new Set(activeTrips?.map((t: any) => t.vehicle_id) || [])
+        const activeVehicleIds = new Set(activeTrips?.map((t: any) => t.veiculo_id) || [])
         setAvailableVehicles(vehicles.filter((v: any) => !activeVehicleIds.has(v.id)))
       }
     } catch (error) {

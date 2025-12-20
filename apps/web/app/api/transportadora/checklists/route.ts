@@ -13,17 +13,17 @@ export async function GET(request: NextRequest) {
         const supabase = getSupabaseAdmin();
         const { searchParams } = new URL(request.url);
 
-        const driverId = searchParams.get('driver_id');
-        const vehicleId = searchParams.get('vehicle_id');
+        const driverId = searchParams.get('motorista_id');
+        const vehicleId = searchParams.get('veiculo_id');
         const status = searchParams.get('status');
         const date = searchParams.get('date');
         const limit = parseInt(searchParams.get('limit') || '50');
 
         let query = supabase
-            .from('vehicle_checklists' as any)
+            .from('veiculo_checklists' as any)
             .select(`
                 *,
-                motorista:users!driver_id(id, name, phone),
+                motorista:users!motorista_id(id, name, phone),
                 veiculo:vehicles(id, plate, model),
                 trip:trips(id, scheduled_date, route:routes(name))
             `)
@@ -31,11 +31,11 @@ export async function GET(request: NextRequest) {
             .limit(limit);
 
         if (driverId) {
-            query = query.eq('driver_id', driverId);
+            query = query.eq('motorista_id', driverId);
         }
 
         if (vehicleId) {
-            query = query.eq('vehicle_id', vehicleId);
+            query = query.eq('veiculo_id', vehicleId);
         }
 
         if (status) {
@@ -93,7 +93,7 @@ export async function PUT(request: NextRequest) {
         }
 
         const { data, error } = await supabase
-            .from('vehicle_checklists' as any)
+            .from('veiculo_checklists' as any)
             .update({
                 status,
                 reviewed_by,

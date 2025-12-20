@@ -133,7 +133,7 @@ export async function POST(req: NextRequest) {
       stop_order: s.sequence,
       stop_name: s.fullName,
       address: '',
-      passenger_id: s.id,
+      passageiro_id: s.id,
       estimated_arrival_time: s.etaMinutes,
     })),
   }

@@ -45,7 +45,7 @@ async function runDiagnostic() {
   try {
     const { data, error } = await supabaseClient
       .from('users')
-      .select('role, company_id, carrier_id')
+      .select('role, company_id, transportadora_id')
       .eq('id', results.auth.userId)
       .single();
     
@@ -53,7 +53,7 @@ async function runDiagnostic() {
     results.userInfo = data;
     console.log('✅ Role do usuário:', data.role);
     console.log('✅ Company ID:', data.company_id || 'null');
-    console.log('✅ transportadora ID:', data.carrier_id || 'null');
+    console.log('✅ transportadora ID:', data.transportadora_id || 'null');
   } catch (error) {
     results.errors.push({ step: 'userInfo', error: error.message });
     console.error('❌ Erro ao buscar informações do usuário:', error);
@@ -85,7 +85,7 @@ async function runDiagnostic() {
   try {
     const { data, error, count } = await supabaseClient
       .from('trips')
-      .select('id, vehicle_id, status', { count: 'exact' })
+      .select('id, veiculo_id, status', { count: 'exact' })
       .eq('status', 'inProgress');
     
     if (error) throw error;
@@ -104,7 +104,7 @@ async function runDiagnostic() {
   try {
     const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
     const { data, error, count } = await supabaseClient
-      .from('driver_positions')
+      .from('motorista_positions')
       .select('id, trip_id, lat, lng, timestamp', { count: 'exact' })
       .gte('timestamp', oneHourAgo);
     

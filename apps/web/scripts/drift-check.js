@@ -74,7 +74,7 @@ const TABLES_WITH_RLS = [
   'gf_report_history',
   'gf_audit_log',
   'gf_vehicle_maintenance',
-  'gf_vehicle_checklists',
+  'gf_veiculo_checklists',
   'gf_driver_documents',
 ]
 

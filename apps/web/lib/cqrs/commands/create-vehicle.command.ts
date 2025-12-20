@@ -14,8 +14,8 @@ export interface CreateVehicleCommandPayload {
   is_active?: boolean
 }
 
-export class CreateVehicleCommand {
-  readonly type = 'CreateVehicleCommand'
+export class CreateVeiculoCommand {
+  readonly type = 'CreateVeiculoCommand'
   constructor(public readonly payload: CreateVehicleCommandPayload) {}
 }
 

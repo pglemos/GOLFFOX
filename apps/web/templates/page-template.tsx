@@ -48,10 +48,10 @@ export default function PageTemplate({
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[var(--bg)]">
+      <div className="min-h-screen flex items-center justify-center bg-bg">
         <div className="text-center">
           <div className="loader-spinner mx-auto"></div>
-          <p className="mt-4 text-[var(--ink-muted)]">Carregando...</p>
+          <p className="mt-4 text-ink-muted">Carregando...</p>
         </div>
       </div>
     )
@@ -67,12 +67,12 @@ export default function PageTemplate({
       <div className="space-y-6 animate-fade-in">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="p-3 rounded-[var(--radius-lg)] bg-[var(--brand-light)]">
+            <div className="p-3 rounded-lg-custom bg-brand-light">
               {icon}
             </div>
             <div>
               <h1 className="text-4xl font-bold mb-1">{title}</h1>
-              <p className="text-[var(--ink-muted)] text-lg">{description}</p>
+              <p className="text-ink-muted text-lg">{description}</p>
             </div>
           </div>
           {showCreateButton && (

@@ -33,9 +33,9 @@ CREATE TABLE IF NOT EXISTS public.gf_operational_alerts (
   message TEXT NOT NULL,
   details JSONB DEFAULT '{}',
   company_id UUID REFERENCES public.companies(id) ON DELETE CASCADE,
-  carrier_id UUID,
+  transportadora_id UUID,
   route_id UUID REFERENCES public.routes(id) ON DELETE SET NULL,
-  vehicle_id UUID REFERENCES public.vehicles(id) ON DELETE SET NULL,
+  veiculo_id UUID REFERENCES public.vehicles(id) ON DELETE SET NULL,
   trip_id UUID REFERENCES public.trips(id) ON DELETE SET NULL,
   resolved BOOLEAN DEFAULT false,
   resolved_at TIMESTAMPTZ,
@@ -64,7 +64,7 @@ CREATE TABLE IF NOT EXISTS public.gf_audit_log (
   user_email TEXT,
   user_role TEXT,
   company_id UUID REFERENCES public.companies(id) ON DELETE SET NULL,
-  carrier_id UUID,
+  transportadora_id UUID,
   details JSONB DEFAULT '{}',
   ip_address INET,
   user_agent TEXT,
@@ -84,26 +84,26 @@ CREATE INDEX IF NOT EXISTS idx_audit_log_created ON public.gf_audit_log(created_
 COMMENT ON TABLE public.gf_audit_log IS 'Log de auditoria de todas as ações do sistema';
 
 -- ============================================================
--- 4. driver_positions - Posições GPS (alias para driver_locations)
+-- 4. motorista_positions - Posições GPS (alias para motorista_locations)
 -- ============================================================
--- Se driver_locations já existe, criar view ou garantir compatibilidade
+-- Se motorista_locations já existe, criar view ou garantir compatibilidade
 DO $$
 BEGIN
-  -- Verificar se driver_positions não existe mas driver_locations existe
+  -- Verificar se motorista_positions não existe mas motorista_locations existe
   IF NOT EXISTS (
     SELECT 1 FROM information_schema.tables 
     WHERE table_schema = 'public' 
-    AND table_name = 'driver_positions'
+    AND table_name = 'motorista_positions'
   ) AND EXISTS (
     SELECT 1 FROM information_schema.tables 
     WHERE table_schema = 'public' 
-    AND table_name = 'driver_locations'
+    AND table_name = 'motorista_locations'
   ) THEN
     -- Criar view para compatibilidade
-    CREATE OR REPLACE VIEW public.driver_positions AS
+    CREATE OR REPLACE VIEW public.motorista_positions AS
     SELECT 
       id,
-      driver_id,
+      motorista_id,
       trip_id,
       latitude,
       longitude,
@@ -112,18 +112,18 @@ BEGIN
       heading,
       accuracy,
       recorded_at
-    FROM public.driver_locations;
+    FROM public.motorista_locations;
     
-    COMMENT ON VIEW public.driver_positions IS 'View de compatibilidade para driver_locations';
+    COMMENT ON VIEW public.motorista_positions IS 'View de compatibilidade para motorista_locations';
   ELSIF NOT EXISTS (
     SELECT 1 FROM information_schema.tables 
     WHERE table_schema = 'public' 
-    AND table_name = 'driver_positions'
+    AND table_name = 'motorista_positions'
   ) THEN
-    -- Criar tabela se nem driver_locations nem driver_positions existem
-    CREATE TABLE public.driver_positions (
+    -- Criar tabela se nem motorista_locations nem motorista_positions existem
+    CREATE TABLE public.motorista_positions (
       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-      driver_id UUID REFERENCES public.users(id) ON DELETE CASCADE,
+      motorista_id UUID REFERENCES public.users(id) ON DELETE CASCADE,
       trip_id UUID REFERENCES public.trips(id) ON DELETE SET NULL,
       latitude NUMERIC NOT NULL,
       longitude NUMERIC NOT NULL,
@@ -134,45 +134,45 @@ BEGIN
       recorded_at TIMESTAMPTZ DEFAULT NOW()
     );
     
-    CREATE INDEX IF NOT EXISTS idx_driver_positions_driver ON public.driver_positions(driver_id);
-    CREATE INDEX IF NOT EXISTS idx_driver_positions_trip ON public.driver_positions(trip_id);
-    CREATE INDEX IF NOT EXISTS idx_driver_positions_recorded ON public.driver_positions(recorded_at DESC);
+    CREATE INDEX IF NOT EXISTS idx_driver_positions_driver ON public.motorista_positions(motorista_id);
+    CREATE INDEX IF NOT EXISTS idx_driver_positions_trip ON public.motorista_positions(trip_id);
+    CREATE INDEX IF NOT EXISTS idx_driver_positions_recorded ON public.motorista_positions(recorded_at DESC);
     
-    COMMENT ON TABLE public.driver_positions IS 'Posições GPS dos motoristas em tempo real';
+    COMMENT ON TABLE public.motorista_positions IS 'Posições GPS dos motoristas em tempo real';
   END IF;
 END $$;
 
 -- ============================================================
--- 5. gf_vehicle_checklists - Checklists de Veículos (se não existir)
+-- 5. gf_veiculo_checklists - Checklists de Veículos (se não existir)
 -- ============================================================
--- Verificar se vehicle_checklists existe, se sim criar alias
+-- Verificar se veiculo_checklists existe, se sim criar alias
 DO $$
 BEGIN
   IF NOT EXISTS (
     SELECT 1 FROM information_schema.tables 
     WHERE table_schema = 'public' 
-    AND table_name = 'gf_vehicle_checklists'
+    AND table_name = 'gf_veiculo_checklists'
   ) AND EXISTS (
     SELECT 1 FROM information_schema.tables 
     WHERE table_schema = 'public' 
-    AND table_name = 'vehicle_checklists'
+    AND table_name = 'veiculo_checklists'
   ) THEN
     -- Criar view para compatibilidade
-    CREATE OR REPLACE VIEW public.gf_vehicle_checklists AS
-    SELECT * FROM public.vehicle_checklists;
+    CREATE OR REPLACE VIEW public.gf_veiculo_checklists AS
+    SELECT * FROM public.veiculo_checklists;
     
-    COMMENT ON VIEW public.gf_vehicle_checklists IS 'View de compatibilidade para vehicle_checklists';
+    COMMENT ON VIEW public.gf_veiculo_checklists IS 'View de compatibilidade para veiculo_checklists';
   ELSIF NOT EXISTS (
     SELECT 1 FROM information_schema.tables 
     WHERE table_schema = 'public' 
-    AND table_name = 'gf_vehicle_checklists'
+    AND table_name = 'gf_veiculo_checklists'
   ) THEN
     -- Criar tabela se não existir
-    CREATE TABLE public.gf_vehicle_checklists (
+    CREATE TABLE public.gf_veiculo_checklists (
       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
       trip_id UUID REFERENCES public.trips(id) ON DELETE CASCADE,
-      driver_id UUID REFERENCES public.users(id) ON DELETE SET NULL,
-      vehicle_id UUID REFERENCES public.vehicles(id) ON DELETE SET NULL,
+      motorista_id UUID REFERENCES public.users(id) ON DELETE SET NULL,
+      veiculo_id UUID REFERENCES public.vehicles(id) ON DELETE SET NULL,
       items JSONB NOT NULL DEFAULT '[]',
       photos JSONB DEFAULT '[]',
       odometer_reading NUMERIC,
@@ -185,11 +185,11 @@ BEGIN
       updated_at TIMESTAMPTZ DEFAULT NOW()
     );
     
-    CREATE INDEX IF NOT EXISTS idx_gf_vehicle_checklists_trip ON public.gf_vehicle_checklists(trip_id);
-    CREATE INDEX IF NOT EXISTS idx_gf_vehicle_checklists_driver ON public.gf_vehicle_checklists(driver_id);
-    CREATE INDEX IF NOT EXISTS idx_gf_vehicle_checklists_vehicle ON public.gf_vehicle_checklists(vehicle_id);
+    CREATE INDEX IF NOT EXISTS idx_gf_vehicle_checklists_trip ON public.gf_veiculo_checklists(trip_id);
+    CREATE INDEX IF NOT EXISTS idx_gf_vehicle_checklists_driver ON public.gf_veiculo_checklists(motorista_id);
+    CREATE INDEX IF NOT EXISTS idx_gf_vehicle_checklists_vehicle ON public.gf_veiculo_checklists(veiculo_id);
     
-    COMMENT ON TABLE public.gf_vehicle_checklists IS 'Checklists de verificação pré-viagem do veículo';
+    COMMENT ON TABLE public.gf_veiculo_checklists IS 'Checklists de verificação pré-viagem do veículo';
   END IF;
 END $$;
 
@@ -247,17 +247,17 @@ CREATE TRIGGER update_operational_alerts_updated_at
   FOR EACH ROW 
   EXECUTE FUNCTION update_updated_at_column();
 
--- Trigger para gf_vehicle_checklists (se tabela existe)
+-- Trigger para gf_veiculo_checklists (se tabela existe)
 DO $$
 BEGIN
   IF EXISTS (
     SELECT 1 FROM information_schema.tables 
     WHERE table_schema = 'public' 
-    AND table_name = 'gf_vehicle_checklists'
+    AND table_name = 'gf_veiculo_checklists'
   ) THEN
-    DROP TRIGGER IF EXISTS update_gf_vehicle_checklists_updated_at ON public.gf_vehicle_checklists;
+    DROP TRIGGER IF EXISTS update_gf_vehicle_checklists_updated_at ON public.gf_veiculo_checklists;
     CREATE TRIGGER update_gf_vehicle_checklists_updated_at 
-      BEFORE UPDATE ON public.gf_vehicle_checklists
+      BEFORE UPDATE ON public.gf_veiculo_checklists
       FOR EACH ROW 
       EXECUTE FUNCTION update_updated_at_column();
   END IF;

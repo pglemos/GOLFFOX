@@ -31,14 +31,14 @@ export async function GET(request: NextRequest) {
         const supabaseAdmin = getSupabaseAdmin()
         const token = request.headers.get('authorization')?.replace('Bearer ', '')
 
-        let profile: { role: string; company_id?: string; carrier_id?: string } | null = null
+        let profile: { role: string; company_id?: string; transportadora_id?: string } | null = null
 
         if (token) {
             const { data: { user } } = await supabaseAdmin.auth.getUser(token)
             if (user) {
                 const { data: p } = await supabaseAdmin
                     .from('profiles')
-                    .select('role, company_id, carrier_id')
+                    .select('role, company_id, transportadora_id')
                     .eq('id', user.id)
                     .single()
                 profile = p
@@ -80,8 +80,8 @@ export async function GET(request: NextRequest) {
         // Aplicar filtro de tenant baseado no papel
         if (profile?.role === 'empresa' && profile.company_id) {
             query = query.eq('company_id', profile.company_id)
-        } else if ((profile?.role === 'transportadora' || profile?.role === 'operador') && profile.carrier_id) {
-            query = query.eq('carrier_id', profile.carrier_id)
+        } else if ((profile?.role === 'transportadora' || profile?.role === 'operador') && profile.transportadora_id) {
+            query = query.eq('transportadora_id', profile.transportadora_id)
         }
 
         // Aplicar filtros
@@ -141,7 +141,7 @@ export async function GET(request: NextRequest) {
         const revenues: ManualRevenue[] = (data || []).map((row: Record<string, unknown>) => ({
             id: row.id as string,
             companyId: row.company_id as string | null,
-            carrierId: row.carrier_id as string | null,
+            carrierId: row.transportadora_id as string | null,
             category: row.category as string,
             description: row.description as string,
             amount: parseFloat(row.amount as string),
@@ -190,7 +190,7 @@ export async function POST(request: NextRequest) {
         const token = request.headers.get('authorization')?.replace('Bearer ', '')
 
         let userId: string | null = null
-        let profile: { role: string; company_id?: string; carrier_id?: string } | null = null
+        let profile: { role: string; company_id?: string; transportadora_id?: string } | null = null
 
         if (token) {
             const { data: { user } } = await supabaseAdmin.auth.getUser(token)
@@ -198,7 +198,7 @@ export async function POST(request: NextRequest) {
                 userId = user.id
                 const { data: p } = await supabaseAdmin
                     .from('profiles')
-                    .select('role, company_id, carrier_id')
+                    .select('role, company_id, transportadora_id')
                     .eq('id', user.id)
                     .single()
                 profile = p
@@ -230,7 +230,7 @@ export async function POST(request: NextRequest) {
             companyId = profile.company_id
             carrierId = null
         } else if (profile?.role === 'transportadora' || profile?.role === 'operador') {
-            carrierId = profile.carrier_id
+            carrierId = profile.transportadora_id
             companyId = null
         }
 
@@ -239,7 +239,7 @@ export async function POST(request: NextRequest) {
             .from('gf_manual_revenues')
             .insert({
                 company_id: companyId,
-                carrier_id: carrierId,
+                transportadora_id: carrierId,
                 category: body.category,
                 description: body.description,
                 amount: body.amount,
@@ -272,7 +272,7 @@ export async function POST(request: NextRequest) {
         const newRevenue: ManualRevenue = {
             id: data.id,
             companyId: data.company_id,
-            carrierId: data.carrier_id,
+            carrierId: data.transportadora_id,
             category: data.category,
             description: data.description,
             amount: parseFloat(data.amount),

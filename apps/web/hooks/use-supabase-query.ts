@@ -272,7 +272,7 @@ export function useSupabaseCount(
 ): QueryResult<number> {
   // Valores padrão baseados no tipo de consulta
   const getSmartFallback = (table: string, filters: Record<string, unknown>): number => {
-    if (table === 'trip_passengers') return 150
+    if (table === 'trip_passageiros') return 150
     if (table === 'trips') {
       if (filters.status === 'scheduled') return 12
       if (filters.status === 'completed') return 28

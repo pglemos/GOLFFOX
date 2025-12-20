@@ -214,7 +214,7 @@ async function seedTrips(client, routes, vehicles, drivers) {
         // Verificar se viagem já existe
         const { rows: existing } = await client.query(
           `SELECT id FROM public.trips 
-           WHERE route_id = $1 AND vehicle_id = $2 
+           WHERE route_id = $1 AND veiculo_id = $2 
            AND DATE(scheduled_at) = $3`,
           [route.id, veiculo.id, date.toISOString().split('T')[0]]
         )
@@ -227,7 +227,7 @@ async function seedTrips(client, routes, vehicles, drivers) {
         // Criar viagem
         const { rows } = await client.query(
           `INSERT INTO public.trips (
-            route_id, vehicle_id, driver_id, status, scheduled_at, created_at
+            route_id, veiculo_id, motorista_id, status, scheduled_at, created_at
           ) VALUES ($1, $2, $3, $4, $5, NOW())
           RETURNING id`,
           [route.id, veiculo.id, motorista.id, status, scheduledTime.toISOString()]
@@ -265,8 +265,8 @@ async function seedPositions(client, tripId, vehicleId, driverId, scheduledTime)
     
     try {
       await client.query(
-        `INSERT INTO public.driver_positions (
-          trip_id, vehicle_id, driver_id, lat, lng, speed, timestamp, created_at
+        `INSERT INTO public.motorista_positions (
+          trip_id, veiculo_id, motorista_id, lat, lng, speed, timestamp, created_at
         ) VALUES ($1, $2, $3, $4, $5, $6, $7, NOW())
         ON CONFLICT DO NOTHING`,
         [tripId, vehicleId, driverId, lat, lng, speed, timestamp.toISOString()]
@@ -313,7 +313,7 @@ async function seedCosts(client, companies, routes, vehicles) {
       try {
         await client.query(
           `INSERT INTO public.gf_vehicle_costs (
-            route_id, vehicle_id, date, km, total, created_at
+            route_id, veiculo_id, date, km, total, created_at
           ) VALUES ($1, $2, $3, $4, $5, NOW())
           ON CONFLICT DO NOTHING`,
           [route.id, veiculo.id, date.toISOString().split('T')[0], km, total]

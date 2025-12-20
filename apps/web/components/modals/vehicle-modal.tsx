@@ -45,7 +45,7 @@ interface veiculo {
   photo_url?: string | null
 }
 
-interface VehicleModalProps {
+interface VeiculoModalProps {
   veiculo: veiculo | null
   isOpen: boolean
   onClose: () => void
@@ -54,7 +54,7 @@ interface VehicleModalProps {
   carriers?: { id: string, name: string }[]
 }
 
-export function VehicleModal({ veiculo, isOpen, onClose, onSave, carriers }: VehicleModalProps) {
+export function VehicleModal({ veiculo, isOpen, onClose, onSave, carriers }: VeiculoModalProps) {
   const [formData, setFormData] = useState<veiculo>({
     plate: "",
     model: "",

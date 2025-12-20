@@ -133,7 +133,7 @@ async function schedulePostHandler(request: NextRequest) {
     // Mapeamento de tipos alternativos para tipos válidos
     const reportKeyAliases: Record<string, string> = {
       'financial': 'efficiency',
-      'summary': 'driver_ranking',
+      'summary': 'motorista_ranking',
       'performance': 'efficiency',
       'operations': 'delays',
     }
@@ -146,7 +146,7 @@ async function schedulePostHandler(request: NextRequest) {
     }
 
     // Validar reportKey
-    const validReportKeys = ['delays', 'occupancy', 'not_boarded', 'efficiency', 'driver_ranking']
+    const validReportKeys = ['delays', 'occupancy', 'not_boarded', 'efficiency', 'motorista_ranking']
     if (!validReportKeys.includes(normalizedReportKey)) {
       const validAliases = Object.keys(reportKeyAliases)
       return NextResponse.json(

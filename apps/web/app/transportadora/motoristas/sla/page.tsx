@@ -8,7 +8,7 @@ import { useAuth } from "@/hooks/use-auth"
 import { Gauge, Clock, AlertTriangle, CheckCircle, TrendingUp, Users } from "lucide-react"
 import { Progress } from "@/components/ui/progress"
 
-interface DriverSLA {
+interface MotoristaSLA {
     id: string
     name: string
     on_time_rate: number
@@ -20,12 +20,12 @@ interface DriverSLA {
 
 export default function SLAMotoristaPage() {
     const { user } = useAuth()
-    const [drivers, setDrivers] = useState<DriverSLA[]>([])
+    const [drivers, setDrivers] = useState<MotoristaSLA[]>([])
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
         // Mock data
-        const mockDrivers: DriverSLA[] = [
+        const mockDrivers: MotoristaSLA[] = [
             { id: '1', name: 'João Silva', on_time_rate: 98, incidents: 0, trips_completed: 45, avg_delay_minutes: 1.2, sla_status: 'green' },
             { id: '2', name: 'Maria Santos', on_time_rate: 95, incidents: 1, trips_completed: 42, avg_delay_minutes: 2.5, sla_status: 'green' },
             { id: '3', name: 'Pedro Costa', on_time_rate: 88, incidents: 2, trips_completed: 38, avg_delay_minutes: 5.3, sla_status: 'yellow' },

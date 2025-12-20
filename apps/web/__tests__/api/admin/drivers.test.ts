@@ -72,7 +72,7 @@ describe('POST /api/admin/drivers', () => {
     expect(data.error).toBe('Transportadora é obrigatória')
   })
 
-  it('deve aceitar carrier_id como alternativa a transportadora_id', async () => {
+  it('deve aceitar transportadora_id como alternativa a transportadora_id', async () => {
     const transportadora = createTestTransportadora()
     mockSupabaseClient.setTableData('carriers', [transportadora])
 
@@ -80,7 +80,7 @@ describe('POST /api/admin/drivers', () => {
       method: 'POST',
       body: {
         name: 'Motorista Teste',
-        carrier_id: transportadora.id, // Usando carrier_id em vez de transportadora_id
+        transportadora_id: transportadora.id, // Usando transportadora_id em vez de transportadora_id
       },
     }) as NextRequest
 

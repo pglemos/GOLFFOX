@@ -44,7 +44,7 @@ export function AdvancedNavigationButton({
           longitude,
           address,
           stop_name,
-          passenger_id,
+          passageiro_id,
           estimated_arrival_time,
           gf_employee_company!inner(name)
         `)

@@ -31,14 +31,14 @@ export async function GET(request: NextRequest) {
         const supabaseAdmin = getSupabaseAdmin()
         const token = request.headers.get('authorization')?.replace('Bearer ', '')
 
-        let profile: { role: string; company_id?: string; carrier_id?: string } | null = null
+        let profile: { role: string; company_id?: string; transportadora_id?: string } | null = null
 
         if (token) {
             const { data: { user } } = await supabaseAdmin.auth.getUser(token)
             if (user) {
                 const { data: p } = await supabaseAdmin
                     .from('profiles')
-                    .select('role, company_id, carrier_id')
+                    .select('role, company_id, transportadora_id')
                     .eq('id', user.id)
                     .single()
                 profile = p
@@ -75,8 +75,8 @@ export async function GET(request: NextRequest) {
         // Aplicar filtro de tenant
         if (profile?.role === 'empresa' && profile.company_id) {
             query = query.eq('company_id', profile.company_id)
-        } else if ((profile?.role === 'transportadora' || profile?.role === 'operador') && profile.carrier_id) {
-            query = query.eq('carrier_id', profile.carrier_id)
+        } else if ((profile?.role === 'transportadora' || profile?.role === 'operador') && profile.transportadora_id) {
+            query = query.eq('transportadora_id', profile.transportadora_id)
         }
 
         const { data, error } = await query
@@ -101,7 +101,7 @@ export async function GET(request: NextRequest) {
         const budgets: Budget[] = (data || []).map((row: Record<string, unknown>) => ({
             id: row.id as string,
             companyId: row.company_id as string | null,
-            carrierId: row.carrier_id as string | null,
+            carrierId: row.transportadora_id as string | null,
             categoryId: row.category_id as string | null,
             categoryName: row.category_name as string | null,
             periodYear: row.period_year as number,
@@ -136,7 +136,7 @@ export async function POST(request: NextRequest) {
         const token = request.headers.get('authorization')?.replace('Bearer ', '')
 
         let userId: string | null = null
-        let profile: { role: string; company_id?: string; carrier_id?: string } | null = null
+        let profile: { role: string; company_id?: string; transportadora_id?: string } | null = null
 
         if (token) {
             const { data: { user } } = await supabaseAdmin.auth.getUser(token)
@@ -144,7 +144,7 @@ export async function POST(request: NextRequest) {
                 userId = user.id
                 const { data: p } = await supabaseAdmin
                     .from('profiles')
-                    .select('role, company_id, carrier_id')
+                    .select('role, company_id, transportadora_id')
                     .eq('id', user.id)
                     .single()
                 profile = p
@@ -183,7 +183,7 @@ export async function POST(request: NextRequest) {
             companyId = profile.company_id
             carrierId = null
         } else if (profile?.role === 'transportadora' || profile?.role === 'operador') {
-            carrierId = profile.carrier_id
+            carrierId = profile.transportadora_id
             companyId = null
         }
 
@@ -192,7 +192,7 @@ export async function POST(request: NextRequest) {
             .from('gf_budgets')
             .upsert({
                 company_id: companyId,
-                carrier_id: carrierId,
+                transportadora_id: carrierId,
                 category_id: body.categoryId,
                 category_name: body.categoryName,
                 period_year: body.periodYear,
@@ -202,7 +202,7 @@ export async function POST(request: NextRequest) {
                 notes: body.notes,
                 created_by: userId,
             }, {
-                onConflict: 'company_id,carrier_id,category_id,period_year,period_month'
+                onConflict: 'company_id,transportadora_id,category_id,period_year,period_month'
             })
             .select(`
         *,
@@ -222,7 +222,7 @@ export async function POST(request: NextRequest) {
         const newBudget: Budget = {
             id: data.id,
             companyId: data.company_id,
-            carrierId: data.carrier_id,
+            carrierId: data.transportadora_id,
             categoryId: data.category_id,
             categoryName: data.category_name,
             periodYear: data.period_year,

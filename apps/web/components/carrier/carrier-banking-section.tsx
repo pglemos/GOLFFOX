@@ -12,7 +12,7 @@ import {
     PixKeyType,
     BANK_ACCOUNT_TYPE_LABELS,
     PIX_KEY_TYPE_LABELS,
-    CarrierBankingData,
+    TransportadoraBankingData,
 } from "@/types/documents"
 import {
     Select,
@@ -22,14 +22,14 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 
-interface CarrierBankingSectionProps {
+interface TransportadoraBankingSectionProps {
     carrierId: string | undefined
     isEditing: boolean
-    initialData?: CarrierBankingData
-    onSave?: (data: CarrierBankingData) => void
+    initialData?: TransportadoraBankingData
+    onSave?: (data: TransportadoraBankingData) => void
 }
 
-const defaultBankingData: CarrierBankingData = {
+const defaultBankingData: TransportadoraBankingData = {
     bank_name: "",
     bank_code: "",
     bank_agency: "",
@@ -47,8 +47,8 @@ export function CarrierBankingSection({
     isEditing,
     initialData,
     onSave,
-}: CarrierBankingSectionProps) {
-    const [formData, setFormData] = useState<CarrierBankingData>(initialData || defaultBankingData)
+}: TransportadoraBankingSectionProps) {
+    const [formData, setFormData] = useState<TransportadoraBankingData>(initialData || defaultBankingData)
     const [loading, setLoading] = useState(false)
     const [saving, setSaving] = useState(false)
 

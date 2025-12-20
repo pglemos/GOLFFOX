@@ -11,11 +11,11 @@ export interface CostFilters {
   start_date?: string
   end_date?: string
   route_id?: string
-  vehicle_id?: string
-  driver_id?: string
+  veiculo_id?: string
+  motorista_id?: string
   category_id?: string
   group_name?: string
-  carrier_id?: string
+  transportadora_id?: string
   cost_center_id?: string
 }
 
@@ -198,8 +198,8 @@ export function CostFilters({
                 <Label>Veículo</Label>
                 <select
                   className="w-full px-3 py-2 rounded-lg border border-border bg-white text-sm"
-                  value={tempFilters.vehicle_id || ''}
-                  onChange={(e) => handleTempFilterChange('vehicle_id', e.target.value || undefined)}
+                  value={tempFilters.veiculo_id || ''}
+                  onChange={(e) => handleTempFilterChange('veiculo_id', e.target.value || undefined)}
                 >
                   <option value="">Todos os veículos</option>
                   {vehicles.map(veiculo => (
@@ -215,8 +215,8 @@ export function CostFilters({
                 <Label>Motorista</Label>
                 <select
                   className="w-full px-3 py-2 rounded-lg border border-border bg-white text-sm"
-                  value={tempFilters.driver_id || ''}
-                  onChange={(e) => handleTempFilterChange('driver_id', e.target.value || undefined)}
+                  value={tempFilters.motorista_id || ''}
+                  onChange={(e) => handleTempFilterChange('motorista_id', e.target.value || undefined)}
                 >
                   <option value="">Todos os motoristas</option>
                   {drivers.map(motorista => (
@@ -268,8 +268,8 @@ export function CostFilters({
                 <Label>Transportadora</Label>
                 <select
                   className="w-full px-3 py-2 rounded-lg border border-border bg-white text-sm"
-                  value={tempFilters.carrier_id || ''}
-                  onChange={(e) => handleTempFilterChange('carrier_id', e.target.value || undefined)}
+                  value={tempFilters.transportadora_id || ''}
+                  onChange={(e) => handleTempFilterChange('transportadora_id', e.target.value || undefined)}
                 >
                   <option value="">Todas as transportadoras</option>
                   {carriers.map(transportadora => (

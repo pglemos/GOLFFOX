@@ -12,7 +12,7 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url)
     const startDate = searchParams.get('start_date')
     const endDate = searchParams.get('end_date')
-    const transportadoraId = searchParams.get('transportadora_id') || searchParams.get('carrier_id') // Compatibilidade
+    const transportadoraId = searchParams.get('transportadora_id')
 
     if (!transportadoraId) {
       return NextResponse.json({ error: 'transportadora_id é obrigatório' }, { status: 400 })
@@ -36,7 +36,7 @@ export async function GET(req: NextRequest) {
       .select(`
         id,
         route_id,
-        driver_id,
+        motorista_id,
         created_at,
         completed_at,
         status,
@@ -59,7 +59,7 @@ export async function GET(req: NextRequest) {
     // Buscar passageiros por viagem
     const tripIds = trips?.map(t => t.id) || []
     const { data: passengers, error: passengersError } = await supabase
-      .from('trip_passengers')
+      .from('trip_passageiros')
       .select('trip_id')
       .in('trip_id', tripIds)
 
@@ -75,7 +75,7 @@ export async function GET(req: NextRequest) {
     const tripsData = trips?.map(trip => ({
       trip_id: trip.id,
       route_name: (trip.routes as any)?.name || 'N/A',
-      driver_name: (trip.users as any)?.name || 'N/A',
+      motorista_name: (trip.users as any)?.name || 'N/A',
       driver_email: (trip.users as any)?.email || 'N/A',
       created_at: trip.created_at,
       completed_at: trip.completed_at,

@@ -18,14 +18,14 @@ const CarrierDocumentsSection = dynamic(() => import("@/components/carrier/carri
 const CarrierBankingSection = dynamic(() => import("@/components/carrier/carrier-banking-section"), { ssr: false })
 const CarrierLegalRepSection = dynamic(() => import("@/components/carrier/carrier-legal-rep-section"), { ssr: false })
 
-interface EditCarrierModalProps {
+interface EditTransportadoraModalProps {
   transportadora: transportadora
   isOpen: boolean
   onClose: () => void
   onSave: () => void
 }
 
-export function EditCarrierModal({ transportadora, isOpen, onClose, onSave }: EditCarrierModalProps) {
+export function EditCarrierModal({ transportadora, isOpen, onClose, onSave }: EditTransportadoraModalProps) {
   const [name, setName] = useState("")
   const [address, setAddress] = useState("")
   const [phone, setPhone] = useState("")

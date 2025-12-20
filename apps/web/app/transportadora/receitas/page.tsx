@@ -62,7 +62,7 @@ export default function ReceitasPage() {
             const { data, error } = await (supabase as any)
                 .from('gf_manual_revenues')
                 .select('*')
-                .eq('carrier_id', carrierId)
+                .eq('transportadora_id', carrierId)
                 .order('created_at', { ascending: false })
 
             if (error) throw error
@@ -78,7 +78,7 @@ export default function ReceitasPage() {
         if (!carrierId) return
         try {
             const { error } = await (supabase as any).from('gf_manual_revenues').insert({
-                carrier_id: carrierId,
+                transportadora_id: carrierId,
                 description: formData.description,
                 amount: parseFloat(formData.amount),
                 type: formData.type,

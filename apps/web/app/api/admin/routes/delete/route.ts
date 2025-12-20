@@ -73,13 +73,13 @@ export async function DELETE(request: NextRequest) {
         logger.log('   ✅ Trip_summary excluído')
       }
 
-      // 2. Excluir driver_positions
+      // 2. Excluir motorista_positions
       // NOTA: O trigger trg_driver_positions_recalc_summary tentará chamar calculate_trip_summary()
       // que faz INSERT/UPDATE em trip_summary. Como trip_summary já foi excluído acima,
       // o trigger pode falhar, mas não deve bloquear a exclusão se tratarmos o erro corretamente
-      logger.log('   2. Excluindo driver_positions...')
+      logger.log('   2. Excluindo motorista_positions...')
       const { error: positionsError } = await supabaseAdmin
-        .from('driver_positions')
+        .from('motorista_positions')
         .delete()
         .in('trip_id', tripIds)
 
@@ -93,7 +93,7 @@ export async function DELETE(request: NextRequest) {
           logger.log('   ⚠️ Trigger tentou atualizar trip_summary (já excluído) - continuando...')
         } else {
           // Outro erro - logar mas continuar
-          logger.log(`   ⚠️ Aviso ao excluir driver_positions: ${positionsError.message}`)
+          logger.log(`   ⚠️ Aviso ao excluir motorista_positions: ${positionsError.message}`)
         }
       } else {
         logger.log('   ✅ Driver_positions excluído')
@@ -103,7 +103,7 @@ export async function DELETE(request: NextRequest) {
       logger.log('   3. Excluindo outras dependências de trips...')
       const dependentTables = [
         'trip_events',
-        'trip_passengers',
+        'trip_passageiros',
         'checklists',
         'passenger_reports',
         'chat_messages'

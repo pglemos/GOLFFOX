@@ -60,9 +60,9 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
         // Buscar documentos
         const { data: documents, error } = await supabaseAdmin
-            .from('gf_carrier_documents')
-            .select('id, carrier_id, document_type, document_number, expiry_date, issue_date, file_url, file_name, file_size, file_type, status, notes, created_at, updated_at')
-            .eq('carrier_id', carrierId)
+            .from('gf_transportadora_documents')
+            .select('id, transportadora_id, document_type, document_number, expiry_date, issue_date, file_url, file_name, file_size, file_type, status, notes, created_at, updated_at')
+            .eq('transportadora_id', carrierId)
             .order('document_type', { ascending: true })
 
         if (error) {
@@ -133,16 +133,16 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
         // Verificar se já existe documento do mesmo tipo
         const { data: existing } = await supabaseAdmin
-            .from('gf_carrier_documents')
+            .from('gf_transportadora_documents')
             .select('id')
-            .eq('carrier_id', carrierId)
+            .eq('transportadora_id', carrierId)
             .eq('document_type', documentData.document_type)
             .single()
 
         if (existing) {
             // Atualizar documento existente
             const { data: updated, error: updateError } = await (supabaseAdmin
-                .from('gf_carrier_documents') as any)
+                .from('gf_transportadora_documents') as any)
                 .update({
                     ...documentData,
                     updated_at: new Date().toISOString(),
@@ -164,9 +164,9 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
         // Criar novo documento
         const { data: created, error: createError } = await (supabaseAdmin
-            .from('gf_carrier_documents') as any)
+            .from('gf_transportadora_documents') as any)
             .insert({
-                carrier_id: carrierId,
+                transportadora_id: carrierId,
                 ...documentData,
             })
             .select()
@@ -212,10 +212,10 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
 
         // Verificar se documento existe e pertence à transportadora
         const { data: document, error: docError } = await supabaseAdmin
-            .from('gf_carrier_documents')
+            .from('gf_transportadora_documents')
             .select('id, file_url')
             .eq('id', documentId)
-            .eq('carrier_id', carrierId)
+            .eq('transportadora_id', carrierId)
             .single()
 
         if (docError || !document) {
@@ -227,7 +227,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
 
         // Remover do banco
         const { error: deleteError } = await supabaseAdmin
-            .from('gf_carrier_documents')
+            .from('gf_transportadora_documents')
             .delete()
             .eq('id', documentId)
 

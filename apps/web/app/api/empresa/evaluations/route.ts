@@ -14,22 +14,22 @@ export async function GET(request: NextRequest) {
         const { searchParams } = new URL(request.url);
 
         const companyId = searchParams.get('company_id');
-        const passengerId = searchParams.get('passenger_id');
+        const passengerId = searchParams.get('passageiro_id');
         const limit = parseInt(searchParams.get('limit') || '100');
 
         let query = supabase
             .from('trip_evaluations' as any)
             .select(`
                 *,
-                passageiro:users!passenger_id(id, name, email, company_id),
-                motorista:users!driver_id(id, name),
+                passageiro:users!passageiro_id(id, name, email, company_id),
+                motorista:users!motorista_id(id, name),
                 trip:trips(id, scheduled_date, route:routes(name))
             `)
             .order('created_at', { ascending: false })
             .limit(limit);
 
         if (passengerId) {
-            query = query.eq('passenger_id', passengerId);
+            query = query.eq('passageiro_id', passengerId);
         }
 
         const { data, error } = await query;

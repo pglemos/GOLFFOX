@@ -19,7 +19,6 @@ export async function POST(request: NextRequest) {
       email,
       phone,
       transportadora_id,
-      carrier_id, // Compatibilidade
       cpf,
       cnh,
       cnh_category,
@@ -38,7 +37,7 @@ export async function POST(request: NextRequest) {
       return validationErrorResponse('Nome é obrigatório')
     }
 
-    const transportadoraId = transportadora_id || carrier_id // Compatibilidade
+    const transportadoraId = transportadora_id
     if (!transportadoraId) {
       return validationErrorResponse('Transportadora é obrigatória')
     }

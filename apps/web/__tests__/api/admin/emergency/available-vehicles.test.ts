@@ -43,7 +43,7 @@ describe('GET /api/admin/emergency/available-vehicles', () => {
     
     mockSupabaseClient.setTableData('vehicles', [availableVehicle, occupiedVehicle])
     mockSupabaseClient.setTableData('trips', [
-      { id: 'trip-1', vehicle_id: occupiedVehicle.id, status: 'inProgress' },
+      { id: 'trip-1', veiculo_id: occupiedVehicle.id, status: 'inProgress' },
     ])
 
     const req = createAdminRequest({

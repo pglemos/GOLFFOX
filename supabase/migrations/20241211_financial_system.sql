@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS gf_manual_costs_v2 (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   -- Vínculo multi-tenant
   company_id UUID REFERENCES companies(id) ON DELETE CASCADE,
-  carrier_id UUID REFERENCES carriers(id) ON DELETE CASCADE,
+  transportadora_id UUID REFERENCES carriers(id) ON DELETE CASCADE,
   -- Dados do custo
   category_id UUID REFERENCES gf_cost_categories(id),
   description TEXT NOT NULL,
@@ -46,9 +46,9 @@ CREATE TABLE IF NOT EXISTS gf_manual_costs_v2 (
   recurring_end_date DATE,
   parent_recurring_id UUID REFERENCES gf_manual_costs_v2(id), -- Gerado automaticamente
   -- Vínculos operacionais (opcional)
-  vehicle_id UUID REFERENCES vehicles(id) ON DELETE SET NULL,
+  veiculo_id UUID REFERENCES vehicles(id) ON DELETE SET NULL,
   route_id UUID REFERENCES routes(id) ON DELETE SET NULL,
-  driver_id UUID REFERENCES users(id) ON DELETE SET NULL,
+  motorista_id UUID REFERENCES users(id) ON DELETE SET NULL,
   -- Documentação
   attachment_url TEXT,
   attachment_name VARCHAR(255),
@@ -61,15 +61,15 @@ CREATE TABLE IF NOT EXISTS gf_manual_costs_v2 (
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW(),
   -- Constraint: pelo menos um tenant
-  CONSTRAINT chk_tenant CHECK (company_id IS NOT NULL OR carrier_id IS NOT NULL)
+  CONSTRAINT chk_tenant CHECK (company_id IS NOT NULL OR transportadora_id IS NOT NULL)
 );
 
 -- Índices para performance
 CREATE INDEX IF NOT EXISTS idx_manual_costs_v2_company ON gf_manual_costs_v2(company_id);
-CREATE INDEX IF NOT EXISTS idx_manual_costs_v2_carrier ON gf_manual_costs_v2(carrier_id);
+CREATE INDEX IF NOT EXISTS idx_manual_costs_v2_carrier ON gf_manual_costs_v2(transportadora_id);
 CREATE INDEX IF NOT EXISTS idx_manual_costs_v2_date ON gf_manual_costs_v2(cost_date);
 CREATE INDEX IF NOT EXISTS idx_manual_costs_v2_category ON gf_manual_costs_v2(category_id);
-CREATE INDEX IF NOT EXISTS idx_manual_costs_v2_vehicle ON gf_manual_costs_v2(vehicle_id);
+CREATE INDEX IF NOT EXISTS idx_manual_costs_v2_vehicle ON gf_manual_costs_v2(veiculo_id);
 CREATE INDEX IF NOT EXISTS idx_manual_costs_v2_recurring ON gf_manual_costs_v2(is_recurring) WHERE is_recurring = true;
 
 -- ============================================================
@@ -79,7 +79,7 @@ CREATE TABLE IF NOT EXISTS gf_manual_revenues (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   -- Vínculo multi-tenant
   company_id UUID REFERENCES companies(id) ON DELETE CASCADE,
-  carrier_id UUID REFERENCES carriers(id) ON DELETE CASCADE,
+  transportadora_id UUID REFERENCES carriers(id) ON DELETE CASCADE,
   -- Dados da receita
   category VARCHAR(100) NOT NULL,
   description TEXT NOT NULL,
@@ -100,12 +100,12 @@ CREATE TABLE IF NOT EXISTS gf_manual_revenues (
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW(),
   -- Constraint: pelo menos um tenant
-  CONSTRAINT chk_revenue_tenant CHECK (company_id IS NOT NULL OR carrier_id IS NOT NULL)
+  CONSTRAINT chk_revenue_tenant CHECK (company_id IS NOT NULL OR transportadora_id IS NOT NULL)
 );
 
 -- Índices
 CREATE INDEX IF NOT EXISTS idx_revenues_company ON gf_manual_revenues(company_id);
-CREATE INDEX IF NOT EXISTS idx_revenues_carrier ON gf_manual_revenues(carrier_id);
+CREATE INDEX IF NOT EXISTS idx_revenues_carrier ON gf_manual_revenues(transportadora_id);
 CREATE INDEX IF NOT EXISTS idx_revenues_date ON gf_manual_revenues(revenue_date);
 
 -- ============================================================
@@ -115,7 +115,7 @@ CREATE TABLE IF NOT EXISTS gf_budgets (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   -- Vínculo multi-tenant
   company_id UUID REFERENCES companies(id) ON DELETE CASCADE,
-  carrier_id UUID REFERENCES carriers(id) ON DELETE CASCADE,
+  transportadora_id UUID REFERENCES carriers(id) ON DELETE CASCADE,
   -- Dados do orçamento
   category_id UUID REFERENCES gf_cost_categories(id),
   category_name VARCHAR(100), -- Fallback se não usar categoria
@@ -130,12 +130,12 @@ CREATE TABLE IF NOT EXISTS gf_budgets (
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW(),
   -- Unicidade
-  CONSTRAINT uq_budget UNIQUE NULLS NOT DISTINCT (company_id, carrier_id, category_id, period_year, period_month)
+  CONSTRAINT uq_budget UNIQUE NULLS NOT DISTINCT (company_id, transportadora_id, category_id, period_year, period_month)
 );
 
 -- Índices
 CREATE INDEX IF NOT EXISTS idx_budgets_company ON gf_budgets(company_id);
-CREATE INDEX IF NOT EXISTS idx_budgets_carrier ON gf_budgets(carrier_id);
+CREATE INDEX IF NOT EXISTS idx_budgets_carrier ON gf_budgets(transportadora_id);
 CREATE INDEX IF NOT EXISTS idx_budgets_period ON gf_budgets(period_year, period_month);
 
 -- ============================================================
@@ -145,7 +145,7 @@ CREATE TABLE IF NOT EXISTS gf_financial_forecasts (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   -- Vínculo
   company_id UUID REFERENCES companies(id) ON DELETE CASCADE,
-  carrier_id UUID REFERENCES carriers(id) ON DELETE CASCADE,
+  transportadora_id UUID REFERENCES carriers(id) ON DELETE CASCADE,
   -- Dados da projeção
   forecast_type VARCHAR(20) NOT NULL CHECK (forecast_type IN ('cost', 'revenue')),
   category_id UUID REFERENCES gf_cost_categories(id),
@@ -164,7 +164,7 @@ CREATE TABLE IF NOT EXISTS gf_financial_forecasts (
 
 -- Índices
 CREATE INDEX IF NOT EXISTS idx_forecasts_company ON gf_financial_forecasts(company_id);
-CREATE INDEX IF NOT EXISTS idx_forecasts_carrier ON gf_financial_forecasts(carrier_id);
+CREATE INDEX IF NOT EXISTS idx_forecasts_carrier ON gf_financial_forecasts(transportadora_id);
 CREATE INDEX IF NOT EXISTS idx_forecasts_period ON gf_financial_forecasts(period_year, period_month);
 
 -- ============================================================
@@ -174,7 +174,7 @@ CREATE TABLE IF NOT EXISTS gf_financial_alerts (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   -- Vínculo
   company_id UUID REFERENCES companies(id) ON DELETE CASCADE,
-  carrier_id UUID REFERENCES carriers(id) ON DELETE CASCADE,
+  transportadora_id UUID REFERENCES carriers(id) ON DELETE CASCADE,
   -- Dados do alerta
   alert_type VARCHAR(50) NOT NULL, -- 'budget_exceeded', 'unusual_expense', 'recurring_due', 'forecast_deviation'
   severity VARCHAR(20) DEFAULT 'warning' CHECK (severity IN ('info', 'warning', 'critical')),
@@ -199,7 +199,7 @@ CREATE TABLE IF NOT EXISTS gf_financial_alerts (
 
 -- Índices
 CREATE INDEX IF NOT EXISTS idx_fin_alerts_company ON gf_financial_alerts(company_id);
-CREATE INDEX IF NOT EXISTS idx_fin_alerts_carrier ON gf_financial_alerts(carrier_id);
+CREATE INDEX IF NOT EXISTS idx_fin_alerts_carrier ON gf_financial_alerts(transportadora_id);
 CREATE INDEX IF NOT EXISTS idx_fin_alerts_unread ON gf_financial_alerts(is_read) WHERE is_read = false;
 
 -- ============================================================
@@ -236,7 +236,7 @@ CREATE POLICY "costs_empresa_access" ON gf_manual_costs_v2
 
 CREATE POLICY "costs_transportadora_access" ON gf_manual_costs_v2
   FOR ALL USING (
-    carrier_id IN (SELECT carrier_id FROM profiles WHERE id = auth.uid())
+    transportadora_id IN (SELECT transportadora_id FROM profiles WHERE id = auth.uid())
   );
 
 -- Receitas: Mesma lógica dos custos
@@ -252,7 +252,7 @@ CREATE POLICY "revenues_empresa_access" ON gf_manual_revenues
 
 CREATE POLICY "revenues_transportadora_access" ON gf_manual_revenues
   FOR ALL USING (
-    carrier_id IN (SELECT carrier_id FROM profiles WHERE id = auth.uid())
+    transportadora_id IN (SELECT transportadora_id FROM profiles WHERE id = auth.uid())
   );
 
 -- Orçamentos: Mesma lógica
@@ -264,7 +264,7 @@ CREATE POLICY "budgets_admin_full" ON gf_budgets
 CREATE POLICY "budgets_tenant_access" ON gf_budgets
   FOR ALL USING (
     company_id IN (SELECT company_id FROM profiles WHERE id = auth.uid())
-    OR carrier_id IN (SELECT carrier_id FROM profiles WHERE id = auth.uid())
+    OR transportadora_id IN (SELECT transportadora_id FROM profiles WHERE id = auth.uid())
   );
 
 -- Projeções: Mesma lógica
@@ -276,7 +276,7 @@ CREATE POLICY "forecasts_admin_full" ON gf_financial_forecasts
 CREATE POLICY "forecasts_tenant_access" ON gf_financial_forecasts
   FOR ALL USING (
     company_id IN (SELECT company_id FROM profiles WHERE id = auth.uid())
-    OR carrier_id IN (SELECT carrier_id FROM profiles WHERE id = auth.uid())
+    OR transportadora_id IN (SELECT transportadora_id FROM profiles WHERE id = auth.uid())
   );
 
 -- Alertas financeiros: Mesma lógica
@@ -288,7 +288,7 @@ CREATE POLICY "fin_alerts_admin_full" ON gf_financial_alerts
 CREATE POLICY "fin_alerts_tenant_access" ON gf_financial_alerts
   FOR ALL USING (
     company_id IN (SELECT company_id FROM profiles WHERE id = auth.uid())
-    OR carrier_id IN (SELECT carrier_id FROM profiles WHERE id = auth.uid())
+    OR transportadora_id IN (SELECT transportadora_id FROM profiles WHERE id = auth.uid())
   );
 
 -- ============================================================
@@ -343,7 +343,7 @@ ON CONFLICT DO NOTHING;
 -- View: Custos vs Orçamento por mês
 CREATE OR REPLACE VIEW v_costs_vs_budget_monthly AS
 SELECT 
-  COALESCE(c.company_id, c.carrier_id) as tenant_id,
+  COALESCE(c.company_id, c.transportadora_id) as tenant_id,
   CASE WHEN c.company_id IS NOT NULL THEN 'empresa' ELSE 'transportadora' END as tenant_type,
   EXTRACT(YEAR FROM c.cost_date)::INT as period_year,
   EXTRACT(MONTH FROM c.cost_date)::INT as period_month,
@@ -362,10 +362,10 @@ LEFT JOIN gf_budgets b ON
   b.category_id = c.category_id 
   AND b.period_year = EXTRACT(YEAR FROM c.cost_date)
   AND b.period_month = EXTRACT(MONTH FROM c.cost_date)
-  AND (b.company_id = c.company_id OR b.carrier_id = c.carrier_id)
+  AND (b.company_id = c.company_id OR b.transportadora_id = c.transportadora_id)
 WHERE c.status = 'confirmed'
 GROUP BY 
-  COALESCE(c.company_id, c.carrier_id),
+  COALESCE(c.company_id, c.transportadora_id),
   CASE WHEN c.company_id IS NOT NULL THEN 'empresa' ELSE 'transportadora' END,
   EXTRACT(YEAR FROM c.cost_date),
   EXTRACT(MONTH FROM c.cost_date),
@@ -392,8 +392,8 @@ SELECT
 -- View: Custos por Veículo (Transportadora)
 CREATE OR REPLACE VIEW v_vehicle_costs_summary AS
 SELECT
-  c.carrier_id,
-  c.vehicle_id,
+  c.transportadora_id,
+  c.veiculo_id,
   v.plate as vehicle_plate,
   v.model as vehicle_model,
   EXTRACT(YEAR FROM c.cost_date)::INT as period_year,
@@ -402,10 +402,10 @@ SELECT
   COUNT(*) as entries_count,
   ARRAY_AGG(DISTINCT cat.name) as categories
 FROM gf_manual_costs_v2 c
-JOIN vehicles v ON c.vehicle_id = v.id
+JOIN vehicles v ON c.veiculo_id = v.id
 LEFT JOIN gf_cost_categories cat ON c.category_id = cat.id
-WHERE c.status = 'confirmed' AND c.vehicle_id IS NOT NULL
-GROUP BY c.carrier_id, c.vehicle_id, v.plate, v.model, EXTRACT(YEAR FROM c.cost_date), EXTRACT(MONTH FROM c.cost_date);
+WHERE c.status = 'confirmed' AND c.veiculo_id IS NOT NULL
+GROUP BY c.transportadora_id, c.veiculo_id, v.plate, v.model, EXTRACT(YEAR FROM c.cost_date), EXTRACT(MONTH FROM c.cost_date);
 
 -- ============================================================
 -- 10. FUNÇÕES PARA AUTOMAÇÕES
@@ -440,11 +440,11 @@ BEGIN
     ) THEN
       -- Criar novo custo recorrente
       INSERT INTO gf_manual_costs_v2 (
-        company_id, carrier_id, category_id, description, amount, cost_date,
+        company_id, transportadora_id, category_id, description, amount, cost_date,
         is_recurring, recurring_interval, recurring_end_date, parent_recurring_id,
-        vehicle_id, route_id, status, created_by
+        veiculo_id, route_id, status, created_by
       ) VALUES (
-        rec.company_id, rec.carrier_id, rec.category_id, rec.description, rec.amount,
+        rec.company_id, rec.transportadora_id, rec.category_id, rec.description, rec.amount,
         (CASE rec.recurring_interval
           WHEN 'daily' THEN rec.cost_date + INTERVAL '1 day'
           WHEN 'weekly' THEN rec.cost_date + INTERVAL '1 week'
@@ -453,7 +453,7 @@ BEGIN
         END)::DATE,
         false, -- Gerado não é recorrente
         NULL, NULL, rec.id,
-        rec.vehicle_id, rec.route_id, 'pending', rec.created_by
+        rec.veiculo_id, rec.route_id, 'pending', rec.created_by
       );
       generated_count := generated_count + 1;
     END IF;
@@ -480,7 +480,7 @@ BEGIN
       c.category_id = b.category_id 
       AND EXTRACT(YEAR FROM c.cost_date) = b.period_year
       AND EXTRACT(MONTH FROM c.cost_date) = b.period_month
-      AND (c.company_id = b.company_id OR c.carrier_id = b.carrier_id)
+      AND (c.company_id = b.company_id OR c.transportadora_id = b.transportadora_id)
       AND c.status = 'confirmed'
     LEFT JOIN gf_cost_categories cat ON b.category_id = cat.id
     WHERE b.period_year = EXTRACT(YEAR FROM CURRENT_DATE)
@@ -497,10 +497,10 @@ BEGIN
         AND created_at >= CURRENT_DATE - INTERVAL '7 days'
       ) THEN
         INSERT INTO gf_financial_alerts (
-          company_id, carrier_id, alert_type, severity, title, message,
+          company_id, transportadora_id, alert_type, severity, title, message,
           budget_id, category_id, threshold_value, actual_value, variance_percent
         ) VALUES (
-          rec.company_id, rec.carrier_id, 'budget_exceeded',
+          rec.company_id, rec.transportadora_id, 'budget_exceeded',
           CASE WHEN (rec.actual_spent / rec.budgeted_amount * 100) >= 100 THEN 'critical' ELSE 'warning' END,
           'Orçamento ' || rec.category_name || ' atingido',
           'O orçamento de ' || rec.category_name || ' atingiu ' || 

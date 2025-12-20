@@ -9,10 +9,10 @@
 -- ====================================================
 
 -- motorista Positions (High frequency updates)
-CREATE TABLE IF NOT EXISTS public.driver_positions (
+CREATE TABLE IF NOT EXISTS public.motorista_positions (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   trip_id UUID REFERENCES public.trips(id) ON DELETE CASCADE,
-  driver_id UUID REFERENCES public.users(id) ON DELETE SET NULL,
+  motorista_id UUID REFERENCES public.users(id) ON DELETE SET NULL,
   lat DOUBLE PRECISION NOT NULL,
   lng DOUBLE PRECISION NOT NULL,
   speed DOUBLE PRECISION,
@@ -22,8 +22,8 @@ CREATE TABLE IF NOT EXISTS public.driver_positions (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE INDEX IF NOT EXISTS idx_driver_positions_trip_id ON public.driver_positions(trip_id);
-CREATE INDEX IF NOT EXISTS idx_driver_positions_timestamp ON public.driver_positions(timestamp DESC);
+CREATE INDEX IF NOT EXISTS idx_driver_positions_trip_id ON public.motorista_positions(trip_id);
+CREATE INDEX IF NOT EXISTS idx_driver_positions_timestamp ON public.motorista_positions(timestamp DESC);
 
 -- Route Stops (Points along a route)
 CREATE TABLE IF NOT EXISTS public.route_stops (
@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS public.gf_incidents (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   company_id UUID REFERENCES public.companies(id) ON DELETE CASCADE,
   route_id UUID REFERENCES public.routes(id) ON DELETE SET NULL,
-  vehicle_id UUID REFERENCES public.vehicles(id) ON DELETE SET NULL,
+  veiculo_id UUID REFERENCES public.vehicles(id) ON DELETE SET NULL,
   severity TEXT CHECK (severity IN ('low', 'medium', 'high', 'critical')),
   description TEXT NOT NULL,
   status TEXT DEFAULT 'open' CHECK (status IN ('open', 'resolved', 'investigating')),
@@ -72,13 +72,13 @@ CREATE TABLE IF NOT EXISTS public.gf_service_requests (
 CREATE INDEX IF NOT EXISTS idx_service_requests_empresa_id ON public.gf_service_requests(empresa_id);
 
 -- Trip Passengers (Manifest)
-CREATE TABLE IF NOT EXISTS public.trip_passengers (
+CREATE TABLE IF NOT EXISTS public.trip_passageiros (
   trip_id UUID REFERENCES public.trips(id) ON DELETE CASCADE,
-  passenger_id UUID REFERENCES public.users(id) ON DELETE CASCADE,
+  passageiro_id UUID REFERENCES public.users(id) ON DELETE CASCADE,
   status TEXT DEFAULT 'scheduled' CHECK (status IN ('scheduled', 'boarded', 'no_show', 'cancelled')),
   boarded_at TIMESTAMPTZ,
   created_at TIMESTAMPTZ DEFAULT NOW(),
-  PRIMARY KEY (trip_id, passenger_id)
+  PRIMARY KEY (trip_id, passageiro_id)
 );
 
 -- Trip Events (Audit/Log)
@@ -111,11 +111,11 @@ CREATE INDEX IF NOT EXISTS idx_checklists_trip_id ON public.checklists(trip_id);
 -- View: vehicle_positions (Latest position per veiculo for Realtime)
 -- Note: This is a simplified view. In production, consider a materialized view or a separate table updated by triggers.
 CREATE OR REPLACE VIEW public.vehicle_positions AS
-SELECT DISTINCT ON (t.vehicle_id)
+SELECT DISTINCT ON (t.veiculo_id)
   dp.id,
-  t.vehicle_id,
+  t.veiculo_id,
   v.plate as license_plate,
-  u.name as driver_name,
+  u.name as motorista_name,
   dp.lat as latitude,
   dp.lng as longitude,
   CASE 
@@ -129,13 +129,13 @@ SELECT DISTINCT ON (t.vehicle_id)
   r.name as route_name,
   0 as passenger_count,
   v.capacity
-FROM driver_positions dp
+FROM motorista_positions dp
 JOIN trips t ON dp.trip_id = t.id
-JOIN vehicles v ON t.vehicle_id = v.id
-LEFT JOIN users u ON t.driver_id = u.id
+JOIN vehicles v ON t.veiculo_id = v.id
+LEFT JOIN users u ON t.motorista_id = u.id
 LEFT JOIN routes r ON t.route_id = r.id
 WHERE t.status = 'inProgress'
-ORDER BY t.vehicle_id, dp.timestamp DESC;
+ORDER BY t.veiculo_id, dp.timestamp DESC;
 
 -- View: profiles (User + Metadata wrapper)
 CREATE OR REPLACE VIEW public.profiles AS
@@ -145,7 +145,7 @@ SELECT
   name,
   role,
   company_id,
-  carrier_id,
+  transportadora_id,
   created_at,
   updated_at
 FROM users;
@@ -169,32 +169,32 @@ SELECT
   c.source,
   c.notes,
   c.route_id,
-  c.vehicle_id,
-  c.driver_id,
+  c.veiculo_id,
+  c.motorista_id,
   c.cost_category_id
 FROM gf_costs c
 JOIN companies comp ON c.company_id = comp.id
 JOIN gf_cost_categories cat ON c.cost_category_id = cat.id
 LEFT JOIN routes r ON c.route_id = r.id
-LEFT JOIN vehicles v ON c.vehicle_id = v.id
-LEFT JOIN users u ON c.driver_id = u.id;
+LEFT JOIN vehicles v ON c.veiculo_id = v.id
+LEFT JOIN users u ON c.motorista_id = u.id;
 
 -- ====================================================
 -- PART 3: RLS POLICIES FOR NEW TABLES
 -- ====================================================
 
-ALTER TABLE public.driver_positions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.motorista_positions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.route_stops ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.gf_incidents ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.gf_service_requests ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.trip_passengers ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.trip_passageiros ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.trip_events ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.checklists ENABLE ROW LEVEL SECURITY;
 
 -- motorista Positions: Service role full access, drivers can insert, others read via trips
-CREATE POLICY "Service role full access on driver_positions" ON public.driver_positions FOR ALL TO service_role USING (true) WITH CHECK (true);
-CREATE POLICY "Drivers can insert their positions" ON public.driver_positions FOR INSERT TO authenticated WITH CHECK (driver_id = auth.uid());
-CREATE POLICY "Users can read positions for their company trips" ON public.driver_positions FOR SELECT TO authenticated USING (
+CREATE POLICY "Service role full access on motorista_positions" ON public.motorista_positions FOR ALL TO service_role USING (true) WITH CHECK (true);
+CREATE POLICY "Drivers can insert their positions" ON public.motorista_positions FOR INSERT TO authenticated WITH CHECK (motorista_id = auth.uid());
+CREATE POLICY "Users can read positions for their company trips" ON public.motorista_positions FOR SELECT TO authenticated USING (
   trip_id IN (SELECT id FROM trips WHERE route_id IN (SELECT id FROM routes WHERE company_id IN (SELECT company_id FROM users WHERE id = auth.uid())))
 );
 

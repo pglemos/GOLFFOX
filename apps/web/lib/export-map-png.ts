@@ -17,7 +17,7 @@ export async function exportMapPNG(containerId: string = 'map-container'): Promi
 
     // Mostrar loading
     const loadingToast = document.createElement('div')
-    loadingToast.className = 'fixed top-4 right-4 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg z-50'
+    loadingToast.className = 'fixed top-4 right-4 bg-info text-white px-4 py-2 rounded-lg shadow-lg z-50'
     loadingToast.textContent = 'Exportando mapa...'
     document.body.appendChild(loadingToast)
 
@@ -50,7 +50,7 @@ export async function exportMapPNG(containerId: string = 'map-container'): Promi
 
       // Mostrar sucesso
       const successToast = document.createElement('div')
-      successToast.className = 'fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50'
+      successToast.className = 'fixed top-4 right-4 bg-success text-white px-4 py-2 rounded-lg shadow-lg z-50'
       successToast.textContent = 'Mapa exportado com sucesso!'
       document.body.appendChild(successToast)
       setTimeout(() => {
@@ -62,7 +62,7 @@ export async function exportMapPNG(containerId: string = 'map-container'): Promi
       
       // Mostrar erro
       const errorToast = document.createElement('div')
-      errorToast.className = 'fixed top-4 right-4 bg-red-500 text-white px-4 py-2 rounded-lg shadow-lg z-50'
+      errorToast.className = 'fixed top-4 right-4 bg-error text-white px-4 py-2 rounded-lg shadow-lg z-50'
       errorToast.textContent = `Erro ao exportar: ${error.message}`
       document.body.appendChild(errorToast)
       setTimeout(() => {

@@ -25,7 +25,7 @@ import { useAuth } from "@/hooks/use-auth"
 
 const Link: any = require("next/link")
 
-interface DriverMetrics {
+interface MotoristaMetrics {
   id: string
   name: string
   email: string
@@ -43,7 +43,7 @@ interface DriverMetrics {
 
 export default function MotoristasPage() {
   const { user } = useAuth()
-  const [drivers, setDrivers] = useState<DriverMetrics[]>([])
+  const [drivers, setDrivers] = useState<MotoristaMetrics[]>([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedDriver, setSelectedDriver] = useState<string | null>(null)
@@ -65,7 +65,7 @@ export default function MotoristasPage() {
       setLoading(true)
       const response = await fetch('/api/transportadora/motoristas')
       const result = await response.json()
-      const apiDrivers: DriverMetrics[] = result.drivers
+      const apiDrivers: MotoristaMetrics[] = result.drivers
       setDrivers(apiDrivers)
 
       // Calcular viagens do dia

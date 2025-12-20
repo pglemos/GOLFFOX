@@ -60,8 +60,8 @@ export default function ScanScreen() {
             // Usar serviço correto
             const { createPassengerCheckin } = await import('../../src/services/supabase');
             await createPassengerCheckin({
-                passenger_id: selectedPassenger.id !== 'new' ? selectedPassenger.id : undefined,
-                driver_id: profile?.id || '',
+                passageiro_id: selectedPassenger.id !== 'new' ? selectedPassenger.id : undefined,
+                motorista_id: profile?.id || '',
                 type: selectedPassenger.checkedIn ? 'dropoff' : 'boarding',
                 method: mode,
                 passenger_identifier: selectedPassenger.identifier,

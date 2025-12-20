@@ -4,7 +4,7 @@
  * Evento de domínio disparado quando um veículo é atualizado
  */
 
-export interface VehicleUpdatedEventData {
+export interface VeiculoUpdatedEventData {
   vehicleId: string
   changes: Record<string, unknown>
   updatedBy: string
@@ -16,7 +16,7 @@ export class VehicleUpdatedEvent {
   readonly eventType = 'VehicleUpdated'
   readonly occurredAt: Date
 
-  constructor(public readonly data: VehicleUpdatedEventData) {
+  constructor(public readonly data: VeiculoUpdatedEventData) {
     this.eventId = crypto.randomUUID()
     this.occurredAt = new Date()
   }

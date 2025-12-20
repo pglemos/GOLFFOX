@@ -42,11 +42,11 @@ export async function GET(
     if (authErrorResponse) return authErrorResponse
 
     // Selecionar apenas colunas necessárias para listagem (otimização de performance)
-    const maintenanceColumns = 'id,vehicle_id,maintenance_type,scheduled_date,completed_date,next_maintenance_date,odometer_km,description,cost_parts_brl,cost_labor_brl,workshop_name,mechanic_name,status,notes,created_at,updated_at'
+    const maintenanceColumns = 'id,veiculo_id,maintenance_type,scheduled_date,completed_date,next_maintenance_date,odometer_km,description,cost_parts_brl,cost_labor_brl,workshop_name,mechanic_name,status,notes,created_at,updated_at'
     const { data, error } = await supabaseServiceRole
       .from('vehicle_maintenances')
       .select(maintenanceColumns)
-      .eq('vehicle_id', params.vehicleId)
+      .eq('veiculo_id', params.vehicleId)
       .order('created_at', { ascending: false })
 
     if (error) {
@@ -82,7 +82,7 @@ export async function POST(
     const { data, error } = await supabaseServiceRole
       .from('vehicle_maintenances')
       .insert({
-        vehicle_id: params.vehicleId,
+        veiculo_id: params.vehicleId,
         ...validated,
         scheduled_date: validated.scheduled_date || null,
         completed_date: validated.completed_date || null,

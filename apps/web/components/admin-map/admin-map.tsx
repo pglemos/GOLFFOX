@@ -54,12 +54,12 @@ export interface AdminMapProps {
 
 // Interfaces exportadas
 export interface veiculo {
-  vehicle_id: string
+  veiculo_id: string
   trip_id: string
   route_id: string
   route_name: string
-  driver_id: string
-  driver_name: string
+  motorista_id: string
+  motorista_name: string
   company_id: string
   company_name: string
   plate: string
@@ -89,7 +89,7 @@ export interface Alert {
   alert_type: 'incident' | 'assistance'
   company_id: string
   route_id?: string
-  vehicle_id?: string
+  veiculo_id?: string
   severity: 'low' | 'medium' | 'high' | 'critical'
   lat?: number
   lng?: number
@@ -126,7 +126,7 @@ export function AdminMap({
   const [selectedAlert, setSelectedAlert] = useState<Alert | null>(null)
   const [mode, setMode] = useState<'live' | 'history'>('live')
   const [historicalTrajectories, setHistoricalTrajectories] = useState<Array<{
-    vehicle_id: string
+    veiculo_id: string
     trip_id: string
     positions: Array<{ lat: number; lng: number; timestamp: Date }>
     color?: string
@@ -607,22 +607,22 @@ export function AdminMap({
           .from('trips')
           .select(`
             id,
-            vehicle_id,
-            driver_id,
+            veiculo_id,
+            motorista_id,
             route_id,
             status,
             routes(name),
             users!trips_driver_id_fkey(id, name)
           `)
-          .in('vehicle_id', vehicleIds)
+          .in('veiculo_id', vehicleIds)
           .eq('status', 'inProgress')
         
-        // Mapear trips por vehicle_id
+        // Mapear trips por veiculo_id
         const tripsByVehicle = new Map()
         if (activeTrips) {
           activeTrips.forEach((trip: any) => {
-            if (!tripsByVehicle.has(trip.vehicle_id)) {
-              tripsByVehicle.set(trip.vehicle_id, trip)
+            if (!tripsByVehicle.has(trip.veiculo_id)) {
+              tripsByVehicle.set(trip.veiculo_id, trip)
             }
           })
         }
@@ -635,43 +635,43 @@ export function AdminMap({
           // Buscar posições recentes (últimas 5 minutos) primeiro
           const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString()
           const { data: recentPositions } = await supabase
-            .from('driver_positions')
+            .from('motorista_positions')
             .select('trip_id, lat, lng, speed, timestamp')
             .in('trip_id', tripIds)
             .gte('timestamp', fiveMinutesAgo)
             .order('timestamp', { ascending: false })
           
           if (recentPositions && recentPositions.length > 0) {
-            // Mapear posições para vehicle_id via trips
-            const tripToVehicle = new Map(activeTrips?.map((t: any) => [t.id, t.vehicle_id]) || [])
+            // Mapear posições para veiculo_id via trips
+            const tripToVehicle = new Map(activeTrips?.map((t: any) => [t.id, t.veiculo_id]) || [])
             lastPositions = recentPositions.map((pos: any) => ({
               ...pos,
-              vehicle_id: tripToVehicle.get(pos.trip_id)
+              veiculo_id: tripToVehicle.get(pos.trip_id)
             }))
           } else {
             // Se não há posições recentes, buscar últimas posições conhecidas
             const { data: allPositions } = await supabase
-              .from('driver_positions')
+              .from('motorista_positions')
               .select('trip_id, lat, lng, speed, timestamp')
               .in('trip_id', tripIds)
               .order('timestamp', { ascending: false })
               .limit(tripIds.length * 10)
             
             if (allPositions) {
-              const tripToVehicle = new Map(activeTrips?.map((t: any) => [t.id, t.vehicle_id]) || [])
+              const tripToVehicle = new Map(activeTrips?.map((t: any) => [t.id, t.veiculo_id]) || [])
               lastPositions = allPositions.map((pos: any) => ({
                 ...pos,
-                vehicle_id: tripToVehicle.get(pos.trip_id)
+                veiculo_id: tripToVehicle.get(pos.trip_id)
               }))
             }
           }
         }
         
-        // Agrupar posições por vehicle_id e pegar a mais recente
+        // Agrupar posições por veiculo_id e pegar a mais recente
         const positionsByVehicle = new Map()
         lastPositions.forEach((pos: any) => {
-          if (pos.vehicle_id && !positionsByVehicle.has(pos.vehicle_id)) {
-            positionsByVehicle.set(pos.vehicle_id, pos)
+          if (pos.veiculo_id && !positionsByVehicle.has(pos.veiculo_id)) {
+            positionsByVehicle.set(pos.veiculo_id, pos)
           }
         })
         
@@ -714,7 +714,7 @@ export function AdminMap({
           // Ele aparecerá na lista de veículos mesmo sem posição no mapa
           
           return {
-            vehicle_id: v.id,
+            veiculo_id: v.id,
             plate: v.plate,
             model: v.model || '',
             company_id: v.company_id,
@@ -722,14 +722,14 @@ export function AdminMap({
             trip_id: trip?.id || null,
             route_id: trip?.route_id || null,
             route_name: trip?.routes?.name || 'Sem rota ativa',
-            driver_id: trip?.driver_id || null,
-            driver_name: trip?.users?.name || 'Sem motorista',
+            motorista_id: trip?.motorista_id || null,
+            motorista_name: trip?.users?.name || 'Sem motorista',
             lat: lat,
             lng: lng,
             speed: lastPos?.speed || null,
             heading: heading,
             vehicle_status: vehicleStatus,
-            passenger_count: 0, // Seria necessário buscar de trip_passengers
+            passenger_count: 0, // Seria necessário buscar de trip_passageiros
             last_position_time: lastPos?.timestamp || null,
           }
         })
@@ -749,7 +749,7 @@ export function AdminMap({
         totalRetornado: finalVehiclesData?.length || 0,
         erro: vehiclesError?.message || null,
         primeirosVeiculos: finalVehiclesData?.slice(0, 2).map((v: any) => ({
-          vehicle_id: v.vehicle_id,
+          veiculo_id: v.veiculo_id,
           plate: v.plate,
           lat: v.lat,
           lng: v.lng,
@@ -771,7 +771,7 @@ export function AdminMap({
               }
             } else {
               // Veículo sem coordenadas - ainda assim incluir
-              debug(`Veículo ${v.plate} (${v.vehicle_id}) sem coordenadas GPS - será exibido como "na garagem"`, { vehicleId: v.vehicle_id, plate: v.plate }, 'AdminMap')
+              debug(`Veículo ${v.plate} (${v.veiculo_id}) sem coordenadas GPS - será exibido como "na garagem"`, { vehicleId: v.veiculo_id, plate: v.plate }, 'AdminMap')
               v.lat = null
               v.lng = null
               v.vehicle_status = 'garage'
@@ -853,7 +853,7 @@ export function AdminMap({
         try {
           let incidentsQuery = supabase
             .from('gf_incidents')
-            .select('id, company_id, route_id, vehicle_id, severity, description, created_at, status')
+            .select('id, company_id, route_id, veiculo_id, severity, description, created_at, status')
             .eq('status', 'open')
 
           if (filters.company) {
@@ -927,7 +927,7 @@ export function AdminMap({
             alert_type: 'incident',
             company_id: i.company_id,
             route_id: i.route_id,
-            vehicle_id: i.vehicle_id,
+            veiculo_id: i.veiculo_id,
             severity: i.severity,
             lat: null, // gf_incidents não tem coluna lat
             lng: null, // gf_incidents não tem coluna lng
@@ -945,7 +945,7 @@ export function AdminMap({
               alert_type: 'assistance',
               company_id: a.empresa_id,
               route_id: a.route_id,
-              vehicle_id: payload.vehicle_id ?? null,
+              veiculo_id: payload.veiculo_id ?? null,
               severity: payload.severity ?? 'high',
               lat,
               lng,
@@ -1026,7 +1026,7 @@ export function AdminMap({
     if (update.type === 'position') {
       setVehicles((prev) => {
         const index = prev.findIndex(
-          (v) => v.vehicle_id === update.data.vehicle_id
+          (v) => v.veiculo_id === update.data.veiculo_id
         )
         if (index >= 0) {
           const updated = [...prev]
@@ -1034,7 +1034,7 @@ export function AdminMap({
           
           // Validar coordenadas antes de atualizar
           if (!isValidCoordinate(update.data.lat, update.data.lng)) {
-            warn(`Coordenadas inválidas recebidas para veículo ${update.data.vehicle_id}`, { lat: update.data.lat, lng: update.data.lng }, 'AdminMap')
+            warn(`Coordenadas inválidas recebidas para veículo ${update.data.veiculo_id}`, { lat: update.data.lat, lng: update.data.lng }, 'AdminMap')
             return prev // Não atualizar se coordenadas inválidas
           }
           
@@ -1075,7 +1075,7 @@ export function AdminMap({
                   // Criar alerta se desviou
                   if (deviation.isDeviated) {
                     const isCritical = deviation.distance > 500
-                    const deviationKey = `${veiculo.vehicle_id}-${route.route_id}-${Math.floor(deviation.distance / 100)}`
+                    const deviationKey = `${veiculo.veiculo_id}-${route.route_id}-${Math.floor(deviation.distance / 100)}`
                     
                     createAlert({
                       type: 'route_deviation',
@@ -1083,7 +1083,7 @@ export function AdminMap({
                       title: `Veículo fora de rota: ${veiculo.plate}`,
                       message: `Veículo ${veiculo.plate} está ${Math.round(deviation.distance)}m fora da rota planejada.`,
                       metadata: {
-                        vehicle_id: veiculo.vehicle_id,
+                        veiculo_id: veiculo.veiculo_id,
                         route_id: veiculo.route_id,
                         distance: deviation.distance,
                         lat: update.data.lat,
@@ -1229,16 +1229,16 @@ export function AdminMap({
 
     // Agrupar posições por veículo e trip para criar trajetos
     const trajectoriesMap = new Map<string, {
-      vehicle_id: string
+      veiculo_id: string
       trip_id: string
       positions: Array<{ lat: number; lng: number; timestamp: Date }>
     }>()
 
     positions.forEach((pos) => {
-      const key = `${pos.vehicle_id}-${pos.trip_id}`
+      const key = `${pos.veiculo_id}-${pos.trip_id}`
       if (!trajectoriesMap.has(key)) {
         trajectoriesMap.set(key, {
-          vehicle_id: pos.vehicle_id,
+          veiculo_id: pos.veiculo_id,
           trip_id: pos.trip_id,
           positions: [],
         })
@@ -1301,7 +1301,7 @@ export function AdminMap({
       const positions = await playbackServiceRef.current.loadPositions(
         null,
         veiculo.route_id,
-        veiculo.vehicle_id,
+        veiculo.veiculo_id,
         from,
         to,
         1
@@ -1333,7 +1333,7 @@ export function AdminMap({
       
       // Mostrar trajeto no mapa
       const trajectory = {
-        vehicle_id: veiculo.vehicle_id,
+        veiculo_id: veiculo.veiculo_id,
         trip_id: veiculo.trip_id,
         positions: positions.map((p) => ({
           lat: p.lat,
@@ -1382,7 +1382,7 @@ export function AdminMap({
       const positions = await playbackServiceRef.current.loadPositions(
         null,
         veiculo.route_id || null,
-        veiculo.vehicle_id,
+        veiculo.veiculo_id,
         from,
         to,
         1
@@ -1390,7 +1390,7 @@ export function AdminMap({
 
       if (positions.length > 0) {
         const trajectory = {
-          vehicle_id: veiculo.vehicle_id,
+          veiculo_id: veiculo.veiculo_id,
           trip_id: veiculo.trip_id,
           positions: positions.map((p) => ({
             lat: p.lat,
@@ -1514,8 +1514,8 @@ export function AdminMap({
           empresa_id: veiculo.company_id,
           tipo: 'socorro',
           payload: {
-            vehicle_id: veiculo.vehicle_id,
-            driver_id: veiculo.driver_id,
+            veiculo_id: veiculo.veiculo_id,
+            motorista_id: veiculo.motorista_id,
             route_id: veiculo.route_id,
             latitude: veiculo.lat,
             longitude: veiculo.lng,
@@ -1562,7 +1562,7 @@ export function AdminMap({
             v.plate,
             v.model,
             v.route_name || 'N/A',
-            v.driver_name || 'N/A',
+            v.motorista_name || 'N/A',
             v.lat?.toFixed(6) || '0',
             v.lng?.toFixed(6) || '0',
             v.speed?.toString() || '0',
@@ -1591,8 +1591,8 @@ export function AdminMap({
     const params = new URLSearchParams()
     if (filters.company) params.set('company_id', filters.company)
     if (filters.route) params.set('route_id', filters.route)
-    if (filters.veiculo) params.set('vehicle_id', filters.veiculo)
-    if (filters.motorista) params.set('driver_id', filters.motorista)
+    if (filters.veiculo) params.set('veiculo_id', filters.veiculo)
+    if (filters.motorista) params.set('motorista_id', filters.motorista)
     if (filters.status) params.set('status', filters.status)
     if (filters.shift) params.set('shift', filters.shift)
     
@@ -1688,7 +1688,7 @@ export function AdminMap({
                 to: playbackTo,
                 onPositionUpdate: (position, timestamp) => {
                   // Atualizar marcador do veículo no mapa
-                  const marker = markersRef.current.get(position.vehicle_id)
+                  const marker = markersRef.current.get(position.veiculo_id)
                   if (marker && mapInstanceRef.current) {
                     marker.setPosition({ lat: position.lat, lng: position.lng })
                     if (position.heading !== null) {
@@ -1718,16 +1718,16 @@ export function AdminMap({
                         position: { lat: position.lat, lng: position.lng },
                         map: mapInstanceRef.current,
                         icon,
-                        title: `Veículo ${position.vehicle_id}`,
+                        title: `Veículo ${position.veiculo_id}`,
                       })
 
-                      markersRef.current.set(position.vehicle_id, newMarker)
+                      markersRef.current.set(position.veiculo_id, newMarker)
                     }
                   }
 
                   // Atualizar veículo no estado (ou criar se não existir)
                   setVehicles((prev) => {
-                    const index = prev.findIndex(v => v.vehicle_id === position.vehicle_id)
+                    const index = prev.findIndex(v => v.veiculo_id === position.veiculo_id)
                     if (index >= 0) {
                       const updated = [...prev]
                       updated[index] = {
@@ -1742,12 +1742,12 @@ export function AdminMap({
                     } else {
                       // Criar veículo básico se não existir
                       return [...prev, {
-                        vehicle_id: position.vehicle_id,
+                        veiculo_id: position.veiculo_id,
                         trip_id: position.trip_id,
                         route_id: position.route_id,
                         route_name: 'Rota',
-                        driver_id: position.driver_id,
-                        driver_name: 'Motorista',
+                        motorista_id: position.motorista_id,
+                        motorista_name: 'Motorista',
                         company_id: filters.company || '',
                         company_name: '',
                         plate: 'VEÍCULO',
@@ -1823,7 +1823,7 @@ export function AdminMap({
                 // Confirmar despacho
                 const confirmed = window.confirm(
                   `Despachar socorro para o veículo ${selectedVehicle.plate}?\n\n` +
-                  `Motorista: ${selectedVehicle.driver_name}\n` +
+                  `Motorista: ${selectedVehicle.motorista_name}\n` +
                   `Rota: ${selectedVehicle.route_name}\n` +
                   `Posição: ${selectedVehicle.lat.toFixed(6)}, ${selectedVehicle.lng.toFixed(6)}`
                 )
@@ -1950,7 +1950,7 @@ export function AdminMap({
             {vehicles.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {vehicles.map((veiculo) => (
-                  <Card key={veiculo.vehicle_id} className="p-4 hover:shadow-md transition-shadow">
+                  <Card key={veiculo.veiculo_id} className="p-4 hover:shadow-md transition-shadow">
                     <div className="flex items-start justify-between mb-2">
                       <div>
                         <h4 className="font-semibold">{veiculo.plate}</h4>
@@ -1968,7 +1968,7 @@ export function AdminMap({
                     </div>
                     <div className="text-sm text-ink-muted space-y-1">
                       <p>Rota: {veiculo.route_name || 'N/D'}</p>
-                      <p>Motorista: {veiculo.driver_name || 'N/D'}</p>
+                      <p>Motorista: {veiculo.motorista_name || 'N/D'}</p>
                       <p>Posição: {veiculo.lat?.toFixed(4)}, {veiculo.lng?.toFixed(4)}</p>
                       <p>Velocidade: {veiculo.speed ? `${(veiculo.speed * 3.6).toFixed(0)} km/h` : 'N/D'}</p>
                       <p>Passageiros: {veiculo.passenger_count || 0}</p>

@@ -105,8 +105,8 @@ export async function POST(req: NextRequest) {
         .insert({
           company_id: route.company_id,
           route_id: routeId,
-          vehicle_id: vehicleId,
-          driver_id: driverId,
+          veiculo_id: vehicleId,
+          motorista_id: driverId,
           severity: 'critical',
           status: 'open',
           description: `Despacho de socorro para a rota ${route.name}`

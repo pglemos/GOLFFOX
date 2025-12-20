@@ -210,7 +210,7 @@ export default function TransportadoraVeiculosPage() {
             const { data: lastMaintenance } = await supabase
               .from('vehicle_maintenances')
               .select('*')
-              .eq('vehicle_id', v.id)
+              .eq('veiculo_id', v.id)
               .order('completed_date', { ascending: false })
               .order('scheduled_date', { ascending: false })
               .limit(1)
@@ -448,7 +448,7 @@ export default function TransportadoraVeiculosPage() {
                             className="flex-1"
                             onClick={(e) => {
                               e.stopPropagation()
-                              router.push(`/transportadora/mapa?vehicle_id=${veiculo.id}`)
+                              router.push(`/transportadora/mapa?veiculo_id=${veiculo.id}`)
                             }}
                           >
                             <MapPin className="h-4 w-4 mr-1" />
@@ -533,7 +533,7 @@ export default function TransportadoraVeiculosPage() {
                             size="sm"
                             onClick={(e) => {
                               e.stopPropagation()
-                              router.push(`/transportadora/mapa?vehicle_id=${veiculo.id}`)
+                              router.push(`/transportadora/mapa?veiculo_id=${veiculo.id}`)
                             }}
                           >
                             <MapPin className="h-4 w-4 mr-2" />

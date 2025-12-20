@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
         const supabase = getSupabaseAdmin();
         const { searchParams } = new URL(request.url);
 
-        const driverId = searchParams.get('driver_id');
+        const driverId = searchParams.get('motorista_id');
         const tripId = searchParams.get('trip_id');
         const minScore = searchParams.get('min_score');
         const maxScore = searchParams.get('max_score');
@@ -23,15 +23,15 @@ export async function GET(request: NextRequest) {
             .from('trip_evaluations' as any)
             .select(`
                 *,
-                passageiro:users!passenger_id(id, name, email),
-                motorista:users!driver_id(id, name),
+                passageiro:users!passageiro_id(id, name, email),
+                motorista:users!motorista_id(id, name),
                 trip:trips(id, scheduled_date, route:routes(name))
             `)
             .order('created_at', { ascending: false })
             .limit(limit);
 
         if (driverId) {
-            query = query.eq('driver_id', driverId);
+            query = query.eq('motorista_id', driverId);
         }
 
         if (tripId) {

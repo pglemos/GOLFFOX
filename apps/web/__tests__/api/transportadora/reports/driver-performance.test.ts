@@ -23,7 +23,7 @@ describe('GET /api/transportadora/reports/motorista-performance', () => {
     mockSupabaseClient.setTableData('users', [motorista])
     mockSupabaseClient.setTableData('gf_gamification_scores', [
       {
-        driver_id: motorista.id,
+        motorista_id: motorista.id,
         trips_completed: 10,
         total_points: 500,
         average_rating: 4.5,
@@ -82,7 +82,7 @@ describe('GET /api/transportadora/reports/motorista-performance', () => {
     expect(data.error).toBe('transportadora_id é obrigatório')
   })
 
-  it('deve aceitar carrier_id como alternativa', async () => {
+  it('deve aceitar transportadora_id como alternativa', async () => {
     const transportadora = createTestTransportadora()
     mockSupabaseClient.setTableData('users', [])
     mockSupabaseClient.setTableData('gf_gamification_scores', [])
@@ -91,7 +91,7 @@ describe('GET /api/transportadora/reports/motorista-performance', () => {
 
     const req = createTransportadoraRequest({
       method: 'GET',
-      url: `http://localhost:3000/api/transportadora/reports/motorista-performance?carrier_id=${transportadora.id}`,
+      url: `http://localhost:3000/api/transportadora/reports/motorista-performance?transportadora_id=${transportadora.id}`,
     }) as NextRequest
 
     const response = await GET(req)

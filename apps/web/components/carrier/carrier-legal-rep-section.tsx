@@ -11,18 +11,18 @@ import { DocumentCard } from "@/components/ui/document-card"
 import { useFileUpload } from "@/hooks/use-file-upload"
 import { notifySuccess, notifyError } from "@/lib/toast"
 import {
-    CarrierLegalRepData,
-    CARRIER_DOCUMENT_LABELS,
+    TransportadoraLegalRepData,
+    TRANSPORTADORA_DOCUMENT_LABELS,
 } from "@/types/documents"
 
-interface CarrierLegalRepSectionProps {
+interface TransportadoraLegalRepSectionProps {
     carrierId: string | undefined
     isEditing: boolean
-    initialData?: CarrierLegalRepData
-    onSave?: (data: CarrierLegalRepData) => void
+    initialData?: TransportadoraLegalRepData
+    onSave?: (data: TransportadoraLegalRepData) => void
 }
 
-const defaultLegalRepData: CarrierLegalRepData = {
+const defaultLegalRepData: TransportadoraLegalRepData = {
     legal_rep_name: "",
     legal_rep_cpf: "",
     legal_rep_rg: "",
@@ -38,8 +38,8 @@ export function CarrierLegalRepSection({
     isEditing,
     initialData,
     onSave,
-}: CarrierLegalRepSectionProps) {
-    const [formData, setFormData] = useState<CarrierLegalRepData>(initialData || defaultLegalRepData)
+}: TransportadoraLegalRepSectionProps) {
+    const [formData, setFormData] = useState<TransportadoraLegalRepData>(initialData || defaultLegalRepData)
     const [loading, setLoading] = useState(false)
     const [saving, setSaving] = useState(false)
     const [cnhDocument, setCnhDocument] = useState<{ file_url?: string; file_name?: string } | null>(null)
@@ -279,7 +279,7 @@ export function CarrierLegalRepSection({
                     <div className="space-y-4">
                         <DocumentCard
                             documentType="legal_rep_cnh"
-                            documentLabel={CARRIER_DOCUMENT_LABELS.legal_rep_cnh}
+                            documentLabel={TRANSPORTADORA_DOCUMENT_LABELS.legal_rep_cnh}
                             fileUrl={cnhDocument.file_url}
                             fileName={cnhDocument.file_name}
                             status="valid"

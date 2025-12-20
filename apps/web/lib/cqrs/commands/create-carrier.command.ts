@@ -13,8 +13,8 @@ export interface CreateCarrierCommandPayload {
   is_active?: boolean
 }
 
-export class CreateCarrierCommand {
-  readonly type = 'CreateCarrierCommand'
+export class CreateTransportadoraCommand {
+  readonly type = 'CreateTransportadoraCommand'
   constructor(public readonly payload: CreateCarrierCommandPayload) {}
 }
 

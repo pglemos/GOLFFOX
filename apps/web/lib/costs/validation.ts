@@ -5,10 +5,10 @@ import { z } from 'zod'
  */
 export const costSchema = z.object({
   company_id: z.string().uuid('ID da empresa inválido'),
-  carrier_id: z.string().uuid('ID da transportadora inválido').optional().nullable(),
+  transportadora_id: z.string().uuid('ID da transportadora inválido').optional().nullable(),
   route_id: z.string().uuid('ID da rota inválido').optional().nullable(),
-  vehicle_id: z.string().uuid('ID do veículo inválido').optional().nullable(),
-  driver_id: z.string().uuid('ID do motorista inválido').optional().nullable(),
+  veiculo_id: z.string().uuid('ID do veículo inválido').optional().nullable(),
+  motorista_id: z.string().uuid('ID do motorista inválido').optional().nullable(),
   cost_category_id: z.string().uuid('ID da categoria inválido'),
   cost_center_id: z.string().uuid('ID do centro de custo inválido').optional().nullable(),
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Data deve estar no formato YYYY-MM-DD'),

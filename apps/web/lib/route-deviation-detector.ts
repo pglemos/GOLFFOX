@@ -147,7 +147,7 @@ export function detectRouteDeviation(
  */
 export function detectMultipleRouteDeviations(
   vehicles: Array<{
-    vehicle_id: string
+    veiculo_id: string
     lat: number
     lng: number
     speed: number | null
@@ -168,7 +168,7 @@ export function detectMultipleRouteDeviations(
         routePolyline,
         threshold
       )
-      results.set(veiculo.vehicle_id, deviation)
+      results.set(veiculo.veiculo_id, deviation)
     }
   })
 

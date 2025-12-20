@@ -10,11 +10,11 @@ import { DocumentCard } from "@/components/ui/document-card"
 import { useFileUpload } from "@/hooks/use-file-upload"
 import { notifySuccess, notifyError } from "@/lib/toast"
 import {
-    VehicleDocumentType,
-    VEHICLE_DOCUMENT_LABELS,
+    VeiculoDocumentType,
+    VEICULO_DOCUMENT_LABELS,
     VEHICLE_DOCS_WITH_EXPIRY,
-    REQUIRED_VEHICLE_DOCUMENTS,
-    VehicleDocument,
+    REQUIRED_VEICULO_DOCUMENTS,
+    VeiculoDocument,
 } from "@/types/documents"
 import {
     Select,
@@ -24,7 +24,7 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 
-interface VehicleDocumentsSectionProps {
+interface VeiculoDocumentsSectionProps {
     vehicleId: string | undefined
     isEditing: boolean
     compact?: boolean
@@ -37,10 +37,10 @@ export function VehicleDocumentsSection({
     vehicleId,
     isEditing,
     compact = false,
-}: VehicleDocumentsSectionProps) {
-    const [documents, setDocuments] = useState<VehicleDocument[]>([])
+}: VeiculoDocumentsSectionProps) {
+    const [documents, setDocuments] = useState<VeiculoDocument[]>([])
     const [loading, setLoading] = useState(false)
-    const [selectedType, setSelectedType] = useState<VehicleDocumentType>("crlv")
+    const [selectedType, setSelectedType] = useState<VeiculoDocumentType>("crlv")
     const [expiryDate, setExpiryDate] = useState("")
     const [documentNumber, setDocumentNumber] = useState("")
     const [fileToUpload, setFileToUpload] = useState<File | null>(null)
@@ -137,11 +137,11 @@ export function VehicleDocumentsSection({
         }
     }
 
-    const getDocumentByType = (type: VehicleDocumentType) => {
+    const getDocumentByType = (type: VeiculoDocumentType) => {
         return documents.find((d) => d.document_type === type)
     }
 
-    const documentTypes = Object.keys(VEHICLE_DOCUMENT_LABELS) as VehicleDocumentType[]
+    const documentTypes = Object.keys(VEICULO_DOCUMENT_LABELS) as VeiculoDocumentType[]
 
     if (!isEditing || !vehicleId) {
         return (
@@ -172,13 +172,13 @@ export function VehicleDocumentsSection({
 
                 {documentTypes.map((type) => {
                     const doc = getDocumentByType(type)
-                    const isRequired = REQUIRED_VEHICLE_DOCUMENTS.includes(type)
+                    const isRequired = REQUIRED_VEICULO_DOCUMENTS.includes(type)
 
                     return (
                         <DocumentCard
                             key={type}
                             documentType={type}
-                            documentLabel={VEHICLE_DOCUMENT_LABELS[type]}
+                            documentLabel={VEICULO_DOCUMENT_LABELS[type]}
                             fileUrl={doc?.file_url}
                             fileName={doc?.file_name}
                             fileSize={doc?.file_size}
@@ -209,7 +209,7 @@ export function VehicleDocumentsSection({
                         <Label>Tipo de Documento</Label>
                         <Select
                             value={selectedType}
-                            onValueChange={(v) => setSelectedType(v as VehicleDocumentType)}
+                            onValueChange={(v) => setSelectedType(v as VeiculoDocumentType)}
                         >
                             <SelectTrigger>
                                 <SelectValue />
@@ -217,8 +217,8 @@ export function VehicleDocumentsSection({
                             <SelectContent>
                                 {documentTypes.map((type) => (
                                     <SelectItem key={type} value={type}>
-                                        {VEHICLE_DOCUMENT_LABELS[type]}
-                                        {REQUIRED_VEHICLE_DOCUMENTS.includes(type) && " *"}
+                                        {VEICULO_DOCUMENT_LABELS[type]}
+                                        {REQUIRED_VEICULO_DOCUMENTS.includes(type) && " *"}
                                     </SelectItem>
                                 ))}
                             </SelectContent>
@@ -286,7 +286,7 @@ export function VehicleDocumentsSection({
                         <AlertTriangle className="h-8 w-8 mx-auto mb-2 opacity-50" />
                         <p>Nenhum documento enviado ainda</p>
                         <p className="text-xs mt-1">
-                            Documentos obrigatórios: {REQUIRED_VEHICLE_DOCUMENTS.map((t) => VEHICLE_DOCUMENT_LABELS[t]).join(", ")}
+                            Documentos obrigatórios: {REQUIRED_VEICULO_DOCUMENTS.map((t) => VEICULO_DOCUMENT_LABELS[t]).join(", ")}
                         </p>
                     </div>
                 ) : (
@@ -295,14 +295,14 @@ export function VehicleDocumentsSection({
                             <DocumentCard
                                 key={doc.id}
                                 documentType={doc.document_type}
-                                documentLabel={VEHICLE_DOCUMENT_LABELS[doc.document_type as VehicleDocumentType] || doc.document_type}
+                                documentLabel={VEICULO_DOCUMENT_LABELS[doc.document_type as VeiculoDocumentType] || doc.document_type}
                                 fileUrl={doc.file_url}
                                 fileName={doc.file_name}
                                 fileSize={doc.file_size}
                                 expiryDate={doc.expiry_date}
                                 status={doc.status}
                                 documentNumber={doc.document_number}
-                                required={REQUIRED_VEHICLE_DOCUMENTS.includes(doc.document_type as VehicleDocumentType)}
+                                required={REQUIRED_VEICULO_DOCUMENTS.includes(doc.document_type as VeiculoDocumentType)}
                                 onDelete={() => handleDelete(doc.id)}
                             />
                         ))}

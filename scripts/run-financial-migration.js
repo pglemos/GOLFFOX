@@ -71,7 +71,7 @@ async function runMigration() {
     CREATE TABLE gf_manual_costs_v2 (
       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
       company_id UUID REFERENCES companies(id) ON DELETE CASCADE,
-      carrier_id UUID REFERENCES carriers(id) ON DELETE CASCADE,
+      transportadora_id UUID REFERENCES carriers(id) ON DELETE CASCADE,
       category_id UUID REFERENCES gf_cost_categories(id),
       description TEXT NOT NULL,
       amount DECIMAL(15,2) NOT NULL CHECK (amount >= 0),
@@ -80,9 +80,9 @@ async function runMigration() {
       recurring_interval VARCHAR(20) CHECK (recurring_interval IN ('daily', 'weekly', 'monthly', 'yearly')),
       recurring_end_date DATE,
       parent_recurring_id UUID,
-      vehicle_id UUID,
+      veiculo_id UUID,
       route_id UUID,
-      driver_id UUID,
+      motorista_id UUID,
       attachment_url TEXT,
       attachment_name VARCHAR(255),
       notes TEXT,
@@ -94,7 +94,7 @@ async function runMigration() {
       updated_at TIMESTAMPTZ DEFAULT NOW()
     );
     CREATE INDEX idx_manual_costs_v2_company ON gf_manual_costs_v2(company_id);
-    CREATE INDEX idx_manual_costs_v2_carrier ON gf_manual_costs_v2(carrier_id);
+    CREATE INDEX idx_manual_costs_v2_carrier ON gf_manual_costs_v2(transportadora_id);
     CREATE INDEX idx_manual_costs_v2_date ON gf_manual_costs_v2(cost_date);
     CREATE INDEX idx_manual_costs_v2_category ON gf_manual_costs_v2(category_id);
   `, 'Criando tabela gf_manual_costs_v2');
@@ -104,7 +104,7 @@ async function runMigration() {
     CREATE TABLE gf_manual_revenues (
       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
       company_id UUID REFERENCES companies(id) ON DELETE CASCADE,
-      carrier_id UUID REFERENCES carriers(id) ON DELETE CASCADE,
+      transportadora_id UUID REFERENCES carriers(id) ON DELETE CASCADE,
       category VARCHAR(100) NOT NULL,
       description TEXT NOT NULL,
       amount DECIMAL(15,2) NOT NULL CHECK (amount >= 0),
@@ -121,7 +121,7 @@ async function runMigration() {
       updated_at TIMESTAMPTZ DEFAULT NOW()
     );
     CREATE INDEX idx_revenues_company ON gf_manual_revenues(company_id);
-    CREATE INDEX idx_revenues_carrier ON gf_manual_revenues(carrier_id);
+    CREATE INDEX idx_revenues_carrier ON gf_manual_revenues(transportadora_id);
     CREATE INDEX idx_revenues_date ON gf_manual_revenues(revenue_date);
   `, 'Criando tabela gf_manual_revenues');
 
@@ -130,7 +130,7 @@ async function runMigration() {
     CREATE TABLE gf_budgets (
       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
       company_id UUID REFERENCES companies(id) ON DELETE CASCADE,
-      carrier_id UUID REFERENCES carriers(id) ON DELETE CASCADE,
+      transportadora_id UUID REFERENCES carriers(id) ON DELETE CASCADE,
       category_id UUID REFERENCES gf_cost_categories(id),
       category_name VARCHAR(100),
       period_year INT NOT NULL CHECK (period_year >= 2020 AND period_year <= 2100),
@@ -143,7 +143,7 @@ async function runMigration() {
       updated_at TIMESTAMPTZ DEFAULT NOW()
     );
     CREATE INDEX idx_budgets_company ON gf_budgets(company_id);
-    CREATE INDEX idx_budgets_carrier ON gf_budgets(carrier_id);
+    CREATE INDEX idx_budgets_carrier ON gf_budgets(transportadora_id);
     CREATE INDEX idx_budgets_period ON gf_budgets(period_year, period_month);
   `, 'Criando tabela gf_budgets');
 
@@ -152,7 +152,7 @@ async function runMigration() {
     CREATE TABLE gf_financial_forecasts (
       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
       company_id UUID REFERENCES companies(id) ON DELETE CASCADE,
-      carrier_id UUID REFERENCES carriers(id) ON DELETE CASCADE,
+      transportadora_id UUID REFERENCES carriers(id) ON DELETE CASCADE,
       forecast_type VARCHAR(20) NOT NULL CHECK (forecast_type IN ('cost', 'revenue')),
       category_id UUID REFERENCES gf_cost_categories(id),
       period_year INT NOT NULL,
@@ -166,7 +166,7 @@ async function runMigration() {
       notes TEXT
     );
     CREATE INDEX idx_forecasts_company ON gf_financial_forecasts(company_id);
-    CREATE INDEX idx_forecasts_carrier ON gf_financial_forecasts(carrier_id);
+    CREATE INDEX idx_forecasts_carrier ON gf_financial_forecasts(transportadora_id);
     CREATE INDEX idx_forecasts_period ON gf_financial_forecasts(period_year, period_month);
   `, 'Criando tabela gf_financial_forecasts');
 
@@ -175,7 +175,7 @@ async function runMigration() {
     CREATE TABLE gf_financial_alerts (
       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
       company_id UUID REFERENCES companies(id) ON DELETE CASCADE,
-      carrier_id UUID REFERENCES carriers(id) ON DELETE CASCADE,
+      transportadora_id UUID REFERENCES carriers(id) ON DELETE CASCADE,
       alert_type VARCHAR(50) NOT NULL,
       severity VARCHAR(20) DEFAULT 'warning' CHECK (severity IN ('info', 'warning', 'critical')),
       title VARCHAR(200) NOT NULL,
@@ -193,7 +193,7 @@ async function runMigration() {
       created_at TIMESTAMPTZ DEFAULT NOW()
     );
     CREATE INDEX idx_fin_alerts_company ON gf_financial_alerts(company_id);
-    CREATE INDEX idx_fin_alerts_carrier ON gf_financial_alerts(carrier_id);
+    CREATE INDEX idx_fin_alerts_carrier ON gf_financial_alerts(transportadora_id);
   `, 'Criando tabela gf_financial_alerts');
 
     // 8. Habilitar RLS
@@ -222,7 +222,7 @@ async function runMigration() {
       company_id IN (SELECT company_id FROM profiles WHERE id = auth.uid())
     );
     CREATE POLICY "costs_transportadora_access" ON gf_manual_costs_v2 FOR ALL USING (
-      carrier_id IN (SELECT carrier_id FROM profiles WHERE id = auth.uid())
+      transportadora_id IN (SELECT transportadora_id FROM profiles WHERE id = auth.uid())
     );
   `, 'Criando políticas RLS para custos');
 
@@ -234,7 +234,7 @@ async function runMigration() {
       company_id IN (SELECT company_id FROM profiles WHERE id = auth.uid())
     );
     CREATE POLICY "revenues_transportadora_access" ON gf_manual_revenues FOR ALL USING (
-      carrier_id IN (SELECT carrier_id FROM profiles WHERE id = auth.uid())
+      transportadora_id IN (SELECT transportadora_id FROM profiles WHERE id = auth.uid())
     );
   `, 'Criando políticas RLS para receitas');
 
@@ -244,7 +244,7 @@ async function runMigration() {
     );
     CREATE POLICY "budgets_tenant_access" ON gf_budgets FOR ALL USING (
       company_id IN (SELECT company_id FROM profiles WHERE id = auth.uid())
-      OR carrier_id IN (SELECT carrier_id FROM profiles WHERE id = auth.uid())
+      OR transportadora_id IN (SELECT transportadora_id FROM profiles WHERE id = auth.uid())
     );
   `, 'Criando políticas RLS para orçamentos');
 
@@ -254,7 +254,7 @@ async function runMigration() {
     );
     CREATE POLICY "forecasts_tenant_access" ON gf_financial_forecasts FOR ALL USING (
       company_id IN (SELECT company_id FROM profiles WHERE id = auth.uid())
-      OR carrier_id IN (SELECT carrier_id FROM profiles WHERE id = auth.uid())
+      OR transportadora_id IN (SELECT transportadora_id FROM profiles WHERE id = auth.uid())
     );
   `, 'Criando políticas RLS para projeções');
 
@@ -264,7 +264,7 @@ async function runMigration() {
     );
     CREATE POLICY "alerts_tenant_access" ON gf_financial_alerts FOR ALL USING (
       company_id IN (SELECT company_id FROM profiles WHERE id = auth.uid())
-      OR carrier_id IN (SELECT carrier_id FROM profiles WHERE id = auth.uid())
+      OR transportadora_id IN (SELECT transportadora_id FROM profiles WHERE id = auth.uid())
     );
   `, 'Criando políticas RLS para alertas');
 

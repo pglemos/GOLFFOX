@@ -19,7 +19,7 @@ import { useResponsive, useReducedMotion } from '@/hooks/use-responsive'
 import { usePerformance } from '@/hooks/use-performance'
 import { useAccessibility } from '@/hooks/use-accessibility'
 
-interface PassengerInfo {
+interface PassageiroInfo {
   id: string
   name: string
   phone?: string
@@ -37,13 +37,13 @@ interface RouteStop {
   lng: number
   address: string
   stop_name: string
-  passenger_id?: string
+  passageiro_id?: string
   passenger_name?: string
   estimated_arrival?: string
   stop_type: 'pickup' | 'dropoff'
   passenger_photo?: string
   observations?: string
-  passageiro?: PassengerInfo
+  passageiro?: PassageiroInfo
 }
 
 interface RouteData {
@@ -303,14 +303,14 @@ export const AdvancedRouteMap = memo(function AdvancedRouteMap({
           lng: stop.longitude,
           address: stop.address || '',
           stop_name: stop.stop_name || `Parada ${index + 1}`,
-          passenger_id: stop.passenger_id,
+          passageiro_id: stop.passageiro_id,
           passenger_name: stop.gf_employee_company?.name || '',
           estimated_arrival: stop.estimated_arrival_time,
           stop_type: index === 0 ? 'pickup' : 'dropoff',
           passenger_photo: stop.gf_employee_company?.photo_url,
           observations: stop.observations,
           passageiro: {
-            id: stop.passenger_id || '',
+            id: stop.passageiro_id || '',
             name: stop.gf_employee_company?.name || 'Passageiro não identificado',
             phone: stop.gf_employee_company?.phone,
             email: stop.gf_employee_company?.email,
@@ -1110,7 +1110,7 @@ export const AdvancedRouteMap = memo(function AdvancedRouteMap({
             scheduledTime: selectedStop.estimated_arrival || new Date().toISOString(),
             type: selectedStop.stop_type as 'pickup' | 'dropoff',
             passageiro: selectedStop.passageiro || {
-              id: selectedStop.passenger_id || '',
+              id: selectedStop.passageiro_id || '',
               name: selectedStop.passenger_name || 'Passageiro não identificado',
               type: 'visitor' as const
             },
@@ -1139,7 +1139,7 @@ export const AdvancedRouteMap = memo(function AdvancedRouteMap({
                 ...(selectedStop.passageiro.phone && { phone: selectedStop.passageiro.phone }),
                 ...(selectedStop.passageiro.observations && { observations: selectedStop.passageiro.observations })
               } : {
-                id: selectedStop.passenger_id || '',
+                id: selectedStop.passageiro_id || '',
                 name: selectedStop.passenger_name || 'Passageiro não identificado',
                 type: 'regular' as const
               },

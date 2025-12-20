@@ -27,16 +27,16 @@ export async function DELETE(request: NextRequest) {
 
     // Excluir permanentemente o veículo do banco de dados
     // Primeiro, precisamos tratar as foreign keys:
-    // - trips.vehicle_id tem ON DELETE SET NULL, mas precisamos setar manualmente para evitar erro
+    // - trips.veiculo_id tem ON DELETE SET NULL, mas precisamos setar manualmente para evitar erro
     // - Outras tabelas com CASCADE serão excluídas automaticamente
     
     logger.log(`🗑️ Tentando excluir veículo: ${vehicleId}`)
     
-    // Primeiro, setar vehicle_id para NULL em trips (mesmo que seja SET NULL, fazemos explicitamente)
+    // Primeiro, setar veiculo_id para NULL em trips (mesmo que seja SET NULL, fazemos explicitamente)
     await supabaseAdmin
       .from('trips')
-      .update({ vehicle_id: null })
-      .eq('vehicle_id', vehicleId)
+      .update({ veiculo_id: null })
+      .eq('veiculo_id', vehicleId)
     
     // Agora excluir o veículo
     const { data, error } = await supabaseAdmin

@@ -12,7 +12,7 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url)
     const startDate = searchParams.get('start_date')
     const endDate = searchParams.get('end_date')
-    const transportadoraId = searchParams.get('transportadora_id') || searchParams.get('carrier_id') // Compatibilidade
+    const transportadoraId = searchParams.get('transportadora_id')
 
     if (!transportadoraId) {
       return NextResponse.json({ error: 'transportadora_id é obrigatório' }, { status: 400 })
@@ -54,9 +54,9 @@ export async function GET(req: NextRequest) {
 
     // Buscar posições dos veículos para calcular tempo em rota
     const { data: positions, error: positionsError } = await supabase
-      .from('driver_positions')
-      .select('vehicle_id, created_at')
-      .in('vehicle_id', vehicleIds)
+      .from('motorista_positions')
+      .select('veiculo_id, created_at')
+      .in('veiculo_id', vehicleIds)
       .order('created_at', { ascending: false })
 
     if (positionsError) throw positionsError
@@ -68,10 +68,10 @@ export async function GET(req: NextRequest) {
         return true // Simplificado - em produção, verificar associação veículo-rota
       }) || []
 
-      const vehiclePositions = positions?.filter(p => p.vehicle_id === veiculo.id) || []
+      const vehiclePositions = positions?.filter(p => p.veiculo_id === veiculo.id) || []
       
       return {
-        vehicle_id: veiculo.id,
+        veiculo_id: veiculo.id,
         plate: veiculo.plate,
         model: veiculo.model,
         is_active: veiculo.is_active,

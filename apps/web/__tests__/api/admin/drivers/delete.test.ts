@@ -49,7 +49,7 @@ describe('DELETE /api/admin/drivers/delete', () => {
     const motorista = createTestUser({ role: 'motorista' })
     mockSupabaseClient.setTableData('users', [motorista])
     mockSupabaseClient.setTableData('trips', [
-      { id: 'trip-1', driver_id: motorista.id },
+      { id: 'trip-1', motorista_id: motorista.id },
     ])
 
     const req = createAdminRequest({

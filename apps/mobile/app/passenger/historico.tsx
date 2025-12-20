@@ -13,7 +13,7 @@ interface TripHistory {
     origin: string;
     destination: string;
     status: 'completed' | 'cancelled' | 'no_show';
-    driver_name?: string;
+    motorista_name?: string;
 }
 
 export default function HistoricoScreen() {
@@ -25,11 +25,11 @@ export default function HistoricoScreen() {
     useEffect(() => {
         // Mock data
         const mockTrips: TripHistory[] = [
-            { id: '1', date: '2024-12-11', route_name: 'Rota Centro-Shopping', origin: 'Ponto A', destination: 'Shopping Center', status: 'completed', driver_name: 'João Silva' },
-            { id: '2', date: '2024-12-10', route_name: 'Rota Centro-Shopping', origin: 'Ponto A', destination: 'Shopping Center', status: 'completed', driver_name: 'João Silva' },
-            { id: '3', date: '2024-12-09', route_name: 'Rota Centro-Shopping', origin: 'Ponto A', destination: 'Shopping Center', status: 'cancelled', driver_name: 'Maria Santos' },
-            { id: '4', date: '2024-12-06', route_name: 'Rota Centro-Shopping', origin: 'Ponto A', destination: 'Shopping Center', status: 'completed', driver_name: 'João Silva' },
-            { id: '5', date: '2024-12-05', route_name: 'Rota Centro-Shopping', origin: 'Ponto A', destination: 'Shopping Center', status: 'no_show', driver_name: 'João Silva' },
+            { id: '1', date: '2024-12-11', route_name: 'Rota Centro-Shopping', origin: 'Ponto A', destination: 'Shopping Center', status: 'completed', motorista_name: 'João Silva' },
+            { id: '2', date: '2024-12-10', route_name: 'Rota Centro-Shopping', origin: 'Ponto A', destination: 'Shopping Center', status: 'completed', motorista_name: 'João Silva' },
+            { id: '3', date: '2024-12-09', route_name: 'Rota Centro-Shopping', origin: 'Ponto A', destination: 'Shopping Center', status: 'cancelled', motorista_name: 'Maria Santos' },
+            { id: '4', date: '2024-12-06', route_name: 'Rota Centro-Shopping', origin: 'Ponto A', destination: 'Shopping Center', status: 'completed', motorista_name: 'João Silva' },
+            { id: '5', date: '2024-12-05', route_name: 'Rota Centro-Shopping', origin: 'Ponto A', destination: 'Shopping Center', status: 'no_show', motorista_name: 'João Silva' },
         ];
         setTrips(mockTrips);
         setLoading(false);
@@ -73,10 +73,10 @@ export default function HistoricoScreen() {
                         <Text variant="bodyMedium">{item.destination}</Text>
                     </View>
                 </View>
-                {item.driver_name && (
+                {item.motorista_name && (
                     <View style={styles.driverInfo}>
                         <Avatar.Icon size={24} icon="account" style={{ backgroundColor: theme.colors.primary }} />
-                        <Text variant="bodySmall" style={styles.driverName}>{item.driver_name}</Text>
+                        <Text variant="bodySmall" style={styles.driverName}>{item.motorista_name}</Text>
                     </View>
                 )}
             </Card.Content>

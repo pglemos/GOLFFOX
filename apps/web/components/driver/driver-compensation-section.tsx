@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Card } from "@/components/ui/card"
 import { notifySuccess, notifyError } from "@/lib/toast"
 import {
-    DriverCompensation,
+    MotoristaCompensation,
     PaymentFrequency,
     ContractType,
     PAYMENT_FREQUENCY_LABELS,
@@ -24,7 +24,7 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 
-interface DriverCompensationSectionProps {
+interface MotoristaCompensationSectionProps {
     driverId: string | undefined
     isEditing: boolean
 }
@@ -56,7 +56,7 @@ const defaultCompensation = {
 export function DriverCompensationSection({
     driverId,
     isEditing,
-}: DriverCompensationSectionProps) {
+}: MotoristaCompensationSectionProps) {
     const [formData, setFormData] = useState(defaultCompensation)
     const [loading, setLoading] = useState(false)
     const [saving, setSaving] = useState(false)
@@ -70,7 +70,7 @@ export function DriverCompensationSection({
         try {
             const response = await fetch(`/api/admin/drivers/${driverId}/compensation`)
             if (response.ok) {
-                const data: DriverCompensation | null = await response.json()
+                const data: MotoristaCompensation | null = await response.json()
                 if (data) {
                     setFormData({
                         base_salary: data.base_salary ?? undefined,

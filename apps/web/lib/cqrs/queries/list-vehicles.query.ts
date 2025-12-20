@@ -12,7 +12,7 @@ export interface ListVehiclesQueryFilters {
   limit?: number
 }
 
-export class ListVehiclesQuery {
-  readonly type = 'ListVehiclesQuery'
+export class ListVeiculosQuery {
+  readonly type = 'ListVeiculosQuery'
   constructor(public readonly filters: ListVehiclesQueryFilters = {}) {}
 }

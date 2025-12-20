@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
     try {
         const supabase = getSupabaseAdmin();
         const body = await request.json();
-        const { company_id, carrier_id, title, message, type = 'info', target_role = 'all', expires_at } = body;
+        const { company_id, transportadora_id, title, message, type = 'info', target_role = 'all', expires_at } = body;
 
         if (!title || !message) {
             return NextResponse.json(
@@ -75,7 +75,7 @@ export async function POST(request: NextRequest) {
             .from('announcements')
             .insert({
                 company_id,
-                carrier_id,
+                transportadora_id,
                 title,
                 message,
                 type,

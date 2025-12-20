@@ -8,10 +8,10 @@ import { supabase } from './supabase'
 import { RealtimeChannel, RealtimePostgresChangesPayload } from '@supabase/supabase-js'
 import { debug, warn, error } from './logger'
 
-export interface VehiclePositionUpdate {
-  vehicle_id: string
+export interface VeiculoPositionUpdate {
+  veiculo_id: string
   trip_id: string
-  driver_id: string
+  motorista_id: string
   route_id: string
   lat: number
   lng: number
@@ -25,8 +25,8 @@ export interface VehiclePositionUpdate {
 export interface TripUpdate {
   trip_id: string
   route_id: string
-  vehicle_id: string
-  driver_id: string
+  veiculo_id: string
+  motorista_id: string
   status: 'scheduled' | 'inProgress' | 'completed' | 'cancelled'
   started_at?: string
   completed_at?: string
@@ -37,7 +37,7 @@ export interface AlertUpdate {
   alert_type: 'incident' | 'assistance'
   company_id: string
   route_id?: string
-  vehicle_id?: string
+  veiculo_id?: string
   severity: 'low' | 'medium' | 'high' | 'critical'
   lat?: number
   lng?: number
@@ -46,7 +46,7 @@ export interface AlertUpdate {
 }
 
 export type RealtimeUpdateType =
-  | { type: 'position'; data: VehiclePositionUpdate }
+  | { type: 'position'; data: VeiculoPositionUpdate }
   | { type: 'trip'; data: TripUpdate }
   | { type: 'alert'; data: AlertUpdate }
 
@@ -82,7 +82,7 @@ export class RealtimeService {
    */
   async connect(): Promise<void> {
     try {
-      // Canal para driver_positions
+      // Canal para motorista_positions
       await this.subscribeToDriverPositions()
 
       // Canal para trips
@@ -136,30 +136,30 @@ export class RealtimeService {
   }
 
   /**
-   * Inscreve no canal de driver_positions
+   * Inscreve no canal de motorista_positions
    */
   private async subscribeToDriverPositions(): Promise<void> {
-    const channel = (supabase.channel('map:driver_positions') as unknown as RealtimeChannel)
+    const channel = (supabase.channel('map:motorista_positions') as unknown as RealtimeChannel)
       .on(
         'postgres_changes',
         {
           event: 'INSERT',
           schema: 'public',
-          table: 'driver_positions',
+          table: 'motorista_positions',
         },
         async (payload: RealtimePostgresChangesPayload<any>) => {
           try {
             // Buscar dados completos diretamente das tabelas (view v_live_vehicles não existe)
             const position = payload.new as any
 
-            // driver_positions tem trip_id, não vehicle_id diretamente
+            // motorista_positions tem trip_id, não veiculo_id diretamente
             // Buscar trip no cache ou no banco
             let tripData = this.tripCache.get(position.trip_id)
 
             if (!tripData) {
               const { data, error: tripError } = await supabase
                 .from('trips')
-                .select('id, vehicle_id, route_id, driver_id, status')
+                .select('id, veiculo_id, route_id, motorista_id, status')
                 .eq('id', position.trip_id)
                 .single()
 
@@ -180,9 +180,9 @@ export class RealtimeService {
             this.queueUpdate({
               type: 'position',
               data: {
-                vehicle_id: tripData.vehicle_id,
+                veiculo_id: tripData.veiculo_id,
                 trip_id: position.trip_id,
-                driver_id: tripData.driver_id || position.driver_id,
+                motorista_id: tripData.motorista_id || position.motorista_id,
                 route_id: tripData.route_id || null,
                 lat: position.lat,
                 lng: position.lng,
@@ -201,15 +201,15 @@ export class RealtimeService {
       )
       .subscribe((status: string) => {
         if (status === 'SUBSCRIBED') {
-          debug('Conectado ao canal driver_positions', undefined, 'RealtimeService')
+          debug('Conectado ao canal motorista_positions', undefined, 'RealtimeService')
         } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
-          warn('Canal driver_positions indisponível, usando polling', undefined, 'RealtimeService')
+          warn('Canal motorista_positions indisponível, usando polling', undefined, 'RealtimeService')
           // Não disparamos onError aqui para evitar ruído de logs;
           // o polling já está habilitado como fallback em connect().
         }
       }) as unknown as RealtimeChannel
 
-    this.channels.set('driver_positions', channel)
+    this.channels.set('motorista_positions', channel)
   }
 
   /**
@@ -235,8 +235,8 @@ export class RealtimeService {
             data: {
               trip_id: trip.id,
               route_id: trip.route_id,
-              vehicle_id: trip.vehicle_id,
-              driver_id: trip.driver_id,
+              veiculo_id: trip.veiculo_id,
+              motorista_id: trip.motorista_id,
               status: trip.status,
               started_at: trip.started_at,
               completed_at: trip.completed_at,
@@ -281,7 +281,7 @@ export class RealtimeService {
               alert_type: 'incident',
               company_id: incident.company_id,
               route_id: incident.route_id,
-              vehicle_id: incident.vehicle_id,
+              veiculo_id: incident.veiculo_id,
               severity: incident.severity || 'medium',
               lat: undefined, // gf_incidents não tem lat
               lng: undefined, // gf_incidents não tem lng
@@ -335,13 +335,13 @@ export class RealtimeService {
    * Inicia polling como fallback
    */
   private startPolling(): void {
-    // Polling para posições (usando tabela driver_positions diretamente)
+    // Polling para posições (usando tabela motorista_positions diretamente)
     const positionInterval = setInterval(async () => {
       try {
-        // Buscar últimas posições diretamente da tabela driver_positions
+        // Buscar últimas posições diretamente da tabela motorista_positions
         const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString()
         const { data: positionsData, error } = await supabase
-          .from('driver_positions')
+          .from('motorista_positions')
           .select(`
             trip_id,
             lat,
@@ -349,7 +349,7 @@ export class RealtimeService {
             speed,
             heading,
             timestamp,
-            trips!inner(vehicle_id, route_id, driver_id, status)
+            trips!inner(veiculo_id, route_id, motorista_id, status)
           `)
           .gte('timestamp', fiveMinutesAgo)
           .eq('trips.status', 'inProgress')
@@ -358,7 +358,7 @@ export class RealtimeService {
 
         if (error) {
           // Se der erro, apenas logar (não quebrar o polling)
-          warn('Erro no polling de posições (view v_live_vehicles não existe, usando driver_positions)', { error }, 'RealtimeService')
+          warn('Erro no polling de posições (view v_live_vehicles não existe, usando motorista_positions)', { error }, 'RealtimeService')
           return
         }
 
@@ -369,9 +369,9 @@ export class RealtimeService {
               this.queueUpdate({
                 type: 'position',
                 data: {
-                  vehicle_id: trip.vehicle_id,
+                  veiculo_id: trip.veiculo_id,
                   trip_id: pos.trip_id,
-                  driver_id: trip.driver_id,
+                  motorista_id: trip.motorista_id,
                   route_id: trip.route_id,
                   lat: pos.lat,
                   lng: pos.lng,
@@ -402,7 +402,7 @@ export class RealtimeService {
       //   // Buscar incidentes abertos
       //   const { data: incidentsData, error: incidentsError } = await supabase
       //     .from('gf_incidents')
-      //     .select('id, company_id, route_id, vehicle_id, severity, description, created_at, status')
+      //     .select('id, company_id, route_id, veiculo_id, severity, description, created_at, status')
       //     .eq('status', 'open')
       //     .gte('created_at', oneHourAgo)
 

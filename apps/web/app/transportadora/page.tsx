@@ -181,7 +181,7 @@ export default function TransportadoraDashboard() {
           {
             event: '*',
             schema: 'public',
-            table: 'driver_positions'
+            table: 'motorista_positions'
           },
           () => {
             loadFleetData()
@@ -203,7 +203,7 @@ export default function TransportadoraDashboard() {
           {
             event: '*',
             schema: 'public',
-            table: 'trip_passengers'
+            table: 'trip_passageiros'
           },
           () => {
             loadFleetData()
@@ -294,14 +294,14 @@ export default function TransportadoraDashboard() {
 
       // Mapear veículos com posições do RPC
       const fleetData = (vehicles || []).map((veiculo: any) => {
-        const bus = (mapData as any)?.buses?.find((b: any) => b.vehicle_id === veiculo.id)
-        const garage = (mapData as any)?.garages?.find((g: any) => g.vehicle_id === veiculo.id)
+        const bus = (mapData as any)?.buses?.find((b: any) => b.veiculo_id === veiculo.id)
+        const garage = (mapData as any)?.garages?.find((g: any) => g.veiculo_id === veiculo.id)
 
         if (bus) {
           return {
             id: veiculo.id,
             plate: veiculo.plate,
-            motorista: bus.driver_name || 'N/A',
+            motorista: bus.motorista_name || 'N/A',
             status: 'on-route',
             route: bus.route_name || 'Livre',
             lat: bus.lat,
@@ -359,10 +359,10 @@ export default function TransportadoraDashboard() {
         const { data: rankings } = await ((supabase
           .from('gf_gamification_scores' as any)
           .select('*')
-          .in('driver_id', driverIds)) as any)
+          .in('motorista_id', driverIds)) as any)
 
         driversWithStats = (driversData || []).map((motorista: any) => {
-          const ranking = rankings?.find((r: any) => r.driver_id === motorista.id)
+          const ranking = rankings?.find((r: any) => r.motorista_id === motorista.id)
           return {
             id: motorista.id,
             name: motorista.name,

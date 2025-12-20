@@ -32,12 +32,12 @@ interface Bus {
   trip_id: string
   route_id: string
   route_name: string
-  vehicle_id: string
+  veiculo_id: string
   vehicle_plate: string
   vehicle_model: string
   capacity?: number
-  driver_id: string
-  driver_name: string
+  motorista_id: string
+  motorista_name: string
   company_id: string
   company_name: string
   lat: number
@@ -59,7 +59,7 @@ interface Stop {
   address: string
   stop_name: string
   passenger_name?: string
-  passenger_id?: string
+  passageiro_id?: string
   estimated_arrival?: string
 }
 
@@ -377,7 +377,7 @@ export const FleetMap = memo(function FleetMap({ companyId, transportadoraId, ro
                 <strong>Rota:</strong> ${bus.route_name}
               </div>
               <div style="font-size: 13px; color: #4b5563; margin-bottom: 4px;">
-                <strong>Motorista:</strong> ${bus.driver_name}
+                <strong>Motorista:</strong> ${bus.motorista_name}
               </div>
               <div style="font-size: 13px; color: #4b5563; margin-bottom: 4px;">
                 <strong>Status:</strong> ${bus.status}
@@ -562,7 +562,7 @@ export const FleetMap = memo(function FleetMap({ companyId, transportadoraId, ro
         {
           event: '*',
           schema: 'public',
-          table: 'driver_positions'
+          table: 'motorista_positions'
         },
         (payload: any) => {
           // Recarregar dados ao receber mudança na posição
@@ -586,7 +586,7 @@ export const FleetMap = memo(function FleetMap({ companyId, transportadoraId, ro
         {
           event: '*',
           schema: 'public',
-          table: 'trip_passengers'
+          table: 'trip_passageiros'
         },
         (payload: any) => {
           // Recarregar dados ao receber mudança nos passageiros
@@ -778,7 +778,7 @@ export const FleetMap = memo(function FleetMap({ companyId, transportadoraId, ro
               <div className="space-y-3 sm:space-y-4 text-sm">
                 <div>
                   <span className="text-ink-muted block mb-1 text-xs sm:text-sm">Motorista:</span>
-                  <p className="font-semibold text-sm sm:text-base truncate">{selectedBus.driver_name}</p>
+                  <p className="font-semibold text-sm sm:text-base truncate">{selectedBus.motorista_name}</p>
                 </div>
                 <div>
                   <span className="text-ink-muted block mb-1 text-xs sm:text-sm">Rota:</span>

@@ -16,7 +16,7 @@ export interface UpdateVehicleCommandPayload {
   is_active?: boolean
 }
 
-export class UpdateVehicleCommand {
-  readonly type = 'UpdateVehicleCommand'
+export class UpdateVeiculoCommand {
+  readonly type = 'UpdateVeiculoCommand'
   constructor(public readonly payload: UpdateVehicleCommandPayload) {}
 }

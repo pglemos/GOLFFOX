@@ -24,9 +24,9 @@ import {
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 
-interface VehicleMaintenance {
+interface VeiculoMaintenance {
   id?: string
-  vehicle_id: string
+  veiculo_id: string
   type: string
   due_at: string
   status: string
@@ -34,7 +34,7 @@ interface VehicleMaintenance {
 }
 
 interface VehicleMaintenanceModalProps {
-  maintenance: VehicleMaintenance | null
+  maintenance: VeiculoMaintenance | null
   vehicleId: string
   isOpen: boolean
   onClose: () => void
@@ -63,8 +63,8 @@ export function VehicleMaintenanceModal({
 }: VehicleMaintenanceModalProps) {
   const [loading, setLoading] = useState(false)
   const { sync } = useSupabaseSync({ showToast: false })
-  const [formData, setFormData] = useState<VehicleMaintenance>({
-    vehicle_id: vehicleId,
+  const [formData, setFormData] = useState<VeiculoMaintenance>({
+    veiculo_id: vehicleId,
     type: '',
     due_at: '',
     status: 'pending',
@@ -79,7 +79,7 @@ export function VehicleMaintenanceModal({
       })
     } else {
       setFormData({
-        vehicle_id: vehicleId,
+        veiculo_id: vehicleId,
         type: '',
         due_at: '',
         status: 'pending',
@@ -99,7 +99,7 @@ export function VehicleMaintenanceModal({
       }
 
       const maintenanceData = {
-        vehicle_id: formData.vehicle_id,
+        veiculo_id: formData.veiculo_id,
         type: formData.type,
         due_at: formData.due_at,
         status: formData.status,
@@ -154,9 +154,9 @@ export function VehicleMaintenanceModal({
           await (supabase as any).from('gf_audit_log').insert({
             actor_id: session.user.id,
             action_type: maintenance?.id ? 'update' : 'create',
-            resource_type: 'vehicle_maintenance',
+            resource_type: 'veiculo_maintenance',
             resource_id: maintenance?.id || null,
-            details: { vehicle_id: vehicleId, type: formData.type, status: formData.status }
+            details: { veiculo_id: vehicleId, type: formData.type, status: formData.status }
           })
         }
       } catch (auditError) {

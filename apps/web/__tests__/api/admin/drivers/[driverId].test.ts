@@ -113,7 +113,7 @@ describe('PUT /api/admin/drivers/[driverId]', () => {
     expect(data.error).toBe('Nome é obrigatório')
   })
 
-  it('deve aceitar carrier_id como alternativa', async () => {
+  it('deve aceitar transportadora_id como alternativa', async () => {
     const transportadora = createTestTransportadora()
     const motorista = createTestDriver(transportadora.id)
     mockSupabaseClient.setTableData('drivers', [motorista])
@@ -123,7 +123,7 @@ describe('PUT /api/admin/drivers/[driverId]', () => {
       method: 'PUT',
       body: {
         name: 'Motorista Atualizado',
-        carrier_id: transportadora.id,
+        transportadora_id: transportadora.id,
       },
     }) as NextRequest
 

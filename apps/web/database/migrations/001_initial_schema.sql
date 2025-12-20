@@ -86,7 +86,7 @@ CREATE TABLE IF NOT EXISTS public.users (
   name TEXT NOT NULL,
   role TEXT NOT NULL CHECK (role IN ('admin', 'operador', 'transportadora', 'motorista', 'passageiro')),
   company_id UUID REFERENCES public.companies(id) ON DELETE SET NULL,
-  carrier_id TEXT,
+  transportadora_id TEXT,
   phone VARCHAR(20),
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
@@ -97,7 +97,7 @@ CREATE TABLE IF NOT EXISTS public.routes (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   name TEXT NOT NULL,
   company_id UUID REFERENCES public.companies(id) ON DELETE CASCADE,
-  carrier_id TEXT,
+  transportadora_id TEXT,
   origin TEXT NOT NULL,
   destination TEXT NOT NULL,
   distance NUMERIC,
@@ -115,7 +115,7 @@ CREATE TABLE IF NOT EXISTS public.vehicles (
   manufacturer TEXT,
   year INTEGER,
   capacity INTEGER DEFAULT 0,
-  carrier_id TEXT,
+  transportadora_id TEXT,
   company_id UUID REFERENCES public.companies(id) ON DELETE SET NULL,
   is_active BOOLEAN DEFAULT true,
   created_at TIMESTAMPTZ DEFAULT NOW(),
@@ -157,8 +157,8 @@ END $$;
 CREATE TABLE IF NOT EXISTS public.trips (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   route_id UUID NOT NULL REFERENCES public.routes(id) ON DELETE CASCADE,
-  driver_id UUID REFERENCES public.users(id) ON DELETE SET NULL,
-  vehicle_id UUID REFERENCES public.vehicles(id) ON DELETE SET NULL,
+  motorista_id UUID REFERENCES public.users(id) ON DELETE SET NULL,
+  veiculo_id UUID REFERENCES public.vehicles(id) ON DELETE SET NULL,
   status TEXT NOT NULL DEFAULT 'scheduled' CHECK (status IN ('scheduled', 'inProgress', 'completed', 'cancelled')),
   scheduled_date DATE,
   scheduled_start_time TIMESTAMPTZ,
@@ -238,10 +238,10 @@ CREATE TABLE IF NOT EXISTS public.gf_cost_categories (
 CREATE TABLE IF NOT EXISTS public.gf_costs (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   company_id UUID REFERENCES public.companies(id) ON DELETE CASCADE,
-  carrier_id UUID,
+  transportadora_id UUID,
   route_id UUID REFERENCES public.routes(id) ON DELETE SET NULL,
-  vehicle_id UUID REFERENCES public.vehicles(id) ON DELETE SET NULL,
-  driver_id UUID REFERENCES public.users(id) ON DELETE SET NULL,
+  veiculo_id UUID REFERENCES public.vehicles(id) ON DELETE SET NULL,
+  motorista_id UUID REFERENCES public.users(id) ON DELETE SET NULL,
   cost_category_id UUID NOT NULL REFERENCES public.gf_cost_categories(id) ON DELETE RESTRICT,
   cost_center_id UUID,
   cost_date DATE NOT NULL,
@@ -263,15 +263,15 @@ CREATE INDEX IF NOT EXISTS idx_users_email ON public.users(email);
 CREATE INDEX IF NOT EXISTS idx_users_role ON public.users(role);
 CREATE INDEX IF NOT EXISTS idx_users_company_id ON public.users(company_id);
 CREATE INDEX IF NOT EXISTS idx_trips_status ON public.trips(status);
-CREATE INDEX IF NOT EXISTS idx_trips_driver_id ON public.trips(driver_id);
+CREATE INDEX IF NOT EXISTS idx_trips_driver_id ON public.trips(motorista_id);
 CREATE INDEX IF NOT EXISTS idx_trips_route_id ON public.trips(route_id);
-CREATE INDEX IF NOT EXISTS idx_trips_vehicle_id ON public.trips(vehicle_id);
+CREATE INDEX IF NOT EXISTS idx_trips_vehicle_id ON public.trips(veiculo_id);
 CREATE INDEX IF NOT EXISTS idx_trips_scheduled_date ON public.trips(scheduled_date);
 CREATE INDEX IF NOT EXISTS idx_vehicles_company_id ON public.vehicles(company_id);
 CREATE INDEX IF NOT EXISTS idx_vehicles_plate ON public.vehicles(plate);
 CREATE INDEX IF NOT EXISTS idx_routes_company_id ON public.routes(company_id);
 CREATE INDEX IF NOT EXISTS idx_costs_company_id ON public.gf_costs(company_id);
-CREATE INDEX IF NOT EXISTS idx_costs_vehicle_id ON public.gf_costs(vehicle_id);
+CREATE INDEX IF NOT EXISTS idx_costs_vehicle_id ON public.gf_costs(veiculo_id);
 CREATE INDEX IF NOT EXISTS idx_costs_route_id ON public.gf_costs(route_id);
 CREATE INDEX IF NOT EXISTS idx_costs_cost_category_id ON public.gf_costs(cost_category_id);
 CREATE INDEX IF NOT EXISTS idx_costs_cost_date ON public.gf_costs(cost_date);

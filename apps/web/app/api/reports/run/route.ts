@@ -25,7 +25,7 @@ export async function OPTIONS(request: NextRequest) {
 const REPORT_CONFIGS: Record<string, { viewName: string; columns: string[] }> = {
   delays: {
     viewName: 'v_reports_delays',
-    columns: ['company_id', 'route_id', 'route_name', 'driver_id', 'driver_name', 'trip_date', 'scheduled_time', 'actual_time', 'delay_minutes', 'status']
+    columns: ['company_id', 'route_id', 'route_name', 'motorista_id', 'motorista_name', 'trip_date', 'scheduled_time', 'actual_time', 'delay_minutes', 'status']
   },
   occupancy: {
     viewName: 'v_reports_occupancy',
@@ -33,7 +33,7 @@ const REPORT_CONFIGS: Record<string, { viewName: string; columns: string[] }> = 
   },
   not_boarded: {
     viewName: 'v_reports_not_boarded',
-    columns: ['company_id', 'route_id', 'route_name', 'passenger_id', 'passenger_name', 'trip_date', 'scheduled_time', 'reason']
+    columns: ['company_id', 'route_id', 'route_name', 'passageiro_id', 'passenger_name', 'trip_date', 'scheduled_time', 'reason']
   },
   efficiency: {
     viewName: 'v_reports_efficiency',
@@ -41,7 +41,7 @@ const REPORT_CONFIGS: Record<string, { viewName: string; columns: string[] }> = 
   },
   driver_ranking: {
     viewName: 'v_reports_driver_ranking',
-    columns: ['company_id', 'driver_id', 'driver_name', 'routes_completed', 'punctuality_score', 'efficiency_score', 'total_score', 'ranking']
+    columns: ['company_id', 'motorista_id', 'motorista_name', 'routes_completed', 'punctuality_score', 'efficiency_score', 'total_score', 'ranking']
   }
 }
 
@@ -82,7 +82,7 @@ async function runReportHandler(request: NextRequest): Promise<NextResponse> {
       'monthly_summary': 'efficiency', // Mapear monthly_summary para efficiency
       'monthly-summary': 'efficiency', // Mapear monthly-summary (com hífen) para efficiency
       'financial': 'efficiency', // Mapear financial para efficiency
-      'summary': 'driver_ranking', // Mapear summary para driver_ranking
+      'summary': 'motorista_ranking', // Mapear summary para driver_ranking
       'performance': 'efficiency',
       'operations': 'delays',
       'general': 'delays',
@@ -102,7 +102,7 @@ async function runReportHandler(request: NextRequest): Promise<NextResponse> {
       'cost-analysis': 'efficiency', // Mapear cost-analysis para efficiency
       'cost_analysis': 'efficiency', // Mapear cost_analysis para efficiency
       'cost_summary': 'efficiency', // Mapear cost_summary para efficiency
-      'driver_performance': 'driver_ranking', // Mapear driver_performance para driver_ranking
+      'driver_performance': 'motorista_ranking', // Mapear driver_performance para driver_ranking
     }
 
     // Normalizar reportKey (case-insensitive)

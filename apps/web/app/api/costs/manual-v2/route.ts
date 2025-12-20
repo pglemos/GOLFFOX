@@ -25,14 +25,14 @@ export async function GET(request: NextRequest) {
         const supabaseAdmin = getSupabaseAdmin()
         const token = request.headers.get('authorization')?.replace('Bearer ', '')
 
-        let profile: { role: string; company_id?: string; carrier_id?: string } | null = null
+        let profile: { role: string; company_id?: string; transportadora_id?: string } | null = null
 
         if (token) {
             const { data: { user } } = await supabaseAdmin.auth.getUser(token)
             if (user) {
                 const { data: p } = await supabaseAdmin
                     .from('profiles')
-                    .select('role, company_id, carrier_id')
+                    .select('role, company_id, transportadora_id')
                     .eq('id', user.id)
                     .single()
                 profile = p
@@ -49,7 +49,7 @@ export async function GET(request: NextRequest) {
         // Filtros
         const filters: CostFilters = {
             categoryId: searchParams.get('category_id') || undefined,
-            vehicleId: searchParams.get('vehicle_id') || undefined,
+            vehicleId: searchParams.get('veiculo_id') || undefined,
             routeId: searchParams.get('route_id') || undefined,
             status: (searchParams.get('status') as CostFilters['status']) || undefined,
             isRecurring: searchParams.get('is_recurring') ? searchParams.get('is_recurring') === 'true' : undefined,
@@ -79,8 +79,8 @@ export async function GET(request: NextRequest) {
         // Aplicar filtro de tenant baseado no papel
         if (profile?.role === 'empresa' && profile.company_id) {
             query = query.eq('company_id', profile.company_id)
-        } else if ((profile?.role === 'transportadora' || profile?.role === 'operador') && profile.carrier_id) {
-            query = query.eq('carrier_id', profile.carrier_id)
+        } else if ((profile?.role === 'transportadora' || profile?.role === 'operador') && profile.transportadora_id) {
+            query = query.eq('transportadora_id', profile.transportadora_id)
         }
         // Admin vê tudo (sem filtro adicional)
 
@@ -89,7 +89,7 @@ export async function GET(request: NextRequest) {
             query = query.eq('category_id', filters.categoryId)
         }
         if (filters.vehicleId) {
-            query = query.eq('vehicle_id', filters.vehicleId)
+            query = query.eq('veiculo_id', filters.vehicleId)
         }
         if (filters.routeId) {
             query = query.eq('route_id', filters.routeId)
@@ -147,7 +147,7 @@ export async function GET(request: NextRequest) {
         const costs: ManualCost[] = (data || []).map((row: Record<string, unknown>) => ({
             id: row.id as string,
             companyId: row.company_id as string | null,
-            carrierId: row.carrier_id as string | null,
+            carrierId: row.transportadora_id as string | null,
             categoryId: row.category_id as string | null,
             description: row.description as string,
             amount: parseFloat(row.amount as string),
@@ -156,9 +156,9 @@ export async function GET(request: NextRequest) {
             recurringInterval: row.recurring_interval as ManualCost['recurringInterval'],
             recurringEndDate: row.recurring_end_date as string | null,
             parentRecurringId: row.parent_recurring_id as string | null,
-            vehicleId: row.vehicle_id as string | null,
+            vehicleId: row.veiculo_id as string | null,
             routeId: row.route_id as string | null,
-            driverId: row.driver_id as string | null,
+            driverId: row.motorista_id as string | null,
             attachmentUrl: row.attachment_url as string | null,
             attachmentName: row.attachment_name as string | null,
             notes: row.notes as string | null,
@@ -205,7 +205,7 @@ export async function POST(request: NextRequest) {
         const token = request.headers.get('authorization')?.replace('Bearer ', '')
 
         let userId: string | null = null
-        let profile: { role: string; company_id?: string; carrier_id?: string } | null = null
+        let profile: { role: string; company_id?: string; transportadora_id?: string } | null = null
 
         if (token) {
             const { data: { user } } = await supabaseAdmin.auth.getUser(token)
@@ -213,7 +213,7 @@ export async function POST(request: NextRequest) {
                 userId = user.id
                 const { data: p } = await supabaseAdmin
                     .from('profiles')
-                    .select('role, company_id, carrier_id')
+                    .select('role, company_id, transportadora_id')
                     .eq('id', user.id)
                     .single()
                 profile = p
@@ -245,12 +245,12 @@ export async function POST(request: NextRequest) {
             companyId = profile.company_id || body.companyId
             carrierId = null
         } else if (profile?.role === 'transportadora' || profile?.role === 'operador') {
-            carrierId = profile.carrier_id || body.carrierId
+            carrierId = profile.transportadora_id || body.carrierId
             companyId = null
         }
         // Admin pode especificar qualquer tenant
 
-        // Validar constraint chk_tenant: deve ter company_id OU carrier_id
+        // Validar constraint chk_tenant: deve ter company_id OU transportadora_id
         if (!companyId && !carrierId) {
             return NextResponse.json(
                 { success: false, error: 'É necessário especificar uma empresa ou transportadora' },
@@ -263,7 +263,7 @@ export async function POST(request: NextRequest) {
             .from('gf_manual_costs_v2')
             .insert({
                 company_id: companyId,
-                carrier_id: carrierId,
+                transportadora_id: carrierId,
                 category_id: body.categoryId,
                 description: body.description,
                 amount: body.amount,
@@ -271,9 +271,9 @@ export async function POST(request: NextRequest) {
                 is_recurring: body.isRecurring ?? false,
                 recurring_interval: body.recurringInterval,
                 recurring_end_date: body.recurringEndDate,
-                vehicle_id: body.vehicleId,
+                veiculo_id: body.vehicleId,
                 route_id: body.routeId,
-                driver_id: body.driverId,
+                motorista_id: body.driverId,
                 attachment_url: body.attachmentUrl,
                 attachment_name: body.attachmentName,
                 notes: body.notes,
@@ -298,7 +298,7 @@ export async function POST(request: NextRequest) {
         const newCost: ManualCost = {
             id: data.id,
             companyId: data.company_id,
-            carrierId: data.carrier_id,
+            carrierId: data.transportadora_id,
             categoryId: data.category_id,
             description: data.description,
             amount: parseFloat(data.amount),
@@ -307,9 +307,9 @@ export async function POST(request: NextRequest) {
             recurringInterval: data.recurring_interval,
             recurringEndDate: data.recurring_end_date,
             parentRecurringId: data.parent_recurring_id,
-            vehicleId: data.vehicle_id,
+            vehicleId: data.veiculo_id,
             routeId: data.route_id,
-            driverId: data.driver_id,
+            driverId: data.motorista_id,
             attachmentUrl: data.attachment_url,
             attachmentName: data.attachment_name,
             notes: data.notes,

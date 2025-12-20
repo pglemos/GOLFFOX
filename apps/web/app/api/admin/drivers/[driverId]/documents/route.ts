@@ -43,7 +43,7 @@ export async function GET(
         const { data, error } = await supabase
             .from('gf_driver_documents')
             .select('*')
-            .eq('driver_id', driverId)
+            .eq('motorista_id', driverId)
             .order('created_at', { ascending: false })
 
         if (error) {
@@ -88,7 +88,7 @@ export async function POST(
         const { data: existing } = await supabase
             .from('gf_driver_documents')
             .select('id')
-            .eq('driver_id', driverId)
+            .eq('motorista_id', driverId)
             .eq('document_type', validatedData.document_type)
             .single()
 
@@ -109,7 +109,7 @@ export async function POST(
             result = await supabase
                 .from('gf_driver_documents')
                 .insert({
-                    driver_id: driverId,
+                    motorista_id: driverId,
                     ...validatedData,
                 })
                 .select()
@@ -163,7 +163,7 @@ export async function DELETE(
             .from('gf_driver_documents')
             .delete()
             .eq('id', documentId)
-            .eq('driver_id', driverId)
+            .eq('motorista_id', driverId)
 
         if (error) {
             logError('Erro ao remover documento', { error, driverId }, 'DriverDocumentsAPI')

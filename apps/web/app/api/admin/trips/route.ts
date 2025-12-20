@@ -34,9 +34,9 @@ export async function GET(request: NextRequest) {
     
     // Filtros opcionais
     const companyId = searchParams.get('company_id')
-    const vehicleId = searchParams.get('vehicle_id')
+    const vehicleId = searchParams.get('veiculo_id')
     const routeId = searchParams.get('route_id')
-    const driverId = searchParams.get('driver_id')
+    const driverId = searchParams.get('motorista_id')
     const status = searchParams.get('status')
     const startDate = searchParams.get('start_date')
     const endDate = searchParams.get('end_date')
@@ -44,18 +44,18 @@ export async function GET(request: NextRequest) {
     const offset = parseInt(searchParams.get('offset') || '0')
 
     // Selecionar apenas colunas necessárias para listagem (otimização de performance)
-    const tripColumns = 'id,route_id,vehicle_id,driver_id,status,scheduled_date,scheduled_start_time,start_time,end_time,actual_start_time,actual_end_time,distance_km,notes,created_at,updated_at'
+    const tripColumns = 'id,route_id,veiculo_id,motorista_id,status,scheduled_date,scheduled_start_time,start_time,end_time,actual_start_time,actual_end_time,distance_km,notes,created_at,updated_at'
     let query = supabaseAdmin.from('trips').select(tripColumns, { count: 'exact' })
 
     // Aplicar filtros
     if (vehicleId) {
-      query = query.eq('vehicle_id', vehicleId)
+      query = query.eq('veiculo_id', vehicleId)
     }
     if (routeId) {
       query = query.eq('route_id', routeId)
     }
     if (driverId) {
-      query = query.eq('driver_id', driverId)
+      query = query.eq('motorista_id', driverId)
     }
     if (status) {
       query = query.eq('status', status)
@@ -125,8 +125,8 @@ export async function POST(request: NextRequest) {
 
     // Aceitar tanto snake_case quanto camelCase
     const routeId = body?.route_id || body?.routeId
-    const vehicleId = body?.vehicle_id || body?.vehicleId
-    const driverId = body?.driver_id || body?.driverId
+    const vehicleId = body?.veiculo_id || body?.vehicleId
+    const driverId = body?.motorista_id || body?.driverId
     const scheduledDate = body?.scheduled_date || body?.scheduledDate
     const scheduledStartTime = body?.scheduled_start_time || body?.scheduledStartTime
     const startTime = body?.start_time || body?.startTime
@@ -284,8 +284,8 @@ export async function POST(request: NextRequest) {
       status: status
     }
 
-    if (vehicleId) tripData.vehicle_id = vehicleId
-    if (driverId) tripData.driver_id = driverId
+    if (vehicleId) tripData.veiculo_id = vehicleId
+    if (driverId) tripData.motorista_id = driverId
     if (scheduledStartTime) {
       tripData.scheduled_start_time = scheduledStartTime
     } else if (startTime) {

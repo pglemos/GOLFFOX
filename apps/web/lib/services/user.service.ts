@@ -190,8 +190,8 @@ export class UserService {
       // Limpar referências em outras tabelas
       await supabaseAdmin
         .from('trips')
-        .update({ driver_id: null })
-        .eq('driver_id', userId)
+        .update({ motorista_id: null })
+        .eq('motorista_id', userId)
 
       // Deletar usuário
       const { error } = await supabaseAdmin

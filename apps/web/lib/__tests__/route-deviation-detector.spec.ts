@@ -103,14 +103,14 @@ describe('RouteDeviationDetector', () => {
     it('deve detectar desvios para múltiplos veículos', () => {
       const vehicles = [
         {
-          vehicle_id: 'veiculo-1',
+          veiculo_id: 'veiculo-1',
           lat: -19.916681,
           lng: -43.934493,
           speed: 10,
           route_id: 'route-1',
         },
         {
-          vehicle_id: 'veiculo-2',
+          veiculo_id: 'veiculo-2',
           lat: -19.920681, // Longe da rota
           lng: -43.934493,
           speed: 10,
@@ -131,7 +131,7 @@ describe('RouteDeviationDetector', () => {
     it('deve retornar resultados vazios se não há rotas', () => {
       const vehicles = [
         {
-          vehicle_id: 'veiculo-1',
+          veiculo_id: 'veiculo-1',
           lat: -19.916681,
           lng: -43.934493,
           speed: 10,

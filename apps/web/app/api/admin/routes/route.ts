@@ -114,8 +114,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Campos opcionais
-    if (body.carrier_id || body.carrierId) {
-      routeData.carrier_id = body.carrier_id || body.carrierId
+    if (body.transportadora_id || body.carrierId) {
+      routeData.transportadora_id = body.transportadora_id
     }
     if (body.distance !== undefined) {
       routeData.distance = body.distance
@@ -227,7 +227,7 @@ export async function GET(request: NextRequest) {
     const offset = parseInt(searchParams.get('offset') || '0')
 
     // Selecionar apenas colunas necessárias para listagem (otimização de performance)
-    const routeColumns = 'id,name,company_id,carrier_id,origin,destination,origin_lat,origin_lng,destination_lat,destination_lng,polyline,is_active,created_at,updated_at'
+    const routeColumns = 'id,name,company_id,transportadora_id,origin,destination,origin_lat,origin_lng,destination_lat,destination_lng,polyline,is_active,created_at,updated_at'
     let query = supabaseAdmin.from('routes').select(routeColumns, { count: 'exact' })
 
     if (companyId) {

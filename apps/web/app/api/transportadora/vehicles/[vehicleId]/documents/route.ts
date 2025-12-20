@@ -41,11 +41,11 @@ export async function GET(
     if (authErrorResponse) return authErrorResponse
 
     // Selecionar apenas colunas necessárias para listagem (otimização de performance)
-    const documentColumns = 'id,vehicle_id,document_type,document_number,file_url,file_name,issue_date,expiry_date,value_brl,insurance_company,policy_number,status,notes,created_at,updated_at'
+    const documentColumns = 'id,veiculo_id,document_type,document_number,file_url,file_name,issue_date,expiry_date,value_brl,insurance_company,policy_number,status,notes,created_at,updated_at'
     const { data, error } = await supabaseServiceRole
       .from('vehicle_documents')
       .select(documentColumns)
-      .eq('vehicle_id', params.vehicleId)
+      .eq('veiculo_id', params.vehicleId)
       .order('created_at', { ascending: false })
 
     if (error) {
@@ -81,7 +81,7 @@ export async function POST(
     const { data, error } = await supabaseServiceRole
       .from('vehicle_documents')
       .insert({
-        vehicle_id: params.vehicleId,
+        veiculo_id: params.vehicleId,
         ...validated,
         issue_date: validated.issue_date || null,
         expiry_date: validated.expiry_date || null,

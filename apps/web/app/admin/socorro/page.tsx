@@ -520,8 +520,8 @@ export default function SocorroPage() {
                               await supabase.from('gf_incidents').insert({
                                 company_id: ocorrencia.company_id || null,
                                 route_id: ocorrencia.route_id || null,
-                                vehicle_id: ocorrencia.vehicle_id || null,
-                                driver_id: ocorrencia.driver_id || null,
+                                veiculo_id: ocorrencia.veiculo_id || null,
+                                motorista_id: ocorrencia.motorista_id || null,
                                 severity: 'critical',
                                 status: 'open',
                                 description: `Ocorrência de socorro: ${ocorrencia.request_type} - ${ocorrencia.description || ''}`

@@ -20,7 +20,7 @@ describe('DELETE /api/admin/vehicles/[vehicleId]', () => {
     mockSupabaseClient.setTableData('vehicles', [veiculo])
     mockSupabaseClient.setTableData('trips', [])
     mockSupabaseClient.setTableData('gf_vehicle_maintenance', [])
-    mockSupabaseClient.setTableData('gf_vehicle_checklists', [])
+    mockSupabaseClient.setTableData('gf_veiculo_checklists', [])
 
     const req = createAdminRequest({
       method: 'DELETE',
@@ -41,7 +41,7 @@ describe('DELETE /api/admin/vehicles/[vehicleId]', () => {
     const veiculo = createTestVehicle('transportadora-1', { plate: 'ABC1234' })
     mockSupabaseClient.setTableData('vehicles', [veiculo])
     mockSupabaseClient.setTableData('trips', [
-      { id: 'trip-1', vehicle_id: veiculo.id },
+      { id: 'trip-1', veiculo_id: veiculo.id },
     ])
 
     const req = createAdminRequest({

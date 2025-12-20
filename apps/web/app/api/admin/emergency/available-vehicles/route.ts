@@ -27,7 +27,7 @@ export async function GET(req: NextRequest) {
     // Buscar viagens em andamento para filtrar veículos ocupados
     const { data: activeTrips, error: tripsError } = await supabase
       .from('trips')
-      .select('vehicle_id')
+      .select('veiculo_id')
       .eq('status', 'inProgress')
 
     if (tripsError) {
@@ -35,7 +35,7 @@ export async function GET(req: NextRequest) {
     }
 
     const activeVehicleIds = new Set(
-      (activeTrips || []).map((t: any) => t.vehicle_id).filter(Boolean)
+      (activeTrips || []).map((t: any) => t.veiculo_id).filter(Boolean)
     )
 
     // Filtrar veículos disponíveis (não estão em viagem)

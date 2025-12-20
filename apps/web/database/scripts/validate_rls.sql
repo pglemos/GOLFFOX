@@ -30,7 +30,7 @@ FROM information_schema.tables
 WHERE table_schema = 'public' 
   AND table_name IN (
     'companies', 'carriers', 'users', 'vehicles', 'routes', 
-    'trips', 'driver_positions'
+    'trips', 'motorista_positions'
   );
 
 -- ====================================================
@@ -49,7 +49,7 @@ SELECT
   ) as detalhes
 FROM pg_tables 
 WHERE schemaname = 'public' 
-  AND tablename IN ('users', 'routes', 'trips', 'vehicles', 'driver_positions', 'companies', 'gf_costs')
+  AND tablename IN ('users', 'routes', 'trips', 'vehicles', 'motorista_positions', 'companies', 'gf_costs')
 ORDER BY tablename;
 
 -- ====================================================
@@ -66,7 +66,7 @@ SELECT
   END as status
 FROM pg_policies 
 WHERE schemaname = 'public'
-  AND tablename IN ('users', 'routes', 'trips', 'vehicles', 'driver_positions', 'companies', 'gf_costs')
+  AND tablename IN ('users', 'routes', 'trips', 'vehicles', 'motorista_positions', 'companies', 'gf_costs')
 GROUP BY tablename
 ORDER BY tablename;
 
@@ -84,7 +84,7 @@ SELECT
   STRING_AGG(policyname || ' (' || cmd || ')', ', ' ORDER BY policyname) as detalhes
 FROM pg_policies 
 WHERE schemaname = 'public'
-  AND tablename = 'driver_positions';
+  AND tablename = 'motorista_positions';
 
 -- 5.2 Trips (deve ter políticas para diferentes roles)
 SELECT 
@@ -147,9 +147,9 @@ SELECT
   CASE 
     WHEN (
       (SELECT COUNT(*) FROM pg_extension WHERE extname IN ('uuid-ossp', 'pgcrypto', 'pg_cron')) = 3
-      AND (SELECT COUNT(*) FROM pg_tables WHERE schemaname = 'public' AND tablename IN ('users', 'routes', 'trips', 'vehicles', 'driver_positions', 'companies', 'gf_costs')) >= 7
-      AND (SELECT COUNT(*) FROM pg_tables WHERE schemaname = 'public' AND rowsecurity = true AND tablename IN ('users', 'routes', 'trips', 'vehicles', 'driver_positions', 'companies', 'gf_costs')) >= 7
-      AND (SELECT COUNT(*) FROM pg_policies WHERE schemaname = 'public' AND tablename IN ('users', 'routes', 'trips', 'vehicles', 'driver_positions', 'companies', 'gf_costs')) >= 14
+      AND (SELECT COUNT(*) FROM pg_tables WHERE schemaname = 'public' AND tablename IN ('users', 'routes', 'trips', 'vehicles', 'motorista_positions', 'companies', 'gf_costs')) >= 7
+      AND (SELECT COUNT(*) FROM pg_tables WHERE schemaname = 'public' AND rowsecurity = true AND tablename IN ('users', 'routes', 'trips', 'vehicles', 'motorista_positions', 'companies', 'gf_costs')) >= 7
+      AND (SELECT COUNT(*) FROM pg_policies WHERE schemaname = 'public' AND tablename IN ('users', 'routes', 'trips', 'vehicles', 'motorista_positions', 'companies', 'gf_costs')) >= 14
     ) THEN '✅ TODAS AS VALIDAÇÕES PASSARAM'
     ELSE '⚠️ ALGUMAS VALIDAÇÕES FALHARAM - VER DETALHES ACIMA'
   END as status,

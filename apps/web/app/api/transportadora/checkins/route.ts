@@ -14,17 +14,17 @@ export async function GET(request: NextRequest) {
         const { searchParams } = new URL(request.url);
 
         const tripId = searchParams.get('trip_id');
-        const driverId = searchParams.get('driver_id');
+        const driverId = searchParams.get('motorista_id');
         const date = searchParams.get('date');
         const type = searchParams.get('type'); // 'boarding' ou 'dropoff'
         const limit = parseInt(searchParams.get('limit') || '100');
 
         let query = supabase
-            .from('passenger_checkins' as any)
+            .from('passageiro_checkins' as any)
             .select(`
                 *,
-                passageiro:users!passenger_id(id, name, email, phone),
-                motorista:users!driver_id(id, name),
+                passageiro:users!passageiro_id(id, name, email, phone),
+                motorista:users!motorista_id(id, name),
                 trip:trips(id, scheduled_date, route:routes(name))
             `)
             .order('created_at', { ascending: false })
@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
         }
 
         if (driverId) {
-            query = query.eq('driver_id', driverId);
+            query = query.eq('motorista_id', driverId);
         }
 
         if (date) {

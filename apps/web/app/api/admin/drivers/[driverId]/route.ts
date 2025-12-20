@@ -23,7 +23,6 @@ export async function PUT(
       email,
       phone,
       transportadora_id,
-      carrier_id, // Compatibilidade
       cpf,
       cnh,
       cnh_category,
@@ -38,7 +37,7 @@ export async function PUT(
       )
     }
 
-    const transportadoraId = transportadora_id || carrier_id // Compatibilidade
+    const transportadoraId = transportadora_id
 
     // Atualizar motorista na tabela users
     const { data: motorista, error: driverError } = await supabase

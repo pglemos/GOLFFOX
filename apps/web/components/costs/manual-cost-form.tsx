@@ -76,8 +76,8 @@ export function ManualCostForm({
         body: JSON.stringify({
           company_id: companyId,
           route_id: routeId || null,
-          vehicle_id: vehicleId || null,
-          driver_id: driverId || null,
+          veiculo_id: vehicleId || null,
+          motorista_id: driverId || null,
           cost_category_id: formData.cost_category_id,
           date: formData.date,
           amount: parseFloat(formData.amount),

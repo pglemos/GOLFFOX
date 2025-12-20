@@ -13,22 +13,22 @@ export async function GET(request: NextRequest) {
         const supabase = getSupabaseAdmin();
         const { searchParams } = new URL(request.url);
 
-        const passengerId = searchParams.get('passenger_id');
+        const passengerId = searchParams.get('passageiro_id');
         const date = searchParams.get('date');
         const reason = searchParams.get('reason');
         const limit = parseInt(searchParams.get('limit') || '100');
 
         let query = supabase
-            .from('passenger_cancellations' as any)
+            .from('passageiro_cancellations' as any)
             .select(`
                 *,
-                passageiro:users!passenger_id(id, name, email, phone)
+                passageiro:users!passageiro_id(id, name, email, phone)
             `)
             .order('created_at', { ascending: false })
             .limit(limit);
 
         if (passengerId) {
-            query = query.eq('passenger_id', passengerId);
+            query = query.eq('passageiro_id', passengerId);
         }
 
         if (date) {

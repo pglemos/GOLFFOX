@@ -43,7 +43,7 @@ describe('GET /api/transportadora/costs/veiculo', () => {
     mockSupabaseClient.setTableData('vehicle_costs', [
       {
         id: 'cost-1',
-        vehicle_id: veiculo.id,
+        veiculo_id: veiculo.id,
         cost_date: '2024-01-15',
         amount_brl: 100.0,
       },
@@ -61,7 +61,7 @@ describe('GET /api/transportadora/costs/veiculo', () => {
     expect(Array.isArray(data)).toBe(true)
   })
 
-  it('deve filtrar por vehicle_id', async () => {
+  it('deve filtrar por veiculo_id', async () => {
     const transportadora = createTestTransportadora()
     const user = createTestUser({ role: 'transportadora', transportadora_id: transportadora.id })
     const veiculo = createTestVehicle(transportadora.id)
@@ -72,7 +72,7 @@ describe('GET /api/transportadora/costs/veiculo', () => {
 
     const req = createTransportadoraRequest({
       method: 'GET',
-      url: `http://localhost:3000/api/transportadora/costs/veiculo?vehicle_id=${veiculo.id}`,
+      url: `http://localhost:3000/api/transportadora/costs/veiculo?veiculo_id=${veiculo.id}`,
     }) as NextRequest
 
     const response = await GET(req)
@@ -117,7 +117,7 @@ describe('POST /api/transportadora/costs/veiculo', () => {
     const req = createTransportadoraRequest({
       method: 'POST',
       body: {
-        vehicle_id: veiculo.id,
+        veiculo_id: veiculo.id,
         cost_category: 'combustivel',
         cost_date: '2024-01-15',
         amount_brl: 100.0,
@@ -128,7 +128,7 @@ describe('POST /api/transportadora/costs/veiculo', () => {
     const data = await response.json()
 
     expect([200, 201]).toContain(response.status)
-    expect(data.id || data.vehicle_id).toBeDefined()
+    expect(data.id || data.veiculo_id).toBeDefined()
   })
 
   it('deve validar dados obrigatórios', async () => {
@@ -158,7 +158,7 @@ describe('POST /api/transportadora/costs/veiculo', () => {
     const req = createTransportadoraRequest({
       method: 'POST',
       body: {
-        vehicle_id: veiculo.id,
+        veiculo_id: veiculo.id,
         cost_category: 'combustivel',
         cost_date: '2024-01-15',
         amount_brl: 100.0,

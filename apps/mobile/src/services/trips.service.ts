@@ -48,8 +48,8 @@ export class TripsService {
           origin_city,
           destination_city,
           status,
-          vehicle_id,
-          driver_id,
+          veiculo_id,
+          motorista_id,
           route_id,
           routes (
             name,
@@ -57,7 +57,7 @@ export class TripsService {
             destination
           )
         `)
-        .eq('driver_id', driverId)
+        .eq('motorista_id', driverId)
         .in('status', ['scheduled', 'in_progress'])
         .order('departure_time', { ascending: true })
         .limit(10)
@@ -81,8 +81,8 @@ export class TripsService {
         destinationCity: trip.destination_city || '',
         isNext: trip.status === 'scheduled',
         status: trip.status,
-        vehicleId: trip.vehicle_id,
-        driverId: trip.driver_id,
+        vehicleId: trip.veiculo_id,
+        driverId: trip.motorista_id,
         routeId: trip.route_id,
       }))
 
@@ -101,7 +101,7 @@ export class TripsService {
       const { data, error } = await supabase
         .from('trips')
         .select('*')
-        .eq('driver_id', driverId)
+        .eq('motorista_id', driverId)
         .eq('status', 'in_progress')
         .single()
 
@@ -193,8 +193,8 @@ export class TripsService {
       destinationCity: data.destination_city || '',
       isNext: data.status === 'scheduled',
       status: data.status,
-      vehicleId: data.vehicle_id,
-      driverId: data.driver_id,
+      vehicleId: data.veiculo_id,
+      driverId: data.motorista_id,
       routeId: data.route_id,
     }
   }

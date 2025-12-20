@@ -3,20 +3,20 @@
 -- Migration Date: 2025-12-15
 -- ====================================================
 -- Creates tables required for mobile app functionality:
--- - passenger_checkins: Check-in/out de passageiros
--- - vehicle_checklists: Checklist pré-viagem do motorista
--- - driver_locations: Rastreamento GPS em tempo real
--- - driver_messages: Chat motorista-central
--- - passenger_cancellations: Registro de não-embarques
+-- - passageiro_checkins: Check-in/out de passageiros
+-- - veiculo_checklists: Checklist pré-viagem do motorista
+-- - motorista_locations: Rastreamento GPS em tempo real
+-- - motorista_messages: Chat motorista-central
+-- - passageiro_cancellations: Registro de não-embarques
 
 -- ====================================================
 -- PART 1: passageiro CHECK-INS
 -- ====================================================
-CREATE TABLE IF NOT EXISTS public.passenger_checkins (
+CREATE TABLE IF NOT EXISTS public.passageiro_checkins (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     trip_id UUID REFERENCES public.trips(id) ON DELETE CASCADE,
-    passenger_id UUID REFERENCES public.users(id) ON DELETE CASCADE,
-    driver_id UUID REFERENCES public.users(id) ON DELETE SET NULL,
+    passageiro_id UUID REFERENCES public.users(id) ON DELETE CASCADE,
+    motorista_id UUID REFERENCES public.users(id) ON DELETE SET NULL,
     type TEXT NOT NULL CHECK (type IN ('boarding', 'dropoff')),
     method TEXT CHECK (method IN ('qr', 'nfc', 'manual')),
     passenger_identifier TEXT, -- Código QR ou NFC do passageiro
@@ -27,19 +27,19 @@ CREATE TABLE IF NOT EXISTS public.passenger_checkins (
 );
 
 -- Índices para performance
-CREATE INDEX IF NOT EXISTS idx_passenger_checkins_trip ON public.passenger_checkins(trip_id);
-CREATE INDEX IF NOT EXISTS idx_passenger_checkins_passenger ON public.passenger_checkins(passenger_id);
-CREATE INDEX IF NOT EXISTS idx_passenger_checkins_driver ON public.passenger_checkins(driver_id);
-CREATE INDEX IF NOT EXISTS idx_passenger_checkins_created ON public.passenger_checkins(created_at);
+CREATE INDEX IF NOT EXISTS idx_passenger_checkins_trip ON public.passageiro_checkins(trip_id);
+CREATE INDEX IF NOT EXISTS idx_passenger_checkins_passenger ON public.passageiro_checkins(passageiro_id);
+CREATE INDEX IF NOT EXISTS idx_passenger_checkins_driver ON public.passageiro_checkins(motorista_id);
+CREATE INDEX IF NOT EXISTS idx_passenger_checkins_created ON public.passageiro_checkins(created_at);
 
 -- ====================================================
 -- PART 2: veiculo CHECKLISTS
 -- ====================================================
-CREATE TABLE IF NOT EXISTS public.vehicle_checklists (
+CREATE TABLE IF NOT EXISTS public.veiculo_checklists (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     trip_id UUID REFERENCES public.trips(id) ON DELETE CASCADE,
-    driver_id UUID REFERENCES public.users(id) ON DELETE SET NULL,
-    vehicle_id UUID REFERENCES public.vehicles(id) ON DELETE SET NULL,
+    motorista_id UUID REFERENCES public.users(id) ON DELETE SET NULL,
+    veiculo_id UUID REFERENCES public.vehicles(id) ON DELETE SET NULL,
     items JSONB NOT NULL DEFAULT '[]', -- Array de {item, checked, notes}
     photos JSONB DEFAULT '[]', -- Array de URLs das fotos
     odometer_reading NUMERIC,
@@ -53,17 +53,17 @@ CREATE TABLE IF NOT EXISTS public.vehicle_checklists (
 );
 
 -- Índices
-CREATE INDEX IF NOT EXISTS idx_vehicle_checklists_trip ON public.vehicle_checklists(trip_id);
-CREATE INDEX IF NOT EXISTS idx_vehicle_checklists_driver ON public.vehicle_checklists(driver_id);
-CREATE INDEX IF NOT EXISTS idx_vehicle_checklists_vehicle ON public.vehicle_checklists(vehicle_id);
-CREATE INDEX IF NOT EXISTS idx_vehicle_checklists_status ON public.vehicle_checklists(status);
+CREATE INDEX IF NOT EXISTS idx_vehicle_checklists_trip ON public.veiculo_checklists(trip_id);
+CREATE INDEX IF NOT EXISTS idx_vehicle_checklists_driver ON public.veiculo_checklists(motorista_id);
+CREATE INDEX IF NOT EXISTS idx_vehicle_checklists_vehicle ON public.veiculo_checklists(veiculo_id);
+CREATE INDEX IF NOT EXISTS idx_vehicle_checklists_status ON public.veiculo_checklists(status);
 
 -- ====================================================
 -- PART 3: motorista LOCATIONS (GPS Tracking)
 -- ====================================================
-CREATE TABLE IF NOT EXISTS public.driver_locations (
+CREATE TABLE IF NOT EXISTS public.motorista_locations (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    driver_id UUID REFERENCES public.users(id) ON DELETE CASCADE,
+    motorista_id UUID REFERENCES public.users(id) ON DELETE CASCADE,
     trip_id UUID REFERENCES public.trips(id) ON DELETE SET NULL,
     latitude NUMERIC NOT NULL,
     longitude NUMERIC NOT NULL,
@@ -75,17 +75,17 @@ CREATE TABLE IF NOT EXISTS public.driver_locations (
 );
 
 -- Índice para busca rápida da última localização
-CREATE INDEX IF NOT EXISTS idx_driver_locations_driver ON public.driver_locations(driver_id);
-CREATE INDEX IF NOT EXISTS idx_driver_locations_trip ON public.driver_locations(trip_id);
-CREATE INDEX IF NOT EXISTS idx_driver_locations_recorded ON public.driver_locations(recorded_at DESC);
+CREATE INDEX IF NOT EXISTS idx_driver_locations_driver ON public.motorista_locations(motorista_id);
+CREATE INDEX IF NOT EXISTS idx_driver_locations_trip ON public.motorista_locations(trip_id);
+CREATE INDEX IF NOT EXISTS idx_driver_locations_recorded ON public.motorista_locations(recorded_at DESC);
 
 -- ====================================================
 -- PART 4: motorista MESSAGES (Chat)
 -- ====================================================
-CREATE TABLE IF NOT EXISTS public.driver_messages (
+CREATE TABLE IF NOT EXISTS public.motorista_messages (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    driver_id UUID NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
-    carrier_id UUID, -- Transportadora (para multitenancy)
+    motorista_id UUID NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
+    transportadora_id UUID, -- Transportadora (para multitenancy)
     sender TEXT NOT NULL CHECK (sender IN ('motorista', 'central')),
     message TEXT NOT NULL,
     message_type TEXT DEFAULT 'text' CHECK (message_type IN ('text', 'location', 'emergency', 'delay', 'system')),
@@ -96,17 +96,17 @@ CREATE TABLE IF NOT EXISTS public.driver_messages (
 );
 
 -- Índices
-CREATE INDEX IF NOT EXISTS idx_driver_messages_driver ON public.driver_messages(driver_id);
-CREATE INDEX IF NOT EXISTS idx_driver_messages_carrier ON public.driver_messages(carrier_id);
-CREATE INDEX IF NOT EXISTS idx_driver_messages_created ON public.driver_messages(created_at DESC);
-CREATE INDEX IF NOT EXISTS idx_driver_messages_emergency ON public.driver_messages(is_emergency) WHERE is_emergency = true;
+CREATE INDEX IF NOT EXISTS idx_driver_messages_driver ON public.motorista_messages(motorista_id);
+CREATE INDEX IF NOT EXISTS idx_driver_messages_carrier ON public.motorista_messages(transportadora_id);
+CREATE INDEX IF NOT EXISTS idx_driver_messages_created ON public.motorista_messages(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_driver_messages_emergency ON public.motorista_messages(is_emergency) WHERE is_emergency = true;
 
 -- ====================================================
 -- PART 5: passageiro CANCELLATIONS
 -- ====================================================
-CREATE TABLE IF NOT EXISTS public.passenger_cancellations (
+CREATE TABLE IF NOT EXISTS public.passageiro_cancellations (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    passenger_id UUID NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
+    passageiro_id UUID NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
     trip_id UUID REFERENCES public.trips(id) ON DELETE SET NULL,
     scheduled_date DATE NOT NULL,
     reason TEXT NOT NULL CHECK (reason IN ('home_office', 'folga', 'ferias', 'medico', 'outro')),
@@ -117,8 +117,8 @@ CREATE TABLE IF NOT EXISTS public.passenger_cancellations (
 );
 
 -- Índices
-CREATE INDEX IF NOT EXISTS idx_passenger_cancellations_passenger ON public.passenger_cancellations(passenger_id);
-CREATE INDEX IF NOT EXISTS idx_passenger_cancellations_date ON public.passenger_cancellations(scheduled_date);
+CREATE INDEX IF NOT EXISTS idx_passenger_cancellations_passenger ON public.passageiro_cancellations(passageiro_id);
+CREATE INDEX IF NOT EXISTS idx_passenger_cancellations_date ON public.passageiro_cancellations(scheduled_date);
 
 -- ====================================================
 -- PART 6: passageiro EVALUATIONS (NPS)
@@ -126,8 +126,8 @@ CREATE INDEX IF NOT EXISTS idx_passenger_cancellations_date ON public.passenger_
 CREATE TABLE IF NOT EXISTS public.trip_evaluations (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     trip_id UUID REFERENCES public.trips(id) ON DELETE SET NULL,
-    passenger_id UUID NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
-    driver_id UUID REFERENCES public.users(id) ON DELETE SET NULL,
+    passageiro_id UUID NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
+    motorista_id UUID REFERENCES public.users(id) ON DELETE SET NULL,
     nps_score INTEGER NOT NULL CHECK (nps_score >= 0 AND nps_score <= 10),
     tags JSONB DEFAULT '[]', -- Array de tags selecionadas
     comment TEXT,
@@ -136,7 +136,7 @@ CREATE TABLE IF NOT EXISTS public.trip_evaluations (
 
 -- Índices
 CREATE INDEX IF NOT EXISTS idx_trip_evaluations_trip ON public.trip_evaluations(trip_id);
-CREATE INDEX IF NOT EXISTS idx_trip_evaluations_driver ON public.trip_evaluations(driver_id);
+CREATE INDEX IF NOT EXISTS idx_trip_evaluations_driver ON public.trip_evaluations(motorista_id);
 CREATE INDEX IF NOT EXISTS idx_trip_evaluations_nps ON public.trip_evaluations(nps_score);
 
 -- ====================================================
@@ -145,7 +145,7 @@ CREATE INDEX IF NOT EXISTS idx_trip_evaluations_nps ON public.trip_evaluations(n
 CREATE TABLE IF NOT EXISTS public.announcements (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     company_id UUID REFERENCES public.companies(id) ON DELETE CASCADE,
-    carrier_id UUID,
+    transportadora_id UUID,
     title TEXT NOT NULL,
     message TEXT NOT NULL,
     type TEXT DEFAULT 'info' CHECK (type IN ('info', 'alerta', 'urgente')),
@@ -165,65 +165,65 @@ CREATE INDEX IF NOT EXISTS idx_announcements_active ON public.announcements(is_a
 -- ====================================================
 
 -- Enable RLS
-ALTER TABLE public.passenger_checkins ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.vehicle_checklists ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.driver_locations ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.driver_messages ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.passenger_cancellations ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.passageiro_checkins ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.veiculo_checklists ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.motorista_locations ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.motorista_messages ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.passageiro_cancellations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.trip_evaluations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.announcements ENABLE ROW LEVEL SECURITY;
 
 -- Service role full access
-CREATE POLICY "Service role full access on passenger_checkins" ON public.passenger_checkins FOR ALL TO service_role USING (true) WITH CHECK (true);
-CREATE POLICY "Service role full access on vehicle_checklists" ON public.vehicle_checklists FOR ALL TO service_role USING (true) WITH CHECK (true);
-CREATE POLICY "Service role full access on driver_locations" ON public.driver_locations FOR ALL TO service_role USING (true) WITH CHECK (true);
-CREATE POLICY "Service role full access on driver_messages" ON public.driver_messages FOR ALL TO service_role USING (true) WITH CHECK (true);
-CREATE POLICY "Service role full access on passenger_cancellations" ON public.passenger_cancellations FOR ALL TO service_role USING (true) WITH CHECK (true);
+CREATE POLICY "Service role full access on passageiro_checkins" ON public.passageiro_checkins FOR ALL TO service_role USING (true) WITH CHECK (true);
+CREATE POLICY "Service role full access on veiculo_checklists" ON public.veiculo_checklists FOR ALL TO service_role USING (true) WITH CHECK (true);
+CREATE POLICY "Service role full access on motorista_locations" ON public.motorista_locations FOR ALL TO service_role USING (true) WITH CHECK (true);
+CREATE POLICY "Service role full access on motorista_messages" ON public.motorista_messages FOR ALL TO service_role USING (true) WITH CHECK (true);
+CREATE POLICY "Service role full access on passageiro_cancellations" ON public.passageiro_cancellations FOR ALL TO service_role USING (true) WITH CHECK (true);
 CREATE POLICY "Service role full access on trip_evaluations" ON public.trip_evaluations FOR ALL TO service_role USING (true) WITH CHECK (true);
 CREATE POLICY "Service role full access on announcements" ON public.announcements FOR ALL TO service_role USING (true) WITH CHECK (true);
 
 -- Drivers can create checkins
-CREATE POLICY "Drivers can create checkins" ON public.passenger_checkins 
+CREATE POLICY "Drivers can create checkins" ON public.passageiro_checkins 
     FOR INSERT TO authenticated 
-    WITH CHECK (driver_id = auth.uid());
+    WITH CHECK (motorista_id = auth.uid());
 
 -- Drivers can read their own checkins
-CREATE POLICY "Drivers can read own checkins" ON public.passenger_checkins 
+CREATE POLICY "Drivers can read own checkins" ON public.passageiro_checkins 
     FOR SELECT TO authenticated 
-    USING (driver_id = auth.uid() OR passenger_id = auth.uid());
+    USING (motorista_id = auth.uid() OR passageiro_id = auth.uid());
 
 -- Drivers can manage their checklists
-CREATE POLICY "Drivers can manage checklists" ON public.vehicle_checklists 
+CREATE POLICY "Drivers can manage checklists" ON public.veiculo_checklists 
     FOR ALL TO authenticated 
-    USING (driver_id = auth.uid())
-    WITH CHECK (driver_id = auth.uid());
+    USING (motorista_id = auth.uid())
+    WITH CHECK (motorista_id = auth.uid());
 
 -- Drivers can insert their locations
-CREATE POLICY "Drivers can insert locations" ON public.driver_locations 
+CREATE POLICY "Drivers can insert locations" ON public.motorista_locations 
     FOR INSERT TO authenticated 
-    WITH CHECK (driver_id = auth.uid());
+    WITH CHECK (motorista_id = auth.uid());
 
 -- Users can read motorista locations for their trips
-CREATE POLICY "Users can read trip locations" ON public.driver_locations 
+CREATE POLICY "Users can read trip locations" ON public.motorista_locations 
     FOR SELECT TO authenticated 
     USING (true); -- Ajustar para company_id se necessário
 
 -- motorista messages policies
-CREATE POLICY "Drivers can manage own messages" ON public.driver_messages 
+CREATE POLICY "Drivers can manage own messages" ON public.motorista_messages 
     FOR ALL TO authenticated 
-    USING (driver_id = auth.uid())
-    WITH CHECK (driver_id = auth.uid());
+    USING (motorista_id = auth.uid())
+    WITH CHECK (motorista_id = auth.uid());
 
 -- Passengers can cancel
-CREATE POLICY "Passengers can manage cancellations" ON public.passenger_cancellations 
+CREATE POLICY "Passengers can manage cancellations" ON public.passageiro_cancellations 
     FOR ALL TO authenticated 
-    USING (passenger_id = auth.uid())
-    WITH CHECK (passenger_id = auth.uid());
+    USING (passageiro_id = auth.uid())
+    WITH CHECK (passageiro_id = auth.uid());
 
 -- Passengers can create evaluations
 CREATE POLICY "Passengers can create evaluations" ON public.trip_evaluations 
     FOR INSERT TO authenticated 
-    WITH CHECK (passenger_id = auth.uid());
+    WITH CHECK (passageiro_id = auth.uid());
 
 -- Users can read active announcements
 CREATE POLICY "Users can read announcements" ON public.announcements 
@@ -234,10 +234,10 @@ CREATE POLICY "Users can read announcements" ON public.announcements
 -- PART 9: TRIGGERS
 -- ====================================================
 
--- Updated_at trigger for vehicle_checklists
-DROP TRIGGER IF EXISTS update_vehicle_checklists_updated_at ON public.vehicle_checklists;
+-- Updated_at trigger for veiculo_checklists
+DROP TRIGGER IF EXISTS update_vehicle_checklists_updated_at ON public.veiculo_checklists;
 CREATE TRIGGER update_vehicle_checklists_updated_at 
-    BEFORE UPDATE ON public.vehicle_checklists
+    BEFORE UPDATE ON public.veiculo_checklists
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 -- ====================================================
@@ -269,11 +269,11 @@ END $$;
 -- ====================================================
 -- PART 11: COMMENTS
 -- ====================================================
-COMMENT ON TABLE public.passenger_checkins IS 'Check-ins de embarque/desembarque de passageiros';
-COMMENT ON TABLE public.vehicle_checklists IS 'Checklists de verificação pré-viagem do veículo';
-COMMENT ON TABLE public.driver_locations IS 'Histórico de localização GPS dos motoristas';
-COMMENT ON TABLE public.driver_messages IS 'Mensagens entre motorista e central de operações';
-COMMENT ON TABLE public.passenger_cancellations IS 'Registro de não-embarques de passageiros';
+COMMENT ON TABLE public.passageiro_checkins IS 'Check-ins de embarque/desembarque de passageiros';
+COMMENT ON TABLE public.veiculo_checklists IS 'Checklists de verificação pré-viagem do veículo';
+COMMENT ON TABLE public.motorista_locations IS 'Histórico de localização GPS dos motoristas';
+COMMENT ON TABLE public.motorista_messages IS 'Mensagens entre motorista e central de operações';
+COMMENT ON TABLE public.passageiro_cancellations IS 'Registro de não-embarques de passageiros';
 COMMENT ON TABLE public.trip_evaluations IS 'Avaliações NPS das viagens pelos passageiros';
 COMMENT ON TABLE public.announcements IS 'Mural de avisos para passageiros e motoristas';
 

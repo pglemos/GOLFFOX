@@ -73,7 +73,7 @@ export async function GET(req: NextRequest) {
     const routeIdsArray = Array.from(routeIdsWithProblems)
     const { data: activeTrips } = routeIdsArray.length > 0 ? await supabase
       .from('trips')
-      .select('route_id, vehicle_id, driver_id')
+      .select('route_id, veiculo_id, motorista_id')
       .eq('status', 'inProgress')
       .in('route_id', routeIdsArray) : { data: [] }
 
@@ -82,8 +82,8 @@ export async function GET(req: NextRequest) {
     const routeDriverMap = new Map<string, string>()
     
     activeTrips?.forEach(trip => {
-      if (trip.vehicle_id) routeVehicleMap.set(trip.route_id, trip.vehicle_id)
-      if (trip.driver_id) routeDriverMap.set(trip.route_id, trip.driver_id)
+      if (trip.veiculo_id) routeVehicleMap.set(trip.route_id, trip.veiculo_id)
+      if (trip.motorista_id) routeDriverMap.set(trip.route_id, trip.motorista_id)
     })
 
     // Buscar veículos

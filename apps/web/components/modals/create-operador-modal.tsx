@@ -19,7 +19,7 @@ import { globalSyncManager } from "@/lib/global-sync"
 import { formatPhone, formatCEP, formatCPF, formatCNPJ } from "@/lib/format-utils"
 import { AddressForm, AddressData } from "@/components/address-form"
 
-interface CreateOperatorModalProps {
+interface CreateOperadorModalProps {
   isOpen: boolean
   onClose: () => void
   onSave: () => void
@@ -29,7 +29,7 @@ export function CreateOperatorModal({
   isOpen,
   onClose,
   onSave,
-}: CreateOperatorModalProps) {
+}: CreateOperadorModalProps) {
   const [loading, setLoading] = useState(false)
   const [step, setStep] = useState(1)
   const [formData, setFormData] = useState({

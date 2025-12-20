@@ -12,12 +12,12 @@ interface veiculo {
   status: 'on_route' | 'available' | 'delayed'
 }
 
-interface CarrierMapProps {
+interface TransportadoraMapProps {
   vehicles: veiculo[]
   className?: string
 }
 
-export function CarrierMap({ vehicles, className = "" }: CarrierMapProps) {
+export function CarrierMap({ vehicles, className = "" }: TransportadoraMapProps) {
   const mapRef = useRef<HTMLDivElement>(null)
   const mapInstanceRef = useRef<google.maps.Map | null>(null)
   const markersRef = useRef<Map<string, google.maps.Marker>>(new Map())

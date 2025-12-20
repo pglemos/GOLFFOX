@@ -163,7 +163,7 @@ export function formatDelaysReport(rows: any[]): ReportData {
     rows: rows.map(row => [
       new Date(row.scheduled_at).toLocaleDateString('pt-BR'),
       row.route_name || '-',
-      row.driver_name || '-',
+      row.motorista_name || '-',
       new Date(row.scheduled_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
       row.started_at ? new Date(row.started_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : '-',
       row.delay_start_minutes ? `${Math.round(row.delay_start_minutes)}` : '0',
@@ -199,7 +199,7 @@ export function formatNotBoardedReport(rows: any[]): ReportData {
     rows: rows.map(row => [
       new Date(row.scheduled_at).toLocaleDateString('pt-BR'),
       row.route_name || '-',
-      row.driver_name || '-',
+      row.motorista_name || '-',
       row.passenger_name || '-',
       row.missed_pickup_location || '-',
       row.reason || '-'

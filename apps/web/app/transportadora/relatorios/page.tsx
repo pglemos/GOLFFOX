@@ -157,7 +157,7 @@ export default function TransportadoraRelatoriosPage() {
             headers = ['Rota', 'Motorista', 'Data de Criação', 'Data de Conclusão', 'Status', 'Passageiros', 'Duração (min)']
             rows = tripsData.data.map((t: any) => [
               t.route_name,
-              t.driver_name,
+              t.motorista_name,
               new Date(t.created_at).toLocaleDateString('pt-BR'),
               t.completed_at ? new Date(t.completed_at).toLocaleDateString('pt-BR') : 'N/A',
               t.status,
@@ -247,7 +247,7 @@ export default function TransportadoraRelatoriosPage() {
           
           headers = ['Tipo', 'Entidade', 'Documento', 'Nível de Alerta', 'Data de Vencimento', 'Dias Restantes']
           rows = (documentsData || []).map((d: any) => [
-            d.item_type === 'driver_document' ? 'Motorista' : d.item_type === 'vehicle_document' ? 'Veículo' : 'Exame',
+            d.item_type === 'motorista_document' ? 'Motorista' : d.item_type === 'veiculo_document' ? 'Veículo' : 'Exame',
             d.entity_name || 'N/A',
             d.document_type || 'N/A',
             d.alert_level === 'expired' ? 'Vencido' : d.alert_level === 'critical' ? 'Crítico' : 'Atenção',

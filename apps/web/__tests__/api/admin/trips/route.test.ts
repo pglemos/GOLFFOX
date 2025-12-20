@@ -45,13 +45,13 @@ describe('GET /api/admin/trips', () => {
     expect(Array.isArray(data.data)).toBe(true)
   })
 
-  it('deve filtrar por vehicle_id', async () => {
+  it('deve filtrar por veiculo_id', async () => {
     const trip = createTestTrip('route-1', 'veiculo-1', 'motorista-1')
     mockSupabaseClient.setTableData('trips', [trip])
 
     const req = createAdminRequest({
       method: 'GET',
-      url: 'http://localhost:3000/api/admin/trips?vehicle_id=veiculo-1',
+      url: 'http://localhost:3000/api/admin/trips?veiculo_id=veiculo-1',
     }) as NextRequest
 
     const response = await GET(req)
@@ -129,8 +129,8 @@ describe('POST /api/admin/trips', () => {
       method: 'POST',
       body: {
         route_id: route.id,
-        vehicle_id: 'veiculo-1',
-        driver_id: 'motorista-1',
+        veiculo_id: 'veiculo-1',
+        motorista_id: 'motorista-1',
         scheduled_date: '2024-01-15',
         status: 'scheduled',
       },
@@ -147,7 +147,7 @@ describe('POST /api/admin/trips', () => {
     const req = createAdminRequest({
       method: 'POST',
       body: {
-        vehicle_id: 'veiculo-1',
+        veiculo_id: 'veiculo-1',
       },
     }) as NextRequest
 

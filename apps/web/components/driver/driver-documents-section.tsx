@@ -10,11 +10,11 @@ import { DocumentCard } from "@/components/ui/document-card"
 import { useFileUpload } from "@/hooks/use-file-upload"
 import { notifySuccess, notifyError } from "@/lib/toast"
 import {
-    DriverDocumentType,
-    DRIVER_DOCUMENT_LABELS,
+    MotoristaDocumentType,
+    MOTORISTA_DOCUMENT_LABELS,
     DRIVER_DOCS_WITH_EXPIRY,
-    REQUIRED_DRIVER_DOCUMENTS,
-    DriverDocument,
+    REQUIRED_MOTORISTA_DOCUMENTS,
+    MotoristaDocument,
 } from "@/types/documents"
 import {
     Select,
@@ -24,7 +24,7 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 
-interface DriverDocumentsSectionProps {
+interface MotoristaDocumentsSectionProps {
     driverId: string | undefined
     isEditing: boolean
     compact?: boolean
@@ -37,10 +37,10 @@ export function DriverDocumentsSection({
     driverId,
     isEditing,
     compact = false,
-}: DriverDocumentsSectionProps) {
-    const [documents, setDocuments] = useState<DriverDocument[]>([])
+}: MotoristaDocumentsSectionProps) {
+    const [documents, setDocuments] = useState<MotoristaDocument[]>([])
     const [loading, setLoading] = useState(false)
-    const [selectedType, setSelectedType] = useState<DriverDocumentType>("cnh")
+    const [selectedType, setSelectedType] = useState<MotoristaDocumentType>("cnh")
     const [expiryDate, setExpiryDate] = useState("")
     const [documentNumber, setDocumentNumber] = useState("")
     const [fileToUpload, setFileToUpload] = useState<File | null>(null)
@@ -141,11 +141,11 @@ export function DriverDocumentsSection({
         }
     }
 
-    const getDocumentByType = (type: DriverDocumentType) => {
+    const getDocumentByType = (type: MotoristaDocumentType) => {
         return documents.find((d) => d.document_type === type)
     }
 
-    const documentTypes = Object.keys(DRIVER_DOCUMENT_LABELS) as DriverDocumentType[]
+    const documentTypes = Object.keys(MOTORISTA_DOCUMENT_LABELS) as MotoristaDocumentType[]
 
     if (!isEditing || !driverId) {
         return (
@@ -174,13 +174,13 @@ export function DriverDocumentsSection({
                     </Button>
                 </div>
 
-                {REQUIRED_DRIVER_DOCUMENTS.map((type) => {
+                {REQUIRED_MOTORISTA_DOCUMENTS.map((type) => {
                     const doc = getDocumentByType(type)
                     return (
                         <DocumentCard
                             key={type}
                             documentType={type}
-                            documentLabel={DRIVER_DOCUMENT_LABELS[type]}
+                            documentLabel={MOTORISTA_DOCUMENT_LABELS[type]}
                             fileUrl={doc?.file_url}
                             fileName={doc?.file_name}
                             expiryDate={doc?.expiry_date}
@@ -209,7 +209,7 @@ export function DriverDocumentsSection({
                         <Label>Tipo de Documento</Label>
                         <Select
                             value={selectedType}
-                            onValueChange={(v) => setSelectedType(v as DriverDocumentType)}
+                            onValueChange={(v) => setSelectedType(v as MotoristaDocumentType)}
                         >
                             <SelectTrigger>
                                 <SelectValue />
@@ -217,8 +217,8 @@ export function DriverDocumentsSection({
                             <SelectContent>
                                 {documentTypes.map((type) => (
                                     <SelectItem key={type} value={type}>
-                                        {DRIVER_DOCUMENT_LABELS[type]}
-                                        {REQUIRED_DRIVER_DOCUMENTS.includes(type) && " *"}
+                                        {MOTORISTA_DOCUMENT_LABELS[type]}
+                                        {REQUIRED_MOTORISTA_DOCUMENTS.includes(type) && " *"}
                                     </SelectItem>
                                 ))}
                             </SelectContent>
@@ -292,14 +292,14 @@ export function DriverDocumentsSection({
                             <DocumentCard
                                 key={doc.id}
                                 documentType={doc.document_type}
-                                documentLabel={DRIVER_DOCUMENT_LABELS[doc.document_type as DriverDocumentType] || doc.document_type}
+                                documentLabel={MOTORISTA_DOCUMENT_LABELS[doc.document_type as MotoristaDocumentType] || doc.document_type}
                                 fileUrl={doc.file_url}
                                 fileName={doc.file_name}
                                 fileSize={doc.file_size}
                                 expiryDate={doc.expiry_date}
                                 status={doc.status}
                                 documentNumber={doc.document_number}
-                                required={REQUIRED_DRIVER_DOCUMENTS.includes(doc.document_type as DriverDocumentType)}
+                                required={REQUIRED_MOTORISTA_DOCUMENTS.includes(doc.document_type as MotoristaDocumentType)}
                                 onDelete={() => handleDelete(doc.id)}
                             />
                         ))}

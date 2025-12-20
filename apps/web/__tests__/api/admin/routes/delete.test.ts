@@ -33,7 +33,7 @@ describe('DELETE /api/admin/routes/delete', () => {
     mockSupabaseClient.setTableData('trips', [])
     mockSupabaseClient.setTableData('route_stops', [])
     mockSupabaseClient.setTableData('trip_summary', [])
-    mockSupabaseClient.setTableData('driver_positions', [])
+    mockSupabaseClient.setTableData('motorista_positions', [])
 
     const req = createAdminRequest({
       method: 'DELETE',
@@ -56,9 +56,9 @@ describe('DELETE /api/admin/routes/delete', () => {
     ])
     mockSupabaseClient.setTableData('route_stops', [])
     mockSupabaseClient.setTableData('trip_summary', [])
-    mockSupabaseClient.setTableData('driver_positions', [])
+    mockSupabaseClient.setTableData('motorista_positions', [])
     mockSupabaseClient.setTableData('trip_events', [])
-    mockSupabaseClient.setTableData('trip_passengers', [])
+    mockSupabaseClient.setTableData('trip_passageiros', [])
     mockSupabaseClient.setTableData('checklists', [])
     mockSupabaseClient.setTableData('passenger_reports', [])
     mockSupabaseClient.setTableData('chat_messages', [])

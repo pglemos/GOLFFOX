@@ -29,15 +29,15 @@ export async function DELETE(request: NextRequest) {
     // As foreign keys com ON DELETE CASCADE vão excluir automaticamente:
     // - gf_driver_documents (documentos do motorista)
     // - gf_driver_events (eventos do motorista)
-    // - trips.driver_id tem ON DELETE SET NULL, então setamos manualmente
+    // - trips.motorista_id tem ON DELETE SET NULL, então setamos manualmente
 
     logger.log(`🗑️ Tentando excluir motorista: ${driverId}`)
 
-    // Primeiro, setar driver_id para NULL em trips (mesmo que seja SET NULL, fazemos explicitamente)
+    // Primeiro, setar motorista_id para NULL em trips (mesmo que seja SET NULL, fazemos explicitamente)
     await supabaseAdmin
       .from('trips')
-      .update({ driver_id: null })
-      .eq('driver_id', driverId)
+      .update({ motorista_id: null })
+      .eq('motorista_id', driverId)
 
     // Agora excluir o motorista
     const { data, error } = await supabaseAdmin

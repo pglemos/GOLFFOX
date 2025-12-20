@@ -12,7 +12,7 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url)
     const startDate = searchParams.get('start_date')
     const endDate = searchParams.get('end_date')
-    const transportadoraId = searchParams.get('transportadora_id') || searchParams.get('carrier_id') // Compatibilidade
+    const transportadoraId = searchParams.get('transportadora_id')
 
     if (!transportadoraId) {
       return NextResponse.json({ error: 'transportadora_id é obrigatório' }, { status: 400 })
@@ -32,11 +32,11 @@ export async function GET(req: NextRequest) {
     const driverIds = drivers?.map(d => d.id) || []
 
     // Buscar dados de gamificação/ranking (selecionar apenas colunas necessárias)
-    const rankingColumns = 'id,driver_id,trips_completed,total_points,average_rating,on_time_percentage,safety_score,created_at,updated_at'
+    const rankingColumns = 'id,motorista_id,trips_completed,total_points,average_rating,on_time_percentage,safety_score,created_at,updated_at'
     const { data: rankings, error: rankingsError } = await supabase
       .from('gf_gamification_scores')
       .select(rankingColumns)
-      .in('driver_id', driverIds)
+      .in('motorista_id', driverIds)
 
     if (rankingsError) throw rankingsError
 
@@ -45,13 +45,13 @@ export async function GET(req: NextRequest) {
       .from('trips')
       .select(`
         id,
-        driver_id,
+        motorista_id,
         route_id,
         created_at,
         routes!inner(transportadora_id)
       `)
       .eq('routes.transportadora_id', transportadoraId)
-      .in('driver_id', driverIds)
+      .in('motorista_id', driverIds)
 
     if (startDate) {
       tripsQuery = tripsQuery.gte('created_at', startDate)
@@ -66,11 +66,11 @@ export async function GET(req: NextRequest) {
 
     // Calcular performance por motorista
     const driverPerformance = drivers?.map(motorista => {
-      const driverRanking = rankings?.find(r => r.driver_id === motorista.id)
-      const driverTrips = trips?.filter(t => t.driver_id === motorista.id) || []
+      const driverRanking = rankings?.find(r => r.motorista_id === motorista.id)
+      const driverTrips = trips?.filter(t => t.motorista_id === motorista.id) || []
 
       return {
-        driver_id: motorista.id,
+        motorista_id: motorista.id,
         name: motorista.name,
         email: motorista.email,
         phone: motorista.phone,

@@ -54,7 +54,7 @@ interface motorista {
   address_state?: string
 }
 
-interface DriverDocument {
+interface MotoristaDocument {
   id?: string
   document_type: 'cnh' | 'certificado_transporte' | 'toxico' | 'residencia' | 'selfie' | 'outros'
   document_number?: string
@@ -69,7 +69,7 @@ interface transportadora {
   name: string
 }
 
-interface DriverModalProps {
+interface MotoristaModalProps {
   motorista: motorista | null
   isOpen: boolean
   onClose: () => void
@@ -77,7 +77,7 @@ interface DriverModalProps {
   carriers?: transportadora[]
 }
 
-export function DriverModal({ motorista, isOpen, onClose, onSave, carriers = [] }: DriverModalProps) {
+export function DriverModal({ motorista, isOpen, onClose, onSave, carriers = [] }: MotoristaModalProps) {
   const [formData, setFormData] = useState<motorista>({
     name: "",
     email: "",
@@ -85,7 +85,7 @@ export function DriverModal({ motorista, isOpen, onClose, onSave, carriers = [] 
     cpf: "",
     role: "motorista"
   })
-  const [documents, setDocuments] = useState<DriverDocument[]>([])
+  const [documents, setDocuments] = useState<MotoristaDocument[]>([])
   const [loading, setLoading] = useState(false)
   const { sync } = useSupabaseSync({ showToast: false })
 
@@ -130,7 +130,7 @@ export function DriverModal({ motorista, isOpen, onClose, onSave, carriers = [] 
       const { data: docs } = await supabase
         .from("gf_driver_documents")
         .select("*")
-        .eq("driver_id", driverId)
+        .eq("motorista_id", driverId)
         .order("created_at", { ascending: false })
 
       if (docs) setDocuments(docs as any)
@@ -221,7 +221,7 @@ export function DriverModal({ motorista, isOpen, onClose, onSave, carriers = [] 
     }
   }
 
-  const handleDocumentUpload = async (type: DriverDocument['document_type'], file: File) => {
+  const handleDocumentUpload = async (type: MotoristaDocument['document_type'], file: File) => {
     if (!motorista?.id) {
       notifyError('', undefined, { i18n: { ns: 'common', key: 'validation.saveDriverFirst' } })
       return
@@ -250,7 +250,7 @@ export function DriverModal({ motorista, isOpen, onClose, onSave, carriers = [] 
       const { error: docError } = await (supabase as any)
         .from("gf_driver_documents")
         .insert({
-          driver_id: motorista.id,
+          motorista_id: motorista.id,
           document_type: type,
           file_url: publicUrl,
           file_name: file.name

@@ -66,7 +66,7 @@ describe('RealtimeService', () => {
 
       await service.connect()
 
-      expect(mockSupabase.channel).toHaveBeenCalledWith('map:driver_positions')
+      expect(mockSupabase.channel).toHaveBeenCalledWith('map:motorista_positions')
       expect(mockSupabase.channel).toHaveBeenCalledWith('map:trips')
       expect(mockChannel.subscribe).toHaveBeenCalled()
       expect(onConnected).toHaveBeenCalled()
@@ -108,12 +108,12 @@ describe('RealtimeService', () => {
       })
 
       mockChannel.on.mockImplementation((event, config, handler) => {
-        if (event === 'postgres_changes' && config.table === 'driver_positions') {
+        if (event === 'postgres_changes' && config.table === 'motorista_positions') {
           // Simular atualização de posição
           setTimeout(() => {
             handler({
               new: {
-                vehicle_id: 'veiculo-1',
+                veiculo_id: 'veiculo-1',
                 trip_id: 'trip-1',
                 lat: -19.916681,
                 lng: -43.934493,
@@ -130,7 +130,7 @@ describe('RealtimeService', () => {
             single: jest.fn(() =>
               Promise.resolve({
                 data: {
-                  vehicle_id: 'veiculo-1',
+                  veiculo_id: 'veiculo-1',
                   lat: -19.916681,
                   lng: -43.934493,
                   speed: 10,
@@ -168,8 +168,8 @@ describe('RealtimeService', () => {
               new: {
                 id: 'trip-1',
                 route_id: 'route-1',
-                vehicle_id: 'veiculo-1',
-                driver_id: 'motorista-1',
+                veiculo_id: 'veiculo-1',
+                motorista_id: 'motorista-1',
                 status: 'completed',
               },
             })
@@ -214,7 +214,7 @@ describe('RealtimeService', () => {
                 id: 'incident-1',
                 company_id: 'company-1',
                 route_id: 'route-1',
-                vehicle_id: 'veiculo-1',
+                veiculo_id: 'veiculo-1',
                 severity: 'high',
                 description: 'Test incident',
                 created_at: new Date().toISOString(),
@@ -291,9 +291,9 @@ describe('RealtimeService', () => {
                       heading: 90,
                       timestamp: new Date().toISOString(),
                       trips: {
-                        vehicle_id: 'veiculo-1',
+                        veiculo_id: 'veiculo-1',
                         route_id: 'route-1',
-                        driver_id: 'motorista-1',
+                        motorista_id: 'motorista-1',
                         status: 'inProgress',
                       },
                     },
@@ -315,7 +315,7 @@ describe('RealtimeService', () => {
       // Aguardar um ciclo de polling
       await new Promise((resolve) => setTimeout(resolve, 1500))
 
-      expect(mockFrom).toHaveBeenCalledWith('driver_positions')
+      expect(mockFrom).toHaveBeenCalledWith('motorista_positions')
     })
 
     it('deve lidar com erros no polling sem quebrar', async () => {
@@ -368,8 +368,8 @@ describe('RealtimeService', () => {
               new: {
                 id: 'trip-1',
                 route_id: 'route-1',
-                vehicle_id: 'veiculo-1',
-                driver_id: 'motorista-1',
+                veiculo_id: 'veiculo-1',
+                motorista_id: 'motorista-1',
                 status: 'inProgress',
               },
             })
@@ -379,8 +379,8 @@ describe('RealtimeService', () => {
               new: {
                 id: 'trip-1',
                 route_id: 'route-1',
-                vehicle_id: 'veiculo-1',
-                driver_id: 'motorista-1',
+                veiculo_id: 'veiculo-1',
+                motorista_id: 'motorista-1',
                 status: 'completed',
               },
             })
@@ -409,14 +409,14 @@ describe('RealtimeService', () => {
 
       const tripData = {
         id: 'trip-1',
-        vehicle_id: 'veiculo-1',
+        veiculo_id: 'veiculo-1',
         route_id: 'route-1',
-        driver_id: 'motorista-1',
+        motorista_id: 'motorista-1',
         status: 'inProgress',
       }
 
       mockChannel.on.mockImplementation((event, config, handler) => {
-        if (event === 'postgres_changes' && config.table === 'driver_positions') {
+        if (event === 'postgres_changes' && config.table === 'motorista_positions') {
           setTimeout(() => {
             handler({
               new: {
@@ -454,7 +454,7 @@ describe('RealtimeService', () => {
 
       // Enviar outra atualização de posição para o mesmo trip
       mockChannel.on.mockImplementation((event, config, handler) => {
-        if (event === 'postgres_changes' && config.table === 'driver_positions') {
+        if (event === 'postgres_changes' && config.table === 'motorista_positions') {
           setTimeout(() => {
             handler({
               new: {
@@ -501,7 +501,7 @@ describe('RealtimeService', () => {
       })
 
       mockChannel.on.mockImplementation((event, config, handler) => {
-        if (event === 'postgres_changes' && config.table === 'driver_positions') {
+        if (event === 'postgres_changes' && config.table === 'motorista_positions') {
           setTimeout(() => {
             handler({
               new: {
@@ -525,9 +525,9 @@ describe('RealtimeService', () => {
               Promise.resolve({
                 data: {
                   id: 'trip-1',
-                  vehicle_id: 'veiculo-1',
+                  veiculo_id: 'veiculo-1',
                   route_id: 'route-1',
-                  driver_id: 'motorista-1',
+                  motorista_id: 'motorista-1',
                   status: 'inProgress',
                 },
                 error: null,
@@ -551,7 +551,7 @@ describe('RealtimeService', () => {
       })
 
       mockChannel.on.mockImplementation((event, config, handler) => {
-        if (event === 'postgres_changes' && config.table === 'driver_positions') {
+        if (event === 'postgres_changes' && config.table === 'motorista_positions') {
           setTimeout(() => {
             handler({
               new: {

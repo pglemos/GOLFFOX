@@ -18,11 +18,10 @@ function getSupabaseAdmin() {
 
 const carrierLoginSchema = z.object({
   transportadora_id: z.string().uuid('ID da transportadora inválido').optional(),
-  carrier_id: z.string().uuid('ID da transportadora inválido').optional(),
   email: z.string().email('Email inválido'),
   name: z.string().min(1, 'Nome é obrigatório'),
   password: z.string().min(6, 'Senha deve ter no mínimo 6 caracteres'),
-}).refine(data => data.transportadora_id || data.carrier_id, {
+}).refine(data => data.transportadora_id, {
   message: 'ID da transportadora é obrigatório'
 })
 
@@ -44,7 +43,7 @@ export async function POST(req: NextRequest) {
 
     const body = await req.json()
     const validated = carrierLoginSchema.parse(body)
-    const transportadoraId = validated.transportadora_id || validated.carrier_id
+    const transportadoraId = validated.transportadora_id
 
     const supabaseAdmin = getSupabaseAdmin()
 

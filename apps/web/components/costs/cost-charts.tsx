@@ -84,12 +84,12 @@ export function CostCharts({ companyId, period = 'month' }: CostChartProps) {
       // Dados por motorista (usar v_reports_driver_ranking com custos)
       const { data: drivers } = await supabase
         .from('v_reports_driver_ranking')
-        .select('driver_id, driver_name, routes_completed')
+        .select('motorista_id, motorista_name, routes_completed')
         .limit(10)
 
       if (drivers) {
         setByDriverData(drivers.map((d: any) => ({
-          name: d.driver_name || 'Motorista',
+          name: d.motorista_name || 'Motorista',
           routes: d.routes_completed || 0,
           cost: (d.routes_completed || 0) * 50 // Estimativa
         })))

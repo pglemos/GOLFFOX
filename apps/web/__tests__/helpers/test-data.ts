@@ -25,7 +25,7 @@ export interface TestTransportadora {
   updated_at: string
 }
 
-export interface TestVehicle {
+export interface TestVeiculo {
   id: string
   plate: string
   model: string
@@ -36,7 +36,7 @@ export interface TestVehicle {
   updated_at: string
 }
 
-export interface TestDriver {
+export interface TestMotorista {
   id: string
   name: string
   cpf: string
@@ -67,8 +67,8 @@ export interface TestCompany {
 export interface TestTrip {
   id: string
   route_id: string
-  vehicle_id?: string | null
-  driver_id?: string | null
+  veiculo_id?: string | null
+  motorista_id?: string | null
   status: string
   scheduled_date?: string
   scheduled_start_time?: string | null
@@ -125,7 +125,7 @@ export function createTestTransportadora(overrides: Partial<TestTransportadora> 
 /**
  * Factory para criar veículo de teste
  */
-export function createTestVehicle(transportadoraId: string, overrides: Partial<TestVehicle> = {}): TestVehicle {
+export function createTestVehicle(transportadoraId: string, overrides: Partial<TestVeiculo> = {}): TestVeiculo {
   const id = overrides.id || `veiculo-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
   
   return {
@@ -144,7 +144,7 @@ export function createTestVehicle(transportadoraId: string, overrides: Partial<T
 /**
  * Factory para criar motorista de teste
  */
-export function createTestDriver(transportadoraId: string, overrides: Partial<TestDriver> = {}): TestDriver {
+export function createTestDriver(transportadoraId: string, overrides: Partial<TestMotorista> = {}): TestMotorista {
   const id = overrides.id || `motorista-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
   
   return {
@@ -207,8 +207,8 @@ export function createTestTrip(
   return {
     id,
     route_id: routeId,
-    vehicle_id: vehicleId || overrides.vehicle_id || null,
-    driver_id: driverId || overrides.driver_id || null,
+    veiculo_id: vehicleId || overrides.veiculo_id || null,
+    motorista_id: driverId || overrides.motorista_id || null,
     status: overrides.status || 'scheduled',
     scheduled_date: overrides.scheduled_date || new Date().toISOString().split('T')[0],
     scheduled_start_time: overrides.scheduled_start_time || null,

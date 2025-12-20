@@ -65,7 +65,7 @@ export default function AlertasPage() {
 
   const filteredAlerts = alerts.filter((alert: any) => {
     const meta = alert.metadata || {}
-    const searchString = `${alert.message} ${alert.alert_type} ${meta.driver_name || ''} ${meta.plate || ''}`.toLowerCase()
+    const searchString = `${alert.message} ${alert.alert_type} ${meta.motorista_name || ''} ${meta.plate || ''}`.toLowerCase()
 
     const matchesSearch = searchString.includes(searchTerm.toLowerCase())
 
@@ -228,9 +228,9 @@ export default function AlertasPage() {
                           <Truck className="h-3 w-3" /> {meta.plate}
                         </span>
                       )}
-                      {meta.driver_name && (
+                      {meta.motorista_name && (
                         <span className="flex items-center gap-1">
-                          <Users className="h-3 w-3" /> {meta.driver_name}
+                          <Users className="h-3 w-3" /> {meta.motorista_name}
                         </span>
                       )}
                       {/* Data expiry se houver */}
