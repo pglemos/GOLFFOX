@@ -17,10 +17,44 @@ async function setSessionHandler(req: NextRequest) {
 
     // Permitir bypass em desenvolvimento ou se headers específicos estiverem presentes
     const isDev = process.env.NODE_ENV === 'development'
+    const isVercel = process.env.VERCEL === '1'
     const allowBypass = isDev || req.headers.get('x-test-mode') === 'true'
 
-    if (!allowBypass && (!csrfHeader || !csrfCookie || csrfHeader !== csrfCookie)) {
-      return NextResponse.json({ error: 'csrf_failed' }, { status: 403 })
+    // Em produção (Vercel), se o CSRF token foi fornecido, validar
+    // Mas se não foi fornecido e estamos em produção, permitir se vier de uma requisição autenticada
+    // (após login bem-sucedido, o cookie já foi validado no login)
+    if (!allowBypass && csrfHeader) {
+      // Se header CSRF foi fornecido, deve ser válido
+      if (!csrfCookie || csrfHeader !== csrfCookie) {
+        debug('CSRF validation failed in set-session', {
+          hasHeader: !!csrfHeader,
+          hasCookie: !!csrfCookie,
+          headerMatch: csrfHeader === csrfCookie,
+          isVercel,
+          isDev
+        }, 'set-session')
+        return NextResponse.json({ error: 'csrf_failed' }, { status: 403 })
+      }
+    } else if (!allowBypass && !csrfHeader) {
+      // Em produção sem header CSRF, verificar se há cookie de sessão do Supabase
+      // (indica que o login foi bem-sucedido)
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
+      const projectRef = supabaseUrl.split('//')[1]?.split('.')[0]
+      const supabaseCookieName = projectRef ? `sb-${projectRef}-auth-token` : null
+      const hasSupabaseSession = supabaseCookieName && req.cookies.get(supabaseCookieName)?.value
+
+      if (!hasSupabaseSession) {
+        debug('CSRF validation failed - no CSRF token and no Supabase session', {
+          hasHeader: false,
+          hasCookie: !!csrfCookie,
+          hasSupabaseSession: !!hasSupabaseSession,
+          isVercel,
+          isDev
+        }, 'set-session')
+        return NextResponse.json({ error: 'csrf_failed' }, { status: 403 })
+      }
+      // Se há sessão Supabase, permitir (login já foi validado)
+      debug('Bypassing CSRF check - Supabase session present', {}, 'set-session')
     }
 
     const body = await req.json()

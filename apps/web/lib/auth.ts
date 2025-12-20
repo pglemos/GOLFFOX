@@ -207,12 +207,22 @@ export class AuthManager {
     // ✅ Definir cookie HttpOnly via API server-side (seguro contra XSS)
     try {
       // Obter CSRF token
-      const csrfResponse = await fetch('/api/auth/csrf', { method: 'GET', credentials: 'include' })
+      const csrfResponse = await fetch('/api/auth/csrf', { 
+        method: 'GET', 
+        credentials: 'include',
+        cache: 'no-store' // Evitar cache do token CSRF
+      })
+      
       if (!csrfResponse.ok) {
-        throw new Error('Falha ao obter CSRF token')
+        throw new Error(`Falha ao obter CSRF token: ${csrfResponse.status}`)
       }
+      
       const csrfData = await csrfResponse.json()
       const csrfToken = csrfData.token || csrfData.csrfToken
+
+      if (!csrfToken) {
+        throw new Error('CSRF token não encontrado na resposta')
+      }
 
       // Chamar API para definir cookie HttpOnly
       const setSessionResponse = await fetch('/api/auth/set-session', {
@@ -221,7 +231,8 @@ export class AuthManager {
           'Content-Type': 'application/json',
           'x-csrf-token': csrfToken
         },
-        credentials: 'include',
+        credentials: 'include', // ✅ CRÍTICO: Incluir cookies na requisição
+        cache: 'no-store',
         body: JSON.stringify({
           user: {
             id: userData.id,
@@ -235,13 +246,15 @@ export class AuthManager {
 
       if (!setSessionResponse.ok) {
         const errorData = await setSessionResponse.json().catch(() => ({}))
-        throw new Error(errorData.error || 'Falha ao definir cookie de sessão')
+        const errorMsg = errorData.error || `Falha ao definir cookie de sessão: ${setSessionResponse.status}`
+        throw new Error(errorMsg)
       }
 
       debug('Cookie de sessão definido via API (HttpOnly)', { role: userData.role }, 'AuthManager')
     } catch (cookieErr) {
       error('Falha ao definir cookie de sessão via API', { error: cookieErr }, 'AuthManager')
       // Não bloquear o fluxo se falhar - o Supabase cookie ainda pode funcionar
+      // Mas logar o erro para debug
     }
 
     if (typeof window !== 'undefined') {
