@@ -36,25 +36,32 @@ async function setSessionHandler(req: NextRequest) {
         return NextResponse.json({ error: 'csrf_failed' }, { status: 403 })
       }
     } else if (!allowBypass && !csrfHeader) {
-      // Em produção sem header CSRF, verificar se há cookie de sessão do Supabase
+      // Em produção sem header CSRF, verificar se há sessão válida (Supabase ou golffox-session)
       // (indica que o login foi bem-sucedido)
       const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
       const projectRef = supabaseUrl.split('//')[1]?.split('.')[0]
       const supabaseCookieName = projectRef ? `sb-${projectRef}-auth-token` : null
       const hasSupabaseSession = supabaseCookieName && req.cookies.get(supabaseCookieName)?.value
+      const hasGolffoxSession = req.cookies.get('golffox-session')?.value
 
-      if (!hasSupabaseSession) {
-        debug('CSRF validation failed - no CSRF token and no Supabase session', {
+      if (!hasSupabaseSession && !hasGolffoxSession) {
+        debug('CSRF validation failed - no CSRF token and no valid session', {
           hasHeader: false,
           hasCookie: !!csrfCookie,
           hasSupabaseSession: !!hasSupabaseSession,
+          hasGolffoxSession: !!hasGolffoxSession,
+          supabaseCookieName,
           isVercel,
           isDev
         }, 'set-session')
         return NextResponse.json({ error: 'csrf_failed' }, { status: 403 })
       }
-      // Se há sessão Supabase, permitir (login já foi validado)
-      debug('Bypassing CSRF check - Supabase session present', {}, 'set-session')
+      // Se há sessão válida (Supabase ou golffox-session), permitir (login já foi validado)
+      debug('Bypassing CSRF check - valid session present', { 
+        supabaseCookieName, 
+        hasSupabaseSession: !!hasSupabaseSession,
+        hasGolffoxSession: !!hasGolffoxSession
+      }, 'set-session')
     }
 
     const body = await req.json()
