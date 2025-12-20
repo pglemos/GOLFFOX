@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense, useMemo, useCallback } from 'react';
 import { View, StyleSheet, ScrollView, Pressable } from 'react-native';
 import { Card, Text, Avatar, Chip, useTheme, IconButton, Divider } from 'react-native-paper';
 import { useRouter } from 'expo-router';
@@ -71,14 +71,14 @@ export default function DriverDashboard() {
     const theme = useTheme();
     const [activeTab, setActiveTab] = useState<'pending' | 'completed'>('pending');
 
-    const handleStartTrip = (tripId: string) => {
+    const handleStartTrip = useCallback((tripId: string) => {
         router.push('/motorista/checklist');
-    };
+    }, [router]);
 
-    const handleLogout = async () => {
+    const handleLogout = useCallback(async () => {
         await logout();
         router.replace('/login');
-    };
+    }, [logout, router]);
 
     const getGreeting = () => {
         const hour = new Date().getHours();

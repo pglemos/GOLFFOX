@@ -282,9 +282,10 @@ function LoginContent() {
         console.log('🔍 [CSRF] Resposta da API:', { status: res.status, ok: res.ok })
         if (res.ok) {
           const data = await res.json()
-          console.log('🔍 [CSRF] Dados recebidos:', { hasCsrfToken: !!data?.csrfToken, hasToken: !!data?.token, keys: Object.keys(data) })
-          // Aceitar tanto 'token' quanto 'csrfToken' para compatibilidade
-          const token = data?.csrfToken || data?.token
+          console.log('🔍 [CSRF] Dados recebidos:', { hasCsrfToken: !!data?.csrfToken, hasToken: !!data?.token, hasData: !!data?.data, keys: Object.keys(data) })
+          // A API retorna { success: true, data: { token, csrfToken } }
+          // Aceitar tanto 'token' quanto 'csrfToken' e também dentro de 'data'
+          const token = data?.data?.token || data?.data?.csrfToken || data?.csrfToken || data?.token
           if (token) {
             setCsrfToken(token)
             console.log('✅ [CSRF] Token obtido e definido:', token.substring(0, 10) + '...')
@@ -470,7 +471,8 @@ function LoginContent() {
               })
               if (res.ok) {
                 const data = await res.json()
-                const token = data?.csrfToken || data?.token
+                // A API retorna { success: true, data: { token, csrfToken } }
+                const token = data?.data?.token || data?.data?.csrfToken || data?.csrfToken || data?.token
                 if (token) {
                   finalCsrfToken = token
                   setCsrfToken(token)

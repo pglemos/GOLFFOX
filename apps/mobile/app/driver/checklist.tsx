@@ -60,13 +60,13 @@ export default function ChecklistScreen() {
     const { profile } = useAuth();
     const router = useRouter();
 
-    const setItemValue = (id: string, value: 'yes' | 'no') => {
+    const setItemValue = useCallback((id: string, value: 'yes' | 'no') => {
         setItems(prev =>
             prev.map(item =>
                 item.id === id ? { ...item, value } : item
             )
         );
-    };
+    }, []);
 
     const pickImage = async (photoId: string) => {
         const { status } = await ImagePicker.requestCameraPermissionsAsync();

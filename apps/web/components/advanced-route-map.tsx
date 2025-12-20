@@ -330,7 +330,9 @@ export const AdvancedRouteMap = memo(function AdvancedRouteMap({
         }
       })
 
-      setRouteData(routeDataFormatted)
+      startTransition(() => {
+        setRouteData(routeDataFormatted)
+      })
 
       // Salvar no cache
       setCachedData(cacheKey, routeDataFormatted)

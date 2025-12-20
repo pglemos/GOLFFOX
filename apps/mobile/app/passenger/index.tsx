@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense, useMemo, useCallback } from 'react';
 import { View, StyleSheet, ScrollView, Pressable, RefreshControl } from 'react-native';
 import { Text, Surface, Avatar, Chip, Button } from 'react-native-paper';
 import { useRouter } from 'expo-router';
@@ -46,11 +46,11 @@ export default function PassengerDashboard() {
     const [trip, setTrip] = useState<NextTrip | null>(mockTrip);
     const [eta, setEta] = useState('~8 min');
 
-    const onRefresh = async () => {
+    const onRefresh = useCallback(async () => {
         setRefreshing(true);
         await new Promise(r => setTimeout(r, 1000));
         setRefreshing(false);
-    };
+    }, []);
 
     const getGreeting = () => {
         const hour = new Date().getHours();

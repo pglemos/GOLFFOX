@@ -17,10 +17,16 @@ export async function GET(req: NextRequest) {
     const url = new URL(req.url)
     const isSecure = url.protocol === 'https:'
 
-    // Retornar tanto 'token' (compatibilidade) quanto 'csrfToken' (formato esperado pelos testes)
-    const res = successResponse({ 
-      token, // Mantém compatibilidade com código existente
-      csrfToken: token // Formato esperado pelos testes
+    // Retornar token diretamente no objeto raiz para compatibilidade com código existente
+    // E também dentro de 'data' para compatibilidade com successResponse
+    const res = NextResponse.json({ 
+      token, // Compatibilidade direta
+      csrfToken: token, // Formato esperado pelos testes
+      success: true,
+      data: {
+        token,
+        csrfToken: token
+      }
     })
     // ✅ CORREÇÃO: Usar 'lax' ao invés de 'strict' para funcionar corretamente na Vercel
     // 'lax' permite que o cookie seja enviado em requisições GET de navegação de nível superior
@@ -38,6 +44,9 @@ export async function GET(req: NextRequest) {
     return res
   } catch (error: unknown) {
     logError('Erro ao gerar token CSRF', { error }, 'CSRFAPI')
-    return errorResponse(error, 500, 'Erro ao gerar token CSRF')
+    return NextResponse.json({ 
+      error: 'Erro ao gerar token CSRF',
+      success: false 
+    }, { status: 500 })
   }
 }

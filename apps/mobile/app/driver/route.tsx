@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense, useMemo, useCallback } from 'react';
 import { View, StyleSheet, ScrollView, Pressable, Dimensions, SafeAreaView } from 'react-native';
 import { Text, FAB, useTheme, Portal, Dialog, Button, Surface, IconButton } from 'react-native-paper';
 import * as Location from 'expo-location';
@@ -84,25 +84,35 @@ export default function RouteScreen() {
         startTracking();
     }, []);
 
-    const completedStops = stops.filter(s => s.completed).length;
-    const embarkedPassengers = stops.filter(s => s.completed).reduce((acc, s) => acc + s.passengersCount, 0);
-    const nextStop = stops.find(s => !s.completed);
+    // Memoizar cálculos pesados
+    const completedStops = useMemo(
+        () => stops.filter(s => s.completed).length,
+        [stops]
+    );
+    const embarkedPassengers = useMemo(
+        () => stops.filter(s => s.completed).reduce((acc, s) => acc + s.passengersCount, 0),
+        [stops]
+    );
+    const nextStop = useMemo(
+        () => stops.find(s => !s.completed),
+        [stops]
+    );
 
-    const handleScan = () => {
+    const handleScan = useCallback(() => {
         setSelectedPassenger(mockPassenger);
         setBoardingDialogVisible(true);
-    };
+    }, []);
 
-    const handleConfirmBoarding = () => {
+    const handleConfirmBoarding = useCallback(() => {
         setBoardingDialogVisible(false);
         setSelectedPassenger(null);
-    };
+    }, []);
 
-    const handleFinishRoute = async () => {
+    const handleFinishRoute = useCallback(async () => {
         router.replace('/motorista');
-    };
+    }, [router]);
 
-    const handleSOS = async () => {
+    const handleSOS = useCallback(async () => {
         setSendingSos(true);
         try {
             console.log('SOS enviado:', { motorista: profile?.name, location: location?.coords });

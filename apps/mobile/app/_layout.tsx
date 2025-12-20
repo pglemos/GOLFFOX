@@ -4,6 +4,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { PaperProvider, MD3DarkTheme, MD3LightTheme } from 'react-native-paper';
 import { useColorScheme } from 'react-native';
 import { AuthProvider } from '../src/auth/AuthProvider';
+import { ErrorBoundary } from '../src/components/ErrorBoundary';
 
 // Tema customizado GolfFox - Cores alinhadas com a Web
 const golfFoxColors = {
@@ -47,11 +48,12 @@ export default function RootLayout() {
     const theme = colorScheme === 'dark' ? darkTheme : lightTheme;
 
     return (
-        <SafeAreaProvider>
-            <PaperProvider theme={theme}>
-                <AuthProvider>
-                    <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
-                    <Stack
+        <ErrorBoundary>
+            <SafeAreaProvider>
+                <PaperProvider theme={theme}>
+                    <AuthProvider>
+                        <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
+                        <Stack
                         screenOptions={{
                             headerStyle: {
                                 backgroundColor: theme.colors.primary,
@@ -69,9 +71,10 @@ export default function RootLayout() {
                         <Stack.Screen name="login" options={{ title: 'Entrar' }} />
                         <Stack.Screen name="motorista" options={{ headerShown: false }} />
                         <Stack.Screen name="passageiro" options={{ headerShown: false }} />
-                    </Stack>
-                </AuthProvider>
-            </PaperProvider>
-        </SafeAreaProvider>
+                        </Stack>
+                    </AuthProvider>
+                </PaperProvider>
+            </SafeAreaProvider>
+        </ErrorBoundary>
     );
 }

@@ -218,7 +218,8 @@ export class AuthManager {
       }
       
       const csrfData = await csrfResponse.json()
-      const csrfToken = csrfData.token || csrfData.csrfToken
+      // A API retorna { success: true, data: { token, csrfToken } }
+      const csrfToken = csrfData?.data?.token || csrfData?.data?.csrfToken || csrfData.token || csrfData.csrfToken
 
       if (!csrfToken) {
         throw new Error('CSRF token não encontrado na resposta')

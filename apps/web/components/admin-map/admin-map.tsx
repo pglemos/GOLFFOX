@@ -116,6 +116,7 @@ export function AdminMap({
   const playbackServiceRef = useRef<PlaybackService | null>(null)
   
   // State
+  const [isPending, startTransition] = useTransition()
   const [loading, setLoading] = useState(true)
   const [mapError, setMapError] = useState<string | null>(null)
   const [veiculos, setVeiculos] = useState<veiculo[]>([])
