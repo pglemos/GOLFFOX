@@ -668,17 +668,29 @@ function LoginContent() {
         // ✅ Incluir name e avatar_url para exibição no Topbar
         // ✅ VALIDAÇÃO: Garantir que rememberMe é sempre um booleano válido
         const storageMode = typeof rememberMe === 'boolean' && rememberMe ? "both" : "session"
-        await AuthManager.persistSession(
-          {
-            id: user.id,
-            email: user.email,
-            role: userRoleFromDatabase,
-            accessToken: token,
-            name: user.name || user.email.split('@')[0],
-            avatar_url: user.avatar_url || null,
-          },
-          { accessToken: token, refreshToken, storage: storageMode }
-        )
+        try {
+          await AuthManager.persistSession(
+            {
+              id: user.id,
+              email: user.email,
+              role: userRoleFromDatabase,
+              accessToken: token,
+              name: user.name || user.email.split('@')[0],
+              avatar_url: user.avatar_url || null,
+            },
+            { accessToken: token, refreshToken, storage: storageMode }
+          )
+        } catch (persistError: any) {
+          console.error('❌ [LOGIN] Erro ao persistir sessão:', {
+            error: persistError,
+            message: persistError?.message,
+            stack: persistError?.stack?.substring(0, 500),
+            name: persistError?.name,
+            type: typeof persistError
+          })
+          // Não bloquear o fluxo se falhar - continuar com o login
+          // O cookie já foi definido pelo servidor, então o login ainda pode funcionar
+        }
 
         setFailedAttempts(0)
         setBlockedUntil(null)

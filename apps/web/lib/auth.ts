@@ -153,12 +153,36 @@ export class AuthManager {
       accessToken?: string
       refreshToken?: string
     }
-  ) {
-    if (typeof window === 'undefined') return
+  ): Promise<void> {
+    console.log('[AuthManager.persistSession] Iniciando', {
+      hasWindow: typeof window !== 'undefined',
+      hasSupabase: !!supabase,
+      hasSupabaseAuth: !!supabase?.auth,
+      setSessionType: typeof supabase?.auth?.setSession,
+      setSessionIsFunction: typeof supabase?.auth?.setSession === 'function',
+      supabaseType: typeof supabase,
+      supabaseIsObject: typeof supabase === 'object' && supabase !== null
+    })
+    
+    if (typeof window === 'undefined') {
+      console.log('[AuthManager.persistSession] window is undefined, retornando')
+      return Promise.resolve()
+    }
+
+    // ✅ VALIDAÇÃO: Garantir que supabase é um objeto válido
+    if (!supabase) {
+      console.error('[AuthManager.persistSession] supabase não está definido')
+      return Promise.resolve()
+    }
+
+    if (typeof supabase !== 'object' || supabase === null) {
+      console.error('[AuthManager.persistSession] supabase não é um objeto válido', { type: typeof supabase })
+      return Promise.resolve()
+    }
 
     // ✅ VALIDAÇÃO: Garantir que supabase está disponível
-    if (!supabase || !supabase.auth) {
-      console.warn('[AuthManager] Supabase não está disponível, pulando sincronização de sessão')
+    if (!supabase.auth) {
+      console.warn('[AuthManager] Supabase auth não está disponível, pulando sincronização de sessão')
       // Continuar com o resto da função mesmo se Supabase não estiver disponível
     }
 
