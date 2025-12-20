@@ -41,7 +41,7 @@ export async function GET(
         const supabase = getSupabaseAdmin()
 
         const { data, error } = await supabase
-            .from('gf_driver_documents')
+            .from('gf_motorista_documents')
             .select('*')
             .eq('motorista_id', driverId)
             .order('created_at', { ascending: false })
@@ -87,7 +87,7 @@ export async function POST(
 
         // Verificar se já existe documento deste tipo
         const { data: existing } = await supabase
-            .from('gf_driver_documents')
+            .from('gf_motorista_documents')
             .select('id')
             .eq('motorista_id', driverId)
             .eq('document_type', validatedData.document_type)
@@ -97,7 +97,7 @@ export async function POST(
         if (existing) {
             // Atualizar documento existente
             result = await (supabase
-                .from('gf_driver_documents') as any)
+                .from('gf_motorista_documents') as any)
                 .update({
                     ...validatedData,
                     updated_at: new Date().toISOString(),
@@ -108,7 +108,7 @@ export async function POST(
         } else {
             // Criar novo documento
             result = await (supabase
-                .from('gf_driver_documents') as any)
+                .from('gf_motorista_documents') as any)
                 .insert({
                     motorista_id: driverId,
                     ...validatedData,
@@ -162,7 +162,7 @@ export async function DELETE(
         const supabase = getSupabaseAdmin()
 
         const { error } = await supabase
-            .from('gf_driver_documents')
+            .from('gf_motorista_documents')
             .delete()
             .eq('id', documentId)
             .eq('motorista_id', driverId)
