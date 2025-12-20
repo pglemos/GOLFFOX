@@ -298,6 +298,9 @@ export class AuthManager {
       window.dispatchEvent(new CustomEvent('golffox:auth', { detail: userData }))
       debug('[AuthManager] Sessão persistida', { role: userData.role })
     }
+
+    console.log('[AuthManager.persistSession] Concluído com sucesso')
+    return Promise.resolve()
   }
 
   // Método para middleware extrair dados do cookie
