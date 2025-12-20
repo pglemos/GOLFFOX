@@ -40,7 +40,7 @@ function GerarPontosContent() {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.2 }}
           >
-            <Card className="p-6 bg-warning-light border-yellow-200">
+            <Card className="p-6 bg-warning-light border-warning-light">
               <div className="flex items-center gap-3">
                 <AlertCircle className="h-5 w-5 text-warning" />
                 <p className="text-sm text-warning">Passe ?routeId=... na URL para carregar a rota.</p>

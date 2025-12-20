@@ -38,10 +38,10 @@ const activityIcons = {
 }
 
 const activityColors = {
-  success: "bg-success-light text-success dark:bg-green-900/20 dark:text-green-400",
-  warning: "bg-warning-light text-warning dark:bg-yellow-900/20 dark:text-yellow-400",
-  error: "bg-error-light text-error dark:bg-red-900/20 dark:text-red-400",
-  info: "bg-info-light text-info dark:bg-blue-900/20 dark:text-blue-400"
+  success: "bg-success-light text-success dark:bg-success/20 dark:text-success",
+  warning: "bg-warning-light text-warning dark:bg-warning/20 dark:text-warning",
+  error: "bg-error-light text-error dark:bg-error/20 dark:text-red-400",
+  info: "bg-info-light text-info dark:bg-info/20 dark:text-blue-400"
 }
 
 export function RecentActivities({

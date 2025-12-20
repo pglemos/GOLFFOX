@@ -621,7 +621,7 @@ export function RouteModal({
             <Button 
               onClick={handleSave} 
               disabled={loading}
-              className="w-full sm:w-auto order-1 sm:order-2 bg-brand hover:bg-orange-600 min-h-[44px] text-base font-medium"
+              className="w-full sm:w-auto order-1 sm:order-2 bg-brand hover:bg-brand-hover min-h-[44px] text-base font-medium"
             >
               {loading ? 'Salvando...' : 'Salvar'}
             </Button>

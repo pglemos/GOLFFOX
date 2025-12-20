@@ -123,7 +123,7 @@ export default function TransportadoraMotoristasListPage() {
 
                 {/* Tabs */}
                 <div className="flex gap-2">
-                    <Button variant="default" className="bg-brand hover:bg-orange-600 cursor-default">
+                    <Button variant="default" className="bg-brand hover:bg-brand-hover cursor-default">
                         Lista de Motoristas
                     </Button>
                     <Link href="/transportadora/motoristas/ranking">

@@ -1073,7 +1073,7 @@ export const AdvancedRouteMap = memo(function AdvancedRouteMap({
           <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-90">
             <div className="text-center">
               <motion.div
-                className="w-8 h-8 border-4 border-info-light border-t-blue-600 rounded-full mx-auto mb-4"
+                className="w-8 h-8 border-4 border-info-light border-t-info rounded-full mx-auto mb-4"
                 animate={{ rotate: 360 }}
                 transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
               />

@@ -143,9 +143,9 @@ export function VehiclePickerModal({
           </div>
 
           {requiredCapacity && (
-            <div className="p-3 bg-orange-50 border border-orange-200 rounded-lg flex items-center gap-2">
-              <AlertTriangle className="h-4 w-4 text-orange-600" />
-              <span className="text-sm text-orange-800">
+            <div className="p-3 bg-brand-light border border-brand-soft rounded-lg flex items-center gap-2">
+              <AlertTriangle className="h-4 w-4 text-brand" />
+              <span className="text-sm text-brand">
                 Capacidade mínima necessária: {requiredCapacity} passageiros
               </span>
             </div>

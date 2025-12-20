@@ -175,7 +175,7 @@ export default function EmpresaDashboard() {
           <Card className="p-8 max-w-md w-full text-center">
             <h2 className="text-xl font-bold mb-2">Nenhuma empresa selecionada</h2>
             <p className="text-ink-muted mb-4">Aguarde enquanto carregamos suas empresas...</p>
-            <div className="w-8 h-8 border-2 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
+            <div className="w-8 h-8 border-2 border-brand border-t-transparent rounded-full animate-spin mx-auto"></div>
           </Card>
         </div>
       </AppShell>
@@ -279,7 +279,7 @@ export default function EmpresaDashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
           <RecentAlertsCard companyId={tenantCompanyId} />
 
-          <Card className="overflow-hidden bg-white/50 backdrop-blur-sm border-orange-100/50">
+          <Card className="overflow-hidden bg-white/50 backdrop-blur-sm border-brand-light/50">
             <CardHeader className="pb-4 px-3 sm:px-6">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
                 <div className="flex-1 min-w-0 pr-2 sm:pr-4">
@@ -294,7 +294,7 @@ export default function EmpresaDashboard() {
             </CardHeader>
             <CardContent className="pt-0 px-3 sm:px-6">
               <div className={cn(
-                "bg-gradient-to-br from-orange-500/10 to-orange-600/10 rounded-lg flex items-center justify-center border border-orange-200/50",
+                "bg-gradient-to-br from-brand/10 to-brand-hover/10 rounded-lg flex items-center justify-center border border-brand-soft/50",
                 isMobile ? "h-48" : "h-64" // Aumentado para alinhar com lista de alertas
               )}>
                 <MapPin className="h-10 w-10 sm:h-12 sm:w-12 text-brand opacity-40" />

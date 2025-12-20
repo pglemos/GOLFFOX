@@ -186,7 +186,7 @@ export function CreateTransportadoraModal({ isOpen, onClose, onSave }: CreateTra
           </div>
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-2 justify-end pt-4 sm:pt-6 border-t mt-4 sm:mt-6">
             <Button type="button" variant="outline" onClick={onClose} disabled={loading} className="w-full sm:w-auto order-2 sm:order-1 min-h-[44px] text-base font-medium">Cancelar</Button>
-            <Button type="submit" disabled={loading || !name} className="w-full sm:w-auto order-1 sm:order-2 bg-brand hover:bg-orange-600 min-h-[44px] text-base font-medium">
+            <Button type="submit" disabled={loading || !name} className="w-full sm:w-auto order-1 sm:order-2 bg-brand hover:bg-brand-hover min-h-[44px] text-base font-medium">
               {loading ? 'Criando...' : 'Salvar Transportadora'}
             </Button>
           </div>

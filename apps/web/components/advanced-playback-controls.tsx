@@ -143,7 +143,7 @@ export function AdvancedPlaybackControls({
 
             {/* Tempo restante */}
             <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4 text-orange-600" />
+              <Clock className="w-4 h-4 text-brand" />
               <span className="text-sm text-ink-muted">
                 {formatDuration(getRemainingTime())} restantes
               </span>
@@ -293,14 +293,14 @@ export function AdvancedPlaybackControls({
             onClick={handleProgressClick}
           >
             <motion.div
-              className="absolute top-0 left-0 h-full bg-gradient-to-r from-blue-500 to-blue-600 rounded-full"
+              className="absolute top-0 left-0 h-full bg-gradient-to-r from-info-light0 to-info rounded-full"
               style={{ width: `${getProgressPercentage()}%` }}
               transition={{ duration: 0.1 }}
             />
             
             {/* Indicador circular */}
             <motion.div
-              className="absolute top-1/2 w-4 h-4 bg-white border-2 border-blue-600 rounded-full shadow-md transform -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity"
+              className="absolute top-1/2 w-4 h-4 bg-white border-2 border-info rounded-full shadow-md transform -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity"
               style={{ left: `${getProgressPercentage()}%`, marginLeft: '-8px' }}
               whileHover={{ scale: 1.2 }}
               whileTap={{ scale: 0.9 }}

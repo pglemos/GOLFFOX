@@ -20,7 +20,7 @@ export function AlertToast({ t, title, message, severity, onDismiss }: AlertToas
             case 'warning':
                 return 'bg-amber-500 border-amber-600'
             case 'info':
-                return 'bg-info-light0 border-blue-600'
+                return 'bg-info-light0 border-info'
             default:
                 return 'bg-slate-800 border-slate-700'
         }

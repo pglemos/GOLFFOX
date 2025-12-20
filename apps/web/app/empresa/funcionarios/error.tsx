@@ -30,7 +30,7 @@ export default function Error({
           </details>
         )}
         <div className="flex gap-4 justify-center flex-wrap">
-          <Button onClick={reset} variant="default" className="bg-brand hover:bg-orange-600">
+          <Button onClick={reset} variant="default" className="bg-brand hover:bg-brand-hover">
             Tentar Novamente
           </Button>
           <Button onClick={() => window.location.href = '/operador'} variant="outline">

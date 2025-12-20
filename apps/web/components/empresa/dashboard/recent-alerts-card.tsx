@@ -36,7 +36,7 @@ export function RecentAlertsCard({ companyId }: RecentAlertsCardProps) {
     })
 
     return (
-        <Card className="h-full bg-white/50 backdrop-blur-sm border-orange-100/50">
+        <Card className="h-full bg-white/50 backdrop-blur-sm border-brand-light/50">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-lg font-semibold text-ink-strong flex items-center gap-2">
                     <AlertTriangle className="h-5 w-5 text-brand" />
@@ -59,9 +59,9 @@ export function RecentAlertsCard({ companyId }: RecentAlertsCardProps) {
                 ) : (
                     <div className="space-y-3">
                         {alerts.map((alert: any) => (
-                            <div key={alert.id} className="p-3 bg-white rounded-lg border border-gray-100 shadow-sm flex items-start gap-3">
+                            <div key={alert.id} className="p-3 bg-white rounded-lg border border-bg-soft shadow-sm flex items-start gap-3">
                                 <div className={`mt-0.5 p-1.5 rounded-full flex-shrink-0 ${alert.severity === 'critical' ? 'bg-error-light text-error' :
-                                        alert.severity === 'warning' ? 'bg-orange-100 text-orange-600' : 'bg-info-light text-info'
+                                        alert.severity === 'warning' ? 'bg-brand-light text-brand' : 'bg-info-light text-info'
                                     }`}>
                                     <AlertTriangle className="h-3.5 w-3.5" />
                                 </div>

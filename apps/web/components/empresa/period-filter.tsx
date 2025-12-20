@@ -31,7 +31,7 @@ export function PeriodFilter({ value, onChange, className }: PeriodFilterProps) 
             size="sm"
             onClick={() => onChange(option.value)}
             className={cn(
-              value === option.value && "bg-brand hover:bg-orange-600 text-white"
+              value === option.value && "bg-brand hover:bg-brand-hover text-white"
             )}
           >
             <Icon className="h-4 w-4 mr-2" />

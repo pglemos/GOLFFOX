@@ -270,7 +270,7 @@ export default function CustosPage() {
 
             <Sheet open={showCostForm} onOpenChange={setShowCostForm}>
               <SheetTrigger asChild>
-                <Button className="bg-brand hover:bg-orange-600">
+                <Button className="bg-brand hover:bg-brand-hover">
                   <Plus className="h-4 w-4 mr-2" />
                   Novo Lançamento
                 </Button>
@@ -305,19 +305,19 @@ export default function CustosPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0 }}
           >
-            <Card className="relative overflow-hidden bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200 dark:from-orange-950 dark:to-orange-900 dark:border-orange-800">
+            <Card className="relative overflow-hidden bg-gradient-to-br from-brand-light to-brand-light border-brand-soft dark:from-orange-950 dark:to-orange-900 dark:border-brand">
               <div className="absolute top-0 right-0 w-32 h-32 bg-brand/10 rounded-bl-full" />
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-orange-700 dark:text-orange-300 flex items-center gap-2">
+                <CardTitle className="text-sm font-medium text-brand dark:text-orange-300 flex items-center gap-2">
                   <TrendingDown className="h-4 w-4" />
                   Total de Custos
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-orange-900 dark:text-orange-100">
+                <div className="text-2xl font-bold text-orange-900 dark:text-brand-light">
                   <CountUp value={kpis.totalCosts} />
                 </div>
-                <p className="text-xs text-orange-600 dark:text-orange-400 mt-1">
+                <p className="text-xs text-brand dark:text-orange-400 mt-1">
                   {kpis.costEntries} lançamentos no mês
                 </p>
               </CardContent>
@@ -329,7 +329,7 @@ export default function CustosPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
           >
-            <Card className="relative overflow-hidden bg-gradient-to-br from-green-50 to-green-100 border-green-200 dark:from-green-950 dark:to-green-900 dark:border-green-800">
+            <Card className="relative overflow-hidden bg-gradient-to-br from-success-light to-green-100 border-success-light dark:from-green-950 dark:to-success dark:border-success">
               <div className="absolute top-0 right-0 w-32 h-32 bg-success-light0/10 rounded-bl-full" />
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-success dark:text-green-300 flex items-center gap-2">
@@ -338,10 +338,10 @@ export default function CustosPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-green-900 dark:text-green-100">
+                <div className="text-2xl font-bold text-success dark:text-green-100">
                   <CountUp value={kpis.totalRevenues} />
                 </div>
-                <p className="text-xs text-success dark:text-green-400 mt-1">
+                <p className="text-xs text-success dark:text-success mt-1">
                   {kpis.revenueEntries} lançamentos no mês
                 </p>
               </CardContent>
@@ -354,8 +354,8 @@ export default function CustosPage() {
             transition={{ delay: 0.2 }}
           >
             <Card className={`relative overflow-hidden ${kpis.margin >= 0
-                ? 'bg-gradient-to-br from-blue-50 to-blue-100 border-info-light dark:from-blue-950 dark:to-blue-900 dark:border-blue-800'
-                : 'bg-gradient-to-br from-red-50 to-red-100 border-error-light dark:from-red-950 dark:to-red-900 dark:border-red-800'
+                ? 'bg-gradient-to-br from-info-light to-info-light border-info-light dark:from-blue-950 dark:to-info dark:border-info'
+                : 'bg-gradient-to-br from-error-light to-red-100 border-error-light dark:from-red-950 dark:to-error dark:border-red-800'
               }`}>
               <div className={`absolute top-0 right-0 w-32 h-32 ${kpis.margin >= 0 ? 'bg-info-light0/10' : 'bg-error-light0/10'} rounded-bl-full`} />
               <CardHeader className="pb-2">
@@ -366,7 +366,7 @@ export default function CustosPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className={`text-2xl font-bold ${kpis.margin >= 0 ? 'text-blue-900 dark:text-blue-100' : 'text-red-900 dark:text-red-100'}`}>
+                <div className={`text-2xl font-bold ${kpis.margin >= 0 ? 'text-info dark:text-info-light' : 'text-error dark:text-red-100'}`}>
                   <CountUp value={Math.abs(kpis.margin)} prefix={kpis.margin < 0 ? '-' : ''} />
                 </div>
                 <p className={`text-xs mt-1 ${kpis.margin >= 0 ? 'text-info dark:text-blue-400' : 'text-error dark:text-red-400'}`}>

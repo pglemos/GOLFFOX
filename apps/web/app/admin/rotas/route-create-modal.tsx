@@ -372,7 +372,7 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
               onClick={handleOptimize}
               disabled={optimizing || !formData.company_id || !formData.selected_employees?.length}
               variant="outline"
-              className="bg-brand hover:bg-orange-600 text-white w-full sm:w-auto order-2 sm:order-2 text-base font-medium h-11 sm:h-12"
+              className="bg-brand hover:bg-brand-hover text-white w-full sm:w-auto order-2 sm:order-2 text-base font-medium h-11 sm:h-12"
               aria-label="Pré-visualizar e otimizar rota"
             >
               {optimizing ? "Otimizando..." : <span className="hidden sm:inline">Pré-visualizar & Otimizar</span>}
@@ -381,7 +381,7 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
             <Button
               onClick={handleSave}
               disabled={saving}
-              className="bg-brand hover:bg-orange-600 text-white w-full sm:w-auto order-1 sm:order-3 text-base font-medium h-11 sm:h-12"
+              className="bg-brand hover:bg-brand-hover text-white w-full sm:w-auto order-1 sm:order-3 text-base font-medium h-11 sm:h-12"
               aria-label="Salvar rota"
             >
               {saving ? "Salvando..." : "Salvar"}

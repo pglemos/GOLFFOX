@@ -131,7 +131,7 @@ export default function ReceitasPage() {
                 </div>
 
                 {/* KPI */}
-                <Card className="bg-success-light border-green-200">
+                <Card className="bg-success-light border-success-light">
                     <CardContent className="pt-6">
                         <div className="flex items-center gap-4">
                             <ArrowUpRight className="h-10 w-10 text-success" />

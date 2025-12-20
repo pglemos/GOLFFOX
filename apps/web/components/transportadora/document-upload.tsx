@@ -221,9 +221,9 @@ export function DocumentUpload({
       )}
 
       {success && (
-        <Alert className="border-success bg-success-light dark:bg-green-900/20">
+        <Alert className="border-success bg-success-light dark:bg-success/20">
           <AlertCircle className="h-4 w-4 text-success" />
-          <AlertDescription className="text-success dark:text-green-200">
+          <AlertDescription className="text-success dark:text-success-light">
             Arquivo enviado com sucesso!
           </AlertDescription>
         </Alert>

@@ -178,7 +178,7 @@ export function TransportadoraUsersModal({ transportadora, isOpen, onClose, onSa
                   >
                     Cancelar
                   </Button>
-                  <Button type="submit" disabled={loading} className="w-full sm:w-auto order-1 sm:order-2 bg-brand hover:bg-orange-600 min-h-[44px] text-base font-medium">
+                  <Button type="submit" disabled={loading} className="w-full sm:w-auto order-1 sm:order-2 bg-brand hover:bg-brand-hover min-h-[44px] text-base font-medium">
                     {loading ? 'Criando...' : 'Criar Usuário'}
                   </Button>
                 </div>

@@ -84,7 +84,7 @@ export function TrajectoryPanel({
                     <span className="font-semibold">Real:</span> {analysis.totalTimeActual.toFixed(0)} min
                   </p>
                   {analysis.timeDelay > 0 && (
-                    <p className="text-xs text-orange-600">
+                    <p className="text-xs text-brand">
                       <TrendingUp className="h-3 w-3 inline mr-1" />
                       +{analysis.timeDelay.toFixed(0)} min de atraso
                     </p>
@@ -135,7 +135,7 @@ export function TrajectoryPanel({
               </h4>
               <div className="space-y-2 max-h-32 sm:max-h-40 overflow-y-auto">
                 {analysis.deviations.slice(0, 5).map((deviation, idx) => (
-                  <div key={idx} className="text-xs p-2 bg-orange-50 rounded border border-orange-200">
+                  <div key={idx} className="text-xs p-2 bg-brand-light rounded border border-brand-soft">
                     <p className="font-semibold">{deviation.distance}m fora da rota</p>
                     <p className="text-ink-muted">
                       {deviation.timestamp.toLocaleTimeString('pt-BR')}

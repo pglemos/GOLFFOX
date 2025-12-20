@@ -56,7 +56,7 @@ export default function AlertasPage() {
       case "critical":
         return { icon: XCircle, color: "text-error", bg: "bg-error-light", border: "border-error-light", label: "Crítico" }
       case "warning":
-        return { icon: AlertTriangle, color: "text-warning", bg: "bg-warning-light", border: "border-yellow-200", label: "Aviso" }
+        return { icon: AlertTriangle, color: "text-warning", bg: "bg-warning-light", border: "border-warning-light", label: "Aviso" }
       case "info":
       default:
         return { icon: Info, color: "text-info", bg: "bg-info-light", border: "border-info-light", label: "Informativo" }
@@ -120,7 +120,7 @@ export default function AlertasPage() {
           <Card
             className={cn(
               "p-4 cursor-pointer transition-all hover:shadow-md",
-              selectedType === "critico" && "ring-2 ring-red-500"
+              selectedType === "critico" && "ring-2 ring-error"
             )}
             onClick={() => setSelectedType(selectedType === "critico" ? "all" : "critico")}
           >
@@ -138,7 +138,7 @@ export default function AlertasPage() {
           <Card
             className={cn(
               "p-4 cursor-pointer transition-all hover:shadow-md",
-              selectedType === "aviso" && "ring-2 ring-yellow-500"
+              selectedType === "aviso" && "ring-2 ring-warning"
             )}
             onClick={() => setSelectedType(selectedType === "aviso" ? "all" : "aviso")}
           >
@@ -171,7 +171,7 @@ export default function AlertasPage() {
 
         {loading ? (
           <div className="text-center py-12">
-            <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-orange-500 border-r-transparent" />
+            <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-brand border-r-transparent" />
             <p className="mt-4 text-ink-muted">Carregando alertas...</p>
           </div>
         ) : filteredAlerts.length === 0 ? (

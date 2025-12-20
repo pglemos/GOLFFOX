@@ -112,11 +112,11 @@ export default function MotoristasPage() {
   const getRankBadgeColor = (rank: number) => {
     switch (rank) {
       case 1:
-        return "bg-gradient-to-r from-yellow-400 to-yellow-600 text-white"
+        return "bg-gradient-to-r from-warning to-yellow-600 text-white"
       case 2:
-        return "bg-gradient-to-r from-gray-300 to-gray-500 text-white"
+        return "bg-gradient-to-r from-muted to-gray-500 text-white"
       case 3:
-        return "bg-gradient-to-r from-orange-400 to-orange-600 text-white"
+        return "bg-gradient-to-r from-orange-400 to-brand-hover text-white"
       default:
         return "bg-muted text-ink-strong"
     }
@@ -133,7 +133,7 @@ export default function MotoristasPage() {
               Classificação baseada em performance e indicadores
             </p>
           </div>
-          <Button className="bg-brand hover:bg-orange-600">
+          <Button className="bg-brand hover:bg-brand-hover">
             <UserPlus className="h-4 w-4 mr-2" />
             Adicionar Motorista
           </Button>
@@ -141,22 +141,22 @@ export default function MotoristasPage() {
 
         {/* Métricas Gerais */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card className="p-4 bg-gradient-to-br from-yellow-50 to-yellow-100 border-yellow-200">
+          <Card className="p-4 bg-gradient-to-br from-yellow-50 to-yellow-100 border-warning-light">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs font-medium text-warning mb-1">Motoristas Ativos</p>
-                <p className="text-2xl font-bold text-yellow-900">{metrics.activeDrivers}</p>
+                <p className="text-2xl font-bold text-warning">{metrics.activeDrivers}</p>
               </div>
               <div className="h-12 w-12 rounded-full bg-warning-light0 flex items-center justify-center">
                 <Users className="h-6 w-6 text-white" />
               </div>
             </div>
           </Card>
-          <Card className="p-4 bg-gradient-to-br from-green-50 to-green-100 border-green-200">
+          <Card className="p-4 bg-gradient-to-br from-success-light to-green-100 border-success-light">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs font-medium text-success mb-1">Faturamento Total</p>
-                <p className="text-2xl font-bold text-green-900">
+                <p className="text-2xl font-bold text-success">
                   R$ {metrics.totalRevenue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                 </p>
               </div>
@@ -165,11 +165,11 @@ export default function MotoristasPage() {
               </div>
             </div>
           </Card>
-          <Card className="p-4 bg-gradient-to-br from-blue-50 to-blue-100 border-info-light">
+          <Card className="p-4 bg-gradient-to-br from-info-light to-info-light border-info-light">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs font-medium text-info mb-1">Corridas do Dia</p>
-                <p className="text-2xl font-bold text-blue-900">{metrics.todayTrips}</p>
+                <p className="text-2xl font-bold text-info">{metrics.todayTrips}</p>
               </div>
               <div className="h-12 w-12 rounded-full bg-info-light0 flex items-center justify-center">
                 <Navigation className="h-6 w-6 text-white" />
@@ -197,7 +197,7 @@ export default function MotoristasPage() {
                 Lista de Motoristas
               </Button>
             </Link>
-            <Button variant="default" className="bg-brand hover:bg-orange-600 cursor-default">
+            <Button variant="default" className="bg-brand hover:bg-brand-hover cursor-default">
               Ranking de Desempenho
             </Button>
           </div>
@@ -234,7 +234,7 @@ export default function MotoristasPage() {
                 >
                   <Card
                     key={motorista.id}
-                    className={`p-4 transition-all cursor-pointer hover:shadow-xl bg-card/50 backdrop-blur-sm border-border hover:border-text-brand/30 ${selectedDriver === motorista.id ? 'ring-2 ring-orange-500' : ''}`}
+                    className={`p-4 transition-all cursor-pointer hover:shadow-xl bg-card/50 backdrop-blur-sm border-border hover:border-text-brand/30 ${selectedDriver === motorista.id ? 'ring-2 ring-brand' : ''}`}
                     onClick={() => setSelectedDriver(selectedDriver === motorista.id ? null : motorista.id)}
                   >
                     <div className="flex flex-col lg:flex-row gap-4">
@@ -242,7 +242,7 @@ export default function MotoristasPage() {
                       <div className="flex items-center gap-4 flex-1">
                         <div className={`h-12 w-12 rounded-lg flex items-center justify-center font-bold text-lg ${getRankBadgeColor(motorista.rank)}`}>#{motorista.rank}</div>
                         <div className="flex items-center gap-3 flex-1">
-                          <div className="h-12 w-12 rounded-full bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center text-white font-bold text-lg">
+                          <div className="h-12 w-12 rounded-full bg-gradient-to-br from-orange-400 to-brand-hover flex items-center justify-center text-white font-bold text-lg">
                             {motorista.name.charAt(0)}
                           </div>
                           <div className="flex-1 min-w-0">
@@ -266,7 +266,7 @@ export default function MotoristasPage() {
                               <span className="font-medium">{motorista.punctualityScore}%</span>
                             </div>
                             <div className="h-2 bg-muted rounded-full overflow-hidden">
-                              <div className="h-full bg-gradient-to-r from-blue-400 to-blue-600 rounded-full transition-all" style={{ width: `${motorista.punctualityScore}%` }} />
+                              <div className="h-full bg-gradient-to-r from-blue-400 to-info rounded-full transition-all" style={{ width: `${motorista.punctualityScore}%` }} />
                             </div>
                           </div>
                           <div>
@@ -275,7 +275,7 @@ export default function MotoristasPage() {
                               <span className="font-medium">{motorista.economyScore}%</span>
                             </div>
                             <div className="h-2 bg-muted rounded-full overflow-hidden">
-                              <div className="h-full bg-gradient-to-r from-green-400 to-green-600 rounded-full transition-all" style={{ width: `${motorista.economyScore}%` }} />
+                              <div className="h-full bg-gradient-to-r from-success to-success rounded-full transition-all" style={{ width: `${motorista.economyScore}%` }} />
                             </div>
                           </div>
                           <div>
@@ -325,7 +325,7 @@ export default function MotoristasPage() {
                         </div>
                         <div className="space-y-1">
                           <p className="text-xs text-ink-muted">Avaliação</p>
-                          <p className="text-sm font-medium flex items-center gap-1">{motorista.avgRating.toFixed(1)}<Star className="h-3 w-3 text-warning fill-yellow-500" /></p>
+                          <p className="text-sm font-medium flex items-center gap-1">{motorista.avgRating.toFixed(1)}<Star className="h-3 w-3 text-warning fill-warning" /></p>
                         </div>
                       </div>
                     )}

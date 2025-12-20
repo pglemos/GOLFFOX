@@ -21,9 +21,9 @@ export default function AdminMin() {
   }
 
   const quickLinks = [
-    { href: "/admin/mapa", label: "Mapa da Frota", icon: MapPin, color: "from-green-500 to-emerald-500" },
-    { href: "/admin/custos", label: "Custos", icon: DollarSign, color: "from-blue-500 to-cyan-500" },
-    { href: "/admin/relatorios", label: "Relatórios", icon: FileText, color: "from-orange-500 to-amber-500" },
+    { href: "/admin/mapa", label: "Mapa da Frota", icon: MapPin, color: "from-success to-emerald-500" },
+    { href: "/admin/custos", label: "Custos", icon: DollarSign, color: "from-info-light0 to-cyan-500" },
+    { href: "/admin/relatorios", label: "Relatórios", icon: FileText, color: "from-brand to-amber-500" },
   ]
 
   return (

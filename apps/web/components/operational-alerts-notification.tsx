@@ -119,9 +119,9 @@ export function OperationalAlertsNotification() {
       case 'warning':
         return 'bg-warning-light text-warning border-yellow-100'
       case 'info':
-        return 'bg-info-light text-info border-blue-100'
+        return 'bg-info-light text-info border-info-light'
       default:
-        return 'bg-bg-soft text-ink-strong border-gray-100'
+        return 'bg-bg-soft text-ink-strong border-bg-soft'
     }
   }
 

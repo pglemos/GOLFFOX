@@ -321,7 +321,7 @@ export default function OperatorConfiguracoesPage() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="w-16 h-16 border-4 border-orange-500 border-t-transparent rounded-full animate-spin" />
+        <div className="w-16 h-16 border-4 border-brand border-t-transparent rounded-full animate-spin" />
       </div>
     )
   }
@@ -369,7 +369,7 @@ export default function OperatorConfiguracoesPage() {
                       </span>
                     )}
                   </div>
-                  <label className="absolute bottom-0 right-0 bg-brand text-white p-3 rounded-full cursor-pointer hover:bg-orange-600 transition-colors shadow-lg">
+                  <label className="absolute bottom-0 right-0 bg-brand text-white p-3 rounded-full cursor-pointer hover:bg-brand-hover transition-colors shadow-lg">
                     <Camera className="h-5 w-5" />
                     <input
                       type="file"
@@ -623,7 +623,7 @@ export default function OperatorConfiguracoesPage() {
                     id="language"
                     value={formData.language}
                     onChange={(e) => handleLanguageChange(e.target.value)}
-                    className="w-full px-3 py-2 border border-border rounded-lg bg-bg-bg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-opacity-20"
+                    className="w-full px-3 py-2 border border-border rounded-lg bg-bg-bg focus:outline-none focus:ring-2 focus:ring-brand focus:ring-opacity-20"
                   >
                     <option value="pt-BR">Português (Brasil)</option>
                     <option value="en-US">English (US)</option>
@@ -639,7 +639,7 @@ export default function OperatorConfiguracoesPage() {
                       id="timezone"
                       value={formData.timezone}
                       onChange={(e) => handleTimezoneChange(e.target.value)}
-                      className="w-full pl-10 pr-3 py-2 border border-border rounded-lg bg-bg-bg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-opacity-20"
+                      className="w-full pl-10 pr-3 py-2 border border-border rounded-lg bg-bg-bg focus:outline-none focus:ring-2 focus:ring-brand focus:ring-opacity-20"
                     >
                       <option value="America/Sao_Paulo">Brasília (GMT-3)</option>
                       <option value="America/Manaus">Manaus (GMT-4)</option>

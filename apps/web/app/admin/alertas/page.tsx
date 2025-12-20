@@ -399,7 +399,7 @@ export default function AlertasPage() {
                   <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
                     <div className="flex gap-3 sm:gap-4 flex-1 min-w-0">
                       <div className={`p-1.5 rounded-lg flex-shrink-0 ${alerta.severity === 'critical' ? 'bg-error-light' :
-                          alerta.severity === 'warning' ? 'bg-orange-100' :
+                          alerta.severity === 'warning' ? 'bg-brand-light' :
                             'bg-info-light'
                         }`}>
                         <AlertTriangle

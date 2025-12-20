@@ -210,8 +210,8 @@ export default function TransportadoraAjudaPage() {
           >
           <Card className="p-6 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-border hover:border-success/30 cursor-pointer">
             <div className="flex items-center gap-4 mb-4">
-              <div className="w-12 h-12 rounded-lg bg-success-light dark:bg-green-900/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                <Mail className="h-6 w-6 text-success dark:text-green-400" />
+              <div className="w-12 h-12 rounded-lg bg-success-light dark:bg-success/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                <Mail className="h-6 w-6 text-success dark:text-success" />
               </div>
               <div>
                 <h3 className="font-semibold mb-1">Contato por Email</h3>

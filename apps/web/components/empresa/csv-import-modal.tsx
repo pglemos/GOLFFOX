@@ -203,7 +203,7 @@ export function CSVImportModal({ isOpen, onClose, onSave, empresaId }: CSVImport
         </DialogHeader>
         <div className="grid gap-4 sm:gap-6 py-2 sm:py-4">
           {!csvAvailable && (
-            <div className="p-3 rounded-lg bg-warning-light border border-yellow-200">
+            <div className="p-3 rounded-lg bg-warning-light border border-warning-light">
               <div className="flex items-center gap-2">
                 <AlertCircle className="h-4 w-4 text-warning" />
                 <span className="text-sm text-warning">
@@ -317,7 +317,7 @@ export function CSVImportModal({ isOpen, onClose, onSave, empresaId }: CSVImport
 
           {importResult && (
             <div className="space-y-2">
-              <div className="p-3 rounded-lg bg-success-light border border-green-200">
+              <div className="p-3 rounded-lg bg-success-light border border-success-light">
                 <div className="flex items-center gap-2 mb-2">
                   <CheckCircle2 className="h-4 w-4 text-success" />
                   <span className="text-sm font-medium text-success">
@@ -354,7 +354,7 @@ export function CSVImportModal({ isOpen, onClose, onSave, empresaId }: CSVImport
             type="button"
             onClick={handleImport}
             disabled={!file || preview.length === 0 || importing || !csvAvailable}
-            className="bg-brand hover:bg-orange-600 w-full sm:w-auto order-1 sm:order-2 min-h-[44px] text-base font-medium"
+            className="bg-brand hover:bg-brand-hover w-full sm:w-auto order-1 sm:order-2 min-h-[44px] text-base font-medium"
           >
             {importing ? (operatorI18n.csv_import?.importing || 'Importando...') : (operatorI18n.csv_import?.import || 'Importar')}
           </Button>

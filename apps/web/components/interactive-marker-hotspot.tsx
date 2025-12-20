@@ -63,8 +63,8 @@ const passengerTypeConfig = {
   disabled: { 
     icon: User, 
     label: 'PCD', 
-    color: 'bg-orange-100 text-orange-800',
-    iconColor: 'text-orange-600'
+    color: 'bg-brand-light text-brand',
+    iconColor: 'text-brand'
   },
   student: { 
     icon: User, 
@@ -155,7 +155,7 @@ export function InteractiveMarkerHotspot({
         <Card className="w-[calc(100vw-2rem)] sm:w-80 max-w-sm shadow-lg border-0 bg-white/95 backdrop-blur-sm">
           <CardContent className="p-0">
             {/* Cabeçalho */}
-            <div className="flex items-center justify-between p-3 sm:p-4 border-b bg-gradient-to-r from-blue-50 to-indigo-50">
+            <div className="flex items-center justify-between p-3 sm:p-4 border-b bg-gradient-to-r from-info-light to-indigo-50">
               <div className="flex items-center gap-3">
                 <div className={`p-2 rounded-full ${
                   stop.type === 'pickup' ? 'bg-success-light' : 'bg-error-light'

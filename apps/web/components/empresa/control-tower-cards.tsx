@@ -32,7 +32,7 @@ export const ControlTowerCards = memo(function ControlTowerCards({
       value: stoppedVehicles,
       icon: Truck,
       color: 'text-brand',
-      bgColor: 'bg-orange-50',
+      bgColor: 'bg-brand-light',
       href: '/operador/alertas?type=bus_stopped'
     },
     {

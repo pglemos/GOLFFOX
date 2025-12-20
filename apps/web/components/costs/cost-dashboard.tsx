@@ -318,15 +318,15 @@ export function CostDashboard({ companyId, period = '30' }: CostDashboardProps) 
 
       {/* Alerta de Orçamento */}
       {budgetVariance && Math.abs(budgetVariance.variance_percent) > 5 && (
-        <Card className="border-orange-200 bg-orange-50">
+        <Card className="border-brand-soft bg-brand-light">
           <CardContent className="p-4">
             <div className="flex items-center gap-2">
               <AlertCircle className="h-5 w-5 text-brand" />
               <div>
-                <p className="font-semibold text-orange-800">
+                <p className="font-semibold text-brand">
                   Divergência significativa do orçamento detectada
                 </p>
-                <p className="text-sm text-orange-600">
+                <p className="text-sm text-brand">
                   Variação de {budgetVariance.variance_percent > 0 ? '+' : ''}{budgetVariance.variance_percent.toFixed(1)}% 
                   ({formatCurrency(Math.abs(budgetVariance.variance_absolute))})
                 </p>

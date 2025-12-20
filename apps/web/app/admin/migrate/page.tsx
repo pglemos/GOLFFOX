@@ -142,8 +142,8 @@ export default function MigratePage() {
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: i * 0.05 }}
                     className={`p-3 rounded-lg flex items-center gap-2 ${
-                      r.status === "exists" ? "bg-success-light text-success border border-green-200" :
-                      r.status === "needs_creation" ? "bg-warning-light text-warning border border-yellow-200" :
+                      r.status === "exists" ? "bg-success-light text-success border border-success-light" :
+                      r.status === "needs_creation" ? "bg-warning-light text-warning border border-warning-light" :
                       "bg-error-light text-error border border-error-light"
                     }`}
                   >
@@ -179,7 +179,7 @@ export default function MigratePage() {
             </Button>
           </div>
 
-          <pre className="bg-ink-strong text-green-400 p-4 rounded-lg overflow-x-auto text-sm whitespace-pre-wrap">
+          <pre className="bg-ink-strong text-success p-4 rounded-lg overflow-x-auto text-sm whitespace-pre-wrap">
             {MIGRATION_SQL}
           </pre>
 

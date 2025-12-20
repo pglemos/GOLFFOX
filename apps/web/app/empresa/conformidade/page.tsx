@@ -56,7 +56,7 @@ export default function ConformidadeOperatorPage() {
     }
   }
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center"><div className="w-16 h-16 border-4 border-orange-500 border-t-transparent rounded-full animate-spin" /></div>
+  if (loading) return <div className="min-h-screen flex items-center justify-center"><div className="w-16 h-16 border-4 border-brand border-t-transparent rounded-full animate-spin" /></div>
 
   return (
     <AppShell user={{ id: user?.id || "", name: user?.name || "Operador", email: user?.email || "", role: "operador", avatar_url: user?.avatar_url }}>
@@ -76,9 +76,9 @@ export default function ConformidadeOperatorPage() {
               whileHover={{ y: -4 }}
               className="group"
             >
-            <Card key={idx} className="p-4 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-border hover:border-orange-500/30">
+            <Card key={idx} className="p-4 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-border hover:border-brand/30">
               <div className="flex items-center gap-3">
-                <div className="p-1.5 rounded-lg bg-orange-100">
+                <div className="p-1.5 rounded-lg bg-brand-light">
                   <FileWarning className="h-4 w-4 text-brand" />
                 </div>
                 <div className="flex-1">

@@ -65,7 +65,7 @@ function ComunicacoesOperatorPageInner() {
     }
   }
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center"><div className="w-16 h-16 border-4 border-orange-500 border-t-transparent rounded-full animate-spin" /></div>
+  if (loading) return <div className="min-h-screen flex items-center justify-center"><div className="w-16 h-16 border-4 border-brand border-t-transparent rounded-full animate-spin" /></div>
 
   return (
     <AppShell user={{ id: user?.id || "", name: user?.name || "Operador", email: user?.email || "", role: "operador", avatar_url: user?.avatar_url }}>
@@ -75,7 +75,7 @@ function ComunicacoesOperatorPageInner() {
             <h1 className="text-3xl font-bold mb-2">Comunicações</h1>
             <p className="text-ink-muted">Broadcasts internos e histórico</p>
           </div>
-          <Button className="bg-brand hover:bg-orange-600" onClick={() => setIsModalOpen(true)}>
+          <Button className="bg-brand hover:bg-brand-hover" onClick={() => setIsModalOpen(true)}>
             <Send className="h-4 w-4 mr-2" /> Novo Broadcast
           </Button>
         </div>

@@ -476,7 +476,7 @@ export default function SocorroPage() {
                       {ocorrencia.status === 'open' && ocorrencia.created_at && (
                         <div className="flex items-center gap-1 mt-2">
                           <Clock className="h-3 w-3 text-brand" />
-                          <span className="text-xs text-orange-600 font-medium">
+                          <span className="text-xs text-brand font-medium">
                             Tempo de resposta: {(() => {
                               const minutes = Math.floor((Date.now() - new Date(ocorrencia.created_at).getTime()) / (1000 * 60))
                               return `${minutes}min`

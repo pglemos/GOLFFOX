@@ -30,7 +30,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import dynamic from "next/dynamic"
 
 // Lazy load seção de documentos
-const VehicleDocumentsSection = dynamic(() => import("@/components/veiculo/veiculo-documents-section"), { ssr: false })
+const VehicleDocumentsSection = dynamic(() => import("@/components/vehicle/vehicle-documents-section"), { ssr: false })
 
 interface veiculo {
   id?: string
@@ -650,7 +650,7 @@ export function VehicleModal({ veiculo, isOpen, onClose, onSave, carriers }: Veh
                 <Button
                   type="submit"
                   disabled={loading}
-                  className="w-full sm:w-auto order-1 sm:order-2 bg-brand hover:bg-orange-600 min-h-[44px] text-base font-medium"
+                  className="w-full sm:w-auto order-1 sm:order-2 bg-brand hover:bg-brand-hover min-h-[44px] text-base font-medium"
                 >
                   {loading ? "Salvando..." : veiculo ? "Atualizar" : "Cadastrar"}
                 </Button>

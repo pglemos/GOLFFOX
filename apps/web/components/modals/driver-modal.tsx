@@ -30,8 +30,8 @@ import { Badge } from "@/components/ui/badge"
 import dynamic from "next/dynamic"
 
 // Lazy load seções pesadas
-const DriverCompensationSection = dynamic(() => import("@/components/motorista/motorista-compensation-section"), { ssr: false })
-const DriverDocumentsSection = dynamic(() => import("@/components/motorista/motorista-documents-section"), { ssr: false })
+const DriverCompensationSection = dynamic(() => import("@/components/driver/driver-compensation-section"), { ssr: false })
+const DriverDocumentsSection = dynamic(() => import("@/components/driver/driver-documents-section"), { ssr: false })
 
 interface motorista {
   id?: string
@@ -534,7 +534,7 @@ export function DriverModal({ motorista, isOpen, onClose, onSave, carriers = [] 
                 <Button
                   type="submit"
                   disabled={loading}
-                  className="w-full sm:w-auto order-1 sm:order-2 bg-brand hover:bg-orange-600 min-h-[44px] text-base font-medium touch-manipulation"
+                  className="w-full sm:w-auto order-1 sm:order-2 bg-brand hover:bg-brand-hover min-h-[44px] text-base font-medium touch-manipulation"
                 >
                   {loading ? "Salvando..." : motorista ? "Atualizar" : "Cadastrar"}
                 </Button>

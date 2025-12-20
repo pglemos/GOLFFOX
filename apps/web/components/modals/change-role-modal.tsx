@@ -189,9 +189,9 @@ export function ChangeRoleModal({
           </div>
 
           {user?.role === 'admin' && newRole !== 'admin' && (
-            <div className="flex items-start gap-2 p-3 bg-orange-50 border border-orange-200 rounded-lg">
-              <AlertTriangle className="h-4 w-4 text-orange-600 mt-0.5" />
-              <p className="text-sm text-orange-800">
+            <div className="flex items-start gap-2 p-3 bg-brand-light border border-brand-soft rounded-lg">
+              <AlertTriangle className="h-4 w-4 text-brand mt-0.5" />
+              <p className="text-sm text-brand">
                 Atenção: Você está removendo o papel de administrador deste usuário.
                 Esta ação requer privilégios de administrador.
               </p>
@@ -211,7 +211,7 @@ export function ChangeRoleModal({
             <Button
               type="submit"
               disabled={loading || newRole === user?.role}
-              className="w-full sm:w-auto order-1 sm:order-2 bg-brand hover:bg-orange-600 min-h-[44px] text-base font-medium"
+              className="w-full sm:w-auto order-1 sm:order-2 bg-brand hover:bg-brand-hover min-h-[44px] text-base font-medium"
             >
               {loading ? "Alterando..." : "Alterar Papel"}
             </Button>

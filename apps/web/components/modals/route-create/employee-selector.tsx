@@ -67,7 +67,7 @@ export function EmployeeSelector({
                             return (
                                 <div
                                     key={emp.employee_id}
-                                    className={`flex items-start gap-3 p-2 rounded-lg border cursor-pointer transition-colors ${isSelected ? "bg-orange-50 border-orange-200" : "hover:bg-bg-soft"
+                                    className={`flex items-start gap-3 p-2 rounded-lg border cursor-pointer transition-colors ${isSelected ? "bg-brand-light border-brand-soft" : "hover:bg-bg-soft"
                                         }`}
                                     onClick={() => onToggleEmployee(emp.employee_id)}
                                     role="button"

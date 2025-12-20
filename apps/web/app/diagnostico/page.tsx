@@ -264,7 +264,7 @@ export default function DiagnosticoPage() {
                     JSON Completo
                   </h2>
                 </div>
-                <pre className="text-xs bg-ink-strong text-green-400 p-4 rounded overflow-x-auto">
+                <pre className="text-xs bg-ink-strong text-success p-4 rounded overflow-x-auto">
                   {JSON.stringify(resultado, null, 2)}
                 </pre>
               </Card>

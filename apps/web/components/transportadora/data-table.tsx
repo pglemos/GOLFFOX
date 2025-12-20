@@ -182,7 +182,7 @@ export function DataTable<T extends Record<string, any>>({
       return <Badge className="bg-success-light0 hover:bg-success text-white">{status}</Badge>
     }
     if (statusLower.includes('pending') || statusLower.includes('pendente')) {
-      return <Badge className="bg-brand hover:bg-orange-600 text-white">{status}</Badge>
+      return <Badge className="bg-brand hover:bg-brand-hover text-white">{status}</Badge>
     }
     if (statusLower.includes('inactive') || statusLower.includes('inativo')) {
       return <Badge variant="secondary">{status}</Badge>

@@ -50,9 +50,9 @@ export function ControlTowerVisual({
       label: labels.stopped,
       value: stoppedVehicles,
       icon: Truck,
-      color: 'text-orange-600',
-      bgColor: 'bg-orange-50',
-      borderColor: 'border-orange-200',
+      color: 'text-brand',
+      bgColor: 'bg-brand-light',
+      borderColor: 'border-brand-soft',
       href: '/operador/alertas?type=bus_stopped'
     },
     {
@@ -61,7 +61,7 @@ export function ControlTowerVisual({
       icon: Route,
       color: 'text-warning',
       bgColor: 'bg-warning-light',
-      borderColor: 'border-yellow-200',
+      borderColor: 'border-warning-light',
       href: '/operador/alertas?type=deviation'
     },
     {
@@ -92,7 +92,7 @@ export function ControlTowerVisual({
           >
             {hasIssues ? (
               <Link href={item.href} className="block h-full">
-                <Card className={`relative h-full overflow-hidden bg-card/50 backdrop-blur-sm border-2 ${item.borderColor} hover:shadow-xl transition-all duration-300 cursor-pointer ${hasIssues ? 'ring-2 ring-offset-2 ring-red-500/50' : ''}`}>
+                <Card className={`relative h-full overflow-hidden bg-card/50 backdrop-blur-sm border-2 ${item.borderColor} hover:shadow-xl transition-all duration-300 cursor-pointer ${hasIssues ? 'ring-2 ring-offset-2 ring-error/50' : ''}`}>
                   {/* Pulse Animation for Issues */}
                   {hasIssues && (
                     <motion.div

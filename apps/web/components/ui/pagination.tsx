@@ -76,7 +76,7 @@ export function Pagination({ currentPage, totalPages, onPageChange, className }:
             size="sm"
             onClick={() => onPageChange(page as number)}
             className={cn(
-              currentPage === page && "bg-brand hover:bg-orange-600 text-white"
+              currentPage === page && "bg-brand hover:bg-brand-hover text-white"
             )}
           >
             {page}

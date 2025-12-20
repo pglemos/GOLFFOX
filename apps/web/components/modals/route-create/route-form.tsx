@@ -324,7 +324,7 @@ export function RouteForm({
                     </div>
 
                     {warnings.length > 0 && (
-                        <div className="p-3 bg-warning-light border border-yellow-200 rounded-lg">
+                        <div className="p-3 bg-warning-light border border-warning-light rounded-lg">
                             {warnings.map((w, i) => (
                                 <div key={i} className="text-sm text-warning flex items-center gap-2">
                                     <AlertTriangle className="h-4 w-4" />

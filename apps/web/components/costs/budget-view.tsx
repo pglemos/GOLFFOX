@@ -367,7 +367,7 @@ export function BudgetView({ companyId }: BudgetViewProps) {
                 <Button type="button" variant="outline" onClick={() => { setShowForm(false); resetForm(); }}>
                   Cancelar
                 </Button>
-                <Button type="submit" className="bg-brand hover:bg-orange-600">
+                <Button type="submit" className="bg-brand hover:bg-brand-hover">
                   Salvar
                 </Button>
               </div>

@@ -51,7 +51,7 @@ export default function SatisfacaoPage() {
         return Array.from({ length: 5 }).map((_, i) => (
             <Star
                 key={i}
-                className={`h-5 w-5 ${i < Math.round(rating) ? 'fill-yellow-400 text-yellow-400' : 'text-ink-light'}`}
+                className={`h-5 w-5 ${i < Math.round(rating) ? 'fill-warning text-warning' : 'text-ink-light'}`}
             />
         ))
     }
@@ -73,7 +73,7 @@ export default function SatisfacaoPage() {
 
                 {/* Main KPIs */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <Card className="bg-gradient-to-br from-yellow-50 to-yellow-100 border-yellow-200">
+                    <Card className="bg-gradient-to-br from-yellow-50 to-yellow-100 border-warning-light">
                         <CardContent className="pt-6">
                             <div className="flex items-center gap-2 mb-2">
                                 {renderStars(data.overall_rating)}

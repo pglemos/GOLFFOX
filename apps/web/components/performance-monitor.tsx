@@ -115,7 +115,7 @@ export function PerformanceMonitor({
       exit={{ scale: 0, opacity: 0 }}
     >
       <Card className={`${isMobile ? 'w-80' : 'w-96'} shadow-lg border-2 ${
-        isPerformanceGood ? 'border-green-200' : 'border-error-light'
+        isPerformanceGood ? 'border-success-light' : 'border-error-light'
       }`}>
         <CardHeader className="pb-2">
           <div className="flex items-center justify-between">
@@ -260,8 +260,8 @@ export function PerformanceMonitor({
 
                 {/* Performance Tips */}
                 {!isPerformanceGood && (
-                  <div className="bg-warning-light dark:bg-yellow-900/20 p-2 rounded text-xs">
-                    <div className="font-medium text-warning dark:text-yellow-200 mb-1">
+                  <div className="bg-warning-light dark:bg-warning/20 p-2 rounded text-xs">
+                    <div className="font-medium text-warning dark:text-warning-light mb-1">
                       Dicas de Otimização:
                     </div>
                     <ul className="text-warning dark:text-yellow-300 space-y-1">

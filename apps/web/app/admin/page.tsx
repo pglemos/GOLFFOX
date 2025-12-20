@@ -444,8 +444,8 @@ export default function AdminDashboard() {
               description: "Últimas atualizações do sistema",
               icon: AlertCircle,
               href: "/admin/alertas",
-              gradient: "from-red-500 to-orange-500",
-              bgGradient: "from-red-500/10 to-orange-500/5",
+              gradient: "from-error to-brand",
+              bgGradient: "from-error/10 to-brand/5",
             },
           ]}
         />

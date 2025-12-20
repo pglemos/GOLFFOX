@@ -99,7 +99,7 @@ function AlertasOperatorPageInner() {
   if (loading || tenantLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="w-16 h-16 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
+        <div className="w-16 h-16 border-4 border-brand border-t-transparent rounded-full animate-spin mx-auto"></div>
       </div>
     )
   }
@@ -170,7 +170,7 @@ function AlertasOperatorPageInner() {
       case 'error':
         return 'bg-error-light text-error border-error-light'
       case 'warning':
-        return 'bg-warning-light text-warning border-yellow-200'
+        return 'bg-warning-light text-warning border-warning-light'
       case 'info':
         return 'bg-info-light text-info border-info-light'
       default:
@@ -291,7 +291,7 @@ function AlertasOperatorPageInner() {
           {hasNextPage && (
             <div ref={ref} className="flex justify-center py-4">
               {isFetchingNextPage && (
-                <div className="w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
+                <div className="w-8 h-8 border-4 border-brand border-t-transparent rounded-full animate-spin"></div>
               )}
             </div>
           )}
@@ -321,7 +321,7 @@ export default function AlertasOperatorPage() {
   return (
     <Suspense fallback={
       <div className="min-h-screen flex items-center justify-center">
-        <div className="w-16 h-16 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
+        <div className="w-16 h-16 border-4 border-brand border-t-transparent rounded-full animate-spin mx-auto"></div>
       </div>
     }>
       <AlertasOperatorPageInner />

@@ -198,7 +198,7 @@ export function CompanyUsersModal({
                         </div>
                       </div>
 
-                      <div className="flex flex-row sm:flex-col gap-2 w-full sm:w-auto shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 mt-1 sm:mt-0 border-dashed border-gray-100">
+                      <div className="flex flex-row sm:flex-col gap-2 w-full sm:w-auto shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 mt-1 sm:mt-0 border-dashed border-bg-soft">
                         <Button
                           variant="outline"
                           size="sm"

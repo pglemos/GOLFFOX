@@ -93,7 +93,7 @@ export default function HistoricoRotasPage() {
     const getStatusBadge = (status: string) => {
         switch (status) {
             case 'completed':
-                return <Badge className="bg-success-light text-success hover:bg-success-light border-green-200">Concluída</Badge>
+                return <Badge className="bg-success-light text-success hover:bg-success-light border-success-light">Concluída</Badge>
             case 'in_progress':
                 return <Badge className="bg-info-light text-info hover:bg-info-light border-info-light">Em Andamento</Badge>
             case 'cancelled':
@@ -154,7 +154,7 @@ export default function HistoricoRotasPage() {
                 <div className="space-y-4">
                     {loading ? (
                         <div className="text-center py-12">
-                            <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-orange-500 border-r-transparent" />
+                            <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-brand border-r-transparent" />
                             <p className="mt-4 text-ink-muted">Carregando histórico...</p>
                         </div>
                     ) : filteredExecutions.length === 0 ? (

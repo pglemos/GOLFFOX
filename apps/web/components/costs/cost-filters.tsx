@@ -111,7 +111,7 @@ export function CostFilters({
             <Filter className="h-5 w-5 text-brand" />
             <CardTitle className="text-lg">Filtros</CardTitle>
             {hasActiveFilters && (
-              <span className="px-2 py-1 bg-orange-100 text-orange-700 rounded-full text-xs font-medium">
+              <span className="px-2 py-1 bg-brand-light text-brand rounded-full text-xs font-medium">
                 {Object.keys(appliedFilters).length} ativo(s)
               </span>
             )}

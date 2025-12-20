@@ -236,7 +236,7 @@ export function ManualCostForm({
             <Button type="button" variant="outline" onClick={onClose}>
               Cancelar
             </Button>
-            <Button type="submit" disabled={loading} className="bg-brand hover:bg-orange-600">
+            <Button type="submit" disabled={loading} className="bg-brand hover:bg-brand-hover">
               {loading ? 'Salvando...' : 'Salvar'}
             </Button>
           </DialogFooter>

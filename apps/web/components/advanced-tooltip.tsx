@@ -201,7 +201,7 @@ export function AdvancedTooltip({ stop, isVisible, position, onClose: _onClose }
               )}
 
               {/* Coordenadas (para debug/desenvolvimento) */}
-              <div className="pt-2 border-t border-gray-100">
+              <div className="pt-2 border-t border-bg-soft">
                 <p className="text-xs text-ink-light font-mono">
                   {stop.coordinates.lat.toFixed(6)}, {stop.coordinates.lng.toFixed(6)}
                 </p>

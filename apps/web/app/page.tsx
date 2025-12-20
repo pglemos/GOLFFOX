@@ -881,7 +881,7 @@ function LoginContent() {
               )}
 
               {/* Border gradient animado */}
-              <div className="relative w-32 h-32 rounded-[40px] bg-gradient-to-br from-[#F97316] via-[#FB923C] to-[#EA580C] p-[3px] shadow-2xl shadow-orange-500/50">
+              <div className="relative w-32 h-32 rounded-[40px] bg-gradient-to-br from-[#F97316] via-[#FB923C] to-[#EA580C] p-[3px] shadow-2xl shadow-brand/50">
                 <div className="w-full h-full rounded-[37px] bg-black flex items-center justify-center relative overflow-hidden">
                   {/* Shine effect otimizado */}
                   {!shouldReduceMotion && (
@@ -925,7 +925,7 @@ function LoginContent() {
               {/* Pulse ring effect otimizado */}
               {!shouldReduceMotion && (
                 <motion.div
-                  className="absolute inset-0 rounded-[40px] border-2 border-orange-500/30 will-change-transform"
+                  className="absolute inset-0 rounded-[40px] border-2 border-brand/30 will-change-transform"
                   animate={{
                     scale: [1, 1.2, 1],
                     opacity: [0.5, 0, 0.5],
@@ -1084,7 +1084,7 @@ function LoginContent() {
                         initial={{ opacity: 0, y: -10, scale: 0.95 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                        className="p-4 bg-gradient-to-r from-error-light to-red-50/80 border-2 border-error/20 rounded-2xl text-sm text-error shadow-sm backdrop-blur-sm"
+                        className="p-4 bg-gradient-to-r from-error-light to-error-light/80 border-2 border-error/20 rounded-2xl text-sm text-error shadow-sm backdrop-blur-sm"
                         role="alert"
                       >
                         <div className="flex items-start gap-3">
@@ -1101,7 +1101,7 @@ function LoginContent() {
                         initial={{ opacity: 0, y: -10, scale: 0.95 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                        className="p-4 bg-gradient-to-r from-success-light to-green-50/80 border-2 border-success/20 rounded-2xl text-sm text-success shadow-sm backdrop-blur-sm flex items-center gap-3"
+                        className="p-4 bg-gradient-to-r from-success-light to-success-light/80 border-2 border-success/20 rounded-2xl text-sm text-success shadow-sm backdrop-blur-sm flex items-center gap-3"
                       >
                         <Sparkles className="w-5 h-5 flex-shrink-0" />
                         <span className="font-medium">Login realizado com sucesso!</span>
@@ -1396,7 +1396,7 @@ function LoginContent() {
                     initial={{ opacity: 0, y: -10, scale: 0.95 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                    className="mb-6 sm:mb-8 p-4 bg-gradient-to-r from-error-light to-red-50/80 border-2 border-error/20 rounded-2xl text-xs sm:text-sm text-error shadow-sm backdrop-blur-sm"
+                    className="mb-6 sm:mb-8 p-4 bg-gradient-to-r from-error-light to-error-light/80 border-2 border-error/20 rounded-2xl text-xs sm:text-sm text-error shadow-sm backdrop-blur-sm"
                     role="alert"
                   >
                     <div className="flex items-start gap-3">
@@ -1413,7 +1413,7 @@ function LoginContent() {
                     initial={{ opacity: 0, y: -10, scale: 0.95 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                    className="mb-6 sm:mb-8 p-4 bg-gradient-to-r from-success-light to-green-50/80 border-2 border-success/20 rounded-2xl text-xs sm:text-sm text-success shadow-sm backdrop-blur-sm flex items-center gap-3"
+                    className="mb-6 sm:mb-8 p-4 bg-gradient-to-r from-success-light to-success-light/80 border-2 border-success/20 rounded-2xl text-xs sm:text-sm text-success shadow-sm backdrop-blur-sm flex items-center gap-3"
                   >
                     <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
                     <span className="font-medium">Login realizado com sucesso!</span>
