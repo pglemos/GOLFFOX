@@ -871,15 +871,54 @@ function LoginContent() {
           // ✅ IMPORTANTE: Não usar setTimeout - redirecionar imediatamente
           // O cookie já foi definido na resposta HTTP, então está disponível
           // O delay pode causar problemas com o middleware interceptando antes
-          try {
-            window.location.replace(finalRedirectUrl)
-          } catch (redirectError: any) {
-            console.error('❌ [LOGIN] Erro ao redirecionar com window.location.replace:', redirectError)
-            // Fallback para router se window.location.replace falhar
-            router.replace(finalRedirectUrl)
+          // ✅ VALIDAÇÃO CRÍTICA: Garantir que finalRedirectUrl é uma string válida
+          if (typeof finalRedirectUrl === 'string' && finalRedirectUrl.trim() !== '') {
+            try {
+              console.log('🔄 [LOGIN] Redirecionando para:', finalRedirectUrl, { type: typeof finalRedirectUrl })
+              window.location.replace(finalRedirectUrl)
+            } catch (redirectError: any) {
+              console.error('❌ [LOGIN] Erro ao redirecionar com window.location.replace:', redirectError)
+              // Fallback para router se window.location.replace falhar
+              if (typeof router.replace === 'function') {
+                router.replace(finalRedirectUrl)
+              } else {
+                console.error('❌ [LOGIN] router.replace não é uma função:', { type: typeof router.replace })
+                window.location.href = finalRedirectUrl
+              }
+            }
+          } else {
+            console.error('❌ [LOGIN] finalRedirectUrl inválido antes de redirecionar:', {
+              finalRedirectUrl,
+              type: typeof finalRedirectUrl
+            })
+            setError("Erro ao determinar rota de redirecionamento. Entre em contato com o administrador.")
+            setLoading(false)
+            setTransitioning(false)
+            if (typeof document !== "undefined") document.body.style.cursor = prevCursor
+            return
           }
         } else {
-          router.replace(finalRedirectUrl)
+          // ✅ VALIDAÇÃO: Garantir que finalRedirectUrl é uma string válida antes de usar router.replace
+          if (typeof finalRedirectUrl === 'string' && finalRedirectUrl.trim() !== '') {
+            if (typeof router.replace === 'function') {
+              router.replace(finalRedirectUrl)
+            } else {
+              console.error('❌ [LOGIN] router.replace não é uma função:', { type: typeof router.replace })
+              if (typeof window !== 'undefined') {
+                window.location.href = finalRedirectUrl
+              }
+            }
+          } else {
+            console.error('❌ [LOGIN] finalRedirectUrl inválido antes de router.replace:', {
+              finalRedirectUrl,
+              type: typeof finalRedirectUrl
+            })
+            setError("Erro ao determinar rota de redirecionamento. Entre em contato com o administrador.")
+            setLoading(false)
+            setTransitioning(false)
+            if (typeof document !== "undefined") document.body.style.cursor = prevCursor
+            return
+          }
         }
 
         return
