@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo, useCallback, useEffect } from "react"
+import { useState, useMemo, useCallback, useEffect, useOptimistic } from "react"
 import dynamic from "next/dynamic"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -53,6 +53,11 @@ interface AlertasPageClientProps {
 
 export function AlertasPageClient({ initialAlertas }: AlertasPageClientProps) {
   const [alertas, setAlertas] = useState<Alerta[]>(initialAlertas)
+  // useOptimistic para updates otimistas
+  const [optimisticAlerts, updateOptimisticAlerts] = useOptimistic(
+    alertas,
+    (state, newAlert: Alerta) => [...state, newAlert]
+  )
   const [dataLoading, setDataLoading] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
   const debouncedSearchQuery = useDebounce(searchQuery, 300)
@@ -123,9 +128,9 @@ export function AlertasPageClient({ initialAlertas }: AlertasPageClientProps) {
     [dataLoading, loadAlertas]
   )
 
-  // Memoizar alertas filtrados
+  // Memoizar alertas filtrados (usar optimisticAlerts para UI responsiva)
   const filteredAlertas = useMemo(() => {
-    let filtered = alertas
+    let filtered = optimisticAlerts
     if (debouncedSearchQuery) {
       const query = debouncedSearchQuery.toLowerCase()
       filtered = filtered.filter(a =>
@@ -138,7 +143,7 @@ export function AlertasPageClient({ initialAlertas }: AlertasPageClientProps) {
       )
     }
     return filtered
-  }, [alertas, debouncedSearchQuery])
+  }, [optimisticAlerts, debouncedSearchQuery])
 
   const handleDeleteAlerta = async (alertaId: string) => {
     if (!confirm('Tem certeza que deseja excluir este alerta? Esta ação não pode ser desfeita.')) {

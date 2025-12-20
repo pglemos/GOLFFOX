@@ -1,5 +1,6 @@
 "use client"
 
+import { useState, useDeferredValue, useMemo } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Input } from "@/components/ui/input"
 import { Search, X } from "lucide-react"
@@ -19,6 +20,8 @@ export function SearchBarPremium({
   placeholder = "Buscar...",
   className 
 }: SearchBarPremiumProps) {
+  // useDeferredValue para melhorar performance em buscas
+  const deferredValue = useDeferredValue(value)
   return (
     <motion.div
       variants={fadeInUp}

@@ -19,6 +19,7 @@ interface AdminFiltersProps {
 
 export function AdminFilters({ initialFilters, onFiltersChange }: AdminFiltersProps) {
   const isMobile = useMobile()
+  const [isPending, startTransition] = useTransition()
   const [filtersExpanded, setFiltersExpanded] = useState(false)
   const [tempFilters, setTempFilters] = useState({
     empresa: initialFilters?.empresa || '',
@@ -27,7 +28,9 @@ export function AdminFilters({ initialFilters, onFiltersChange }: AdminFiltersPr
   })
 
   const handleSaveFilters = () => {
-    onFiltersChange(tempFilters)
+    startTransition(() => {
+      onFiltersChange(tempFilters)
+    })
     setFiltersExpanded(false)
   }
 
