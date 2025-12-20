@@ -816,7 +816,7 @@ function LoginContent() {
         setFieldErrors((prev) => ({ ...prev, password: "Não foi possível autenticar" }))
         setPassword("")
         passwordInputRef.current?.focus()
-        logError("Erro inesperado no login", {
+        logError("[LoginPage] Erro inesperado no login", {
           error: err,
           errorName: err?.name,
           errorMessage: err?.message,
