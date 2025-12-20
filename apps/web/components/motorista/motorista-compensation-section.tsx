@@ -53,8 +53,8 @@ const defaultCompensation = {
 /**
  * Componente para gerenciar salário e benefícios de motorista
  */
-export function DriverCompensationSection({
-    driverId,
+export function MotoristaCompensationSection({
+    motoristaId: driverId,
     isEditing,
 }: MotoristaCompensationSectionProps) {
     const [formData, setFormData] = useState(defaultCompensation)
