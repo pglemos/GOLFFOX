@@ -50,7 +50,7 @@ export class AuthManager {
       return { success: false, error: 'Falha na autenticação' }
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : 'Erro inesperado'
-      error('Erro no login', { error: err }, 'AuthManager')
+      error('[AuthManager] Erro no login', { error: err })
       return { success: false, error: errorMessage }
     }
   }
@@ -59,7 +59,7 @@ export class AuthManager {
     try {
       await supabase.auth.signOut()
     } catch (err) {
-      error('Erro ao fazer logout no Supabase', { error: err }, 'AuthManager')
+      error('[AuthManager] Erro ao fazer logout no Supabase', { error: err })
     }
 
     // Limpar dados locais
@@ -75,7 +75,7 @@ export class AuthManager {
           credentials: 'include'
         })
       } catch (err) {
-        error('Erro ao limpar cookie de sessão', { error: err }, 'AuthManager')
+        error('[AuthManager] Erro ao limpar cookie de sessão', { error: err })
         // Não bloquear logout se falhar - dados locais já foram limpos
       }
     }
@@ -203,7 +203,7 @@ export class AuthManager {
       }
       // Removido: sessionStorage.setItem('golffox-auth-token') - não armazenar token no cliente
     } catch (storageErr) {
-      error('Falha ao persistir sessão no storage', { error: storageErr }, 'AuthManager')
+      error('[AuthManager] Falha ao persistir sessão no storage', { error: storageErr })
     }
 
     // ✅ Definir cookie HttpOnly via API server-side (seguro contra XSS)
@@ -253,16 +253,16 @@ export class AuthManager {
         throw new Error(errorMsg)
       }
 
-      debug('Cookie de sessão definido via API (HttpOnly)', { role: userData.role }, 'AuthManager')
+      debug('[AuthManager] Cookie de sessão definido via API (HttpOnly)', { role: userData.role })
     } catch (cookieErr) {
-      error('Falha ao definir cookie de sessão via API', { error: cookieErr }, 'AuthManager')
+      error('[AuthManager] Falha ao definir cookie de sessão via API', { error: cookieErr })
       // Não bloquear o fluxo se falhar - o Supabase cookie ainda pode funcionar
       // Mas logar o erro para debug
     }
 
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new CustomEvent('golffox:auth', { detail: userData }))
-      debug('Sessão persistida', { role: userData.role }, 'AuthManager')
+      debug('[AuthManager] Sessão persistida', { role: userData.role })
     }
   }
 
