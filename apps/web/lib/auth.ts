@@ -154,37 +154,38 @@ export class AuthManager {
       refreshToken?: string
     }
   ): Promise<void> {
-    console.log('[AuthManager.persistSession] Iniciando', {
-      hasWindow: typeof window !== 'undefined',
-      hasSupabase: !!supabase,
-      hasSupabaseAuth: !!supabase?.auth,
-      setSessionType: typeof supabase?.auth?.setSession,
-      setSessionIsFunction: typeof supabase?.auth?.setSession === 'function',
-      supabaseType: typeof supabase,
-      supabaseIsObject: typeof supabase === 'object' && supabase !== null
-    })
-    
-    if (typeof window === 'undefined') {
-      console.log('[AuthManager.persistSession] window is undefined, retornando')
-      return Promise.resolve()
-    }
+    try {
+      console.log('[AuthManager.persistSession] Iniciando', {
+        hasWindow: typeof window !== 'undefined',
+        hasSupabase: !!supabase,
+        hasSupabaseAuth: !!supabase?.auth,
+        setSessionType: typeof supabase?.auth?.setSession,
+        setSessionIsFunction: typeof supabase?.auth?.setSession === 'function',
+        supabaseType: typeof supabase,
+        supabaseIsObject: typeof supabase === 'object' && supabase !== null,
+        supabaseAuthType: typeof supabase?.auth,
+        supabaseAuthIsObject: typeof supabase?.auth === 'object' && supabase?.auth !== null
+      })
+      
+      if (typeof window === 'undefined') {
+        console.log('[AuthManager.persistSession] window is undefined, retornando')
+        return Promise.resolve()
+      }
 
-    // ✅ VALIDAÇÃO: Garantir que supabase é um objeto válido
-    if (!supabase) {
-      console.error('[AuthManager.persistSession] supabase não está definido')
-      return Promise.resolve()
-    }
-
-    if (typeof supabase !== 'object' || supabase === null) {
-      console.error('[AuthManager.persistSession] supabase não é um objeto válido', { type: typeof supabase })
-      return Promise.resolve()
-    }
-
-    // ✅ VALIDAÇÃO: Garantir que supabase está disponível
-    if (!supabase.auth) {
-      console.warn('[AuthManager] Supabase auth não está disponível, pulando sincronização de sessão')
-      // Continuar com o resto da função mesmo se Supabase não estiver disponível
-    }
+      // ✅ VALIDAÇÃO: Garantir que supabase é um objeto válido
+      if (!supabase) {
+        console.error('[AuthManager.persistSession] supabase não está definido')
+        // Continuar com o resto da função mesmo se Supabase não estiver disponível
+      } else if (typeof supabase !== 'object' || supabase === null) {
+        console.error('[AuthManager.persistSession] supabase não é um objeto válido', { type: typeof supabase })
+        // Continuar com o resto da função mesmo se Supabase não estiver disponível
+      } else if (!supabase.auth) {
+        console.warn('[AuthManager] Supabase auth não está disponível, pulando sincronização de sessão')
+        // Continuar com o resto da função mesmo se Supabase não estiver disponível
+      } else if (typeof supabase.auth !== 'object' || supabase.auth === null) {
+        console.warn('[AuthManager] supabase.auth não é um objeto válido', { type: typeof supabase.auth })
+        // Continuar com o resto da função mesmo se Supabase não estiver disponível
+      }
 
     const accessToken = options?.accessToken ?? options?.token ?? userData.accessToken
     const refreshToken = options?.refreshToken ?? userData.refreshToken
@@ -195,19 +196,36 @@ export class AuthManager {
     // ✅ Sincronizar com Supabase Auth client-side
     if (accessToken && options.token) {
       try {
-        // ✅ VALIDAÇÃO: Garantir que setSession é uma função antes de chamar
-        if (supabase?.auth?.setSession && typeof supabase.auth.setSession === 'function') {
-          const { error } = await supabase.auth.setSession({
-            access_token: accessToken,
-            refresh_token: options.token // Usar mesmo token se não tiver refresh
-          })
-          if (error) {
-            console.warn('Erro ao sincronizar sessão Supabase:', error)
-          } else {
-            console.log('✅ Sessão Supabase sincronizada')
-          }
+        // ✅ VALIDAÇÃO EXTRA: Verificar se supabase.auth existe e é um objeto válido
+        if (!supabase || !supabase.auth || typeof supabase.auth !== 'object') {
+          console.warn('[AuthManager] supabase.auth não está disponível, pulando setSession')
         } else {
-          console.warn('[AuthManager] supabase.auth.setSession não está disponível ou não é uma função')
+          // ✅ VALIDAÇÃO: Garantir que setSession é uma função antes de chamar
+          const setSessionFn = supabase.auth.setSession
+          console.log('[AuthManager.persistSession] Verificando setSession', {
+            exists: !!setSessionFn,
+            type: typeof setSessionFn,
+            isFunction: typeof setSessionFn === 'function',
+            isBoolean: typeof setSessionFn === 'boolean',
+            value: setSessionFn
+          })
+          
+          if (setSessionFn && typeof setSessionFn === 'function') {
+            const { error } = await setSessionFn({
+              access_token: accessToken,
+              refresh_token: options.token // Usar mesmo token se não tiver refresh
+            })
+            if (error) {
+              console.warn('Erro ao sincronizar sessão Supabase:', error)
+            } else {
+              console.log('✅ Sessão Supabase sincronizada')
+            }
+          } else {
+            console.warn('[AuthManager] supabase.auth.setSession não está disponível ou não é uma função', {
+              type: typeof setSessionFn,
+              value: setSessionFn
+            })
+          }
         }
       } catch (e) {
         console.warn('Falha ao setar sessão Supabase:', e)
@@ -294,13 +312,23 @@ export class AuthManager {
       // Mas logar o erro para debug
     }
 
-    if (typeof window !== 'undefined') {
-      window.dispatchEvent(new CustomEvent('golffox:auth', { detail: userData }))
-      debug('[AuthManager] Sessão persistida', { role: userData.role })
-    }
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('golffox:auth', { detail: userData }))
+        debug('[AuthManager] Sessão persistida', { role: userData.role })
+      }
 
-    console.log('[AuthManager.persistSession] Concluído com sucesso')
-    return Promise.resolve()
+      console.log('[AuthManager.persistSession] Concluído com sucesso')
+      return Promise.resolve()
+    } catch (error: any) {
+      console.error('[AuthManager.persistSession] Erro inesperado:', {
+        error,
+        message: error?.message,
+        stack: error?.stack?.substring(0, 500),
+        name: error?.name
+      })
+      // Retornar Promise resolvida mesmo em caso de erro para não quebrar o fluxo
+      return Promise.resolve()
+    }
   }
 
   // Método para middleware extrair dados do cookie
