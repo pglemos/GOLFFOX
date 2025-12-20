@@ -39,6 +39,7 @@ const DIRECTORIES = [
   'apps/web',
   'apps/mobile',
   'scripts',
+  'docs',
 ]
 
 // Extensões de arquivo a processar
