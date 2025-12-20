@@ -14,7 +14,7 @@ export * from './commands/create-transportadora.command'
 
 // Queries
 export * from './queries/get-company.query'
-export * from './queries/list-vehicles.query'
+export * from './queries/list-veiculos.query'
 
 // Handlers
 export * from './handlers/command-handler.interface'

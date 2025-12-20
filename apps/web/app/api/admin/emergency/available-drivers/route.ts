@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
     const supabase = getSupabaseAdmin()
 
     // Buscar motoristas ativos
-    const { data: drivers, error: driversError } = await supabase
+    const { data: motoristas, error: driversError } = await supabase
       .from('users')
       .select('id, name, email, is_active, role')
       .eq('role', 'motorista')
@@ -40,7 +40,7 @@ export async function GET(req: NextRequest) {
     )
 
     // Filtrar motoristas disponíveis (não estão em viagem)
-    const availableDrivers = (drivers || [])
+    const availableDrivers = (motoristas || [])
       .filter(motorista => !activeDriverIds.has(motorista.id))
       .map(motorista => ({
         id: motorista.id,
@@ -52,7 +52,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      drivers: availableDrivers
+      motoristas: availableDrivers
     })
   } catch (error: any) {
     logError('Erro ao buscar motoristas disponíveis', { error }, 'AvailableDriversAPI')

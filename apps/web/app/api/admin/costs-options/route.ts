@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
     // Buscar todas as opções em paralelo
     const [routesRes, vehiclesRes, driversRes, carriersRes] = await Promise.all([
       supabaseAdmin.from('routes').select('id, name').order('name'),
-      supabaseAdmin.from('vehicles').select('id, plate').order('plate'),
+      supabaseAdmin.from('veiculos').select('id, plate').order('plate'),
       supabaseAdmin.from('users').select('id, email').eq('role', 'motorista').order('email'),
       supabaseAdmin.from('carriers').select('id, name').order('name')
     ])
@@ -34,8 +34,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       success: true,
       routes: routesRes.data || [],
-      vehicles: vehiclesRes.data || [],
-      drivers: driversRes.data || [],
+      veiculos: vehiclesRes.data || [],
+      motoristas: driversRes.data || [],
       carriers: carriersRes.data || []
     })
   } catch (error: unknown) {

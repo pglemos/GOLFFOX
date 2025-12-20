@@ -23,7 +23,7 @@ interface RouteParams {
 }
 
 /**
- * GET /api/admin/vehicles/[vehicleId]/documents
+ * GET /api/admin/veiculos/[vehicleId]/documents
  * Lista todos os documentos de um veículo
  */
 export async function GET(request: NextRequest, { params }: RouteParams) {
@@ -45,7 +45,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
         // Verificar se veículo existe
         const { data: veiculo, error: vehicleError } = await supabaseAdmin
-            .from('vehicles')
+            .from('veiculos')
             .select('id, plate')
             .eq('id', vehicleId)
             .single()
@@ -83,7 +83,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 }
 
 /**
- * POST /api/admin/vehicles/[vehicleId]/documents
+ * POST /api/admin/veiculos/[vehicleId]/documents
  * Adiciona um documento a um veículo
  */
 export async function POST(request: NextRequest, { params }: RouteParams) {
@@ -118,7 +118,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
         // Verificar se veículo existe
         const { data: veiculo, error: vehicleError } = await supabaseAdmin
-            .from('vehicles')
+            .from('veiculos')
             .select('id')
             .eq('id', vehicleId)
             .single()
@@ -190,7 +190,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 }
 
 /**
- * DELETE /api/admin/vehicles/[vehicleId]/documents
+ * DELETE /api/admin/veiculos/[vehicleId]/documents
  * Remove um documento de um veículo
  * Query param: documentId
  */

@@ -17,8 +17,8 @@ import { SkeletonList } from "@/components/ui/skeleton"
 const Link: any = require("next/link")
 
 // Lazy load modal
-const DriverModal = dynamic(
-    () => import("@/components/modals/driver-modal").then(m => ({ default: m.DriverModal })),
+const MotoristaModal = dynamic(
+    () => import("@/components/modals/motorista-modal").then(m => ({ default: m.MotoristaModal })),
     { ssr: false, loading: () => null }
 )
 
@@ -35,9 +35,9 @@ interface motorista {
 
 export default function TransportadoraMotoristasListPage() {
     const { user } = useAuth()
-    const [drivers, setDrivers] = useState<motorista[]>([])
+    const [motoristas, setMotoristas] = useState<motorista[]>([])
     const [dataLoading, setDataLoading] = useState(true)
-    const [selectedDriver, setSelectedDriver] = useState<motorista | null>(null)
+    const [selectedMotorista, setSelectedMotorista] = useState<motorista | null>(null)
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [searchQuery, setSearchQuery] = useState("")
     const debouncedSearchQuery = useDebounce(searchQuery, 300)
@@ -54,25 +54,25 @@ export default function TransportadoraMotoristasListPage() {
             const response = await fetch('/api/transportadora/motoristas')
             if (!response.ok) throw new Error('Erro ao carregar motoristas')
             const data = await response.json()
-            setDrivers(Array.isArray(data) ? data : data.drivers || [])
+            setMotoristas(Array.isArray(data) ? data : data.motoristas || [])
         } catch (error) {
             notifyError(error, "Erro ao carregar motoristas")
-            setDrivers([])
+            setMotoristas([])
         } finally {
             setDataLoading(false)
         }
     }, [])
 
     const filteredDrivers = useMemo(() => {
-        if (!debouncedSearchQuery) return drivers
+        if (!debouncedSearchQuery) return motoristas
 
         const query = debouncedSearchQuery.toLowerCase()
-        return drivers.filter(d =>
+        return motoristas.filter(d =>
             d.name?.toLowerCase().includes(query) ||
             d.email?.toLowerCase().includes(query) ||
             d.cpf?.includes(query)
         )
-    }, [drivers, debouncedSearchQuery])
+    }, [motoristas, debouncedSearchQuery])
 
     const handleDelete = async (driverId: string, driverName: string) => {
         if (!confirm(`Excluir motorista "${driverName}"?`)) return
@@ -88,7 +88,7 @@ export default function TransportadoraMotoristasListPage() {
     }
 
     const handleNewDriver = () => {
-        setSelectedDriver({
+        setSelectedMotorista({
             id: "",
             name: "",
             email: "",
@@ -147,7 +147,7 @@ export default function TransportadoraMotoristasListPage() {
                 </div>
 
                 {/* Grid */}
-                {dataLoading && drivers.length === 0 ? (
+                {dataLoading && motoristas.length === 0 ? (
                     <SkeletonList count={5} />
                 ) : (
                     <div className="grid gap-3 sm:gap-4 w-full">
@@ -194,7 +194,7 @@ export default function TransportadoraMotoristasListPage() {
                                                 <Button
                                                     variant="outline"
                                                     size="sm"
-                                                    onClick={() => { setSelectedDriver(motorista); setIsModalOpen(true) }}
+                                                    onClick={() => { setSelectedMotorista(motorista); setIsModalOpen(true) }}
                                                     className="min-h-[44px] touch-manipulation"
                                                 >
                                                     <Edit className="h-4 w-4 mr-1" />
@@ -219,8 +219,8 @@ export default function TransportadoraMotoristasListPage() {
             </div>
 
             {/* Modal de motorista */}
-            <DriverModal
-                motorista={selectedDriver}
+            <MotoristaModal
+                motorista={selectedMotorista}
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 onSave={() => { setIsModalOpen(false); loadDrivers() }}

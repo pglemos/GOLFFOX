@@ -4,7 +4,7 @@ import { requireAuth } from '@/lib/api-auth'
 import { logError } from '@/lib/logger'
 import { invalidateEntityCache } from '@/lib/next-cache'
 
-// PUT /api/admin/drivers/[driverId] - Editar motorista
+// PUT /api/admin/motoristas/[driverId] - Editar motorista
 export async function PUT(
   request: NextRequest,
   context: { params: Promise<{ driverId: string }> }
@@ -80,7 +80,7 @@ export async function PUT(
   }
 }
 
-// GET /api/admin/drivers/[driverId] - Obter motorista específico
+// GET /api/admin/motoristas/[driverId] - Obter motorista específico
 export async function GET(
   request: NextRequest,
   context: { params: Promise<{ driverId: string }> }

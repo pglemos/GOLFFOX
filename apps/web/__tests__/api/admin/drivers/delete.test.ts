@@ -1,4 +1,4 @@
-import { DELETE } from '@/app/api/admin/drivers/delete/route'
+import { DELETE } from '@/app/api/admin/motoristas/delete/route'
 import { createAdminRequest } from '../../../helpers/api-test-helpers'
 import { mockSupabaseClient } from '../../../helpers/mock-supabase'
 import { createTestUser } from '../../../helpers/test-data'
@@ -18,7 +18,7 @@ jest.mock('@/lib/api-auth', () => ({
   }),
 }))
 
-describe('DELETE /api/admin/drivers/delete', () => {
+describe('DELETE /api/admin/motoristas/delete', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockSupabaseClient.clear()
@@ -34,7 +34,7 @@ describe('DELETE /api/admin/drivers/delete', () => {
 
     const req = createAdminRequest({
       method: 'DELETE',
-      url: `http://localhost:3000/api/admin/drivers/delete?id=${motorista.id}`,
+      url: `http://localhost:3000/api/admin/motoristas/delete?id=${motorista.id}`,
     }) as NextRequest
 
     const response = await DELETE(req)
@@ -54,7 +54,7 @@ describe('DELETE /api/admin/drivers/delete', () => {
 
     const req = createAdminRequest({
       method: 'DELETE',
-      url: `http://localhost:3000/api/admin/drivers/delete?id=${motorista.id}`,
+      url: `http://localhost:3000/api/admin/motoristas/delete?id=${motorista.id}`,
     }) as NextRequest
 
     const response = await DELETE(req)
@@ -67,7 +67,7 @@ describe('DELETE /api/admin/drivers/delete', () => {
   it('deve rejeitar sem ID do motorista', async () => {
     const req = createAdminRequest({
       method: 'DELETE',
-      url: 'http://localhost:3000/api/admin/drivers/delete',
+      url: 'http://localhost:3000/api/admin/motoristas/delete',
     }) as NextRequest
 
     const response = await DELETE(req)
@@ -85,7 +85,7 @@ describe('DELETE /api/admin/drivers/delete', () => {
 
     const req = createAdminRequest({
       method: 'DELETE',
-      url: `http://localhost:3000/api/admin/drivers/delete?id=${motorista.id}`,
+      url: `http://localhost:3000/api/admin/motoristas/delete?id=${motorista.id}`,
     }) as NextRequest
 
     const response = await DELETE(req)

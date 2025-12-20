@@ -40,7 +40,7 @@ export async function DELETE(request: NextRequest) {
     
     // Agora excluir o veículo
     const { data, error } = await supabaseAdmin
-      .from('vehicles')
+      .from('veiculos')
       .delete()
       .eq('id', vehicleId)
       .select()

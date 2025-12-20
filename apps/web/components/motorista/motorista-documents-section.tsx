@@ -56,7 +56,7 @@ export function MotoristaDocumentsSection({
 
         setLoading(true)
         try {
-            const response = await fetch(`/api/admin/drivers/${driverId}/documents`)
+            const response = await fetch(`/api/admin/motoristas/${driverId}/documents`)
             if (response.ok) {
                 const data = await response.json()
                 setDocuments(data || [])
@@ -90,7 +90,7 @@ export function MotoristaDocumentsSection({
             const result = await upload(fileToUpload, driverId, selectedType)
             if (!result) return
 
-            const response = await fetch(`/api/admin/drivers/${driverId}/documents`, {
+            const response = await fetch(`/api/admin/motoristas/${driverId}/documents`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -126,7 +126,7 @@ export function MotoristaDocumentsSection({
 
         try {
             const response = await fetch(
-                `/api/admin/drivers/${driverId}/documents?documentId=${documentId}`,
+                `/api/admin/motoristas/${driverId}/documents?documentId=${documentId}`,
                 { method: "DELETE" }
             )
 

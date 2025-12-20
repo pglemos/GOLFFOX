@@ -11,7 +11,7 @@ import { warn } from '@/lib/logger'
 
 interface HeatmapLayerProps {
   map: google.maps.Map
-  vehicles: veiculo[]
+  veiculos: veiculo[]
   enabled: boolean
   mode: 'live' | 'history'
 }
@@ -23,7 +23,7 @@ interface HeatmapDataPoint {
 
 export function HeatmapLayer({
   map,
-  vehicles,
+  veiculos,
   enabled,
   mode,
 }: HeatmapLayerProps) {
@@ -44,22 +44,22 @@ export function HeatmapLayer({
       heatmapLayerRef.current = null
     }
 
-    if (!enabled || vehicles.length === 0) {
+    if (!enabled || veiculos.length === 0) {
       return
     }
 
     // Filtrar veículos com coordenadas válidas
-    const validVehicles = vehicles.filter((v) => {
+    const validVehicles = veiculos.filter((v) => {
       const isValid = Number.isFinite(v.lat) && Number.isFinite(v.lng) && v.lat >= -90 && v.lat <= 90 && v.lng >= -180 && v.lng <= 180
       return isValid
     })
 
-    if (validVehicles.length !== vehicles.length) {
+    if (validVehicles.length !== veiculos.length) {
       warn('Alguns veículos possuem coordenadas inválidas e foram ignorados no heatmap.', {
         component: 'HeatmapLayer',
-        total: vehicles.length,
+        total: veiculos.length,
         valid: validVehicles.length,
-        invalid: vehicles.length - validVehicles.length,
+        invalid: veiculos.length - validVehicles.length,
       })
     }
 
@@ -102,7 +102,7 @@ export function HeatmapLayer({
         heatmapLayerRef.current = null
       }
     }
-  }, [map, vehicles, enabled, mode])
+  }, [map, veiculos, enabled, mode])
 
   return null
 }

@@ -64,7 +64,7 @@ export async function POST(req: NextRequest) {
     } else if (folder === 'veiculo-documents') {
       // Verificar se o veículo pertence à transportadora
       const { data: veiculo } = await supabaseServiceRole
-        .from('vehicles')
+        .from('veiculos')
         .select('transportadora_id')
         .eq('id', entityId)
         .single()

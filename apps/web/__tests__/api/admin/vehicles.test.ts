@@ -1,4 +1,4 @@
-import { GET, POST } from '@/app/api/admin/vehicles/route'
+import { GET, POST } from '@/app/api/admin/veiculos/route'
 import { createAdminRequest } from '../../helpers/api-test-helpers'
 import { mockSupabaseClient } from '../../helpers/mock-supabase'
 import { createTestVehicle, createTestCompany } from '../../helpers/test-data'
@@ -18,18 +18,18 @@ jest.mock('@/lib/api-auth', () => ({
   }),
 }))
 
-describe('GET /api/admin/vehicles', () => {
+describe('GET /api/admin/veiculos', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockSupabaseClient.clear()
   })
 
   it('deve listar veículos', async () => {
-    const vehicles = [
+    const veiculos = [
       createTestVehicle('transportadora-1', { plate: 'ABC1234' }),
       createTestVehicle('transportadora-1', { plate: 'XYZ5678' }),
     ]
-    mockSupabaseClient.setTableData('vehicles', vehicles)
+    mockSupabaseClient.setTableData('veiculos', veiculos)
 
     const req = createAdminRequest({
       method: 'GET',
@@ -44,7 +44,7 @@ describe('GET /api/admin/vehicles', () => {
   })
 
   it('deve retornar array vazio se não houver veículos', async () => {
-    mockSupabaseClient.setTableData('vehicles', [])
+    mockSupabaseClient.setTableData('veiculos', [])
 
     const req = createAdminRequest({
       method: 'GET',
@@ -58,7 +58,7 @@ describe('GET /api/admin/vehicles', () => {
   })
 })
 
-describe('POST /api/admin/vehicles', () => {
+describe('POST /api/admin/veiculos', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockSupabaseClient.clear()

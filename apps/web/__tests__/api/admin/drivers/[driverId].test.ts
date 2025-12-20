@@ -1,4 +1,4 @@
-import { GET, PUT } from '@/app/api/admin/drivers/[driverId]/route'
+import { GET, PUT } from '@/app/api/admin/motoristas/[driverId]/route'
 import { createAdminRequest } from '../../../helpers/api-test-helpers'
 import { mockSupabaseClient } from '../../../helpers/mock-supabase'
 import { createTestDriver, createTestTransportadora } from '../../../helpers/test-data'
@@ -8,7 +8,7 @@ jest.mock('@/lib/supabase-server', () => ({
   supabaseServiceRole: mockSupabaseClient,
 }))
 
-describe('GET /api/admin/drivers/[driverId]', () => {
+describe('GET /api/admin/motoristas/[driverId]', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockSupabaseClient.clear()
@@ -17,7 +17,7 @@ describe('GET /api/admin/drivers/[driverId]', () => {
   it('deve buscar motorista por ID', async () => {
     const transportadora = createTestTransportadora()
     const motorista = createTestDriver(transportadora.id)
-    mockSupabaseClient.setTableData('drivers', [motorista])
+    mockSupabaseClient.setTableData('motoristas', [motorista])
     mockSupabaseClient.setTableData('carriers', [transportadora])
 
     const req = createAdminRequest({
@@ -38,7 +38,7 @@ describe('GET /api/admin/drivers/[driverId]', () => {
   })
 
   it('deve lidar com motorista não encontrado', async () => {
-    mockSupabaseClient.setTableData('drivers', [])
+    mockSupabaseClient.setTableData('motoristas', [])
 
     const req = createAdminRequest({
       method: 'GET',
@@ -56,7 +56,7 @@ describe('GET /api/admin/drivers/[driverId]', () => {
   })
 })
 
-describe('PUT /api/admin/drivers/[driverId]', () => {
+describe('PUT /api/admin/motoristas/[driverId]', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockSupabaseClient.clear()
@@ -65,7 +65,7 @@ describe('PUT /api/admin/drivers/[driverId]', () => {
   it('deve atualizar motorista', async () => {
     const transportadora = createTestTransportadora()
     const motorista = createTestDriver(transportadora.id)
-    mockSupabaseClient.setTableData('drivers', [motorista])
+    mockSupabaseClient.setTableData('motoristas', [motorista])
     mockSupabaseClient.setTableData('carriers', [transportadora])
 
     const req = createAdminRequest({
@@ -92,7 +92,7 @@ describe('PUT /api/admin/drivers/[driverId]', () => {
   it('deve validar nome obrigatório', async () => {
     const transportadora = createTestTransportadora()
     const motorista = createTestDriver(transportadora.id)
-    mockSupabaseClient.setTableData('drivers', [motorista])
+    mockSupabaseClient.setTableData('motoristas', [motorista])
 
     const req = createAdminRequest({
       method: 'PUT',
@@ -116,7 +116,7 @@ describe('PUT /api/admin/drivers/[driverId]', () => {
   it('deve aceitar transportadora_id como alternativa', async () => {
     const transportadora = createTestTransportadora()
     const motorista = createTestDriver(transportadora.id)
-    mockSupabaseClient.setTableData('drivers', [motorista])
+    mockSupabaseClient.setTableData('motoristas', [motorista])
     mockSupabaseClient.setTableData('carriers', [transportadora])
 
     const req = createAdminRequest({

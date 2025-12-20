@@ -14,8 +14,8 @@ export async function GET(req: NextRequest) {
     const supabase = getSupabaseAdmin()
 
     // Buscar veículos ativos
-    const { data: vehicles, error: vehiclesError } = await supabase
-      .from('vehicles')
+    const { data: veiculos, error: vehiclesError } = await supabase
+      .from('veiculos')
       .select('id, plate, model, brand, is_active, transportadora_id')
       .eq('is_active', true)
       .order('plate', { ascending: true })
@@ -39,7 +39,7 @@ export async function GET(req: NextRequest) {
     )
 
     // Filtrar veículos disponíveis (não estão em viagem)
-    const availableVehicles = (vehicles || [])
+    const availableVehicles = (veiculos || [])
       .filter(veiculo => !activeVehicleIds.has(veiculo.id))
       .map(veiculo => ({
         id: veiculo.id,
@@ -51,7 +51,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      vehicles: availableVehicles
+      veiculos: availableVehicles
     })
   } catch (error: any) {
     logError('Erro ao buscar veículos disponíveis', { error }, 'AvailableVehiclesAPI')

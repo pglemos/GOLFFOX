@@ -71,24 +71,24 @@ export function CostCharts({ companyId, period = 'month' }: CostChartProps) {
       }
 
       // Dados por veículo
-      const { data: vehicles } = await supabase
+      const { data: veiculos } = await supabase
         .from('v_costs_breakdown')
         .select('by_vehicle')
         .limit(1)
         .single()
 
-      if ((vehicles as any)?.by_vehicle) {
-        setByVehicleData(Array.isArray((vehicles as any).by_vehicle) ? (vehicles as any).by_vehicle : [])
+      if ((veiculos as any)?.by_vehicle) {
+        setByVehicleData(Array.isArray((veiculos as any).by_vehicle) ? (veiculos as any).by_vehicle : [])
       }
 
       // Dados por motorista (usar v_reports_driver_ranking com custos)
-      const { data: drivers } = await supabase
+      const { data: motoristas } = await supabase
         .from('v_reports_driver_ranking')
         .select('motorista_id, motorista_name, routes_completed')
         .limit(10)
 
-      if (drivers) {
-        setByDriverData(drivers.map((d: any) => ({
+      if (motoristas) {
+        setByDriverData(motoristas.map((d: any) => ({
           name: d.motorista_name || 'Motorista',
           routes: d.routes_completed || 0,
           cost: (d.routes_completed || 0) * 50 // Estimativa
@@ -134,8 +134,8 @@ export function CostCharts({ companyId, period = 'month' }: CostChartProps) {
       <TabsList className="grid w-full grid-cols-5">
         <TabsTrigger value="monthly">Mensal</TabsTrigger>
         <TabsTrigger value="routes">Por Rota</TabsTrigger>
-        <TabsTrigger value="vehicles">Por Veículo</TabsTrigger>
-        <TabsTrigger value="drivers">Por Motorista</TabsTrigger>
+        <TabsTrigger value="veiculos">Por Veículo</TabsTrigger>
+        <TabsTrigger value="motoristas">Por Motorista</TabsTrigger>
         <TabsTrigger value="companies">Por Empresa</TabsTrigger>
       </TabsList>
 
@@ -197,7 +197,7 @@ export function CostCharts({ companyId, period = 'month' }: CostChartProps) {
         </Card>
       </TabsContent>
 
-      <TabsContent value="vehicles" className="mt-6">
+      <TabsContent value="veiculos" className="mt-6">
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -226,7 +226,7 @@ export function CostCharts({ companyId, period = 'month' }: CostChartProps) {
         </Card>
       </TabsContent>
 
-      <TabsContent value="drivers" className="mt-6">
+      <TabsContent value="motoristas" className="mt-6">
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">

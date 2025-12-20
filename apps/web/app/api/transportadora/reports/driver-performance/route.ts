@@ -21,7 +21,7 @@ export async function GET(req: NextRequest) {
     const supabase = getSupabaseAdmin()
 
     // Buscar motoristas da transportadora
-    const { data: drivers, error: driversError } = await supabase
+    const { data: motoristas, error: driversError } = await supabase
       .from('users')
       .select('id, name, email, phone, transportadora_id')
       .eq('role', 'motorista')
@@ -29,7 +29,7 @@ export async function GET(req: NextRequest) {
 
     if (driversError) throw driversError
 
-    const driverIds = drivers?.map(d => d.id) || []
+    const driverIds = motoristas?.map(d => d.id) || []
 
     // Buscar dados de gamificação/ranking (selecionar apenas colunas necessárias)
     const rankingColumns = 'id,motorista_id,trips_completed,total_points,average_rating,on_time_percentage,safety_score,created_at,updated_at'
@@ -65,7 +65,7 @@ export async function GET(req: NextRequest) {
     if (tripsError) throw tripsError
 
     // Calcular performance por motorista
-    const driverPerformance = drivers?.map(motorista => {
+    const driverPerformance = motoristas?.map(motorista => {
       const driverRanking = rankings?.find(r => r.motorista_id === motorista.id)
       const driverTrips = trips?.filter(t => t.motorista_id === motorista.id) || []
 
@@ -95,9 +95,9 @@ export async function GET(req: NextRequest) {
       success: true,
       data: driverPerformance,
       summary: {
-        total_drivers: drivers?.length || 0,
+        total_drivers: motoristas?.length || 0,
         total_trips: trips?.length || 0,
-        average_trips_per_driver: trips?.length ? trips.length / (drivers?.length || 1) : 0,
+        average_trips_per_driver: trips?.length ? trips.length / (motoristas?.length || 1) : 0,
         top_performer: driverPerformance[0] || null
       }
     })

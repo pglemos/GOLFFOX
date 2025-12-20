@@ -2,7 +2,7 @@
 
 import { NextResponse } from 'next/server'
 
-// Mock data for motoristas (drivers) ranking
+// Mock data for motoristas (motoristas) ranking
 const mockDrivers = [
     {
         id: '1',
@@ -63,5 +63,5 @@ const mockDrivers = [
 ]
 
 export async function GET() {
-    return NextResponse.json({ drivers: mockDrivers })
+    return NextResponse.json({ motoristas: mockDrivers })
 }

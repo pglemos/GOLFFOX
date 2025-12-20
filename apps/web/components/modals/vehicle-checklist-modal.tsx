@@ -68,7 +68,7 @@ export function VehicleChecklistModal({
 }: VehicleChecklistModalProps) {
   const [loading, setLoading] = useState(false)
   const { sync } = useSupabaseSync({ showToast: false })
-  const [drivers, setDrivers] = useState<any[]>([])
+  const [motoristas, setMotoristas] = useState<any[]>([])
   const [formData, setFormData] = useState<VeiculoChecklist>({
     veiculo_id: vehicleId,
     motorista_id: '',
@@ -80,7 +80,7 @@ export function VehicleChecklistModal({
 
   useEffect(() => {
     if (isOpen) {
-      loadDrivers()
+      loadMotoristas()
     }
     if (checklist) {
       setFormData({
@@ -100,7 +100,7 @@ export function VehicleChecklistModal({
     }
   }, [checklist, vehicleId, isOpen])
 
-  const loadDrivers = async () => {
+  const loadMotoristas = async () => {
     try {
       const { data, error } = await supabase
         .from("users")
@@ -109,7 +109,7 @@ export function VehicleChecklistModal({
         .eq("is_active", true)
 
       if (error) throw error
-      setDrivers(data || [])
+      setMotoristas(data || [])
     } catch (error) {
       console.error("Erro ao carregar motoristas:", error)
     }
@@ -234,7 +234,7 @@ export function VehicleChecklistModal({
                 <SelectValue placeholder="Selecione o motorista" />
               </SelectTrigger>
               <SelectContent>
-                {drivers.map((motorista) => (
+                {motoristas.map((motorista) => (
                   <SelectItem key={motorista.id} value={motorista.id}>
                     {motorista.name || motorista.email}
                   </SelectItem>

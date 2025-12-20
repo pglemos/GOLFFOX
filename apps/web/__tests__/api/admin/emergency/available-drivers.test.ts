@@ -1,4 +1,4 @@
-import { GET } from '@/app/api/admin/emergency/available-drivers/route'
+import { GET } from '@/app/api/admin/emergency/available-motoristas/route'
 import { createAdminRequest } from '../../../helpers/api-test-helpers'
 import { mockSupabaseClient } from '../../../helpers/mock-supabase'
 import { createTestUser } from '../../../helpers/test-data'
@@ -8,7 +8,7 @@ jest.mock('@supabase/supabase-js', () => ({
   createClient: jest.fn(() => mockSupabaseClient),
 }))
 
-describe('GET /api/admin/emergency/available-drivers', () => {
+describe('GET /api/admin/emergency/available-motoristas', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockSupabaseClient.clear()
@@ -17,11 +17,11 @@ describe('GET /api/admin/emergency/available-drivers', () => {
   })
 
   it('deve listar motoristas disponíveis', async () => {
-    const drivers = [
+    const motoristas = [
       createTestUser({ role: 'motorista', is_active: true, name: 'Motorista 1' }),
       createTestUser({ role: 'motorista', is_active: true, name: 'Motorista 2' }),
     ]
-    mockSupabaseClient.setTableData('users', drivers)
+    mockSupabaseClient.setTableData('users', motoristas)
     mockSupabaseClient.setTableData('trips', [])
 
     const req = createAdminRequest({
@@ -33,8 +33,8 @@ describe('GET /api/admin/emergency/available-drivers', () => {
 
     expect(response.status).toBe(200)
     expect(data.success).toBe(true)
-    expect(Array.isArray(data.drivers)).toBe(true)
-    expect(data.drivers.length).toBeGreaterThanOrEqual(2)
+    expect(Array.isArray(data.motoristas)).toBe(true)
+    expect(data.motoristas.length).toBeGreaterThanOrEqual(2)
   })
 
   it('deve filtrar motoristas ocupados', async () => {
@@ -56,7 +56,7 @@ describe('GET /api/admin/emergency/available-drivers', () => {
     expect(response.status).toBe(200)
     expect(data.success).toBe(true)
     // Motorista ocupado não deve aparecer na lista
-    const occupiedInList = data.drivers.find((d: any) => d.id === occupiedDriver.id)
+    const occupiedInList = data.motoristas.find((d: any) => d.id === occupiedDriver.id)
     expect(occupiedInList).toBeUndefined()
   })
 
@@ -77,7 +77,7 @@ describe('GET /api/admin/emergency/available-drivers', () => {
     expect(response.status).toBe(200)
     expect(data.success).toBe(true)
     // Motorista inativo não deve aparecer
-    const inactiveInList = data.drivers.find((d: any) => d.id === inactiveDriver.id)
+    const inactiveInList = data.motoristas.find((d: any) => d.id === inactiveDriver.id)
     expect(inactiveInList).toBeUndefined()
   })
 

@@ -30,7 +30,7 @@ describe('DELETE /api/admin/transportadoras/delete', () => {
 
     mockSupabaseClient.setTableData('carriers', [transportadora])
     mockSupabaseClient.setTableData('users', [user])
-    mockSupabaseClient.setTableData('vehicles', [veiculo])
+    mockSupabaseClient.setTableData('veiculos', [veiculo])
     mockSupabaseClient.setTableData('routes', [])
 
     const req = createAdminRequest({

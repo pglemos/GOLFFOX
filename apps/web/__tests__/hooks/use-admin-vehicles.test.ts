@@ -1,5 +1,5 @@
 import { renderHook, waitFor } from '@testing-library/react'
-import { useAdminVehicles } from '@/hooks/use-admin-vehicles'
+import { useAdminVehicles } from '@/hooks/use-admin-veiculos'
 import { renderWithProviders } from '../../helpers/component-helpers'
 
 global.fetch = jest.fn()
@@ -34,7 +34,7 @@ describe('useAdminVehicles hook', () => {
   it('deve lidar com resposta em formato de objeto', async () => {
     const mockResponse = {
       success: true,
-      vehicles: [
+      veiculos: [
         { id: '1', plate: 'ABC1234' },
       ],
     }
@@ -52,7 +52,7 @@ describe('useAdminVehicles hook', () => {
       expect(result.current.isLoading).toBe(false)
     })
 
-    expect(result.current.data).toEqual(mockResponse.vehicles)
+    expect(result.current.data).toEqual(mockResponse.veiculos)
   })
 
   it('deve lidar com erro na requisição', async () => {

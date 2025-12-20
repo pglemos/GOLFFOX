@@ -41,8 +41,8 @@ export async function GET(request: NextRequest) {
         *,
         companies(name),
         routes(name),
-        vehicles(plate),
-        drivers:users!gf_incidents_driver_id_fkey(name, email)
+        veiculos(plate),
+        motoristas:users!gf_incidents_driver_id_fkey(name, email)
       `)
       .order('created_at', { ascending: false })
       .limit(100)

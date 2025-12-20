@@ -1,4 +1,4 @@
-import { DELETE, PATCH } from '@/app/api/admin/vehicles/[vehicleId]/route'
+import { DELETE, PATCH } from '@/app/api/admin/veiculos/[vehicleId]/route'
 import { createAdminRequest } from '../../../helpers/api-test-helpers'
 import { mockSupabaseClient } from '../../../helpers/mock-supabase'
 import { createTestVehicle } from '../../../helpers/test-data'
@@ -8,7 +8,7 @@ jest.mock('@/lib/supabase-server', () => ({
   supabaseServiceRole: mockSupabaseClient,
 }))
 
-describe('DELETE /api/admin/vehicles/[vehicleId]', () => {
+describe('DELETE /api/admin/veiculos/[vehicleId]', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockSupabaseClient.clear()
@@ -17,7 +17,7 @@ describe('DELETE /api/admin/vehicles/[vehicleId]', () => {
 
   it('deve excluir veículo sem viagens associadas', async () => {
     const veiculo = createTestVehicle('transportadora-1', { plate: 'ABC1234' })
-    mockSupabaseClient.setTableData('vehicles', [veiculo])
+    mockSupabaseClient.setTableData('veiculos', [veiculo])
     mockSupabaseClient.setTableData('trips', [])
     mockSupabaseClient.setTableData('gf_vehicle_maintenance', [])
     mockSupabaseClient.setTableData('gf_veiculo_checklists', [])
@@ -39,7 +39,7 @@ describe('DELETE /api/admin/vehicles/[vehicleId]', () => {
 
   it('deve arquivar veículo com viagens associadas', async () => {
     const veiculo = createTestVehicle('transportadora-1', { plate: 'ABC1234' })
-    mockSupabaseClient.setTableData('vehicles', [veiculo])
+    mockSupabaseClient.setTableData('veiculos', [veiculo])
     mockSupabaseClient.setTableData('trips', [
       { id: 'trip-1', veiculo_id: veiculo.id },
     ])
@@ -61,7 +61,7 @@ describe('DELETE /api/admin/vehicles/[vehicleId]', () => {
   })
 
   it('deve rejeitar se veículo não encontrado', async () => {
-    mockSupabaseClient.setTableData('vehicles', [])
+    mockSupabaseClient.setTableData('veiculos', [])
 
     const req = createAdminRequest({
       method: 'DELETE',
@@ -95,7 +95,7 @@ describe('DELETE /api/admin/vehicles/[vehicleId]', () => {
   })
 })
 
-describe('PATCH /api/admin/vehicles/[vehicleId]', () => {
+describe('PATCH /api/admin/veiculos/[vehicleId]', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockSupabaseClient.clear()
@@ -103,7 +103,7 @@ describe('PATCH /api/admin/vehicles/[vehicleId]', () => {
 
   it('deve atualizar veículo', async () => {
     const veiculo = createTestVehicle('transportadora-1', { plate: 'ABC1234' })
-    mockSupabaseClient.setTableData('vehicles', [veiculo])
+    mockSupabaseClient.setTableData('veiculos', [veiculo])
 
     const req = createAdminRequest({
       method: 'PATCH',
@@ -127,7 +127,7 @@ describe('PATCH /api/admin/vehicles/[vehicleId]', () => {
 
   it('deve rejeitar campos não permitidos', async () => {
     const veiculo = createTestVehicle('transportadora-1')
-    mockSupabaseClient.setTableData('vehicles', [veiculo])
+    mockSupabaseClient.setTableData('veiculos', [veiculo])
 
     const req = createAdminRequest({
       method: 'PATCH',

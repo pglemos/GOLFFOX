@@ -1,4 +1,4 @@
-import { POST } from '@/app/api/admin/drivers/route'
+import { POST } from '@/app/api/admin/motoristas/route'
 import { createAdminRequest } from '../../helpers/api-test-helpers'
 import { mockSupabaseClient } from '../../helpers/mock-supabase'
 import { createTestDriver, createTestTransportadora } from '../../helpers/test-data'
@@ -8,7 +8,7 @@ jest.mock('@/lib/supabase-server', () => ({
   supabaseServiceRole: mockSupabaseClient,
 }))
 
-describe('POST /api/admin/drivers', () => {
+describe('POST /api/admin/motoristas', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockSupabaseClient.clear()

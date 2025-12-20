@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
 
     // Selecionar todas as colunas para evitar erros de colunas inexistentes
     const { data, error } = await supabaseServiceRole
-      .from('vehicles')
+      .from('veiculos')
       .select('*')
       .order('created_at', { ascending: false })
 
@@ -125,7 +125,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const vehicleData: any = {
+    const veiculoData: any = {
       plate: validated.plate,
       model: validated.model,
       is_active: validated.is_active,
@@ -133,27 +133,27 @@ export async function POST(request: NextRequest) {
 
     // Adicionar campos opcionais apenas se fornecidos
     if (validated.brand) {
-      vehicleData.brand = validated.brand
+      veiculoData.brand = validated.brand
     }
     if (validated.prefix) {
-      vehicleData.prefix = validated.prefix
+      veiculoData.prefix = validated.prefix
     }
     if (validated.year) {
-      vehicleData.year = validated.year
+      veiculoData.year = validated.year
     }
     if (validated.capacity) {
-      vehicleData.capacity = validated.capacity
+      veiculoData.capacity = validated.capacity
     }
     if (finalCompanyId) {
-      vehicleData.company_id = finalCompanyId
+      veiculoData.company_id = finalCompanyId
     }
     if (validated.transportadora_id) {
-      vehicleData.transportadora_id = validated.transportadora_id
+      veiculoData.transportadora_id = validated.transportadora_id
     }
 
     const { data: newVehicle, error: createError } = await supabaseServiceRole
-      .from('vehicles')
-      .insert(vehicleData)
+      .from('veiculos')
+      .insert(veiculoData)
       .select()
       .single()
 

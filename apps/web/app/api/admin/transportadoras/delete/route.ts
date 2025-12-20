@@ -65,14 +65,14 @@ export async function DELETE(req: NextRequest) {
       )
     }
 
-    // 2. Remover referências de vehicles (setar transportadora_id como NULL)
+    // 2. Remover referências de veiculos (setar transportadora_id como NULL)
     const { error: vehiclesError } = await supabase
-      .from('vehicles')
+      .from('veiculos')
       .update({ transportadora_id: null } as any)
       .eq('transportadora_id', carrierId)
 
     if (vehiclesError) {
-      logError('Erro ao atualizar vehicles', { error: vehiclesError, carrierId }, 'TransportadorasDeleteAPI')
+      logError('Erro ao atualizar veiculos', { error: vehiclesError, carrierId }, 'TransportadorasDeleteAPI')
       return NextResponse.json(
         { 
           success: false, 

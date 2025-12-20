@@ -303,7 +303,7 @@ async function executeSyncWithRetry(
 
     // Determinar tabela baseada no tipo de recurso
     const tableMap: Record<string, string> = {
-      veiculo: 'vehicles',
+      veiculo: 'veiculos',
       motorista: 'users',
       route: 'routes',
       maintenance: 'gf_vehicle_maintenance',

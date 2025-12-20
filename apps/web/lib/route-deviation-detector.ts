@@ -146,7 +146,7 @@ export function detectRouteDeviation(
  * Detecta desvios para múltiplos veículos
  */
 export function detectMultipleRouteDeviations(
-  vehicles: Array<{
+  veiculos: Array<{
     veiculo_id: string
     lat: number
     lng: number
@@ -158,7 +158,7 @@ export function detectMultipleRouteDeviations(
 ): Map<string, DeviationResult> {
   const results = new Map<string, DeviationResult>()
 
-  vehicles.forEach((veiculo) => {
+  veiculos.forEach((veiculo) => {
     const routePolyline = routesMap.get(veiculo.route_id)
     if (routePolyline) {
       const deviation = detectRouteDeviation(

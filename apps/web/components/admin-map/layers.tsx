@@ -34,10 +34,10 @@ export interface RouteStop {
 
 interface MapLayersProps {
   map: google.maps.Map
-  vehicles: veiculo[]
+  veiculos: veiculo[]
   routes: RoutePolyline[]
   alerts: Alert[]
-  selectedVehicle: veiculo | null
+  selectedVeiculo: veiculo | null
   onVehicleClick: (veiculo: veiculo) => void
   onRouteClick: (route: RoutePolyline) => void
   onAlertClick: (alert: Alert) => void
@@ -51,10 +51,10 @@ interface MapLayersProps {
 
 export const MapLayers = memo(function MapLayers({
   map,
-  vehicles,
+  veiculos,
   routes,
   alerts,
-  selectedVehicle,
+  selectedVeiculo,
   onVehicleClick,
   onRouteClick,
   onAlertClick,
@@ -71,7 +71,7 @@ export const MapLayers = memo(function MapLayers({
   const alertMarkersRef = useRef<Map<string, google.maps.Marker>>(new Map())
   const trajectoryPolylinesRef = useRef<Map<string, google.maps.Polyline>>(new Map())
   const markerManagerRef = useRef<MarkerManager | null>(null)
-  const useVirtualization = vehicles.length > 50 // Usar virtualização se >50 veículos
+  const useVirtualization = veiculos.length > 50 // Usar virtualização se >50 veículos
 
   // Desenhar rotas planejadas (polyline azul)
   useEffect(() => {
@@ -173,7 +173,7 @@ export const MapLayers = memo(function MapLayers({
 
     const markers: google.maps.Marker[] = []
 
-    vehicles.forEach((veiculo) => {
+    veiculos.forEach((veiculo) => {
       // Verificar se o veículo tem coordenadas válidas
       // Se não tiver, pular a criação do marcador no mapa, mas o veículo ainda aparecerá na lista
       if (!isValidCoordinate(veiculo.lat, veiculo.lng)) {
@@ -263,7 +263,7 @@ export const MapLayers = memo(function MapLayers({
       // Atualizar visibilidade após adicionar todos os marcadores
       markerManagerRef.current.refresh()
     }
-  }, [vehicles, map, onVehicleClick, clustererRef, useVirtualization])
+  }, [veiculos, map, onVehicleClick, clustererRef, useVirtualization])
 
   // Desenhar alertas (pinos pulsantes)
   useEffect(() => {
@@ -335,7 +335,7 @@ export const MapLayers = memo(function MapLayers({
     // - showTrajectories explícito
     const shouldShowTrajectories = 
       mode === 'history' || 
-      selectedVehicle !== null || 
+      selectedVeiculo !== null || 
       showTrajectories
 
     if (!shouldShowTrajectories || historicalTrajectories.length === 0) {
@@ -383,7 +383,7 @@ export const MapLayers = memo(function MapLayers({
         polyline
       )
     })
-  }, [historicalTrajectories, map, mode, selectedVehicle, showTrajectories])
+  }, [historicalTrajectories, map, mode, selectedVeiculo, showTrajectories])
 
   // Desenhar marcadores de paradas
   useEffect(() => {

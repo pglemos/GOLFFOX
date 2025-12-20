@@ -19,10 +19,10 @@ interface RouteFormProps {
     setFormData: React.Dispatch<React.SetStateAction<RouteFormData>>
     companies: Company[]
     loadingCompanies: boolean
-    selectedDriver: { id: string; name: string; documents_valid: boolean } | null
-    selectedVehicle: { id: string; plate: string; capacity: number } | null
-    onOpenDriverModal: () => void
-    onOpenVehicleModal: () => void
+    selectedMotorista: { id: string; name: string; documents_valid: boolean } | null
+    selectedVeiculo: { id: string; plate: string; capacity: number } | null
+    onOpenMotoristaModal: () => void
+    onOpenVeiculoModal: () => void
     newException: string
     setNewException: (val: string) => void
     addException: () => void
@@ -46,10 +46,10 @@ export function RouteForm({
     setFormData,
     companies,
     loadingCompanies,
-    selectedDriver,
-    selectedVehicle,
-    onOpenDriverModal,
-    onOpenVehicleModal,
+    selectedMotorista,
+    selectedVeiculo,
+    onOpenMotoristaModal,
+    onOpenVeiculoModal,
     newException,
     setNewException,
     addException,
@@ -287,11 +287,11 @@ export function RouteForm({
                             <Button
                                 variant="outline"
                                 className="w-full justify-start text-base h-11 sm:h-12 px-4 py-3"
-                                onClick={onOpenDriverModal}
+                                onClick={onOpenMotoristaModal}
                                 aria-label="Selecionar motorista"
                             >
                                 <User className="h-5 w-5 mr-3" />
-                                <span className="truncate">{selectedDriver ? selectedDriver.name : "Selecionar Motorista"}</span>
+                                <span className="truncate">{selectedMotorista ? selectedMotorista.name : "Selecionar Motorista"}</span>
                             </Button>
                         </div>
                         <div className="grid gap-2.5">
@@ -302,11 +302,11 @@ export function RouteForm({
                             <Button
                                 variant="outline"
                                 className="w-full justify-start text-base h-11 sm:h-12 px-4 py-3"
-                                onClick={onOpenVehicleModal}
+                                onClick={onOpenVeiculoModal}
                                 aria-label="Selecionar veículo"
                             >
                                 <Truck className="h-5 w-5 mr-3" />
-                                <span className="truncate">{selectedVehicle ? `${selectedVehicle.plate} (Cap: ${selectedVehicle.capacity})` : "Selecionar Veículo"}</span>
+                                <span className="truncate">{selectedVeiculo ? `${selectedVeiculo.plate} (Cap: ${selectedVeiculo.capacity})` : "Selecionar Veículo"}</span>
                             </Button>
                         </div>
                     </div>

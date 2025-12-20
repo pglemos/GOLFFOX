@@ -70,7 +70,7 @@ export async function GET(request: NextRequest) {
             .select(`
         *,
         category:gf_cost_categories(id, name, icon, color),
-        veiculo:vehicles(id, plate, model),
+        veiculo:veiculos(id, plate, model),
         route:routes(id, name),
         company:companies(id, name),
         transportadora:carriers(id, name)

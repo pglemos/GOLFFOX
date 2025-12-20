@@ -3,7 +3,7 @@ import { getSupabaseAdmin } from '@/lib/supabase-client'
 import { requireAuth } from '@/lib/api-auth'
 import { logError } from '@/lib/logger'
 
-// GET /api/admin/transportadoras/[transportadoraId]/vehicles
+// GET /api/admin/transportadoras/[transportadoraId]/veiculos
 export async function GET(
   request: NextRequest,
   context: { params: Promise<{ transportadoraId?: string; carrierId?: string }> }
@@ -28,8 +28,8 @@ export async function GET(
     const supabase = getSupabaseAdmin()
 
     // Buscar veículos da transportadora
-    const { data: vehicles, error } = await supabase
-      .from('vehicles')
+    const { data: veiculos, error } = await supabase
+      .from('veiculos')
       .select('*')
       .eq('transportadora_id', transportadoraId)
       .order('created_at', { ascending: false })
@@ -42,7 +42,7 @@ export async function GET(
       )
     }
 
-    return NextResponse.json({ success: true, vehicles: vehicles || [] })
+    return NextResponse.json({ success: true, veiculos: veiculos || [] })
   } catch (err) {
     logError('Erro na API de veículos', { error: err, transportadoraId: (await context.params).transportadoraId || (await context.params).carrierId }, 'TransportadoraVehiclesAPI')
     const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'
@@ -53,7 +53,7 @@ export async function GET(
   }
 }
 
-// POST /api/admin/transportadoras/[transportadoraId]/vehicles
+// POST /api/admin/transportadoras/[transportadoraId]/veiculos
 export async function POST(
   request: NextRequest,
   context: { params: Promise<{ transportadoraId?: string; carrierId?: string }> }
@@ -99,7 +99,7 @@ export async function POST(
     const supabase = getSupabaseAdmin()
 
     const { data: veiculo, error } = await supabase
-      .from('vehicles')
+      .from('veiculos')
       .insert([
         {
           transportadora_id: transportadoraId,

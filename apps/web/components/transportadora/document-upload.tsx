@@ -110,7 +110,7 @@ export function DocumentUpload({
           file_size_bytes: uploadData.file_size_bytes
         }
 
-        const docRes = await fetch(`/api/transportadora/drivers/${driverId}/documents`, {
+        const docRes = await fetch(`/api/transportadora/motoristas/${driverId}/documents`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(docData)
@@ -124,7 +124,7 @@ export function DocumentUpload({
 
       // Se for exame médico
       if (driverId && folder === 'medical-exams' && documentType) {
-        const examRes = await fetch(`/api/transportadora/drivers/${driverId}/exams`, {
+        const examRes = await fetch(`/api/transportadora/motoristas/${driverId}/exams`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -150,7 +150,7 @@ export function DocumentUpload({
           file_name: uploadData.file_name
         }
 
-        const docRes = await fetch(`/api/transportadora/vehicles/${vehicleId}/documents`, {
+        const docRes = await fetch(`/api/transportadora/veiculos/${vehicleId}/documents`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(docData)

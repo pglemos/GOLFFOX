@@ -68,7 +68,7 @@ export function MotoristaCompensationSection({
 
         setLoading(true)
         try {
-            const response = await fetch(`/api/admin/drivers/${driverId}/compensation`)
+            const response = await fetch(`/api/admin/motoristas/${driverId}/compensation`)
             if (response.ok) {
                 const data: MotoristaCompensation | null = await response.json()
                 if (data) {
@@ -117,7 +117,7 @@ export function MotoristaCompensationSection({
 
         setSaving(true)
         try {
-            const response = await fetch(`/api/admin/drivers/${driverId}/compensation`, {
+            const response = await fetch(`/api/admin/motoristas/${driverId}/compensation`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(formData),

@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
 
     // Buscar veículos com relacionamento carriers via transportadora_id
     const { data, error } = await supabaseAdmin
-      .from('vehicles')
+      .from('veiculos')
       .select('*, carriers:transportadora_id(id, name)')
       .order('created_at', { ascending: false })
 

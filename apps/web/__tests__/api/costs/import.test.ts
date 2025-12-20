@@ -42,7 +42,7 @@ describe('POST /api/costs/import', () => {
       { id: 'cat-1', group_name: 'Operacional', category: 'Combustível', subcategory: null },
     ])
     mockSupabaseClient.setTableData('routes', [])
-    mockSupabaseClient.setTableData('vehicles', [])
+    mockSupabaseClient.setTableData('veiculos', [])
     mockSupabaseClient.setTableData('users', [])
 
     const formData = new FormData()

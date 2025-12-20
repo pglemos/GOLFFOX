@@ -101,7 +101,7 @@ describe('RouteDeviationDetector', () => {
 
   describe('detectMultipleRouteDeviations', () => {
     it('deve detectar desvios para múltiplos veículos', () => {
-      const vehicles = [
+      const veiculos = [
         {
           veiculo_id: 'veiculo-1',
           lat: -19.916681,
@@ -121,7 +121,7 @@ describe('RouteDeviationDetector', () => {
       const routesMap = new Map<string, RoutePolylinePoint[]>()
       routesMap.set('route-1', mockRoute)
 
-      const results = detectMultipleRouteDeviations(vehicles, routesMap, 200)
+      const results = detectMultipleRouteDeviations(veiculos, routesMap, 200)
 
       expect(results.size).toBe(2)
       expect(results.get('veiculo-1')?.isDeviated).toBe(false)
@@ -129,7 +129,7 @@ describe('RouteDeviationDetector', () => {
     })
 
     it('deve retornar resultados vazios se não há rotas', () => {
-      const vehicles = [
+      const veiculos = [
         {
           veiculo_id: 'veiculo-1',
           lat: -19.916681,
@@ -141,7 +141,7 @@ describe('RouteDeviationDetector', () => {
 
       const routesMap = new Map<string, RoutePolylinePoint[]>()
 
-      const results = detectMultipleRouteDeviations(vehicles, routesMap, 200)
+      const results = detectMultipleRouteDeviations(veiculos, routesMap, 200)
 
       expect(results.size).toBe(0)
     })

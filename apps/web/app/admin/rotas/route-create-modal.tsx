@@ -17,8 +17,8 @@ import { supabase } from "@/lib/supabase"
 import { notifySuccess, notifyError } from "@/lib/toast"
 import { optimizeRoute } from "@/lib/route-optimization"
 import { geocodeAddress } from "@/lib/geocoding"
-import { DriverPickerModal } from "@/components/admin/driver-picker-modal"
-import { VehiclePickerModal } from "@/components/admin/vehicle-picker-modal"
+import { MotoristaPickerModal } from "@/components/admin/motorista-picker-modal"
+import { VeiculoPickerModal } from "@/components/admin/veiculo-picker-modal"
 import { z } from "zod"
 import React from "react"
 import { useRouteCreate } from "./use-route-create"
@@ -47,8 +47,8 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
     companies, loadingCompanies,
     employees, loadingEmployees, loadEmployees,
     searchEmployee, setSearchEmployee,
-    selectedDriver, setSelectedDriver,
-    selectedVehicle, setSelectedVehicle,
+    selectedMotorista, setSelectedMotorista,
+    selectedVeiculo, setSelectedVeiculo,
     optimizationResult, setOptimizationResult,
     optimizing, setOptimizing,
     saving, setSaving,
@@ -57,8 +57,8 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
     addException, removeException, toggleEmployee
   } = useRouteCreate(isOpen)
 
-  const [isDriverModalOpen, setIsDriverModalOpen] = useState(false)
-  const [isVehicleModalOpen, setIsVehicleModalOpen] = useState(false)
+  const [isMotoristaModalOpen, setIsMotoristaModalOpen] = useState(false)
+  const [isVeiculoModalOpen, setIsVeiculoModalOpen] = useState(false)
 
   // Use the new hook for Google Maps loading
   const { isLoaded: mapLoaded, error: mapError } = useGoogleMapsLoader(isOpen)
@@ -170,19 +170,19 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
 
       const newWarnings: string[] = []
 
-      if (selectedVehicle && selectedVehicle.capacity < waypoints.length) {
-        newWarnings.push(`⚠️ Capacidade do veículo (${selectedVehicle.capacity}) menor que número de passageiros (${waypoints.length})`)
+      if (selectedVeiculo && selectedVeiculo.capacity < waypoints.length) {
+        newWarnings.push(`⚠️ Capacidade do veículo (${selectedVeiculo.capacity}) menor que número de passageiros (${waypoints.length})`)
       }
 
-      if (!selectedDriver) {
+      if (!selectedMotorista) {
         newWarnings.push("⚠️ Motorista não selecionado")
       }
 
-      if (!selectedVehicle) {
+      if (!selectedVeiculo) {
         newWarnings.push("⚠️ VeÃ­culo não selecionado")
       }
 
-      if (selectedDriver && selectedDriver.documents_valid === false) {
+      if (selectedMotorista && selectedMotorista.documents_valid === false) {
         newWarnings.push("⚠️ Motorista com documentos pendentes")
       }
 
@@ -199,13 +199,13 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
       const validated = routeSchema.parse(formData)
       setSaving(true)
 
-      if (!selectedDriver) {
+      if (!selectedMotorista) {
         notifyError(new Error("Selecione um motorista"), "Motorista obrigatório")
         setSaving(false)
         return
       }
 
-      if (!selectedVehicle) {
+      if (!selectedVeiculo) {
         notifyError(new Error("Selecione um veículo"), "Veículo obrigatório")
         setSaving(false)
         return
@@ -216,9 +216,9 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
         ? optimizationResult.ordered.map((o) => o.id)
         : formData.selected_employees || []
 
-      if (selectedVehicle.capacity < orderedEmployees.length) {
+      if (selectedVeiculo.capacity < orderedEmployees.length) {
         const confirm = window.confirm(
-          `Atenção: O veículo selecionado tem capacidade de ${selectedVehicle.capacity} passageiros, mas ${orderedEmployees.length} foram selecionados. Deseja continuar mesmo assim?`
+          `Atenção: O veículo selecionado tem capacidade de ${selectedVeiculo.capacity} passageiros, mas ${orderedEmployees.length} foram selecionados. Deseja continuar mesmo assim?`
         )
         if (!confirm) {
           setSaving(false)
@@ -241,8 +241,8 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
         days_of_week: formData.days_of_week || [],
         exceptions: formData.exceptions || [],
         is_active: formData.is_active ?? true,
-        motorista_id: selectedDriver.id,
-        veiculo_id: selectedVehicle.id,
+        motorista_id: selectedMotorista.id,
+        veiculo_id: selectedVeiculo.id,
         polyline: optimizationResult?.polyline || null,
       } as any
       const insertQuery = supabase.from("routes").insert(insertPayload) as any
@@ -319,10 +319,10 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
                 setFormData={setFormData as React.Dispatch<React.SetStateAction<RouteFormData>>}
                 companies={companies}
                 loadingCompanies={loadingCompanies}
-                selectedDriver={selectedDriver ? { ...selectedDriver, documents_valid: selectedDriver.documents_valid ?? false } : null}
-                selectedVehicle={selectedVehicle}
-                onOpenDriverModal={() => setIsDriverModalOpen(true)}
-                onOpenVehicleModal={() => setIsVehicleModalOpen(true)}
+                selectedMotorista={selectedMotorista ? { ...selectedMotorista, documents_valid: selectedMotorista.documents_valid ?? false } : null}
+                selectedVeiculo={selectedVeiculo}
+                onOpenMotoristaModal={() => setIsMotoristaModalOpen(true)}
+                onOpenVeiculoModal={() => setIsVeiculoModalOpen(true)}
                 newException={newException}
                 setNewException={setNewException}
                 addException={addException}
@@ -390,10 +390,10 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
         </DialogContent>
       </Dialog>
 
-      <DriverPickerModal
-        isOpen={isDriverModalOpen}
-        onClose={() => setIsDriverModalOpen(false)}
-        onSelect={(motorista) => setSelectedDriver({
+      <MotoristaPickerModal
+        isOpen={isMotoristaModalOpen}
+        onClose={() => setIsMotoristaModalOpen(false)}
+        onSelect={(motorista) => setSelectedMotorista({
           id: motorista.id,
           name: motorista.name,
           documents_valid: motorista.documents_valid
@@ -401,11 +401,11 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
         companyId={formData.company_id}
       />
 
-      <VehiclePickerModal
-        isOpen={isVehicleModalOpen}
-        onClose={() => setIsVehicleModalOpen(false)}
+      <VeiculoPickerModal
+        isOpen={isVeiculoModalOpen}
+        onClose={() => setIsVeiculoModalOpen(false)}
         onSelect={(veiculo) =>
-          setSelectedVehicle({ id: veiculo.id, plate: veiculo.plate, capacity: veiculo.capacity })
+          setSelectedVeiculo({ id: veiculo.id, plate: veiculo.plate, capacity: veiculo.capacity })
         }
         companyId={formData.company_id}
         requiredCapacity={formData.selected_employees?.length}

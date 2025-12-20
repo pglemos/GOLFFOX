@@ -4,7 +4,7 @@ import { requireAuth } from '@/lib/api-auth'
 import { getSupabaseAdmin } from '@/lib/supabase-client'
 import { successResponse, errorResponse, validationErrorResponse } from '@/lib/api-response'
 
-// POST /api/admin/drivers - Criar motorista
+// POST /api/admin/motoristas - Criar motorista
 export async function POST(request: NextRequest) {
   // Verificar autenticação admin
   const authError = await requireAuth(request, 'admin')

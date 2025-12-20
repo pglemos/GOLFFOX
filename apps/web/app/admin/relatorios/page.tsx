@@ -112,7 +112,7 @@ export default function RelatoriosPage() {
       icon: FileText
     },
     { 
-      id: 'drivers',
+      id: 'motoristas',
       title: 'Ranking de Motoristas', 
       description: 'Ranking por pontualidade, eficiência e conclusão',
       icon: BarChart3

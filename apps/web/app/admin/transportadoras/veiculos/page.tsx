@@ -31,8 +31,8 @@ import {
 import { Label } from "@/components/ui/label"
 
 // Lazy load modal
-const VehicleModal = dynamic(
-    () => import("@/components/modals/vehicle-modal").then(m => ({ default: m.VehicleModal })),
+const VeiculoModal = dynamic(
+    () => import("@/components/modals/veiculo-modal").then(m => ({ default: m.VeiculoModal })),
     { ssr: false, loading: () => null }
 )
 
@@ -56,10 +56,10 @@ interface Transportadora {
 
 export default function TransportadoraVeiculosPage() {
     const { user, loading: authLoading } = useAuthFast()
-    const [vehicles, setVehicles] = useState<veiculo[]>([])
+    const [veiculos, setVeiculos] = useState<veiculo[]>([])
     const [transportadoras, setTransportadoras] = useState<Transportadora[]>([])
     const [dataLoading, setDataLoading] = useState(true)
-    const [selectedVehicle, setSelectedVehicle] = useState<veiculo | null>(null)
+    const [selectedVeiculo, setSelectedVeiculo] = useState<veiculo | null>(null)
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [isSelectCarrierOpen, setIsSelectCarrierOpen] = useState(false)
     const [newVehicleCarrierId, setNewVehicleCarrierId] = useState<string>("")
@@ -77,7 +77,7 @@ export default function TransportadoraVeiculosPage() {
     const handleCarrierSelected = () => {
         if (!newVehicleCarrierId) return
         const selectedCarrier = transportadoras.find(t => t.id === newVehicleCarrierId)
-        setSelectedVehicle({
+        setSelectedVeiculo({
             id: "",
             plate: "",
             model: "",
@@ -98,13 +98,13 @@ export default function TransportadoraVeiculosPage() {
     const loadVehicles = useCallback(async () => {
         try {
             setDataLoading(true)
-            const response = await fetch('/api/admin/vehicles-list')
+            const response = await fetch('/api/admin/veiculos-list')
             if (!response.ok) throw new Error('Erro ao carregar veículos')
             const data = await response.json()
-            setVehicles(Array.isArray(data) ? data : data.vehicles || [])
+            setVeiculos(Array.isArray(data) ? data : data.veiculos || [])
         } catch (error) {
             notifyError(error, "Erro ao carregar veículos")
-            setVehicles([])
+            setVeiculos([])
         } finally {
             setDataLoading(false)
         }
@@ -123,7 +123,7 @@ export default function TransportadoraVeiculosPage() {
     }, [])
 
     const filteredVehicles = useMemo(() => {
-        let result = vehicles
+        let result = veiculos
 
         // Filtrar por transportadora
         if (filterTransportadora !== "all") {
@@ -142,13 +142,13 @@ export default function TransportadoraVeiculosPage() {
         }
 
         return result
-    }, [vehicles, debouncedSearchQuery, filterTransportadora])
+    }, [veiculos, debouncedSearchQuery, filterTransportadora])
 
     const handleDelete = async (vehicleId: string, vehiclePlate: string) => {
         if (!confirm(`Excluir veículo "${vehiclePlate}"?`)) return
 
         try {
-            const response = await fetch(`/api/admin/vehicles/delete?id=${vehicleId}`, { method: 'DELETE' })
+            const response = await fetch(`/api/admin/veiculos/delete?id=${vehicleId}`, { method: 'DELETE' })
             if (!response.ok) throw new Error('Erro ao excluir')
             notifySuccess('Veículo excluído')
             loadVehicles()
@@ -206,7 +206,7 @@ export default function TransportadoraVeiculosPage() {
                 </div>
 
                 {/* Grid */}
-                {dataLoading && vehicles.length === 0 ? (
+                {dataLoading && veiculos.length === 0 ? (
                     <SkeletonList count={5} />
                 ) : (
                     <div className="grid gap-3 sm:gap-4 w-full">
@@ -270,7 +270,7 @@ export default function TransportadoraVeiculosPage() {
                                                 <Button
                                                     variant="outline"
                                                     size="sm"
-                                                    onClick={() => { setSelectedVehicle(veiculo); setIsModalOpen(true) }}
+                                                    onClick={() => { setSelectedVeiculo(veiculo); setIsModalOpen(true) }}
                                                     className="min-h-[44px] touch-manipulation"
                                                 >
                                                     <Edit className="h-4 w-4 mr-1" />
@@ -335,8 +335,8 @@ export default function TransportadoraVeiculosPage() {
             </Dialog>
 
             {/* Modal */}
-            <VehicleModal
-                veiculo={selectedVehicle as any}
+            <VeiculoModal
+                veiculo={selectedVeiculo as any}
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 onSave={() => { setIsModalOpen(false); loadVehicles() }}

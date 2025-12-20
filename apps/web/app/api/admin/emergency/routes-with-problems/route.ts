@@ -88,20 +88,20 @@ export async function GET(req: NextRequest) {
 
     // Buscar veículos
     const vehicleIds = Array.from(routeVehicleMap.values())
-    const { data: vehicles } = vehicleIds.length > 0 ? await supabase
-      .from('vehicles')
+    const { data: veiculos } = vehicleIds.length > 0 ? await supabase
+      .from('veiculos')
       .select('id, plate, model, brand')
       .in('id', vehicleIds) : { data: [] }
 
     // Buscar motoristas
     const driverIds = Array.from(routeDriverMap.values())
-    const { data: drivers } = driverIds.length > 0 ? await supabase
+    const { data: motoristas } = driverIds.length > 0 ? await supabase
       .from('users')
       .select('id, name, email')
       .in('id', driverIds) : { data: [] }
 
-    const vehiclesMap = new Map((vehicles || []).map(v => [v.id, v]))
-    const driversMap = new Map((drivers || []).map(d => [d.id, d]))
+    const vehiclesMap = new Map((veiculos || []).map(v => [v.id, v]))
+    const driversMap = new Map((motoristas || []).map(d => [d.id, d]))
 
     // Formatar rotas com informações completas
     const formattedRoutes = routesWithProblemsList.map(route => {

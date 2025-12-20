@@ -91,18 +91,18 @@ async function importHandler(request: NextRequest) {
       .select('id, name')
       .eq('company_id', companyId)
 
-    const { data: vehicles } = await supabase
-      .from('vehicles')
+    const { data: veiculos } = await supabase
+      .from('veiculos')
       .select('id, plate')
 
-    const { data: drivers } = await supabase
+    const { data: motoristas } = await supabase
       .from('users')
       .select('id, email')
       .eq('role', 'motorista')
 
     const routeMap = new Map(routes?.map((r: any) => [r.name, r.id]) || [])
-    const vehicleMap = new Map(vehicles?.map((v: any) => [v.plate, v.id]) || [])
-    const driverMap = new Map(drivers?.map((d: any) => [d.email, d.id]) || [])
+    const vehicleMap = new Map(veiculos?.map((v: any) => [v.plate, v.id]) || [])
+    const driverMap = new Map(motoristas?.map((d: any) => [d.email, d.id]) || [])
 
     // Processar e inserir custos
     const costsToInsert = []

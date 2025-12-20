@@ -22,7 +22,7 @@ describe('POST /api/admin/emergency/dispatch', () => {
     const motorista = createTestUser({ role: 'motorista' })
     
     mockSupabaseClient.setTableData('routes', [route])
-    mockSupabaseClient.setTableData('vehicles', [veiculo])
+    mockSupabaseClient.setTableData('veiculos', [veiculo])
     mockSupabaseClient.setTableData('users', [motorista])
     mockSupabaseClient.setTableData('gf_assistance_requests', [])
 
@@ -84,7 +84,7 @@ describe('POST /api/admin/emergency/dispatch', () => {
     const motorista = createTestUser({ role: 'motorista' })
     
     mockSupabaseClient.setTableData('routes', [route])
-    mockSupabaseClient.setTableData('vehicles', [veiculo])
+    mockSupabaseClient.setTableData('veiculos', [veiculo])
     mockSupabaseClient.setTableData('users', [motorista])
     mockSupabaseClient.setTableData('gf_assistance_requests', [
       {

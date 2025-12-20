@@ -40,7 +40,7 @@ export default function TransportadoraAjudaPage() {
   const faqCategories = {
     all: "Todas",
     fleet: "Frota",
-    drivers: "Motoristas",
+    motoristas: "Motoristas",
     reports: "Relatórios",
     costs: "Custos",
     alerts: "Alertas"
@@ -58,12 +58,12 @@ export default function TransportadoraAjudaPage() {
       answer: "Na página Veículos, você pode visualizar todos os veículos da sua transportadora, ver documentos, manutenções e exportar a lista. Use os filtros para encontrar veículos específicos."
     },
     {
-      category: "drivers",
+      category: "motoristas",
       question: "Como verificar o desempenho dos motoristas?",
       answer: "Acesse a página Motoristas para ver informações detalhadas, rankings de desempenho, estatísticas de viagens, pontualidade e segurança. Os motoristas são ordenados por performance."
     },
     {
-      category: "drivers",
+      category: "motoristas",
       question: "Como gerenciar documentos dos motoristas?",
       answer: "Na página Motoristas, selecione a aba Documentos, escolha um motorista e faça upload dos documentos necessários. O sistema alerta sobre documentos vencendo."
     },

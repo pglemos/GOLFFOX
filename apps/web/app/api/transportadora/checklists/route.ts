@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
             .select(`
                 *,
                 motorista:users!motorista_id(id, name, phone),
-                veiculo:vehicles(id, plate, model),
+                veiculo:veiculos(id, plate, model),
                 trip:trips(id, scheduled_date, route:routes(name))
             `)
             .order('created_at', { ascending: false })

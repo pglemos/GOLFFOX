@@ -215,7 +215,7 @@ export async function DELETE(
       .eq('company_id', companyId)
 
     const { count: vehiclesCount } = await supabaseAdmin
-      .from('vehicles')
+      .from('veiculos')
       .select('id', { head: true, count: 'exact' })
       .eq('company_id', companyId)
 
@@ -250,7 +250,7 @@ export async function DELETE(
         message: 'Empresa arquivada (soft delete) devido a dependências',
         dependencies: {
           users: usersCount || 0,
-          vehicles: vehiclesCount || 0,
+          veiculos: vehiclesCount || 0,
           routes: routesCount || 0
         }
       })

@@ -57,8 +57,8 @@ export const MapFilters = memo(function MapFilters({
 }: MapFiltersProps) {
   const [companies, setCompanies] = useState<any[]>([])
   const [routes, setRoutes] = useState<any[]>([])
-  const [vehicles, setVehicles] = useState<any[]>([])
-  const [drivers, setDrivers] = useState<any[]>([])
+  const [veiculos, setVeiculos] = useState<any[]>([])
+  const [motoristas, setMotoristas] = useState<any[]>([])
   const [showPeriodPicker, setShowPeriodPicker] = useState(false)
   const [searchQuery, setSearchQuery] = useState(filters.search)
   const [isSearching, setIsSearching] = useState(false)
@@ -95,7 +95,7 @@ export const MapFilters = memo(function MapFilters({
 
       // Carregar veículos com filtro de empresa
       let vehiclesQuery = supabase
-        .from('vehicles')
+        .from('veiculos')
         .select('id, plate, company_id')
         .eq('is_active', true)
         .order('plate')
@@ -105,8 +105,8 @@ export const MapFilters = memo(function MapFilters({
         vehiclesQuery = vehiclesQuery.eq('company_id', filters.company)
       }
       
-      const { data: vehiclesData } = await vehiclesQuery
-      if (vehiclesData) setVehicles(vehiclesData)
+      const { data: veiculosData } = await vehiclesQuery
+      if (veiculosData) setVeiculos(veiculosData)
 
       // Carregar motoristas (filtrar por empresa)
       const driversQuery = supabase
@@ -119,8 +119,8 @@ export const MapFilters = memo(function MapFilters({
         driversQuery.eq('company_id', filters.company)
       }
       
-      const { data: driversData } = await driversQuery
-      if (driversData) setDrivers(driversData)
+      const { data: motoristasData } = await driversQuery
+      if (motoristasData) setMotoristas(motoristasData)
     } catch (error) {
       logError('Erro ao carregar opções de filtros', { error }, 'AdminMapFilters')
     }
@@ -233,7 +233,7 @@ export const MapFilters = memo(function MapFilters({
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="__ALL__">Todos</SelectItem>
-            {vehicles.map((v) => (
+            {veiculos.map((v) => (
               <SelectItem key={v.id} value={v.id}>
                 {v.plate}
               </SelectItem>
@@ -251,7 +251,7 @@ export const MapFilters = memo(function MapFilters({
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="__ALL__">Todos</SelectItem>
-            {drivers.map((d) => (
+            {motoristas.map((d) => (
               <SelectItem key={d.id} value={d.id}>
                 {d.name}
               </SelectItem>

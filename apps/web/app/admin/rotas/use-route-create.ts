@@ -28,8 +28,8 @@ export function useRouteCreate(isOpen: boolean) {
     const [employees, setEmployees] = useState<EmployeeLite[]>([])
     const [loadingEmployees, setLoadingEmployees] = useState(false)
     const [searchEmployee, setSearchEmployee] = useState("")
-    const [selectedDriver, setSelectedDriver] = useState<{ id: string; name: string; documents_valid?: boolean } | null>(null)
-    const [selectedVehicle, setSelectedVehicle] = useState<{ id: string; plate: string; capacity: number } | null>(null)
+    const [selectedMotorista, setSelectedMotorista] = useState<{ id: string; name: string; documents_valid?: boolean } | null>(null)
+    const [selectedVeiculo, setSelectedVeiculo] = useState<{ id: string; plate: string; capacity: number } | null>(null)
     const [optimizationResult, setOptimizationResult] = useState<OptimizeRouteResponse | null>(null)
     const [optimizing, setOptimizing] = useState(false)
     const [saving, setSaving] = useState(false)
@@ -69,8 +69,8 @@ export function useRouteCreate(isOpen: boolean) {
             is_active: true,
             selected_employees: [],
         })
-        setSelectedDriver(null)
-        setSelectedVehicle(null)
+        setSelectedMotorista(null)
+        setSelectedVeiculo(null)
         setOptimizationResult(null)
         setWarnings([])
         setNewException("")
@@ -290,8 +290,8 @@ export function useRouteCreate(isOpen: boolean) {
         companies, loadingCompanies,
         employees, loadingEmployees, loadEmployees,
         searchEmployee, setSearchEmployee, filteredEmployees,
-        selectedDriver, setSelectedDriver,
-        selectedVehicle, setSelectedVehicle,
+        selectedMotorista, setSelectedMotorista,
+        selectedVeiculo, setSelectedVeiculo,
         optimizationResult, setOptimizationResult,
         optimizing, setOptimizing,
         saving, setSaving,

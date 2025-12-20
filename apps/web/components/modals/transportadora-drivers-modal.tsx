@@ -20,7 +20,7 @@ interface TransportadoraDriversModalProps {
 }
 
 export function TransportadoraDriversModal({ transportadora, isOpen, onClose }: TransportadoraDriversModalProps) {
-  const [drivers, setDrivers] = useState<any[]>([])
+  const [motoristas, setMotoristas] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
   const [activeTab, setActiveTab] = useState("list")
   const { fetchCep, loading: loadingCep } = useCep()
@@ -47,18 +47,18 @@ export function TransportadoraDriversModal({ transportadora, isOpen, onClose }: 
 
   useEffect(() => {
     if (isOpen && transportadora) {
-      loadDrivers()
+      loadMotoristas()
       setActiveTab("list")
     }
   }, [isOpen, transportadora])
 
-  const loadDrivers = async () => {
+  const loadMotoristas = async () => {
     try {
       setLoading(true)
-      const response = await fetch(`/api/admin/transportadora/${transportadora.id}/drivers`)
+      const response = await fetch(`/api/admin/transportadora/${transportadora.id}/motoristas`)
       if (response.ok) {
         const result = await response.json()
-        setDrivers(result.drivers || [])
+        setMotoristas(result.motoristas || [])
       } else {
         throw new Error('Erro ao carregar motoristas')
       }
@@ -116,7 +116,7 @@ export function TransportadoraDriversModal({ transportadora, isOpen, onClose }: 
         throw new Error("Endereço completo é obrigatório")
       }
 
-      const response = await fetch(`/api/admin/transportadora/${transportadora.id}/drivers`, {
+      const response = await fetch(`/api/admin/transportadora/${transportadora.id}/motoristas`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -148,7 +148,7 @@ export function TransportadoraDriversModal({ transportadora, isOpen, onClose }: 
     setLoading(true)
 
     try {
-      const response = await fetch(`/api/admin/transportadora/${transportadora.id}/drivers/${editingDriver.id}`, {
+      const response = await fetch(`/api/admin/transportadora/${transportadora.id}/motoristas/${editingDriver.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
@@ -178,7 +178,7 @@ export function TransportadoraDriversModal({ transportadora, isOpen, onClose }: 
     setLoading(true)
 
     try {
-      const response = await fetch(`/api/admin/transportadora/${transportadora.id}/drivers/${driverId}`, {
+      const response = await fetch(`/api/admin/transportadora/${transportadora.id}/motoristas/${driverId}`, {
         method: 'DELETE'
       })
 
@@ -228,7 +228,7 @@ export function TransportadoraDriversModal({ transportadora, isOpen, onClose }: 
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 overflow-hidden flex flex-col">
           <TabsList className="w-full grid grid-cols-2 gap-1 sm:gap-2">
-            <TabsTrigger value="list" className="text-xs sm:text-sm min-h-[44px]">Lista ({drivers.length})</TabsTrigger>
+            <TabsTrigger value="list" className="text-xs sm:text-sm min-h-[44px]">Lista ({motoristas.length})</TabsTrigger>
             <TabsTrigger value="form" className="text-xs sm:text-sm min-h-[44px]">
               {editingDriver ? 'Editar' : 'Novo Motorista'}
             </TabsTrigger>
@@ -236,7 +236,7 @@ export function TransportadoraDriversModal({ transportadora, isOpen, onClose }: 
 
           <TabsContent value="list" className="flex-1 overflow-y-auto mt-4 space-y-4">
             <div className="flex justify-between items-center">
-              <h3 className="font-semibold">Total de Motoristas: {drivers.length}</h3>
+              <h3 className="font-semibold">Total de Motoristas: {motoristas.length}</h3>
               <Button size="sm" onClick={() => {
                 resetForm()
                 setActiveTab("form")
@@ -251,7 +251,7 @@ export function TransportadoraDriversModal({ transportadora, isOpen, onClose }: 
               <div className="text-center py-8 text-muted-foreground">Carregando motoristas...</div>
             )}
 
-            {!loading && drivers.length === 0 && (
+            {!loading && motoristas.length === 0 && (
               <Card className="p-8 text-center">
                 <Users className="h-12 w-12 text-ink-light mx-auto mb-4" />
                 <p className="text-muted-foreground mb-4">Nenhum motorista associado a esta transportadora</p>
@@ -262,9 +262,9 @@ export function TransportadoraDriversModal({ transportadora, isOpen, onClose }: 
               </Card>
             )}
 
-            {!loading && drivers.length > 0 && (
+            {!loading && motoristas.length > 0 && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {drivers.map((motorista) => (
+                {motoristas.map((motorista) => (
                   <Card key={motorista.id} className="p-4 hover:shadow-md transition-shadow">
                     <div className="space-y-3">
                       {/* Cabeçalho */}

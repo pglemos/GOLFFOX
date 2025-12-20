@@ -46,7 +46,7 @@ export default function TransportadoraRelatoriosPage() {
       icon: BarChart3
     },
     { 
-      id: 'drivers',
+      id: 'motoristas',
       title: 'Performance de Motoristas', 
       description: 'Análise de desempenho dos motoristas',
       icon: BarChart3
@@ -131,7 +131,7 @@ export default function TransportadoraRelatoriosPage() {
             summary = fleetData.summary
           }
           break
-        case 'drivers':
+        case 'motoristas':
           apiUrl = `/api/transportadora/reports/motorista-performance?transportadora_id=${transportadoraId}&start_date=${dateStart}&end_date=${dateEnd}`
           const driversRes = await fetch(apiUrl)
           const driversData = await driversRes.json()
@@ -180,7 +180,7 @@ export default function TransportadoraRelatoriosPage() {
           rows = [
             ...(costsVehicleData || []).map((c: any) => [
               'Veículo',
-              c.vehicles?.plate || 'N/A',
+              c.veiculos?.plate || 'N/A',
               c.cost_category || 'N/A',
               new Date(c.cost_date || c.created_at).toLocaleDateString('pt-BR'),
               parseFloat(c.amount_brl?.toString() || '0').toFixed(2),
@@ -210,15 +210,15 @@ export default function TransportadoraRelatoriosPage() {
             .from('vehicle_maintenances')
             .select(`
               *,
-              vehicles!inner(transportadora_id, plate)
+              veiculos!inner(transportadora_id, plate)
             `)
-            .eq('vehicles.transportadora_id', transportadoraId)
+            .eq('veiculos.transportadora_id', transportadoraId)
             .gte('scheduled_date', dateStart)
             .lte('scheduled_date', dateEnd)
           
           headers = ['Veículo', 'Tipo', 'Status', 'Data Agendada', 'Data Concluída', 'Custo Total (R$)', 'Oficina', 'Descrição']
           rows = (maintenancesData || []).map((m: any) => [
-            m.vehicles?.plate || 'N/A',
+            m.veiculos?.plate || 'N/A',
             m.maintenance_type || 'N/A',
             m.status === 'completed' ? 'Concluída' : m.status === 'in_progress' ? 'Em Andamento' : m.status === 'scheduled' ? 'Agendada' : 'Cancelada',
             m.scheduled_date ? new Date(m.scheduled_date).toLocaleDateString('pt-BR') : 'N/A',

@@ -29,7 +29,7 @@ describe('GET /api/admin/emergency/routes-with-problems', () => {
     ])
     mockSupabaseClient.setTableData('gf_assistance_requests', [])
     mockSupabaseClient.setTableData('trips', [])
-    mockSupabaseClient.setTableData('vehicles', [])
+    mockSupabaseClient.setTableData('veiculos', [])
     mockSupabaseClient.setTableData('users', [])
 
     const req = createAdminRequest({
@@ -68,7 +68,7 @@ describe('GET /api/admin/emergency/routes-with-problems', () => {
         status: 'inProgress',
       },
     ])
-    mockSupabaseClient.setTableData('vehicles', [veiculo])
+    mockSupabaseClient.setTableData('veiculos', [veiculo])
     mockSupabaseClient.setTableData('users', [motorista])
 
     const req = createAdminRequest({
@@ -101,7 +101,7 @@ describe('GET /api/admin/emergency/routes-with-problems', () => {
     ])
     mockSupabaseClient.setTableData('gf_assistance_requests', [])
     mockSupabaseClient.setTableData('trips', [])
-    mockSupabaseClient.setTableData('vehicles', [])
+    mockSupabaseClient.setTableData('veiculos', [])
     mockSupabaseClient.setTableData('users', [])
 
     const req = createAdminRequest({
@@ -130,7 +130,7 @@ describe('GET /api/admin/emergency/routes-with-problems', () => {
       },
     ])
     mockSupabaseClient.setTableData('trips', [])
-    mockSupabaseClient.setTableData('vehicles', [])
+    mockSupabaseClient.setTableData('veiculos', [])
     mockSupabaseClient.setTableData('users', [])
 
     const req = createAdminRequest({
@@ -151,7 +151,7 @@ describe('GET /api/admin/emergency/routes-with-problems', () => {
     mockSupabaseClient.setTableData('gf_incidents', [])
     mockSupabaseClient.setTableData('gf_assistance_requests', [])
     mockSupabaseClient.setTableData('trips', [])
-    mockSupabaseClient.setTableData('vehicles', [])
+    mockSupabaseClient.setTableData('veiculos', [])
     mockSupabaseClient.setTableData('users', [])
 
     const req = createAdminRequest({

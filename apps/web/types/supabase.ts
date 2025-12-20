@@ -672,7 +672,7 @@ export type Database = {
             foreignKeyName: "gf_alerts_vehicle_id_fkey"
             columns: ["vehicle_id"]
             isOneToOne: false
-            referencedRelation: "vehicles"
+            referencedRelation: "veiculos"
             referencedColumns: ["id"]
           },
         ]
@@ -1125,7 +1125,7 @@ export type Database = {
             foreignKeyName: "gf_assistance_requests_dispatched_vehicle_id_fkey"
             columns: ["dispatched_vehicle_id"]
             isOneToOne: false
-            referencedRelation: "vehicles"
+            referencedRelation: "veiculos"
             referencedColumns: ["id"]
           },
           {
@@ -1230,7 +1230,7 @@ export type Database = {
             foreignKeyName: "gf_assistance_requests_vehicle_id_fkey"
             columns: ["vehicle_id"]
             isOneToOne: false
-            referencedRelation: "vehicles"
+            referencedRelation: "veiculos"
             referencedColumns: ["id"]
           },
         ]
@@ -1807,7 +1807,7 @@ export type Database = {
             foreignKeyName: "gf_costs_vehicle_id_fkey"
             columns: ["vehicle_id"]
             isOneToOne: false
-            referencedRelation: "vehicles"
+            referencedRelation: "veiculos"
             referencedColumns: ["id"]
           },
         ]
@@ -2286,7 +2286,7 @@ export type Database = {
             foreignKeyName: "gf_incidents_vehicle_id_fkey"
             columns: ["vehicle_id"]
             isOneToOne: false
-            referencedRelation: "vehicles"
+            referencedRelation: "veiculos"
             referencedColumns: ["id"]
           },
         ]
@@ -3661,7 +3661,7 @@ export type Database = {
             foreignKeyName: "gf_vehicle_checklists_vehicle_id_fkey"
             columns: ["vehicle_id"]
             isOneToOne: false
-            referencedRelation: "vehicles"
+            referencedRelation: "veiculos"
             referencedColumns: ["id"]
           },
         ]
@@ -3787,7 +3787,7 @@ export type Database = {
             foreignKeyName: "gf_vehicle_costs_vehicle_id_fkey"
             columns: ["vehicle_id"]
             isOneToOne: false
-            referencedRelation: "vehicles"
+            referencedRelation: "veiculos"
             referencedColumns: ["id"]
           },
         ]
@@ -3876,7 +3876,7 @@ export type Database = {
             foreignKeyName: "gf_vehicle_maintenance_vehicle_id_fkey"
             columns: ["vehicle_id"]
             isOneToOne: false
-            referencedRelation: "vehicles"
+            referencedRelation: "veiculos"
             referencedColumns: ["id"]
           },
         ]
@@ -4537,7 +4537,7 @@ export type Database = {
             foreignKeyName: "trips_vehicle_id_fkey"
             columns: ["vehicle_id"]
             isOneToOne: false
-            referencedRelation: "vehicles"
+            referencedRelation: "veiculos"
             referencedColumns: ["id"]
           },
         ]
@@ -4739,7 +4739,7 @@ export type Database = {
             foreignKeyName: "vehicle_costs_vehicle_id_fkey"
             columns: ["vehicle_id"]
             isOneToOne: false
-            referencedRelation: "vehicles"
+            referencedRelation: "veiculos"
             referencedColumns: ["id"]
           },
         ]
@@ -4808,7 +4808,7 @@ export type Database = {
             foreignKeyName: "vehicle_documents_vehicle_id_fkey"
             columns: ["vehicle_id"]
             isOneToOne: false
-            referencedRelation: "vehicles"
+            referencedRelation: "veiculos"
             referencedColumns: ["id"]
           },
         ]
@@ -4883,12 +4883,12 @@ export type Database = {
             foreignKeyName: "vehicle_maintenances_vehicle_id_fkey"
             columns: ["vehicle_id"]
             isOneToOne: false
-            referencedRelation: "vehicles"
+            referencedRelation: "veiculos"
             referencedColumns: ["id"]
           },
         ]
       }
-      vehicles: {
+      veiculos: {
         Row: {
           capacity: number | null
           carrier_id: string | null
@@ -5301,7 +5301,7 @@ export type Database = {
             foreignKeyName: "trips_vehicle_id_fkey"
             columns: ["vehicle_id"]
             isOneToOne: false
-            referencedRelation: "vehicles"
+            referencedRelation: "veiculos"
             referencedColumns: ["id"]
           },
         ]
@@ -5601,7 +5601,7 @@ export type Database = {
             foreignKeyName: "gf_costs_vehicle_id_fkey"
             columns: ["vehicle_id"]
             isOneToOne: false
-            referencedRelation: "vehicles"
+            referencedRelation: "veiculos"
             referencedColumns: ["id"]
           },
         ]
@@ -5839,7 +5839,7 @@ export type Database = {
             foreignKeyName: "gf_costs_vehicle_id_fkey"
             columns: ["vehicle_id"]
             isOneToOne: false
-            referencedRelation: "vehicles"
+            referencedRelation: "veiculos"
             referencedColumns: ["id"]
           },
         ]

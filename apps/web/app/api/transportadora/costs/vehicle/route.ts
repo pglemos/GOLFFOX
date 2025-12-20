@@ -54,7 +54,7 @@ export async function GET(req: NextRequest) {
       .from('vehicle_costs')
       .select(`
         *,
-        vehicles(plate, model, transportadora_id)
+        veiculos(plate, model, transportadora_id)
       `)
 
     // Filtrar apenas veículos da transportadora do usuário
@@ -77,7 +77,7 @@ export async function GET(req: NextRequest) {
     // Filtrar apenas veículos da transportadora do usuário após buscar
     const filteredData = (data || []).filter((cost: any) => {
       if (!userData?.transportadora_id) return false
-      const veiculo = cost.vehicles
+      const veiculo = cost.veiculos
       if (!veiculo) return false
       return veiculo.transportadora_id === userData.transportadora_id
     })
@@ -106,7 +106,7 @@ export async function POST(req: NextRequest) {
 
     // Verificar se o veículo pertence à transportadora do usuário
     const { data: veiculo } = await supabaseServiceRole
-      .from('vehicles')
+      .from('veiculos')
       .select('transportadora_id')
       .eq('id', validated.veiculo_id)
       .single()

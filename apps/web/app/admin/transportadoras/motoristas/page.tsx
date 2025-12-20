@@ -31,8 +31,8 @@ import {
 import { Label } from "@/components/ui/label"
 
 // Lazy load modal
-const DriverModal = dynamic(
-    () => import("@/components/modals/driver-modal").then(m => ({ default: m.DriverModal })),
+const MotoristaModal = dynamic(
+    () => import("@/components/modals/motorista-modal").then(m => ({ default: m.MotoristaModal })),
     { ssr: false, loading: () => null }
 )
 
@@ -55,10 +55,10 @@ interface Transportadora {
 
 export default function TransportadoraMotoristasPage() {
     const { user, loading: authLoading } = useAuthFast()
-    const [drivers, setDrivers] = useState<motorista[]>([])
+    const [motoristas, setMotoristas] = useState<motorista[]>([])
     const [transportadoras, setTransportadoras] = useState<Transportadora[]>([])
     const [dataLoading, setDataLoading] = useState(true)
-    const [selectedDriver, setSelectedDriver] = useState<motorista | null>(null)
+    const [selectedMotorista, setSelectedMotorista] = useState<motorista | null>(null)
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [isSelectCarrierOpen, setIsSelectCarrierOpen] = useState(false)
     const [newDriverCarrierId, setNewDriverCarrierId] = useState<string>("")
@@ -75,7 +75,7 @@ export default function TransportadoraMotoristasPage() {
     // Após selecionar transportadora, abre modal de cadastro
     const handleCarrierSelected = () => {
         if (!newDriverCarrierId) return
-        setSelectedDriver({
+        setSelectedMotorista({
             id: "",
             name: "",
             email: "",
@@ -97,13 +97,13 @@ export default function TransportadoraMotoristasPage() {
     const loadDrivers = useCallback(async () => {
         try {
             setDataLoading(true)
-            const response = await fetch('/api/admin/drivers-list')
+            const response = await fetch('/api/admin/motoristas-list')
             if (!response.ok) throw new Error('Erro ao carregar motoristas')
             const data = await response.json()
-            setDrivers(Array.isArray(data) ? data : data.drivers || [])
+            setMotoristas(Array.isArray(data) ? data : data.motoristas || [])
         } catch (error) {
             notifyError(error, "Erro ao carregar motoristas")
-            setDrivers([])
+            setMotoristas([])
         } finally {
             setDataLoading(false)
         }
@@ -122,7 +122,7 @@ export default function TransportadoraMotoristasPage() {
     }, [])
 
     const filteredDrivers = useMemo(() => {
-        let result = drivers
+        let result = motoristas
 
         // Filtrar por transportadora
         if (filterTransportadora !== "all") {
@@ -141,13 +141,13 @@ export default function TransportadoraMotoristasPage() {
         }
 
         return result
-    }, [drivers, debouncedSearchQuery, filterTransportadora])
+    }, [motoristas, debouncedSearchQuery, filterTransportadora])
 
     const handleDelete = async (driverId: string, driverName: string) => {
         if (!confirm(`Excluir motorista "${driverName}"?`)) return
 
         try {
-            const response = await fetch(`/api/admin/drivers/delete?id=${driverId}`, { method: 'DELETE' })
+            const response = await fetch(`/api/admin/motoristas/delete?id=${driverId}`, { method: 'DELETE' })
             if (!response.ok) throw new Error('Erro ao excluir')
             notifySuccess('Motorista excluído')
             loadDrivers()
@@ -205,7 +205,7 @@ export default function TransportadoraMotoristasPage() {
                 </div>
 
                 {/* Grid */}
-                {dataLoading && drivers.length === 0 ? (
+                {dataLoading && motoristas.length === 0 ? (
                     <SkeletonList count={5} />
                 ) : (
                     <div className="grid gap-3 sm:gap-4 w-full">
@@ -258,7 +258,7 @@ export default function TransportadoraMotoristasPage() {
                                                 <Button
                                                     variant="outline"
                                                     size="sm"
-                                                    onClick={() => { setSelectedDriver(motorista); setIsModalOpen(true) }}
+                                                    onClick={() => { setSelectedMotorista(motorista); setIsModalOpen(true) }}
                                                     className="min-h-[44px] touch-manipulation"
                                                 >
                                                     <Edit className="h-4 w-4 mr-1" />
@@ -323,8 +323,8 @@ export default function TransportadoraMotoristasPage() {
             </Dialog>
 
             {/* Modal de motorista */}
-            <DriverModal
-                motorista={selectedDriver}
+            <MotoristaModal
+                motorista={selectedMotorista}
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 onSave={() => { setIsModalOpen(false); loadDrivers() }}

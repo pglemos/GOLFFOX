@@ -20,7 +20,7 @@ interface MotoristaSLA {
 
 export default function SLAMotoristaPage() {
     const { user } = useAuth()
-    const [drivers, setDrivers] = useState<MotoristaSLA[]>([])
+    const [motoristas, setMotoristas] = useState<MotoristaSLA[]>([])
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
@@ -32,12 +32,12 @@ export default function SLAMotoristaPage() {
             { id: '4', name: 'Ana Oliveira', on_time_rate: 92, incidents: 1, trips_completed: 40, avg_delay_minutes: 3.1, sla_status: 'green' },
             { id: '5', name: 'Carlos Lima', on_time_rate: 78, incidents: 4, trips_completed: 35, avg_delay_minutes: 8.7, sla_status: 'red' },
         ]
-        setDrivers(mockDrivers)
+        setMotoristas(mockDrivers)
         setLoading(false)
     }, [])
 
-    const avgOnTimeRate = drivers.length > 0
-        ? drivers.reduce((sum, d) => sum + d.on_time_rate, 0) / drivers.length
+    const avgOnTimeRate = motoristas.length > 0
+        ? motoristas.reduce((sum, d) => sum + d.on_time_rate, 0) / motoristas.length
         : 0
 
     const getStatusBadge = (status: 'green' | 'yellow' | 'red') => {
@@ -80,7 +80,7 @@ export default function SLAMotoristaPage() {
                                 <AlertTriangle className="h-8 w-8 text-warning" />
                                 <div>
                                     <p className="text-sm text-muted-foreground">Motoristas em Alerta</p>
-                                    <p className="text-2xl font-bold">{drivers.filter(d => d.sla_status !== 'green').length}</p>
+                                    <p className="text-2xl font-bold">{motoristas.filter(d => d.sla_status !== 'green').length}</p>
                                 </div>
                             </div>
                         </CardContent>
@@ -91,7 +91,7 @@ export default function SLAMotoristaPage() {
                                 <Users className="h-8 w-8 text-info" />
                                 <div>
                                     <p className="text-sm text-muted-foreground">Total de Motoristas</p>
-                                    <p className="text-2xl font-bold">{drivers.length}</p>
+                                    <p className="text-2xl font-bold">{motoristas.length}</p>
                                 </div>
                             </div>
                         </CardContent>
@@ -100,7 +100,7 @@ export default function SLAMotoristaPage() {
 
                 {/* motorista List */}
                 <div className="space-y-3">
-                    {drivers.map(motorista => (
+                    {motoristas.map(motorista => (
                         <Card key={motorista.id}>
                             <CardContent className="p-4">
                                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">

@@ -4,7 +4,7 @@ import { requireAuth } from '@/lib/api-auth'
 import { logError } from '@/lib/logger'
 import { invalidateEntityCache } from '@/lib/next-cache'
 
-// PUT /api/admin/transportadoras/[transportadoraId]/vehicles/[vehicleId]
+// PUT /api/admin/transportadoras/[transportadoraId]/veiculos/[vehicleId]
 export async function PUT(
   request: NextRequest,
   context: { params: Promise<{ transportadoraId?: string; carrierId?: string; vehicleId: string }> }
@@ -48,7 +48,7 @@ export async function PUT(
     }
 
     const { data: veiculo, error } = await supabase
-      .from('vehicles')
+      .from('veiculos')
       .update({
         plate,
         prefix: prefix || null,
@@ -87,7 +87,7 @@ export async function PUT(
   }
 }
 
-// DELETE /api/admin/transportadoras/[transportadoraId]/vehicles/[vehicleId]
+// DELETE /api/admin/transportadoras/[transportadoraId]/veiculos/[vehicleId]
 export async function DELETE(
   request: NextRequest,
   context: { params: Promise<{ transportadoraId?: string; carrierId?: string; vehicleId: string }> }
@@ -110,7 +110,7 @@ export async function DELETE(
     }
 
     const { error } = await supabase
-      .from('vehicles')
+      .from('veiculos')
       .delete()
       .eq('id', vehicleId)
       .eq('transportadora_id', transportadoraId)

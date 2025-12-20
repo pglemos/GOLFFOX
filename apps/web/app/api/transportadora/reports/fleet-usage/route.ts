@@ -21,14 +21,14 @@ export async function GET(req: NextRequest) {
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
     // Buscar veículos da transportadora
-    const { data: vehicles, error: vehiclesError } = await supabase
-      .from('vehicles')
+    const { data: veiculos, error: vehiclesError } = await supabase
+      .from('veiculos')
       .select('id, plate, model, is_active, transportadora_id')
       .eq('transportadora_id', transportadoraId)
 
     if (vehiclesError) throw vehiclesError
 
-    const vehicleIds = vehicles?.map(v => v.id) || []
+    const vehicleIds = veiculos?.map(v => v.id) || []
 
     // Buscar dados de utilização (trips)
     let tripsQuery = supabase
@@ -62,7 +62,7 @@ export async function GET(req: NextRequest) {
     if (positionsError) throw positionsError
 
     // Calcular estatísticas
-    const vehicleUsage = vehicles?.map(veiculo => {
+    const vehicleUsage = veiculos?.map(veiculo => {
       const vehicleTrips = trips?.filter(t => {
         // Verificar se o veículo está associado à rota da trip
         return true // Simplificado - em produção, verificar associação veículo-rota
@@ -91,8 +91,8 @@ export async function GET(req: NextRequest) {
       success: true,
       data: vehicleUsage,
       summary: {
-        total_vehicles: vehicles?.length || 0,
-        active_vehicles: vehicles?.filter(v => v.is_active).length || 0,
+        total_vehicles: veiculos?.length || 0,
+        active_vehicles: veiculos?.filter(v => v.is_active).length || 0,
         total_trips: trips?.length || 0,
         average_utilization: vehicleUsage.reduce((sum, v) => sum + v.utilization_rate, 0) / (vehicleUsage.length || 1)
       }

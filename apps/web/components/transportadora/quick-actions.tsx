@@ -34,13 +34,13 @@ export function QuickActions({ className }: QuickActionsProps) {
   
   const defaultActions: QuickAction[] = [
     {
-      id: "vehicles",
+      id: "veiculos",
       label: t('transportadora', 'quick_actions_vehicles'),
       icon: Truck,
       href: "/transportadora/veiculos"
     },
     {
-      id: "drivers",
+      id: "motoristas",
       label: t('transportadora', 'quick_actions_drivers'),
       icon: Users,
       href: "/transportadora/motoristas"

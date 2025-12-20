@@ -69,7 +69,7 @@ describe('POST /api/transportadora/storage/signed-url', () => {
     const veiculo = createTestVehicle(transportadora.id)
     
     mockSupabaseClient.setTableData('users', [user])
-    mockSupabaseClient.setTableData('vehicles', [veiculo])
+    mockSupabaseClient.setTableData('veiculos', [veiculo])
     mockSupabaseClient.storage = {
       from: jest.fn(() => ({
         createSignedUrl: jest.fn().mockResolvedValue({

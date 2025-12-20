@@ -2,9 +2,9 @@ import { useQuery } from "@tanstack/react-query"
 
 export function useAdminVehicles() {
   return useQuery({
-    queryKey: ['admin-vehicles'],
+    queryKey: ['admin-veiculos'],
     queryFn: async () => {
-      const response = await fetch('/api/admin/vehicles-list', { 
+      const response = await fetch('/api/admin/veiculos-list', { 
         headers: { 'x-test-mode': 'true' } 
       })
       if (!response.ok) {
@@ -14,8 +14,8 @@ export function useAdminVehicles() {
       if (Array.isArray(result)) {
         return result
       } else if (result && typeof result === 'object') {
-        if (result.success && Array.isArray(result.vehicles)) {
-          return result.vehicles
+        if (result.success && Array.isArray(result.veiculos)) {
+          return result.veiculos
         } else if (Array.isArray(result.data)) {
           return result.data
         }

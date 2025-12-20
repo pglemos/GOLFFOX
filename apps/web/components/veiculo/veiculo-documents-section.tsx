@@ -56,7 +56,7 @@ export function VeiculoDocumentsSection({
 
         setLoading(true)
         try {
-            const response = await fetch(`/api/admin/vehicles/${vehicleId}/documents`)
+            const response = await fetch(`/api/admin/veiculos/${vehicleId}/documents`)
             if (response.ok) {
                 const data = await response.json()
                 setDocuments(data || [])
@@ -90,7 +90,7 @@ export function VeiculoDocumentsSection({
             const result = await upload(fileToUpload, vehicleId, selectedType)
             if (!result) return
 
-            const response = await fetch(`/api/admin/vehicles/${vehicleId}/documents`, {
+            const response = await fetch(`/api/admin/veiculos/${vehicleId}/documents`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -124,7 +124,7 @@ export function VeiculoDocumentsSection({
 
         try {
             const response = await fetch(
-                `/api/admin/vehicles/${vehicleId}/documents?documentId=${documentId}`,
+                `/api/admin/veiculos/${vehicleId}/documents?documentId=${documentId}`,
                 { method: "DELETE" }
             )
 

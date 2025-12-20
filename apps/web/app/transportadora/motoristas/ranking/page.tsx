@@ -43,10 +43,10 @@ interface MotoristaMetrics {
 
 export default function MotoristasPage() {
   const { user } = useAuth()
-  const [drivers, setDrivers] = useState<MotoristaMetrics[]>([])
+  const [motoristas, setMotoristas] = useState<MotoristaMetrics[]>([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
-  const [selectedDriver, setSelectedDriver] = useState<string | null>(null)
+  const [selectedMotorista, setSelectedMotorista] = useState<string | null>(null)
 
   // Métricas gerais
   const [metrics, setMetrics] = useState({
@@ -65,8 +65,8 @@ export default function MotoristasPage() {
       setLoading(true)
       const response = await fetch('/api/transportadora/motoristas')
       const result = await response.json()
-      const apiDrivers: MotoristaMetrics[] = result.drivers
-      setDrivers(apiDrivers)
+      const apiDrivers: MotoristaMetrics[] = result.motoristas
+      setMotoristas(apiDrivers)
 
       // Calcular viagens do dia
       const today = new Date()
@@ -104,7 +104,7 @@ export default function MotoristasPage() {
     }
   }
 
-  const filteredDrivers = drivers.filter((motorista) =>
+  const filteredDrivers = motoristas.filter((motorista) =>
     motorista.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     motorista.email.toLowerCase().includes(searchTerm.toLowerCase())
   )
@@ -234,8 +234,8 @@ export default function MotoristasPage() {
                 >
                   <Card
                     key={motorista.id}
-                    className={`p-4 transition-all cursor-pointer hover:shadow-xl bg-card/50 backdrop-blur-sm border-border hover:border-text-brand/30 ${selectedDriver === motorista.id ? 'ring-2 ring-brand' : ''}`}
-                    onClick={() => setSelectedDriver(selectedDriver === motorista.id ? null : motorista.id)}
+                    className={`p-4 transition-all cursor-pointer hover:shadow-xl bg-card/50 backdrop-blur-sm border-border hover:border-text-brand/30 ${selectedMotorista === motorista.id ? 'ring-2 ring-brand' : ''}`}
+                    onClick={() => setSelectedMotorista(selectedMotorista === motorista.id ? null : motorista.id)}
                   >
                     <div className="flex flex-col lg:flex-row gap-4">
                       {/* Rank Badge e Info */}
@@ -309,7 +309,7 @@ export default function MotoristasPage() {
                       </div>
                     </div>
                     {/* Expanded Details */}
-                    {selectedDriver === motorista.id && (
+                    {selectedMotorista === motorista.id && (
                       <div className="mt-4 pt-4 border-t grid grid-cols-2 sm:grid-cols-4 gap-4">
                         <div className="space-y-1">
                           <p className="text-xs text-ink-muted">Pontualidade</p>

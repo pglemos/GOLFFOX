@@ -175,7 +175,7 @@ export async function POST(request: NextRequest) {
         let companyIdForRoute = null
         if (vehicleId) {
           const { data: veiculo } = await supabaseAdmin
-            .from('vehicles')
+            .from('veiculos')
             .select('company_id')
             .eq('id', vehicleId)
             .single()
@@ -234,7 +234,7 @@ export async function POST(request: NextRequest) {
     // Verificar se veiculo existe e está ativo (se fornecido)
     if (vehicleId) {
       const { data: veiculo, error: vehicleError } = await supabaseAdmin
-        .from('vehicles')
+        .from('veiculos')
         .select('id, is_active')
         .eq('id', vehicleId)
         .single()

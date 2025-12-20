@@ -532,7 +532,7 @@ export async function POST(request: NextRequest) {
           details: {
             company_name: companyName,
             operator_email: operatorEmail,
-            operator_id: userId,
+            operador_id: userId,
           }
         })
         

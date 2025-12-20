@@ -77,7 +77,7 @@ const STATUS_CONFIG = {
 export default function ManutencaoPage() {
     const { user, loading: authLoading } = useAuthFast()
     const [maintenances, setMaintenances] = useState<Maintenance[]>([])
-    const [vehicles, setVehicles] = useState<veiculo[]>([])
+    const [veiculos, setVeiculos] = useState<veiculo[]>([])
     const [dataLoading, setDataLoading] = useState(true)
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [selectedMaintenance, setSelectedMaintenance] = useState<Maintenance | null>(null)
@@ -131,7 +131,7 @@ export default function ManutencaoPage() {
                 .from('vehicle_maintenances')
                 .select(`
           *,
-          veiculo:vehicles(plate, model)
+          veiculo:veiculos(plate, model)
         `)
                 .order('scheduled_date', { ascending: false })
 
@@ -148,13 +148,13 @@ export default function ManutencaoPage() {
     const loadVehicles = useCallback(async () => {
         try {
             const { data } = await (supabase as any)
-                .from('vehicles')
+                .from('veiculos')
                 .select('id, plate, model')
                 .eq('is_active', true)
                 .order('plate')
-            setVehicles(data || [])
+            setVeiculos(data || [])
         } catch {
-            setVehicles([])
+            setVeiculos([])
         }
     }, [])
 
@@ -294,7 +294,7 @@ export default function ManutencaoPage() {
                         </SelectTrigger>
                         <SelectContent>
                             <SelectItem value="all">Todos Veículos</SelectItem>
-                            {vehicles.map(v => (
+                            {veiculos.map(v => (
                                 <SelectItem key={v.id} value={v.id}>{v.plate} - {v.model}</SelectItem>
                             ))}
                         </SelectContent>
@@ -473,7 +473,7 @@ export default function ManutencaoPage() {
                                         <SelectValue placeholder="Selecione o veículo" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        {vehicles.map(v => (
+                                        {veiculos.map(v => (
                                             <SelectItem key={v.id} value={v.id}>{v.plate} - {v.model}</SelectItem>
                                         ))}
                                     </SelectContent>

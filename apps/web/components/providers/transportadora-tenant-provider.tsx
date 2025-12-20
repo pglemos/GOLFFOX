@@ -42,16 +42,16 @@ export function TransportadoraTenantProvider({ children }: { children: ReactNode
 
                 if (foundId) {
                     // Buscar dados da transportadora
-                    const { data: carrierData } = await (supabase as any)
+                    const { data: transportadoraData } = await (supabase as any)
                         .from('carriers')
                         .select('id, name, logo_url')
                         .eq('id', foundId)
                         .single()
 
-                    if (carrierData) {
-                        setTransportadoraId(carrierData.id)
-                        setTransportadoraName(carrierData.name || 'Transportadora')
-                        setLogoUrl(carrierData.logo_url)
+                    if (transportadoraData) {
+                        setTransportadoraId(transportadoraData.id)
+                        setTransportadoraName(transportadoraData.name || 'Transportadora')
+                        setLogoUrl(transportadoraData.logo_url)
                     }
                 } else {
                     // Fallback para dev/test se necessário

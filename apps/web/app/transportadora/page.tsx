@@ -144,7 +144,7 @@ export default function TransportadoraDashboard() {
   }, [router])
 
   const [fleet, setFleet] = useState<any[]>([])
-  const [drivers, setDrivers] = useState<any[]>([])
+  const [motoristas, setMotoristas] = useState<any[]>([])
   const [period, setPeriod] = useState<"today" | "week" | "month" | "custom">("month")
   const [kpis, setKpis] = useState({
     totalFleet: 0,
@@ -280,8 +280,8 @@ export default function TransportadoraDashboard() {
       const transportadoraId = transportadoraData.transportadora_id
 
       // Carregar veículos
-      const { data: vehicles } = await supabase
-        .from('vehicles')
+      const { data: veiculos } = await supabase
+        .from('veiculos')
         .select('*')
         .eq('transportadora_id', transportadoraId)
 
@@ -293,7 +293,7 @@ export default function TransportadoraDashboard() {
       })
 
       // Mapear veículos com posições do RPC
-      const fleetData = (vehicles || []).map((veiculo: any) => {
+      const fleetData = (veiculos || []).map((veiculo: any) => {
         const bus = (mapData as any)?.buses?.find((b: any) => b.veiculo_id === veiculo.id)
         const garage = (mapData as any)?.garages?.find((g: any) => g.veiculo_id === veiculo.id)
 
@@ -373,7 +373,7 @@ export default function TransportadoraDashboard() {
         })
       }
 
-      setDrivers(driversWithStats)
+      setMotoristas(driversWithStats)
 
       // Buscar alertas críticos de vencimento
       const { data: alerts } = await supabase
@@ -888,12 +888,12 @@ export default function TransportadoraDashboard() {
             </CardHeader>
             <CardContent className="pt-0 px-3 sm:px-6">
               <div className="space-y-2 max-h-96 overflow-y-auto">
-                {drivers.length === 0 ? (
+                {motoristas.length === 0 ? (
                   <div className="p-6 sm:p-8 text-center text-ink-muted">
                     <p className="text-xs sm:text-sm">{t('transportadora', 'active_drivers_empty')}</p>
                   </div>
                 ) : (
-                  drivers.map((motorista, i) => (
+                  motoristas.map((motorista, i) => (
                     <div key={i} className="flex items-center justify-between p-2 sm:p-3 rounded-lg hover:bg-bg-hover active:bg-bg-hover transition-colors border border-transparent hover:border-border touch-manipulation">
                       <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
                         <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-brand-light flex items-center justify-center flex-shrink-0">

@@ -48,7 +48,7 @@ class GlobalSyncManager {
       const tables = [
         'companies',
         'users',
-        'vehicles',
+        'veiculos',
         'routes',
         'gf_employee_company',
         'gf_incidents',
@@ -108,7 +108,7 @@ class GlobalSyncManager {
         'UPDATE': 'user.updated',
         'DELETE': 'user.deleted'
       },
-      'vehicles': {
+      'veiculos': {
         'INSERT': 'veiculo.created',
         'UPDATE': 'veiculo.updated',
         'DELETE': 'veiculo.deleted'

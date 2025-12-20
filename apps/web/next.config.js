@@ -45,6 +45,8 @@ let nextConfig = {
     ],
     // instrumentationHook não é mais necessário no Next.js 16.1.0+
     // O arquivo instrumentation.ts é detectado automaticamente
+    // Turbopack: Habilitado via flag --turbo nos scripts do package.json
+    // Configurações do Turbopack são aplicadas automaticamente quando --turbo é usado
   },
 
   // Configuração webpack para resolver problema ESM do Supabase

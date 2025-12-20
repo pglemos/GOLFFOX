@@ -79,17 +79,17 @@ export default function SocorroPage() {
       }
 
       // Carregar motoristas disponíveis
-      const driversResponse = await fetch('/api/admin/emergency/available-drivers')
+      const driversResponse = await fetch('/api/admin/emergency/available-motoristas')
       const driversResult = await driversResponse.json()
       if (driversResult.success) {
-        setAvailableDrivers(driversResult.drivers || [])
+        setAvailableDrivers(driversResult.motoristas || [])
       }
 
       // Carregar veículos disponíveis
-      const vehiclesResponse = await fetch('/api/admin/emergency/available-vehicles')
+      const vehiclesResponse = await fetch('/api/admin/emergency/available-veiculos')
       const vehiclesResult = await vehiclesResponse.json()
       if (vehiclesResult.success) {
-        setAvailableVehicles(vehiclesResult.vehicles || [])
+        setAvailableVehicles(vehiclesResult.veiculos || [])
       }
     } catch (error) {
       console.error('Erro ao carregar recursos de emergência:', error)
@@ -462,15 +462,15 @@ export default function SocorroPage() {
                       {ocorrencia.routes && (
                         <p>🚌 Rota: {ocorrencia.routes.name || ocorrencia.route_id}</p>
                       )}
-                      {ocorrencia.drivers && (
+                      {ocorrencia.motoristas && (
                         <p>
                           👤 Motorista: {(
-                            ocorrencia.drivers.email?.split("@")[0] || ocorrencia.dispatched_driver_id
+                            ocorrencia.motoristas.email?.split("@")[0] || ocorrencia.dispatched_driver_id
                           )}
                         </p>
                       )}
-                      {ocorrencia.vehicles && (
-                        <p>🚛 Veículo: {ocorrencia.vehicles.plate}</p>
+                      {ocorrencia.veiculos && (
+                        <p>🚛 Veículo: {ocorrencia.veiculos.plate}</p>
                       )}
                       <p>🕐 {new Date(ocorrencia.created_at).toLocaleString('pt-BR')}</p>
                       {ocorrencia.status === 'open' && ocorrencia.created_at && (

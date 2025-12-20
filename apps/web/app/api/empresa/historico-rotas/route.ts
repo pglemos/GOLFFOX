@@ -4,7 +4,7 @@ import { NextResponse } from "next/server"
 
 export async function GET() {
     // Mock data for route executions
-    // In a real scenario, this would query a 'route_executions' table joined with 'routes', 'drivers', etc.
+    // In a real scenario, this would query a 'route_executions' table joined with 'routes', 'motoristas', etc.
     const executions = [
         {
             id: "1",

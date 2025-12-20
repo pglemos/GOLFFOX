@@ -48,7 +48,7 @@ describe('GET /api/transportadora/costs/veiculo', () => {
         amount_brl: 100.0,
       },
     ])
-    mockSupabaseClient.setTableData('vehicles', [veiculo])
+    mockSupabaseClient.setTableData('veiculos', [veiculo])
 
     const req = createTransportadoraRequest({
       method: 'GET',
@@ -68,7 +68,7 @@ describe('GET /api/transportadora/costs/veiculo', () => {
     
     mockSupabaseClient.setTableData('users', [user])
     mockSupabaseClient.setTableData('vehicle_costs', [])
-    mockSupabaseClient.setTableData('vehicles', [veiculo])
+    mockSupabaseClient.setTableData('veiculos', [veiculo])
 
     const req = createTransportadoraRequest({
       method: 'GET',
@@ -86,7 +86,7 @@ describe('GET /api/transportadora/costs/veiculo', () => {
     
     mockSupabaseClient.setTableData('users', [user])
     mockSupabaseClient.setTableData('vehicle_costs', [])
-    mockSupabaseClient.setTableData('vehicles', [])
+    mockSupabaseClient.setTableData('veiculos', [])
 
     const req = createTransportadoraRequest({
       method: 'GET',
@@ -111,7 +111,7 @@ describe('POST /api/transportadora/costs/veiculo', () => {
     const veiculo = createTestVehicle(transportadora.id)
     
     mockSupabaseClient.setTableData('users', [user])
-    mockSupabaseClient.setTableData('vehicles', [veiculo])
+    mockSupabaseClient.setTableData('veiculos', [veiculo])
     mockSupabaseClient.setTableData('vehicle_costs', [])
 
     const req = createTransportadoraRequest({
@@ -153,7 +153,7 @@ describe('POST /api/transportadora/costs/veiculo', () => {
     const veiculo = createTestVehicle(transportadora2.id)
     
     mockSupabaseClient.setTableData('users', [user])
-    mockSupabaseClient.setTableData('vehicles', [veiculo])
+    mockSupabaseClient.setTableData('veiculos', [veiculo])
 
     const req = createTransportadoraRequest({
       method: 'POST',

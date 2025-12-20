@@ -31,8 +31,8 @@ export async function GET(request: NextRequest) {
         *,
         trips(id, route_id),
         routes(id, name),
-        vehicles!gf_assistance_requests_dispatched_vehicle_id_fkey(id, plate, model),
-        drivers:users!gf_assistance_requests_dispatched_driver_id_fkey(id, email)
+        veiculos!gf_assistance_requests_dispatched_vehicle_id_fkey(id, plate, model),
+        motoristas:users!gf_assistance_requests_dispatched_driver_id_fkey(id, email)
       `)
       .order('created_at', { ascending: false })
 

@@ -4,7 +4,7 @@ import { requireAuth } from '@/lib/api-auth'
 import { logError } from '@/lib/logger'
 import { invalidateEntityCache } from '@/lib/next-cache'
 
-// PUT /api/admin/transportadoras/[transportadoraId]/drivers/[driverId]
+// PUT /api/admin/transportadoras/[transportadoraId]/motoristas/[driverId]
 export async function PUT(
   request: NextRequest,
   context: { params: Promise<{ transportadoraId?: string; carrierId?: string; driverId: string }> }
@@ -74,7 +74,7 @@ export async function PUT(
   }
 }
 
-// DELETE /api/admin/transportadoras/[transportadoraId]/drivers/[driverId]
+// DELETE /api/admin/transportadoras/[transportadoraId]/motoristas/[driverId]
 export async function DELETE(
   request: NextRequest,
   context: { params: Promise<{ transportadoraId?: string; carrierId?: string; driverId: string }> }

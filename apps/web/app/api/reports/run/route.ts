@@ -97,7 +97,7 @@ async function runReportHandler(request: NextRequest): Promise<NextResponse> {
       'fleet-performance': 'efficiency', // Mapear fleet-performance para efficiency
       'fleet_performance': 'efficiency', // Mapear fleet_performance para efficiency
       'fleet_status': 'efficiency', // Mapear fleet_status para efficiency
-      'vehicles': 'efficiency', // Mapear vehicles para efficiency
+      'veiculos': 'efficiency', // Mapear veiculos para efficiency
       'routes': 'efficiency', // Mapear routes para efficiency
       'cost-analysis': 'efficiency', // Mapear cost-analysis para efficiency
       'cost_analysis': 'efficiency', // Mapear cost_analysis para efficiency

@@ -30,7 +30,7 @@ export default function TransportadoraVeiculosPage() {
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
   const [activeTab, setActiveTab] = useState("list")
-  const [selectedVehicle, setSelectedVehicle] = useState<string | null>(null)
+  const [selectedVeiculo, setSelectedVeiculo] = useState<string | null>(null)
   const [documents, setDocuments] = useState<any[]>([])
   const [maintenances, setMaintenances] = useState<any[]>([])
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false)
@@ -72,7 +72,7 @@ export default function TransportadoraVeiculosPage() {
         .single()
 
       let query = supabase
-        .from('vehicles')
+        .from('veiculos')
         .select('*')
         .order('created_at', { ascending: false })
 
@@ -92,7 +92,7 @@ export default function TransportadoraVeiculosPage() {
   const loadVehicleDocuments = async (vehicleId: string) => {
     try {
       const session = await ensureSupabaseSession()
-      const res = await fetch(`/api/transportadora/vehicles/${vehicleId}/documents`, {
+      const res = await fetch(`/api/transportadora/veiculos/${vehicleId}/documents`, {
         credentials: 'include',
         headers: session?.access_token ? {
           'Authorization': `Bearer ${session.access_token}`
@@ -112,7 +112,7 @@ export default function TransportadoraVeiculosPage() {
   const loadVehicleMaintenances = async (vehicleId: string) => {
     try {
       const session = await ensureSupabaseSession()
-      const res = await fetch(`/api/transportadora/vehicles/${vehicleId}/maintenances`, {
+      const res = await fetch(`/api/transportadora/veiculos/${vehicleId}/maintenances`, {
         credentials: 'include',
         headers: session?.access_token ? {
           'Authorization': `Bearer ${session.access_token}`
@@ -130,11 +130,11 @@ export default function TransportadoraVeiculosPage() {
   }
 
   const handleSaveMaintenance = async () => {
-    if (!selectedVehicle || !maintenanceForm.description) return
+    if (!selectedVeiculo || !maintenanceForm.description) return
 
     try {
       const session = await ensureSupabaseSession()
-      const res = await fetch(`/api/transportadora/vehicles/${selectedVehicle}/maintenances`, {
+      const res = await fetch(`/api/transportadora/veiculos/${selectedVeiculo}/maintenances`, {
         method: 'POST',
         credentials: 'include',
         headers: {
@@ -157,7 +157,7 @@ export default function TransportadoraVeiculosPage() {
           odometer_km: null,
           status: 'scheduled'
         })
-        loadVehicleMaintenances(selectedVehicle)
+        loadVehicleMaintenances(selectedVeiculo)
       }
     } catch (error) {
       console.error("Erro ao salvar manutenção:", error)
@@ -363,7 +363,7 @@ export default function TransportadoraVeiculosPage() {
                     transition={{ delay: index * 0.05 }}
                   >
                     <Card className="p-4 hover:shadow-lg transition-shadow cursor-pointer" onClick={() => {
-                      setSelectedVehicle(veiculo.id)
+                      setSelectedVeiculo(veiculo.id)
                       loadVehicleDocuments(veiculo.id)
                       loadVehicleMaintenances(veiculo.id)
                     }}>
@@ -434,7 +434,7 @@ export default function TransportadoraVeiculosPage() {
                             className="flex-1"
                             onClick={(e) => {
                               e.stopPropagation()
-                              setSelectedVehicle(veiculo.id)
+                              setSelectedVeiculo(veiculo.id)
                               loadVehicleDocuments(veiculo.id)
                               setActiveTab('documents')
                             }}
@@ -470,7 +470,7 @@ export default function TransportadoraVeiculosPage() {
                     transition={{ delay: index * 0.05 }}
                   >
                     <Card className="p-4 hover:shadow-lg transition-shadow cursor-pointer" onClick={() => {
-                      setSelectedVehicle(veiculo.id)
+                      setSelectedVeiculo(veiculo.id)
                       loadVehicleDocuments(veiculo.id)
                       loadVehicleMaintenances(veiculo.id)
                     }}>
@@ -520,7 +520,7 @@ export default function TransportadoraVeiculosPage() {
                             size="sm"
                             onClick={(e) => {
                               e.stopPropagation()
-                              setSelectedVehicle(veiculo.id)
+                              setSelectedVeiculo(veiculo.id)
                               loadVehicleDocuments(veiculo.id)
                               setActiveTab('documents')
                             }}
@@ -560,7 +560,7 @@ export default function TransportadoraVeiculosPage() {
           <TabsContent value="documents" className="space-y-6">
             <div className="flex items-center justify-between">
               <h2 className="text-2xl font-bold">Documentos dos Veículos</h2>
-              {selectedVehicle && (
+              {selectedVeiculo && (
                 <Button onClick={() => {
                   setIsUploadModalOpen(true)
                 }}>
@@ -570,12 +570,12 @@ export default function TransportadoraVeiculosPage() {
               )}
             </div>
 
-            {selectedVehicle ? (
+            {selectedVeiculo ? (
               <div className="space-y-4">
                 <div className="flex items-center gap-4 mb-4">
                   <Label>Veículo:</Label>
-                  <Select value={selectedVehicle} onValueChange={(value) => {
-                    setSelectedVehicle(value)
+                  <Select value={selectedVeiculo} onValueChange={(value) => {
+                    setSelectedVeiculo(value)
                     loadVehicleDocuments(value)
                   }}>
                     <SelectTrigger className="w-64">
@@ -738,7 +738,7 @@ export default function TransportadoraVeiculosPage() {
           <TabsContent value="maintenances" className="space-y-6">
             <div className="flex items-center justify-between">
               <h2 className="text-2xl font-bold">Manutenções dos Veículos</h2>
-              {selectedVehicle && (
+              {selectedVeiculo && (
                 <Button onClick={() => setIsMaintenanceModalOpen(true)}>
                   <Wrench className="h-4 w-4 mr-2" />
                   Nova Manutenção
@@ -746,12 +746,12 @@ export default function TransportadoraVeiculosPage() {
               )}
             </div>
 
-            {selectedVehicle ? (
+            {selectedVeiculo ? (
               <div className="space-y-4">
                 <div className="flex items-center gap-4 mb-4">
                   <Label>Veículo:</Label>
-                  <Select value={selectedVehicle} onValueChange={(value) => {
-                    setSelectedVehicle(value)
+                  <Select value={selectedVeiculo} onValueChange={(value) => {
+                    setSelectedVeiculo(value)
                     loadVehicleMaintenances(value)
                   }}>
                     <SelectTrigger className="w-64">
@@ -979,14 +979,14 @@ export default function TransportadoraVeiculosPage() {
                 </Select>
               </div>
 
-              {selectedVehicle && (
+              {selectedVeiculo && (
                 <DocumentUpload
-                  vehicleId={selectedVehicle}
+                  vehicleId={selectedVeiculo}
                   folder="veiculo-documents"
                   documentType={documentType}
                   onSuccess={() => {
                     setIsUploadModalOpen(false)
-                    loadVehicleDocuments(selectedVehicle)
+                    loadVehicleDocuments(selectedVeiculo)
                   }}
                   onError={(error) => {
                     console.error('Erro no upload:', error)

@@ -1,4 +1,4 @@
-import { GET } from '@/app/api/admin/emergency/available-vehicles/route'
+import { GET } from '@/app/api/admin/emergency/available-veiculos/route'
 import { createAdminRequest } from '../../../helpers/api-test-helpers'
 import { mockSupabaseClient } from '../../../helpers/mock-supabase'
 import { createTestVehicle } from '../../../helpers/test-data'
@@ -8,7 +8,7 @@ jest.mock('@supabase/supabase-js', () => ({
   createClient: jest.fn(() => mockSupabaseClient),
 }))
 
-describe('GET /api/admin/emergency/available-vehicles', () => {
+describe('GET /api/admin/emergency/available-veiculos', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockSupabaseClient.clear()
@@ -17,11 +17,11 @@ describe('GET /api/admin/emergency/available-vehicles', () => {
   })
 
   it('deve listar veículos disponíveis', async () => {
-    const vehicles = [
+    const veiculos = [
       createTestVehicle('transportadora-1', { plate: 'ABC1234', is_active: true }),
       createTestVehicle('transportadora-1', { plate: 'XYZ5678', is_active: true }),
     ]
-    mockSupabaseClient.setTableData('vehicles', vehicles)
+    mockSupabaseClient.setTableData('veiculos', veiculos)
     mockSupabaseClient.setTableData('trips', [])
 
     const req = createAdminRequest({
@@ -33,15 +33,15 @@ describe('GET /api/admin/emergency/available-vehicles', () => {
 
     expect(response.status).toBe(200)
     expect(data.success).toBe(true)
-    expect(Array.isArray(data.vehicles)).toBe(true)
-    expect(data.vehicles.length).toBeGreaterThanOrEqual(2)
+    expect(Array.isArray(data.veiculos)).toBe(true)
+    expect(data.veiculos.length).toBeGreaterThanOrEqual(2)
   })
 
   it('deve filtrar veículos ocupados', async () => {
     const availableVehicle = createTestVehicle('transportadora-1', { plate: 'ABC1234', is_active: true })
     const occupiedVehicle = createTestVehicle('transportadora-1', { plate: 'XYZ5678', is_active: true })
     
-    mockSupabaseClient.setTableData('vehicles', [availableVehicle, occupiedVehicle])
+    mockSupabaseClient.setTableData('veiculos', [availableVehicle, occupiedVehicle])
     mockSupabaseClient.setTableData('trips', [
       { id: 'trip-1', veiculo_id: occupiedVehicle.id, status: 'inProgress' },
     ])
@@ -56,12 +56,12 @@ describe('GET /api/admin/emergency/available-vehicles', () => {
     expect(response.status).toBe(200)
     expect(data.success).toBe(true)
     // Veículo ocupado não deve aparecer na lista
-    const occupiedInList = data.vehicles.find((v: any) => v.id === occupiedVehicle.id)
+    const occupiedInList = data.veiculos.find((v: any) => v.id === occupiedVehicle.id)
     expect(occupiedInList).toBeUndefined()
   })
 
   it('deve retornar array vazio se não houver veículos', async () => {
-    mockSupabaseClient.setTableData('vehicles', [])
+    mockSupabaseClient.setTableData('veiculos', [])
     mockSupabaseClient.setTableData('trips', [])
 
     const req = createAdminRequest({
@@ -73,11 +73,11 @@ describe('GET /api/admin/emergency/available-vehicles', () => {
 
     expect(response.status).toBe(200)
     expect(data.success).toBe(true)
-    expect(data.vehicles).toEqual([])
+    expect(data.veiculos).toEqual([])
   })
 
   it('deve lidar com erro na busca', async () => {
-    mockSupabaseClient.setTableError('vehicles', {
+    mockSupabaseClient.setTableError('veiculos', {
       message: 'Database error',
     })
 

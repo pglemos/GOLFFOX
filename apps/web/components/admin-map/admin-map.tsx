@@ -118,10 +118,10 @@ export function AdminMap({
   // State
   const [loading, setLoading] = useState(true)
   const [mapError, setMapError] = useState<string | null>(null)
-  const [vehicles, setVehicles] = useState<veiculo[]>([])
+  const [veiculos, setVeiculos] = useState<veiculo[]>([])
   const [routes, setRoutes] = useState<RoutePolyline[]>([])
   const [alerts, setAlerts] = useState<Alert[]>([])
-  const [selectedVehicle, setSelectedVehicle] = useState<veiculo | null>(null)
+  const [selectedVeiculo, setSelectedVeiculo] = useState<veiculo | null>(null)
   const [selectedRoute, setSelectedRoute] = useState<RoutePolyline | null>(null)
   const [selectedAlert, setSelectedAlert] = useState<Alert | null>(null)
   const [mode, setMode] = useState<'live' | 'history'>('live')
@@ -313,7 +313,7 @@ export function AdminMap({
         try {
           await loadInitialData()
           debug('Dados iniciais carregados com sucesso', {
-            vehicles: vehicles.length,
+            veiculos: veiculos.length,
             routes: routes.length,
             alerts: alerts.length
           }, 'AdminMap')
@@ -344,7 +344,7 @@ export function AdminMap({
         
         setLoading(false)
         debug('Mapa inicializado com sucesso', {
-          vehicles: vehicles.length,
+          veiculos: veiculos.length,
           routes: routes.length,
           alerts: alerts.length,
           mode
@@ -504,7 +504,7 @@ export function AdminMap({
       // Carregar veículos ativos com todas as informações
       // Usar LEFT JOIN para não excluir veículos sem company_id
       let vehiclesQuery = supabase
-        .from('vehicles')
+        .from('veiculos')
         .select(`
           id,
           plate,
@@ -530,7 +530,7 @@ export function AdminMap({
         {
           filters,
           query: {
-            table: 'vehicles',
+            table: 'veiculos',
             filter_is_active: true,
             filter_company: filters.company || 'nenhum',
           },
@@ -538,9 +538,9 @@ export function AdminMap({
         'AdminMap'
       )
       
-      const { data: vehiclesData, error: vehiclesError } = await vehiclesQuery
+      const { data: veiculosData, error: vehiclesError } = await vehiclesQuery
       
-      let finalVehiclesData: any[] = []
+      let finalVeiculosData: any[] = []
       
       // Log detalhado para debug
       if (vehiclesError) {
@@ -551,24 +551,24 @@ export function AdminMap({
           warn('Tentando query alternativa sem colunas problemáticas', {}, 'AdminMap')
           try {
             const { data: fallbackData, error: fallbackError } = await supabase
-              .from('vehicles')
+              .from('veiculos')
               .select('id, plate, model, is_active, company_id')
               .eq('is_active', true)
             
             if (!fallbackError && fallbackData) {
               debug(`Query alternativa retornou ${fallbackData.length} veículos`, { count: fallbackData.length }, 'AdminMap')
-              finalVehiclesData = fallbackData as any
+              finalVeiculosData = fallbackData as any
             }
           } catch (fallbackErr) {
             logError('Query alternativa também falhou', { error: fallbackErr }, 'AdminMap')
           }
         }
       } else {
-        finalVehiclesData = vehiclesData || []
-        debug(`Query retornou ${finalVehiclesData.length} veículos`, { count: finalVehiclesData.length }, 'AdminMap')
-        if (finalVehiclesData.length > 0) {
+        finalVeiculosData = veiculosData || []
+        debug(`Query retornou ${finalVeiculosData.length} veículos`, { count: finalVeiculosData.length }, 'AdminMap')
+        if (finalVeiculosData.length > 0) {
           debug('Primeiros veículos', {
-            vehicles: finalVehiclesData.slice(0, 3).map((v: any) => ({
+            veiculos: finalVeiculosData.slice(0, 3).map((v: any) => ({
               id: v.id,
               plate: v.plate,
               is_active: v.is_active,
@@ -580,7 +580,7 @@ export function AdminMap({
           // Se não retornou veículos, verificar se há veículos ativos no banco
           warn('Nenhum veículo retornado - verificando se há veículos ativos no banco', {}, 'AdminMap')
           const { data: checkData, error: checkError } = await supabase
-            .from('vehicles')
+            .from('veiculos')
             .select('id, plate, is_active')
             .eq('is_active', true)
             .limit(5)
@@ -588,7 +588,7 @@ export function AdminMap({
           if (checkError) {
             logError('Erro ao verificar veículos', { error: checkError }, 'AdminMap')
           } else if (checkData && checkData.length > 0) {
-            warn(`Encontrados ${checkData.length} veículos ativos, mas não foram retornados pela query principal`, { count: checkData.length, vehicles: checkData }, 'AdminMap')
+            warn(`Encontrados ${checkData.length} veículos ativos, mas não foram retornados pela query principal`, { count: checkData.length, veiculos: checkData }, 'AdminMap')
             warn('Possível problema: RLS policies podem estar bloqueando o acesso', {}, 'AdminMap')
           } else {
             debug('Não há veículos ativos no banco de dados', {}, 'AdminMap')
@@ -596,11 +596,11 @@ export function AdminMap({
         }
       }
       
-      if (finalVehiclesData && finalVehiclesData.length > 0) {
-        debug(`Processando ${finalVehiclesData.length} veículos ativos`, { count: finalVehiclesData.length }, 'AdminMap')
+      if (finalVeiculosData && finalVeiculosData.length > 0) {
+        debug(`Processando ${finalVeiculosData.length} veículos ativos`, { count: finalVeiculosData.length }, 'AdminMap')
         
         // Buscar trips ativas para esses veículos
-        const vehicleIds = finalVehiclesData.map((v: any) => v.id)
+        const vehicleIds = finalVeiculosData.map((v: any) => v.id)
         
         // Buscar trips ativas (inProgress) para obter informações de rota e motorista
         const { data: activeTrips } = await supabase
@@ -676,7 +676,7 @@ export function AdminMap({
         })
         
         // Montar dados finais dos veículos - MOSTRAR TODOS OS VEÍCULOS ATIVOS
-        const processedVehicles = finalVehiclesData.map((v: any) => {
+        const processedVehicles = finalVeiculosData.map((v: any) => {
           const trip = tripsByVehicle.get(v.id)
           const lastPos = positionsByVehicle.get(v.id)
           
@@ -734,21 +734,21 @@ export function AdminMap({
           }
         })
         
-        finalVehiclesData = processedVehicles
-        debug(`Montados ${finalVehiclesData.length} veículos com dados completos`, { count: finalVehiclesData.length }, 'AdminMap')
+        finalVeiculosData = processedVehicles
+        debug(`Montados ${finalVeiculosData.length} veículos com dados completos`, { count: finalVeiculosData.length }, 'AdminMap')
       } else if (vehiclesError) {
         logError('Erro ao carregar veículos', { error: vehiclesError }, 'AdminMap')
-        finalVehiclesData = []
+        finalVeiculosData = []
       } else {
         debug('Nenhum veículo ativo encontrado', {}, 'AdminMap')
-        finalVehiclesData = []
+        finalVeiculosData = []
       }
       
       debug('Resultado final da query de veículos', {
         filtroCompany: filters.company || '(nenhum)',
-        totalRetornado: finalVehiclesData?.length || 0,
+        totalRetornado: finalVeiculosData?.length || 0,
         erro: vehiclesError?.message || null,
-        primeirosVeiculos: finalVehiclesData?.slice(0, 2).map((v: any) => ({
+        primeirosVeiculos: finalVeiculosData?.slice(0, 2).map((v: any) => ({
           veiculo_id: v.veiculo_id,
           plate: v.plate,
           lat: v.lat,
@@ -757,10 +757,10 @@ export function AdminMap({
         })) || []
       })
 
-      if (finalVehiclesData && finalVehiclesData.length > 0) {
+      if (finalVeiculosData && finalVeiculosData.length > 0) {
         // Processar TODOS os veículos - não filtrar por coordenadas
         // Veículos sem coordenadas ainda aparecerão na lista e podem ser visualizados
-        const processedVehicles = finalVehiclesData
+        const processedVehicles = finalVeiculosData
           .map((v: any) => {
             // Normalizar coordenadas se existirem
             if (v.lat !== null && v.lng !== null && isValidCoordinate(v.lat, v.lng)) {
@@ -785,7 +785,7 @@ export function AdminMap({
             }
           })
         
-        setVehicles(processedVehicles as any)
+        setVeiculos(processedVehicles as any)
         
         // Contar veículos com e sem coordenadas
         const withCoords = processedVehicles.filter((v: any) => v.lat !== null && v.lng !== null).length
@@ -811,7 +811,7 @@ export function AdminMap({
         
         // Tentar buscar sem filtros para debug
         const { data: allVehicles, error: allError } = await supabase
-          .from('vehicles')
+          .from('veiculos')
           .select('id, plate, is_active, company_id')
           .eq('is_active', true)
           .limit(5)
@@ -821,7 +821,7 @@ export function AdminMap({
         } else if (allVehicles && allVehicles.length > 0) {
           warn(`Encontrados ${allVehicles.length} veículos ativos, mas não foram retornados com os filtros aplicados`, { 
             count: allVehicles.length,
-            vehicles: allVehicles.map((v: any) => ({ plate: v.plate, company_id: v.company_id }))
+            veiculos: allVehicles.map((v: any) => ({ plate: v.plate, company_id: v.company_id }))
           }, 'AdminMap')
         } else {
           debug('Não há veículos ativos no banco de dados', {}, 'AdminMap')
@@ -1024,7 +1024,7 @@ export function AdminMap({
   // Processar atualizações do realtime
   const handleRealtimeUpdate = useCallback(async (update: RealtimeUpdateType) => {
     if (update.type === 'position') {
-      setVehicles((prev) => {
+      setVeiculos((prev) => {
         const index = prev.findIndex(
           (v) => v.veiculo_id === update.data.veiculo_id
         )
@@ -1353,7 +1353,7 @@ export function AdminMap({
   }, [routes])
 
   // Carregar trajetos quando veículo selecionado
-  const loadVehicleTrajectory = useCallback(async (veiculo: veiculo) => {
+  const loadVeiculoTrajectory = useCallback(async (veiculo: veiculo) => {
     if (!veiculo.trip_id) {
       setHistoricalTrajectories([])
       return
@@ -1425,13 +1425,13 @@ export function AdminMap({
 
   // Carregar trajeto quando veículo selecionado
   useEffect(() => {
-    if (selectedVehicle && mode === 'live') {
-      loadVehicleTrajectory(selectedVehicle)
-    } else if (!selectedVehicle && mode === 'live') {
+    if (selectedVeiculo && mode === 'live') {
+      loadVeiculoTrajectory(selectedVeiculo)
+    } else if (!selectedVeiculo && mode === 'live') {
       setHistoricalTrajectories([])
       setShowTrajectories(false)
     }
-  }, [selectedVehicle, mode, loadVehicleTrajectory])
+  }, [selectedVeiculo, mode, loadVeiculoTrajectory])
 
   // Atalhos de teclado
   useKeyboardShortcuts({
@@ -1555,10 +1555,10 @@ export function AdminMap({
       }
       
       // Exportar CSV dos veículos visíveis
-      if (vehicles.length > 0) {
+      if (veiculos.length > 0) {
         const csvContent = [
           'Placa,Modelo,Rota,Motorista,Latitude,Longitude,Velocidade,Status,Passageiros',
-          ...vehicles.map(v => [
+          ...veiculos.map(v => [
             v.plate,
             v.model,
             v.route_name || 'N/A',
@@ -1584,7 +1584,7 @@ export function AdminMap({
       logError('Erro ao exportar', { error }, 'AdminMap')
     notifyError(formatError(error, t('common','errors.export')))
     }
-  }, [vehicles, listMode])
+  }, [veiculos, listMode])
 
   // Sincronizar URL com filtros (deep-link)
   useEffect(() => {
@@ -1633,7 +1633,7 @@ export function AdminMap({
         <MapFilters
           filters={filters}
           onFiltersChange={setFilters}
-          vehiclesCount={vehicles.length}
+          vehiclesCount={veiculos.length}
           routesCount={routes.length}
           alertsCount={alerts.length}
           mode={mode}
@@ -1726,7 +1726,7 @@ export function AdminMap({
                   }
 
                   // Atualizar veículo no estado (ou criar se não existir)
-                  setVehicles((prev) => {
+                  setVeiculos((prev) => {
                     const index = prev.findIndex(v => v.veiculo_id === position.veiculo_id)
                     if (index >= 0) {
                       const updated = [...prev]
@@ -1804,38 +1804,38 @@ export function AdminMap({
 
       {/* Painéis Laterais */}
       <AnimatePresence>
-        {selectedVehicle && (
+        {selectedVeiculo && (
           <VehiclePanel
-            veiculo={selectedVehicle}
-            onClose={() => setSelectedVehicle(null)}
+            veiculo={selectedVeiculo}
+            onClose={() => setSelectedVeiculo(null)}
             onFollow={() => {
               // Seguir veículo (auto-center)
-              if (selectedVehicle && mapInstanceRef.current) {
+              if (selectedVeiculo && mapInstanceRef.current) {
                 mapInstanceRef.current.setCenter({
-                  lat: selectedVehicle.lat,
-                  lng: selectedVehicle.lng,
+                  lat: selectedVeiculo.lat,
+                  lng: selectedVeiculo.lng,
                 })
                 mapInstanceRef.current.setZoom(15)
               }
             }}
             onDispatch={async () => {
-              if (selectedVehicle) {
+              if (selectedVeiculo) {
                 // Confirmar despacho
                 const confirmed = window.confirm(
-                  `Despachar socorro para o veículo ${selectedVehicle.plate}?\n\n` +
-                  `Motorista: ${selectedVehicle.motorista_name}\n` +
-                  `Rota: ${selectedVehicle.route_name}\n` +
-                  `Posição: ${selectedVehicle.lat.toFixed(6)}, ${selectedVehicle.lng.toFixed(6)}`
+                  `Despachar socorro para o veículo ${selectedVeiculo.plate}?\n\n` +
+                  `Motorista: ${selectedVeiculo.motorista_name}\n` +
+                  `Rota: ${selectedVeiculo.route_name}\n` +
+                  `Posição: ${selectedVeiculo.lat.toFixed(6)}, ${selectedVeiculo.lng.toFixed(6)}`
                 )
                 
                 if (confirmed) {
-                  await handleDispatchAssistance(selectedVehicle)
+                  await handleDispatchAssistance(selectedVeiculo)
                 }
               }
             }}
             onViewHistory={async () => {
-              if (selectedVehicle) {
-                await handleViewVehicleHistory(selectedVehicle)
+              if (selectedVeiculo) {
+                await handleViewVehicleHistory(selectedVeiculo)
               }
             }}
           />
@@ -1852,11 +1852,11 @@ export function AdminMap({
             onClose={() => setSelectedAlert(null)}
           />
         )}
-        {showTrajectoryAnalysis && trajectoryAnalysis && selectedVehicle && (
+        {showTrajectoryAnalysis && trajectoryAnalysis && selectedVeiculo && (
           <TrajectoryPanel
             analysis={trajectoryAnalysis}
-            vehiclePlate={selectedVehicle.plate}
-            routeName={selectedVehicle.route_name}
+            vehiclePlate={selectedVeiculo.plate}
+            routeName={selectedVeiculo.route_name}
             onClose={() => {
               setShowTrajectoryAnalysis(false)
               setTrajectoryAnalysis(null)
@@ -1870,11 +1870,11 @@ export function AdminMap({
         <>
           <MapLayers
             map={mapInstanceRef.current}
-            vehicles={vehicles}
+            veiculos={veiculos}
             routes={routes}
             alerts={alerts}
-            selectedVehicle={selectedVehicle}
-            onVehicleClick={setSelectedVehicle}
+            selectedVeiculo={selectedVeiculo}
+            onVehicleClick={setSelectedVeiculo}
             onRouteClick={setSelectedRoute}
             onAlertClick={(alert) => {
               setSelectedAlert(alert)
@@ -1894,7 +1894,7 @@ export function AdminMap({
           {/* Heatmap Layer */}
           <HeatmapLayer
             map={mapInstanceRef.current}
-            vehicles={vehicles}
+            veiculos={veiculos}
             enabled={showHeatmap}
             mode={mode}
           />
@@ -1947,9 +1947,9 @@ export function AdminMap({
             </div>
             
             {/* Lista de Veículos */}
-            {vehicles.length > 0 ? (
+            {veiculos.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {vehicles.map((veiculo) => (
+                {veiculos.map((veiculo) => (
                   <Card key={veiculo.veiculo_id} className="p-4 hover:shadow-md transition-shadow">
                     <div className="flex items-start justify-between mb-2">
                       <div>
@@ -1999,7 +1999,7 @@ export function AdminMap({
       ) : null}
 
       {/* Estados Vazios */}
-      {!loading && !mapError && vehicles.length === 0 && (
+      {!loading && !mapError && veiculos.length === 0 && (
         <div className="absolute inset-0 z-30 flex items-center justify-center bg-white/50 backdrop-blur-sm">
           <div className="text-center max-w-md p-6 bg-white rounded-lg shadow-lg">
             <MapIcon className="h-16 w-16 text-ink-muted mx-auto mb-4" />

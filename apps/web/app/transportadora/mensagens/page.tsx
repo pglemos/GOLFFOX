@@ -30,44 +30,44 @@ interface motorista {
 
 export default function MensagensPage() {
     const { user } = useAuth()
-    const [drivers, setDrivers] = useState<motorista[]>([])
-    const [selectedDriver, setSelectedDriver] = useState<motorista | null>(null)
+    const [motoristas, setMotoristas] = useState<motorista[]>([])
+    const [selectedMotorista, setSelectedMotorista] = useState<motorista | null>(null)
     const [messages, setMessages] = useState<Message[]>([])
     const [newMessage, setNewMessage] = useState("")
     const [loading, setLoading] = useState(true)
     const messagesEndRef = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
-        // Mock drivers list
+        // Mock motoristas list
         const mockDrivers: motorista[] = [
             { id: '1', name: 'João Silva', is_online: true, last_message: 'Ok, entendido!' },
             { id: '2', name: 'Maria Santos', is_online: true, last_message: 'Chegando em 5 min' },
             { id: '3', name: 'Pedro Costa', is_online: false, last_message: 'Rota finalizada' },
             { id: '4', name: 'Ana Oliveira', is_online: true },
         ]
-        setDrivers(mockDrivers)
+        setMotoristas(mockDrivers)
         setLoading(false)
     }, [])
 
     useEffect(() => {
-        if (selectedDriver) {
+        if (selectedMotorista) {
             // Mock messages for selected motorista
             const mockMessages: Message[] = [
-                { id: '1', sender_id: selectedDriver.id, sender_name: selectedDriver.name, sender_type: 'motorista', content: 'Bom dia! Iniciando rota.', created_at: '2024-12-12T08:00:00' },
+                { id: '1', sender_id: selectedMotorista.id, sender_name: selectedMotorista.name, sender_type: 'motorista', content: 'Bom dia! Iniciando rota.', created_at: '2024-12-12T08:00:00' },
                 { id: '2', sender_id: 'op1', sender_name: 'Central', sender_type: 'operador', content: 'Bom dia! Tudo certo, boa viagem!', created_at: '2024-12-12T08:01:00' },
-                { id: '3', sender_id: selectedDriver.id, sender_name: selectedDriver.name, sender_type: 'motorista', content: 'Houve um pequeno atraso no ponto 3.', created_at: '2024-12-12T08:30:00' },
+                { id: '3', sender_id: selectedMotorista.id, sender_name: selectedMotorista.name, sender_type: 'motorista', content: 'Houve um pequeno atraso no ponto 3.', created_at: '2024-12-12T08:30:00' },
                 { id: '4', sender_id: 'op1', sender_name: 'Central', sender_type: 'operador', content: 'Entendido, obrigado por informar.', created_at: '2024-12-12T08:31:00' },
             ]
             setMessages(mockMessages)
         }
-    }, [selectedDriver])
+    }, [selectedMotorista])
 
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
     }, [messages])
 
     const sendMessage = async () => {
-        if (!newMessage.trim() || !selectedDriver) return
+        if (!newMessage.trim() || !selectedMotorista) return
 
         const msg: Message = {
             id: Date.now().toString(),
@@ -100,11 +100,11 @@ export default function MensagensPage() {
                         </h2>
                     </div>
                     <ScrollArea className="h-full">
-                        {drivers.map(motorista => (
+                        {motoristas.map(motorista => (
                             <div
                                 key={motorista.id}
-                                className={`p-4 border-b cursor-pointer hover:bg-muted/50 ${selectedDriver?.id === motorista.id ? 'bg-muted' : ''}`}
-                                onClick={() => setSelectedDriver(motorista)}
+                                className={`p-4 border-b cursor-pointer hover:bg-muted/50 ${selectedMotorista?.id === motorista.id ? 'bg-muted' : ''}`}
+                                onClick={() => setSelectedMotorista(motorista)}
                             >
                                 <div className="flex items-center gap-3">
                                     <div className="relative">
@@ -129,16 +129,16 @@ export default function MensagensPage() {
 
                 {/* Chat Area */}
                 <div className="flex-1 flex flex-col">
-                    {selectedDriver ? (
+                    {selectedMotorista ? (
                         <>
                             <div className="p-4 border-b flex items-center gap-3">
                                 <Avatar className="h-10 w-10">
-                                    <AvatarFallback>{selectedDriver.name.slice(0, 2).toUpperCase()}</AvatarFallback>
+                                    <AvatarFallback>{selectedMotorista.name.slice(0, 2).toUpperCase()}</AvatarFallback>
                                 </Avatar>
                                 <div>
-                                    <p className="font-medium">{selectedDriver.name}</p>
+                                    <p className="font-medium">{selectedMotorista.name}</p>
                                     <p className="text-sm text-muted-foreground">
-                                        {selectedDriver.is_online ? '🟢 Online' : '⚫ Offline'}
+                                        {selectedMotorista.is_online ? '🟢 Online' : '⚫ Offline'}
                                     </p>
                                 </div>
                             </div>

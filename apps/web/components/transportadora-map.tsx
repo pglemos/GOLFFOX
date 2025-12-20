@@ -13,11 +13,11 @@ interface veiculo {
 }
 
 interface TransportadoraMapProps {
-  vehicles: veiculo[]
+  veiculos: veiculo[]
   className?: string
 }
 
-export function CarrierMap({ vehicles, className = "" }: TransportadoraMapProps) {
+export function CarrierMap({ veiculos, className = "" }: TransportadoraMapProps) {
   const mapRef = useRef<HTMLDivElement>(null)
   const mapInstanceRef = useRef<google.maps.Map | null>(null)
   const markersRef = useRef<Map<string, google.maps.Marker>>(new Map())
@@ -96,12 +96,12 @@ export function CarrierMap({ vehicles, className = "" }: TransportadoraMapProps)
     markersRef.current.forEach(marker => marker.setMap(null))
     markersRef.current.clear()
 
-    if (vehicles.length === 0) return
+    if (veiculos.length === 0) return
 
     // Adicionar novos marcadores
     const bounds = new google.maps.LatLngBounds()
 
-    vehicles.forEach(veiculo => {
+    veiculos.forEach(veiculo => {
       const icon = getVehicleIcon(veiculo.status)
       const marker = new google.maps.Marker({
         position: { lat: veiculo.lat, lng: veiculo.lng },
@@ -130,14 +130,14 @@ export function CarrierMap({ vehicles, className = "" }: TransportadoraMapProps)
 
     // Ajustar zoom para mostrar todos os veículos
     if (mapInstanceRef.current) {
-      if (vehicles.length > 1) {
+      if (veiculos.length > 1) {
         mapInstanceRef.current.fitBounds(bounds)
-      } else if (vehicles.length === 1 && vehicles[0]) {
-        mapInstanceRef.current.setCenter({ lat: vehicles[0].lat, lng: vehicles[0].lng })
+      } else if (veiculos.length === 1 && veiculos[0]) {
+        mapInstanceRef.current.setCenter({ lat: veiculos[0].lat, lng: veiculos[0].lng })
         mapInstanceRef.current.setZoom(15)
       }
     }
-  }, [vehicles, loading, getVehicleIcon])
+  }, [veiculos, loading, getVehicleIcon])
 
   if (error) {
     return (

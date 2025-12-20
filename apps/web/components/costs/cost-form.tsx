@@ -76,7 +76,7 @@ interface CostFormProps {
     profileType: ProfileType
     companyId?: string
     carrierId?: string
-    vehicles?: { id: string; plate: string; model?: string }[]
+    veiculos?: { id: string; plate: string; model?: string }[]
     routes?: { id: string; name: string }[]
     onSuccess?: () => void
     onCancel?: () => void
@@ -87,7 +87,7 @@ export function CostForm({
     profileType,
     companyId,
     carrierId,
-    vehicles = [],
+    veiculos = [],
     routes = [],
     onSuccess,
     onCancel,
@@ -317,9 +317,9 @@ export function CostForm({
                     </div>
 
                     {/* Veículo e Rota (se operacional) */}
-                    {(selectedCategory?.isOperational || vehicles.length > 0 || routes.length > 0) && (
+                    {(selectedCategory?.isOperational || veiculos.length > 0 || routes.length > 0) && (
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            {vehicles.length > 0 && (
+                            {veiculos.length > 0 && (
                                 <div className="space-y-2">
                                     <Label className="flex items-center gap-2">
                                         <Truck className="h-4 w-4" />
@@ -333,7 +333,7 @@ export function CostForm({
                                             <SelectValue placeholder="Selecione..." />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            {vehicles.map((v) => (
+                                            {veiculos.map((v) => (
                                                 <SelectItem key={v.id} value={v.id}>
                                                     {v.plate} {v.model && `- ${v.model}`}
                                                 </SelectItem>

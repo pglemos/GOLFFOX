@@ -16,7 +16,7 @@ async function runDiagnostic() {
   const results = {
     auth: null,
     userInfo: null,
-    vehicles: null,
+    veiculos: null,
     trips: null,
     positions: null,
     routes: null,
@@ -63,12 +63,12 @@ async function runDiagnostic() {
   console.log('\n3️⃣  Verificando veículos ativos...');
   try {
     const { data, error, count } = await supabaseClient
-      .from('vehicles')
+      .from('veiculos')
       .select('id, plate, model, is_active, company_id', { count: 'exact' })
       .eq('is_active', true);
     
     if (error) throw error;
-    results.vehicles = { count, data: data?.slice(0, 3) };
+    results.veiculos = { count, data: data?.slice(0, 3) };
     console.log(`✅ Encontrados ${count} veículos ativos`);
     if (data && data.length > 0) {
       console.log('   Primeiros veículos:', data.slice(0, 3));
@@ -76,7 +76,7 @@ async function runDiagnostic() {
       console.warn('⚠️  Nenhum veículo ativo encontrado!');
     }
   } catch (error) {
-    results.errors.push({ step: 'vehicles', error: error.message });
+    results.errors.push({ step: 'veiculos', error: error.message });
     console.error('❌ Erro ao buscar veículos:', error);
   }
 
@@ -147,7 +147,7 @@ async function runDiagnostic() {
     };
     
     const { error } = await supabaseClient
-      .from('vehicles')
+      .from('veiculos')
       .insert(testVehicle)
       .select()
       .single();
@@ -164,7 +164,7 @@ async function runDiagnostic() {
       console.log('✅ RLS permite inserção');
       // Deletar veículo de teste
       await supabaseClient
-        .from('vehicles')
+        .from('veiculos')
         .delete()
         .eq('plate', 'TEST-DIAGNOSTIC');
     }
@@ -179,7 +179,7 @@ async function runDiagnostic() {
   
   console.log('Autenticação:', results.auth?.authenticated ? '✅' : '❌');
   console.log('Role do usuário:', results.userInfo?.role || '❌');
-  console.log('Veículos ativos:', results.vehicles?.count || 0);
+  console.log('Veículos ativos:', results.veiculos?.count || 0);
   console.log('Trips ativas:', results.trips?.count || 0);
   console.log('Posições GPS recentes:', results.positions?.count || 0);
   console.log('Rotas ativas:', results.routes?.count || 0);
@@ -199,7 +199,7 @@ async function runDiagnostic() {
     console.log('🔴 CRÍTICO: Usuário não está autenticado. Faça login primeiro.');
   }
   
-  if (results.vehicles?.count === 0) {
+  if (results.veiculos?.count === 0) {
     console.log('🔴 CRÍTICO: Não há veículos ativos no banco de dados.');
     console.log('   Solução: Execute o script database/CREATE_TEST_DATA.sql no Supabase.');
   }

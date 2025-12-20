@@ -36,7 +36,7 @@ interface RouteParams {
 }
 
 /**
- * GET /api/admin/drivers/[driverId]/compensation
+ * GET /api/admin/motoristas/[driverId]/compensation
  * Busca a compensação ativa de um motorista
  */
 export async function GET(request: NextRequest, { params }: RouteParams) {
@@ -94,7 +94,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 }
 
 /**
- * POST /api/admin/drivers/[driverId]/compensation
+ * POST /api/admin/motoristas/[driverId]/compensation
  * Cria ou atualiza a compensação de um motorista
  */
 export async function POST(request: NextRequest, { params }: RouteParams) {
@@ -203,7 +203,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 }
 
 /**
- * DELETE /api/admin/drivers/[driverId]/compensation
+ * DELETE /api/admin/motoristas/[driverId]/compensation
  * Desativa a compensação de um motorista
  */
 export async function DELETE(request: NextRequest, { params }: RouteParams) {

@@ -256,7 +256,7 @@ export async function getDriverTrips(driverId: string, date?: string) {
         .select(`
             *,
             route:routes(*),
-            veiculo:vehicles(*)
+            veiculo:veiculos(*)
         `)
         .eq('motorista_id', driverId)
         .gte('scheduled_date', today)
@@ -476,7 +476,7 @@ export async function getPassengerTrips(passengerId: string) {
         .select(`
             *,
             route:routes(*),
-            veiculo:vehicles(*),
+            veiculo:veiculos(*),
             motorista:users!motorista_id(id, name, phone)
         `)
         .gte('scheduled_date', new Date().toISOString().split('T')[0])

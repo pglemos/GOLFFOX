@@ -64,13 +64,13 @@ export function AssistanceModal({ request, isOpen, onClose, onSave }: Assistance
   const loadAvailableResources = async () => {
     try {
       // Carregar motoristas disponíveis (sem viagem em andamento)
-      const { data: drivers } = await supabase
+      const { data: motoristas } = await supabase
         .from("users")
         .select("*")
         .eq("role", "motorista")
         .eq("is_active", true)
 
-      if (drivers) {
+      if (motoristas) {
         // Filtrar motoristas que não estão em viagem
         const { data: activeTrips } = await supabase
           .from("trips")
@@ -78,23 +78,23 @@ export function AssistanceModal({ request, isOpen, onClose, onSave }: Assistance
           .eq("status", "inProgress")
 
         const activeDriverIds = new Set(activeTrips?.map((t: any) => t.motorista_id) || [])
-        setAvailableDrivers(drivers.filter((d: any) => !activeDriverIds.has(d.id)))
+        setAvailableDrivers(motoristas.filter((d: any) => !activeDriverIds.has(d.id)))
       }
 
       // Carregar veículos disponíveis (sem viagem em andamento)
-      const { data: vehicles } = await supabase
-        .from("vehicles")
+      const { data: veiculos } = await supabase
+        .from("veiculos")
         .select("*")
         .eq("is_active", true)
 
-      if (vehicles) {
+      if (veiculos) {
         const { data: activeTrips } = await supabase
           .from("trips")
           .select("veiculo_id")
           .eq("status", "inProgress")
 
         const activeVehicleIds = new Set(activeTrips?.map((t: any) => t.veiculo_id) || [])
-        setAvailableVehicles(vehicles.filter((v: any) => !activeVehicleIds.has(v.id)))
+        setAvailableVehicles(veiculos.filter((v: any) => !activeVehicleIds.has(v.id)))
       }
     } catch (error) {
       console.error("Erro ao carregar recursos:", error)

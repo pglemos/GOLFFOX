@@ -22,8 +22,8 @@ export interface CostFilters {
 interface CostFiltersProps {
   onFiltersChange: (filters: CostFilters) => void
   routes?: Array<{ id: string; name: string }>
-  vehicles?: Array<{ id: string; plate: string }>
-  drivers?: Array<{ id: string; email: string }>
+  veiculos?: Array<{ id: string; plate: string }>
+  motoristas?: Array<{ id: string; email: string }>
   categories?: Array<{ id: string; group_name: string; category: string }>
   carriers?: Array<{ id: string; name: string }>
 }
@@ -59,8 +59,8 @@ const PERIOD_PRESETS = {
 export function CostFilters({
   onFiltersChange,
   routes = [],
-  vehicles = [],
-  drivers = [],
+  veiculos = [],
+  motoristas = [],
   categories = [],
   carriers = []
 }: CostFiltersProps) {
@@ -193,7 +193,7 @@ export function CostFilters({
             )}
 
             {/* Veículo */}
-            {vehicles.length > 0 && (
+            {veiculos.length > 0 && (
               <div className="space-y-2">
                 <Label>Veículo</Label>
                 <select
@@ -202,7 +202,7 @@ export function CostFilters({
                   onChange={(e) => handleTempFilterChange('veiculo_id', e.target.value || undefined)}
                 >
                   <option value="">Todos os veículos</option>
-                  {vehicles.map(veiculo => (
+                  {veiculos.map(veiculo => (
                     <option key={veiculo.id} value={veiculo.id}>{veiculo.plate}</option>
                   ))}
                 </select>
@@ -210,7 +210,7 @@ export function CostFilters({
             )}
 
             {/* Motorista */}
-            {drivers.length > 0 && (
+            {motoristas.length > 0 && (
               <div className="space-y-2">
                 <Label>Motorista</Label>
                 <select
@@ -219,7 +219,7 @@ export function CostFilters({
                   onChange={(e) => handleTempFilterChange('motorista_id', e.target.value || undefined)}
                 >
                   <option value="">Todos os motoristas</option>
-                  {drivers.map(motorista => (
+                  {motoristas.map(motorista => (
                     <option key={motorista.id} value={motorista.id}>{motorista.email}</option>
                   ))}
                 </select>

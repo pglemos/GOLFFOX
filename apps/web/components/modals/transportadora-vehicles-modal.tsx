@@ -20,7 +20,7 @@ interface TransportadoraVehiclesModalProps {
 }
 
 export function TransportadoraVehiclesModal({ transportadora, isOpen, onClose }: TransportadoraVehiclesModalProps) {
-  const [vehicles, setVehicles] = useState<any[]>([])
+  const [veiculos, setVeiculos] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
   const [activeTab, setActiveTab] = useState("list")
   
@@ -41,18 +41,18 @@ export function TransportadoraVehiclesModal({ transportadora, isOpen, onClose }:
 
   useEffect(() => {
     if (isOpen && transportadora) {
-      loadVehicles()
+      loadVeiculos()
       setActiveTab("list")
     }
   }, [isOpen, transportadora])
 
-  const loadVehicles = async () => {
+  const loadVeiculos = async () => {
     try {
       setLoading(true)
-      const response = await fetch(`/api/admin/transportadora/${transportadora.id}/vehicles`)
+      const response = await fetch(`/api/admin/transportadora/${transportadora.id}/veiculos`)
       if (response.ok) {
         const result = await response.json()
-        setVehicles(result.vehicles || [])
+        setVeiculos(result.veiculos || [])
       }
     } catch (error) {
       console.error('Erro ao carregar veículos:', error)
@@ -84,7 +84,7 @@ export function TransportadoraVehiclesModal({ transportadora, isOpen, onClose }:
     setLoading(true)
 
     try {
-      const response = await fetch(`/api/admin/transportadora/${transportadora.id}/vehicles`, {
+      const response = await fetch(`/api/admin/transportadora/${transportadora.id}/veiculos`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -118,7 +118,7 @@ export function TransportadoraVehiclesModal({ transportadora, isOpen, onClose }:
     setLoading(true)
 
     try {
-      const response = await fetch(`/api/admin/transportadora/${transportadora.id}/vehicles/${editingVehicle.id}`, {
+      const response = await fetch(`/api/admin/transportadora/${transportadora.id}/veiculos/${editingVehicle.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -152,7 +152,7 @@ export function TransportadoraVehiclesModal({ transportadora, isOpen, onClose }:
     setLoading(true)
 
     try {
-      const response = await fetch(`/api/admin/transportadora/${transportadora.id}/vehicles/${vehicleId}`, {
+      const response = await fetch(`/api/admin/transportadora/${transportadora.id}/veiculos/${vehicleId}`, {
         method: 'DELETE'
       })
 
@@ -197,7 +197,7 @@ export function TransportadoraVehiclesModal({ transportadora, isOpen, onClose }:
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 overflow-hidden flex flex-col">
           <TabsList className="w-full grid grid-cols-2 gap-1 sm:gap-2">
-            <TabsTrigger value="list" className="text-xs sm:text-sm min-h-[44px]">Lista ({vehicles.length})</TabsTrigger>
+            <TabsTrigger value="list" className="text-xs sm:text-sm min-h-[44px]">Lista ({veiculos.length})</TabsTrigger>
             <TabsTrigger value="form" className="text-xs sm:text-sm min-h-[44px]">
               {editingVehicle ? 'Editar' : 'Novo Veículo'}
             </TabsTrigger>
@@ -205,7 +205,7 @@ export function TransportadoraVehiclesModal({ transportadora, isOpen, onClose }:
 
           <TabsContent value="list" className="flex-1 overflow-y-auto mt-4 space-y-4">
             <div className="flex justify-between items-center">
-              <h3 className="font-semibold">Total de Veículos: {vehicles.length}</h3>
+              <h3 className="font-semibold">Total de Veículos: {veiculos.length}</h3>
               <Button size="sm" onClick={() => {
                 resetForm()
                 setActiveTab("form")
@@ -220,7 +220,7 @@ export function TransportadoraVehiclesModal({ transportadora, isOpen, onClose }:
               <div className="text-center py-8 text-muted-foreground">Carregando veículos...</div>
             )}
 
-            {!loading && vehicles.length === 0 && (
+            {!loading && veiculos.length === 0 && (
               <Card className="p-8 text-center">
                 <Truck className="h-12 w-12 text-ink-light mx-auto mb-4" />
                 <p className="text-muted-foreground mb-4">Nenhum veículo associado a esta transportadora</p>
@@ -231,9 +231,9 @@ export function TransportadoraVehiclesModal({ transportadora, isOpen, onClose }:
               </Card>
             )}
 
-            {!loading && vehicles.length > 0 && (
+            {!loading && veiculos.length > 0 && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {vehicles.map((veiculo) => (
+                {veiculos.map((veiculo) => (
                   <Card key={veiculo.id} className="p-4 hover:shadow-md transition-shadow">
                     <div className="space-y-3">
                       {/* Cabeçalho */}

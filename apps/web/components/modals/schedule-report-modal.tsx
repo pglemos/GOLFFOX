@@ -37,7 +37,7 @@ const REPORT_TYPES = [
   { id: 'occupancy', label: 'Ocupação' },
   { id: 'not_boarded', label: 'Não Embarcados' },
   { id: 'routes', label: 'Rotas Eficientes' },
-  { id: 'drivers', label: 'Ranking de Motoristas' },
+  { id: 'motoristas', label: 'Ranking de Motoristas' },
 ]
 
 const CRON_PRESETS = [

@@ -1,4 +1,4 @@
-import { DELETE } from '@/app/api/admin/vehicles/delete/route'
+import { DELETE } from '@/app/api/admin/veiculos/delete/route'
 import { createAdminRequest } from '../../../helpers/api-test-helpers'
 import { mockSupabaseClient } from '../../../helpers/mock-supabase'
 import { createTestVehicle } from '../../../helpers/test-data'
@@ -18,7 +18,7 @@ jest.mock('@/lib/api-auth', () => ({
   }),
 }))
 
-describe('DELETE /api/admin/vehicles/delete', () => {
+describe('DELETE /api/admin/veiculos/delete', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockSupabaseClient.clear()
@@ -29,12 +29,12 @@ describe('DELETE /api/admin/vehicles/delete', () => {
 
   it('deve excluir veículo', async () => {
     const veiculo = createTestVehicle('transportadora-1', { plate: 'ABC1234' })
-    mockSupabaseClient.setTableData('vehicles', [veiculo])
+    mockSupabaseClient.setTableData('veiculos', [veiculo])
     mockSupabaseClient.setTableData('trips', [])
 
     const req = createAdminRequest({
       method: 'DELETE',
-      url: `http://localhost:3000/api/admin/vehicles/delete?id=${veiculo.id}`,
+      url: `http://localhost:3000/api/admin/veiculos/delete?id=${veiculo.id}`,
     }) as NextRequest
 
     const response = await DELETE(req)
@@ -47,14 +47,14 @@ describe('DELETE /api/admin/vehicles/delete', () => {
 
   it('deve atualizar trips antes de excluir', async () => {
     const veiculo = createTestVehicle('transportadora-1', { plate: 'ABC1234' })
-    mockSupabaseClient.setTableData('vehicles', [veiculo])
+    mockSupabaseClient.setTableData('veiculos', [veiculo])
     mockSupabaseClient.setTableData('trips', [
       { id: 'trip-1', veiculo_id: veiculo.id },
     ])
 
     const req = createAdminRequest({
       method: 'DELETE',
-      url: `http://localhost:3000/api/admin/vehicles/delete?id=${veiculo.id}`,
+      url: `http://localhost:3000/api/admin/veiculos/delete?id=${veiculo.id}`,
     }) as NextRequest
 
     const response = await DELETE(req)
@@ -67,7 +67,7 @@ describe('DELETE /api/admin/vehicles/delete', () => {
   it('deve rejeitar sem ID do veículo', async () => {
     const req = createAdminRequest({
       method: 'DELETE',
-      url: 'http://localhost:3000/api/admin/vehicles/delete',
+      url: 'http://localhost:3000/api/admin/veiculos/delete',
     }) as NextRequest
 
     const response = await DELETE(req)
@@ -79,13 +79,13 @@ describe('DELETE /api/admin/vehicles/delete', () => {
 
   it('deve lidar com erro ao excluir', async () => {
     const veiculo = createTestVehicle('transportadora-1')
-    mockSupabaseClient.setTableError('vehicles', {
+    mockSupabaseClient.setTableError('veiculos', {
       message: 'Database error',
     })
 
     const req = createAdminRequest({
       method: 'DELETE',
-      url: `http://localhost:3000/api/admin/vehicles/delete?id=${veiculo.id}`,
+      url: `http://localhost:3000/api/admin/veiculos/delete?id=${veiculo.id}`,
     }) as NextRequest
 
     const response = await DELETE(req)
