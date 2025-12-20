@@ -256,7 +256,30 @@ async function handleRootRoute(request: NextRequest): Promise<NextResponse> {
   const nextParam = request.nextUrl.searchParams.get('next')
   const safeNext = sanitizeRedirectPath(nextParam, request.url)
   
-  // Validar autenticação usando lib/api-auth.ts
+  // ✅ CORREÇÃO: Verificar cookie primeiro antes de validar autenticação completa
+  // Isso evita chamadas desnecessárias ao Supabase quando não há cookie
+  const hasSessionCookie = request.cookies.get('golffox-session')?.value
+  const hasSupabaseCookie = (() => {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+    if (!supabaseUrl) return false
+    const projectRef = supabaseUrl.split('//')[1]?.split('.')[0]
+    if (!projectRef) return false
+    const supabaseCookieName = `sb-${projectRef}-auth-token`
+    return !!request.cookies.get(supabaseCookieName)?.value
+  })()
+  
+  // Se não há cookies de sessão, permitir acesso à página de login
+  // Manter ?next= na URL para redirecionamento após login
+  if (!hasSessionCookie && !hasSupabaseCookie) {
+    if (safeNext) {
+      debug('Mantendo parâmetro ?next na URL para redirecionamento após login', {
+        next: safeNext
+      }, 'Proxy')
+    }
+    return NextResponse.next()
+  }
+  
+  // Validar autenticação usando lib/api-auth.ts (apenas se houver cookies)
   const user = await validateAuth(request)
   
   if (user) {
@@ -291,16 +314,7 @@ async function handleRootRoute(request: NextRequest): Promise<NextResponse> {
   }
   
   // Não autenticado ou sem rota padrão - permitir acesso à página de login
-  // ✅ CORREÇÃO: Se há parâmetro ?next, manter na URL para redirecionamento após login
-  // Mas apenas se não houver cookie de sessão (usuário realmente não autenticado)
-  const hasSessionCookie = request.cookies.get('golffox-session')?.value
-  if (!hasSessionCookie && safeNext) {
-    // Manter ?next= na URL apenas se não houver sessão
-    debug('Mantendo parâmetro ?next na URL para redirecionamento após login', {
-      next: safeNext
-    }, 'Proxy')
-  }
-  
+  // Se há parâmetro ?next, manter na URL para redirecionamento após login
   return NextResponse.next()
 }
 
