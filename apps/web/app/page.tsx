@@ -1526,4 +1526,219 @@ function LoginContent() {
                 </noscript>
               </div>
             </motion.div>
-            {/* REST_OF_CODE_HERE_6 */}
+            {/* Desktop: Mensagens Premium */}
+            <div className="hidden lg:block mb-6">
+              <AnimatePresence mode="wait">
+                {error && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                    className="p-4 bg-error-light/10 border border-error/20 rounded-xl text-sm text-error shadow-sm flex items-start gap-3"
+                    role="alert"
+                  >
+                    <div className="w-5 h-5 rounded-full bg-error flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <span className="text-white text-xs font-bold">!</span>
+                    </div>
+                    <p className="flex-1 font-medium">{error}</p>
+                  </motion.div>
+                )}
+
+                {success && !error && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                    className="p-4 bg-success-light/10 border border-success/20 rounded-xl text-sm text-success shadow-sm flex items-center gap-3"
+                  >
+                    <Sparkles className="w-5 h-5 flex-shrink-0" />
+                    <span className="font-medium">Login realizado com sucesso!</span>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {/* Desktop: Formulário Premium */}
+            <form
+              action={resolvedAuthEndpoint}
+              method="post"
+              onSubmit={(e) => {
+                e.preventDefault()
+                if (!loading && !transitioning) {
+                  handleLogin()
+                }
+              }}
+              className="hidden lg:block space-y-5"
+            >
+              {/* Título Desktop */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5 }}
+                className="mb-8"
+              >
+                <motion.h1
+                  className="text-4xl font-bold text-ink-strong mb-2 tracking-tight"
+                >
+                  Bem-vindo
+                </motion.h1>
+                <p className="text-lg text-ink-muted">
+                  Entre com suas credenciais para continuar.
+                </p>
+              </motion.div>
+
+              {/* Campo Email Desktop */}
+              <div className="space-y-2">
+                <label className="block text-sm font-semibold text-ink-strong mb-1" htmlFor="desktop-login-email">
+                  E-mail
+                </label>
+                <div className="relative group">
+                  <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none z-10 text-ink-muted">
+                    <Mail className="h-5 w-5" />
+                  </div>
+                  <Input
+                    id="desktop-login-email"
+                    ref={emailInputRef}
+                    name="email"
+                    type="email"
+                    required
+                    placeholder="golffox@admin.com"
+                    value={email}
+                    onChange={(e) => setEmail(sanitizeInput(e.target.value))}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && !loading && !transitioning && password.trim().length > 0) {
+                        e.preventDefault()
+                        passwordInputRef.current?.focus()
+                      }
+                    }}
+                    autoComplete="email"
+                    className={`w-full h-12 pl-12 pr-4 bg-bg-soft border ${fieldErrors.email
+                      ? "border-error focus:border-error focus:ring-2 focus:ring-error/20"
+                      : "border-border focus:border-brand focus:ring-2 focus:ring-brand/20 hover:border-border-hover"
+                      } rounded-xl text-base focus:bg-white placeholder:text-ink-muted transition-all duration-200`}
+                  />
+                  {fieldErrors.email && (
+                    <p className="mt-1 text-xs text-error font-medium flex items-center gap-1">
+                      <span>⚠</span> {fieldErrors.email}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              {/* Campo Senha Desktop */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <label className="block text-sm font-semibold text-ink-strong mb-1" htmlFor="desktop-login-password">
+                    Senha
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => debug('Forgot password clicked', {}, 'LoginPage')}
+                    className="text-xs font-semibold text-brand hover:text-brand-hover transition-colors"
+                  >
+                    Esqueceu?
+                  </button>
+                </div>
+                <div className="relative group">
+                  <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none z-10 text-ink-muted">
+                    <Lock className="h-5 w-5" />
+                  </div>
+                  <Input
+                    id="desktop-login-password"
+                    name="password"
+                    type={showPassword ? "text" : "password"}
+                    required
+                    placeholder="Digite sua senha"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && !loading && !transitioning) {
+                        e.preventDefault()
+                        handleLogin()
+                      }
+                    }}
+                    ref={passwordInputRef}
+                    autoComplete="current-password"
+                    className={`w-full h-12 pl-12 pr-12 bg-bg-soft border ${fieldErrors.password
+                      ? "border-error focus:border-error focus:ring-2 focus:ring-error/20"
+                      : "border-border focus:border-brand focus:ring-2 focus:ring-brand/20 hover:border-border-hover"
+                      } rounded-xl text-base focus:bg-white placeholder:text-ink-muted transition-all duration-200`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-muted hover:text-brand transition-colors h-8 w-8 flex items-center justify-center rounded-lg hover:bg-bg-hover"
+                    aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
+                  >
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                  {fieldErrors.password && (
+                    <p className="mt-1 text-xs text-error font-medium flex items-center gap-1">
+                      <span>⚠</span> {fieldErrors.password}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex items-center space-x-2 pt-2">
+                <Checkbox
+                  id="desktop-remember-me"
+                  checked={rememberMe}
+                  onCheckedChange={(checked) => setRememberMe(checked === true)}
+                  className="rounded border-border data-[state=checked]:bg-brand data-[state=checked]:border-brand"
+                />
+                <label
+                  htmlFor="desktop-remember-me"
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-ink-muted cursor-pointer"
+                >
+                  Manter conectado
+                </label>
+              </div>
+
+              {/* Botão de Login Desktop */}
+              <div className="pt-4">
+                <Button
+                  type="submit"
+                  disabled={!canSubmit}
+                  className="w-full h-12 bg-brand hover:bg-brand-hover text-white font-bold text-base shadow-brand/20 shadow-lg hover:shadow-brand/40 transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed disabled:shadow-none rounded-xl"
+                >
+                  {loading || transitioning ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <motion.span
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                        className="rounded-full h-4 w-4 border-2 border-white/30 border-t-white"
+                      />
+                      <span>Entrando...</span>
+                    </span>
+                  ) : (
+                    <span className="flex items-center justify-center gap-2">
+                      <span>Entrar</span>
+                      <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    </span>
+                  )}
+                </Button>
+              </div>
+            </form>
+
+            {/* Footer Desktop */}
+            <div className="hidden lg:flex mt-12 items-center justify-center text-xs text-ink-muted/60 gap-1.5 opacity-60 hover:opacity-100 transition-opacity">
+              <Shield className="h-3 w-3" />
+              <span>Golf Fox Security</span>
+            </div>
+          </motion.div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <LoginErrorBoundary>
+      <Suspense fallback={<div />}>
+        <LoginContent />
+      </Suspense>
+    </LoginErrorBoundary>
+  )
+}

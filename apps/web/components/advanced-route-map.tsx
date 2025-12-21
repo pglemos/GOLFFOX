@@ -13,7 +13,6 @@ import TemporalProgressBar from './temporal-progress-bar'
 import { MapSkeletonLoader } from './map-skeleton-loader'
 import { InteractiveMarkerHotspot } from './interactive-marker-hotspot'
 import { AdvancedPlaybackControls } from './advanced-playback-controls'
-// PerformanceMonitor removido
 import { AccessibilityControls, useAccessibilityControls } from './accessibility-controls'
 import { useResponsive, useReducedMotion } from '@/hooks/use-responsive'
 import { usePerformance } from '@/hooks/use-performance'
@@ -80,7 +79,6 @@ export const AdvancedRouteMap = memo(function AdvancedRouteMap({
   const prefersReducedMotion = useReducedMotion()
   const { metrics, isPerformanceGood, measureOperation } = usePerformance()
   const { state: accessibilityState, announce, focusElement } = useAccessibility()
-  // PerformanceMonitor removido
   const accessibilityControls = useAccessibilityControls()
   
   const [isLoading, setIsLoading] = useState(true)

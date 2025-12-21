@@ -1,102 +1,13 @@
 /**
- * View Transition Component
+ * View Transition Hook Export
  * 
- * Componente wrapper para aplicar View Transitions em navegação
- */
-
-'use client'
-
-import { ReactNode, useCallback } from 'react'
-import { useRouter } from '@/lib/next-navigation'
-import { useViewTransition, useViewTransitionsSupported } from '@/hooks/use-view-transition'
-
-interface ViewTransitionLinkProps {
-  href: string
-  children: ReactNode
-  replace?: boolean
-  className?: string
-  onClick?: () => void
-}
-
-/**
- * Link component com View Transitions
+ * Este arquivo exporta apenas o hook useViewTransition.
+ * Os componentes ViewTransitionLink e ViewTransitionButton foram removidos
+ * pois não estavam sendo utilizados no projeto.
  * 
- * @example
- * <ViewTransitionLink href="/admin/companies">
- *   Companies
- * </ViewTransitionLink>
+ * Se necessário no futuro, os componentes podem ser recriados usando o hook.
  */
-export function ViewTransitionLink({
-  href,
-  children,
-  replace = false,
-  className,
-  onClick,
-}: ViewTransitionLinkProps) {
-  const { navigateWithTransition, isPending } = useViewTransition()
-  const isSupported = useViewTransitionsSupported()
 
-  const handleClick = useCallback(
-    (e: React.MouseEvent<HTMLAnchorElement>) => {
-      e.preventDefault()
-      onClick?.()
-      navigateWithTransition(href, { replace })
-    },
-    [href, replace, navigateWithTransition, onClick]
-  )
-
-  return (
-    <a
-      href={href}
-      onClick={handleClick}
-      className={className}
-      aria-busy={isPending}
-      data-view-transition={isSupported}
-    >
-      {children}
-    </a>
-  )
-}
-
-/**
- * Button component com View Transitions
- */
-interface ViewTransitionButtonProps {
-  href: string
-  children: ReactNode
-  replace?: boolean
-  className?: string
-  onClick?: () => void
-  disabled?: boolean
-}
-
-export function ViewTransitionButton({
-  href,
-  children,
-  replace = false,
-  className,
-  onClick,
-  disabled,
-}: ViewTransitionButtonProps) {
-  const { navigateWithTransition, isPending } = useViewTransition()
-  const isSupported = useViewTransitionsSupported()
-
-  const handleClick = useCallback(() => {
-    if (disabled || isPending) return
-    onClick?.()
-    navigateWithTransition(href, { replace })
-  }, [href, replace, navigateWithTransition, onClick, disabled, isPending])
-
-  return (
-    <button
-      onClick={handleClick}
-      disabled={disabled || isPending}
-      className={className}
-      aria-busy={isPending}
-      data-view-transition={isSupported}
-    >
-      {children}
-    </button>
-  )
-}
+// Re-exportar hook para compatibilidade
+export { useViewTransition, useViewTransitionsSupported } from '@/hooks/use-view-transition'
 

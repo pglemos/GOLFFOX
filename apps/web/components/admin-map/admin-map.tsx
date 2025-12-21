@@ -150,7 +150,6 @@ export function AdminMap({
   const [playbackFrom, setPlaybackFrom] = useState<Date>(new Date(Date.now() - 2 * 60 * 60 * 1000)) // Últimas 2h
   const [playbackTo, setPlaybackTo] = useState<Date>(new Date())
   const [playbackSpeed, setPlaybackSpeed] = useState<1 | 2 | 4>(1)
-  // Removido estado não utilizado historicalPositions
   const [showHeatmap, setShowHeatmap] = useState(false)
   const [showTrajectoryAnalysis, setShowTrajectoryAnalysis] = useState(false)
   const [trajectoryAnalysis, setTrajectoryAnalysis] = useState<TrajectoryAnalysis | null>(null)

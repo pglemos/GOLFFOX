@@ -15,9 +15,6 @@ cqrsBus.registerCommandHandler<CreateCompanyCommand, any>(
   createCompanyHandler
 )
 
-// Exportar função para inicialização (opcional)
-export function registerAllHandlers() {
-  // Handlers já registrados acima
-  // Adicionar mais handlers conforme necessário
-}
+// Handlers são registrados diretamente acima
+// Se necessário criar função de inicialização no futuro, adicionar aqui
 
