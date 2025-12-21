@@ -33,32 +33,62 @@ const originalNavigator = global.navigator
 const originalFetch = global.fetch
 
 describe('Web Vitals', () => {
+  let originalWindowDescriptor: PropertyDescriptor | undefined
+  let originalDocumentDescriptor: PropertyDescriptor | undefined
+  let originalNavigatorDescriptor: PropertyDescriptor | undefined
+  let originalFetch: typeof fetch
+
   beforeEach(() => {
     jest.clearAllMocks()
     resetMetrics()
 
-    global.window = {
-      location: { href: 'http://localhost:3000/test' },
-    } as any
+    // Store original descriptors
+    originalWindowDescriptor = Object.getOwnPropertyDescriptor(global, 'window')
+    originalDocumentDescriptor = Object.getOwnPropertyDescriptor(global, 'document')
+    originalNavigatorDescriptor = Object.getOwnPropertyDescriptor(global, 'navigator')
+    originalFetch = global.fetch
 
-    global.navigator = {
-      userAgent: 'test-agent',
-      onLine: true,
-      sendBeacon: jest.fn(() => true),
-    } as any
+    Object.defineProperty(global, 'window', {
+      value: {
+        location: { href: 'http://localhost:3000/test' },
+      },
+      writable: true,
+      configurable: true,
+    })
 
-    global.document = {
-      addEventListener: jest.fn(),
-      visibilityState: 'visible',
-    } as any
+    Object.defineProperty(global, 'navigator', {
+      value: {
+        userAgent: 'test-agent',
+        onLine: true,
+        sendBeacon: jest.fn(() => true),
+      },
+      writable: true,
+      configurable: true,
+    })
+
+    Object.defineProperty(global, 'document', {
+      value: {
+        addEventListener: jest.fn(),
+        visibilityState: 'visible',
+      },
+      writable: true,
+      configurable: true,
+    })
 
     global.fetch = jest.fn().mockResolvedValue({ ok: true })
   })
 
   afterEach(() => {
-    global.window = originalWindow
-    global.document = originalDocument
-    global.navigator = originalNavigator
+    // Restore original descriptors
+    if (originalWindowDescriptor) {
+      Object.defineProperty(global, 'window', originalWindowDescriptor)
+    }
+    if (originalDocumentDescriptor) {
+      Object.defineProperty(global, 'document', originalDocumentDescriptor)
+    }
+    if (originalNavigatorDescriptor) {
+      Object.defineProperty(global, 'navigator', originalNavigatorDescriptor)
+    }
     global.fetch = originalFetch
   })
 
@@ -196,7 +226,7 @@ describe('Web Vitals', () => {
     })
 
     it('deve usar fetch como fallback quando sendBeacon retorna false', async () => {
-      ;(global.navigator as any).sendBeacon = jest.fn(() => false)
+      ; (global.navigator as any).sendBeacon = jest.fn(() => false)
 
       const report = {
         url: 'http://localhost:3000/test',
@@ -234,9 +264,9 @@ describe('Web Vitals', () => {
     })
 
     it('deve lidar com erros silenciosamente quando documento está hidden', async () => {
-      ;(global.document as any).visibilityState = 'hidden'
-      ;(global.navigator as any).sendBeacon = jest.fn(() => false)
-      ;(global.fetch as jest.Mock).mockRejectedValue(new Error('Network error'))
+      ; (global.document as any).visibilityState = 'hidden'
+        ; (global.navigator as any).sendBeacon = jest.fn(() => false)
+        ; (global.fetch as jest.Mock).mockRejectedValue(new Error('Network error'))
 
       const report = {
         url: 'http://localhost:3000/test',
@@ -372,7 +402,7 @@ describe('Web Vitals', () => {
         navigationType: 'navigate',
       })
 
-      ;(global.document as any).visibilityState = 'hidden'
+        ; (global.document as any).visibilityState = 'hidden'
       visibilityCallback?.()
 
       expect(global.fetch).toHaveBeenCalled()

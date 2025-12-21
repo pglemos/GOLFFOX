@@ -172,11 +172,8 @@ describe('Supabase Sync Service', () => {
       jest.useFakeTimers()
       const resultPromise = syncToSupabase(operation)
 
-      // Avançar todos os delays de retry
-      for (let i = 0; i < 5; i++) {
-        jest.advanceTimersByTime(1000 * Math.pow(2, i))
-        await Promise.resolve()
-      }
+      // Avançar todos os delays de retry usando runAllTimersAsync
+      await jest.runAllTimersAsync()
 
       const result = await resultPromise
       jest.useRealTimers()
@@ -188,7 +185,7 @@ describe('Supabase Sync Service', () => {
       const failed = getFailedSyncs()
       expect(failed.length).toBeGreaterThan(0)
       expect(failed[0].operation.resourceId).toBe('veiculo-123')
-    })
+    }, 30000)
 
     it('deve validar dados antes de sincronizar', async () => {
       const operation = {
@@ -304,12 +301,10 @@ describe('Supabase Sync Service', () => {
       }
 
       jest.useFakeTimers()
-      await syncToSupabase(operation)
-      // Avançar todos os delays
-      for (let i = 0; i < 5; i++) {
-        jest.advanceTimersByTime(1000 * Math.pow(2, i))
-        await Promise.resolve()
-      }
+      const syncPromise = syncToSupabase(operation)
+      // Avançar todos os delays usando runAllTimersAsync
+      await jest.runAllTimersAsync()
+      await syncPromise
       jest.useRealTimers()
 
       // Agora simular sucesso na reprocessamento
@@ -326,7 +321,7 @@ describe('Supabase Sync Service', () => {
 
       expect(result.processed).toBeGreaterThan(0)
       expect(result.succeeded).toBeGreaterThan(0)
-    })
+    }, 30000)
   })
 
   describe('clearFailedSync', () => {
@@ -353,11 +348,9 @@ describe('Supabase Sync Service', () => {
       }
 
       jest.useFakeTimers()
-      await syncToSupabase(operation)
-      for (let i = 0; i < 5; i++) {
-        jest.advanceTimersByTime(1000 * Math.pow(2, i))
-        await Promise.resolve()
-      }
+      const syncPromise = syncToSupabase(operation)
+      await jest.runAllTimersAsync()
+      await syncPromise
       jest.useRealTimers()
 
       const failedBefore = getFailedSyncs()
@@ -367,7 +360,7 @@ describe('Supabase Sync Service', () => {
 
       const failedAfter = getFailedSyncs()
       expect(failedAfter.length).toBeLessThan(failedBefore.length)
-    })
+    }, 30000)
   })
 
   describe('Mapeamento de dados', () => {

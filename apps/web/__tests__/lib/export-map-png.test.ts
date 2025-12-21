@@ -15,6 +15,11 @@ describe('Export Map PNG', () => {
   const originalDocument = global.document
   const originalWindow = global.window
 
+  let mockGetElementById: jest.Mock
+  let mockCreateElement: jest.Mock
+  let mockAppendChild: jest.Mock
+  let mockRemoveChild: jest.Mock
+
   beforeEach(() => {
     jest.clearAllMocks()
     mockHtml2Canvas.mockResolvedValue({
@@ -23,46 +28,60 @@ describe('Export Map PNG', () => {
       toDataURL: jest.fn(() => 'data:image/png;base64,test'),
     })
 
-    // Mock DOM
-    global.document = {
-      getElementById: jest.fn(),
-      createElement: jest.fn((tag: string) => {
-        if (tag === 'a') {
-          return {
-            download: '',
-            href: '',
-            click: jest.fn(),
-          } as any
-        }
-        if (tag === 'div') {
-          return {
-            className: '',
-            textContent: '',
-          } as any
-        }
-        if (tag === 'canvas') {
-          return {
-            width: 0,
-            height: 0,
-            getContext: jest.fn(() => ({
-              fillStyle: '',
-              fillRect: jest.fn(),
-              drawImage: jest.fn(),
-            })),
-            toDataURL: jest.fn(() => 'data:image/png;base64,test'),
-          } as any
-        }
-        return {} as any
-      }),
-      body: {
-        appendChild: jest.fn(),
-        removeChild: jest.fn(),
-      },
-    } as any
+    // Create mock functions
+    mockGetElementById = jest.fn()
+    mockCreateElement = jest.fn((tag: string) => {
+      if (tag === 'a') {
+        return {
+          download: '',
+          href: '',
+          click: jest.fn(),
+        } as any
+      }
+      if (tag === 'div') {
+        return {
+          className: '',
+          textContent: '',
+        } as any
+      }
+      if (tag === 'canvas') {
+        return {
+          width: 0,
+          height: 0,
+          getContext: jest.fn(() => ({
+            fillStyle: '',
+            fillRect: jest.fn(),
+            drawImage: jest.fn(),
+          })),
+          toDataURL: jest.fn(() => 'data:image/png;base64,test'),
+        } as any
+      }
+      return {} as any
+    })
+    mockAppendChild = jest.fn()
+    mockRemoveChild = jest.fn()
 
-    global.window = {
-      location: { href: 'http://localhost' },
-    } as any
+    // Mock DOM
+    Object.defineProperty(global, 'document', {
+      value: {
+        getElementById: mockGetElementById,
+        createElement: mockCreateElement,
+        body: {
+          appendChild: mockAppendChild,
+          removeChild: mockRemoveChild,
+        },
+      },
+      writable: true,
+      configurable: true,
+    })
+
+    Object.defineProperty(global, 'window', {
+      value: {
+        location: { href: 'http://localhost' },
+      },
+      writable: true,
+      configurable: true,
+    })
   })
 
   afterEach(() => {
@@ -78,11 +97,11 @@ describe('Export Map PNG', () => {
         scrollHeight: 600,
       }
 
-      ;(global.document.getElementById as jest.Mock).mockReturnValue(mockContainer)
+      mockGetElementById.mockReturnValue(mockContainer)
 
       await exportMapPNG('map-container')
 
-      expect(global.document.getElementById).toHaveBeenCalledWith('map-container')
+      expect(mockGetElementById).toHaveBeenCalledWith('map-container')
       expect(mockHtml2Canvas).toHaveBeenCalledWith(mockContainer, expect.objectContaining({
         useCORS: true,
         backgroundColor: '#ffffff',
@@ -98,15 +117,15 @@ describe('Export Map PNG', () => {
         scrollHeight: 600,
       }
 
-      ;(global.document.getElementById as jest.Mock).mockReturnValue(mockContainer)
+      mockGetElementById.mockReturnValue(mockContainer)
 
       await exportMapPNG()
 
-      expect(global.document.getElementById).toHaveBeenCalledWith('map-container')
+      expect(mockGetElementById).toHaveBeenCalledWith('map-container')
     })
 
     it('deve lançar erro se container não encontrado', async () => {
-      ;(global.document.getElementById as jest.Mock).mockReturnValue(null)
+      mockGetElementById.mockReturnValue(null)
 
       await expect(exportMapPNG('non-existent')).rejects.toThrow('Container com ID "non-existent" não encontrado')
     })
@@ -123,22 +142,22 @@ describe('Export Map PNG', () => {
         click: jest.fn(),
       }
 
-      ;(global.document.getElementById as jest.Mock).mockReturnValue(mockContainer)
-      ;(global.document.createElement as jest.Mock).mockReturnValueOnce({
+      mockGetElementById.mockReturnValue(mockContainer)
+      mockCreateElement.mockReturnValueOnce({
         className: '',
         textContent: '',
       } as any)
-      ;(global.document.createElement as jest.Mock).mockReturnValueOnce(mockLink)
-      ;(global.document.createElement as jest.Mock).mockReturnValueOnce({
+      mockCreateElement.mockReturnValueOnce(mockLink)
+      mockCreateElement.mockReturnValueOnce({
         className: '',
         textContent: '',
       } as any)
 
       await exportMapPNG('map-container')
 
-      expect(global.document.body.appendChild).toHaveBeenCalled()
+      expect(mockAppendChild).toHaveBeenCalled()
       expect(mockLink.click).toHaveBeenCalled()
-      expect(global.document.body.removeChild).toHaveBeenCalled()
+      expect(mockRemoveChild).toHaveBeenCalled()
     })
 
     it('deve lidar com erros durante exportação', async () => {
@@ -148,7 +167,7 @@ describe('Export Map PNG', () => {
         scrollHeight: 600,
       }
 
-      ;(global.document.getElementById as jest.Mock).mockReturnValue(mockContainer)
+      mockGetElementById.mockReturnValue(mockContainer)
       mockHtml2Canvas.mockRejectedValue(new Error('Canvas error'))
 
       const mockErrorToast = {
@@ -156,11 +175,11 @@ describe('Export Map PNG', () => {
         textContent: '',
       }
 
-      ;(global.document.createElement as jest.Mock).mockReturnValue(mockErrorToast)
+      mockCreateElement.mockReturnValue(mockErrorToast)
 
       await expect(exportMapPNG('map-container')).rejects.toThrow('Canvas error')
 
-      expect(global.document.body.appendChild).toHaveBeenCalled()
+      expect(mockAppendChild).toHaveBeenCalled()
     })
   })
 
@@ -177,7 +196,7 @@ describe('Export Map PNG', () => {
         scrollHeight: 400,
       }
 
-      ;(global.document.getElementById as jest.Mock)
+      mockGetElementById
         .mockReturnValueOnce(mockMapContainer)
         .mockReturnValueOnce(mockLegendContainer)
 
@@ -204,7 +223,7 @@ describe('Export Map PNG', () => {
         toDataURL: jest.fn(() => 'data:image/png;base64,test'),
       }
 
-      ;(global.document.createElement as jest.Mock).mockReturnValue(mockCanvas)
+      mockCreateElement.mockReturnValue(mockCanvas)
 
       await exportMapPNGWithLegends('map-container', 'legend-container')
 
@@ -219,7 +238,7 @@ describe('Export Map PNG', () => {
         scrollHeight: 600,
       }
 
-      ;(global.document.getElementById as jest.Mock).mockReturnValue(mockMapContainer)
+      mockGetElementById.mockReturnValue(mockMapContainer)
 
       const mockCanvas = {
         width: 0,
@@ -232,7 +251,7 @@ describe('Export Map PNG', () => {
         toDataURL: jest.fn(() => 'data:image/png;base64,test'),
       }
 
-      ;(global.document.createElement as jest.Mock).mockReturnValue(mockCanvas)
+      mockCreateElement.mockReturnValue(mockCanvas)
 
       await exportMapPNGWithLegends('map-container')
 
@@ -240,7 +259,7 @@ describe('Export Map PNG', () => {
     })
 
     it('deve lançar erro se container do mapa não encontrado', async () => {
-      ;(global.document.getElementById as jest.Mock).mockReturnValue(null)
+      mockGetElementById.mockReturnValue(null)
 
       await expect(exportMapPNGWithLegends('non-existent')).rejects.toThrow('Container do mapa "non-existent" não encontrado')
     })
@@ -257,7 +276,7 @@ describe('Export Map PNG', () => {
         scrollHeight: 400,
       }
 
-      ;(global.document.getElementById as jest.Mock)
+      mockGetElementById
         .mockReturnValueOnce(mockMapContainer)
         .mockReturnValueOnce(mockLegendContainer)
 
@@ -289,7 +308,7 @@ describe('Export Map PNG', () => {
         toDataURL: jest.fn(() => 'data:image/png;base64,test'),
       }
 
-      ;(global.document.createElement as jest.Mock).mockReturnValue(mockCanvas)
+      mockCreateElement.mockReturnValue(mockCanvas)
 
       await exportMapPNGWithLegends('map-container', 'legend-container')
 

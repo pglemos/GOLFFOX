@@ -5,7 +5,31 @@
             "jest",
             "@testing-library/jest-dom",
             "node"
-        ]
+        ],
+        "baseUrl": ".",
+        "paths": {
+            "@/*": [
+                "./*"
+            ],
+            "@/components/*": [
+                "./components/*"
+            ],
+            "@/lib/*": [
+                "./lib/*"
+            ],
+            "@/server/*": [
+                "./server/*"
+            ],
+            "@shared/*": [
+                "../../shared/*"
+            ],
+            "@/hooks/*": [
+                "./hooks/*"
+            ],
+            "@/app/*": [
+                "./app/*"
+            ]
+        }
     },
     "include": [
         "**/*.test.ts",
@@ -14,7 +38,16 @@
         "**/*.spec.tsx",
         "**/__tests__/**/*.ts",
         "**/__tests__/**/*.tsx",
-        "jest.setup.js"
+        "lib/**/*.ts",
+        "lib/**/*.tsx",
+        "components/**/*.ts",
+        "components/**/*.tsx",
+        "hooks/**/*.ts",
+        "hooks/**/*.tsx",
+        "app/**/*.ts",
+        "app/**/*.tsx",
+        "jest.setup.js",
+        "types/**/*.d.ts"
     ],
     "exclude": [
         "node_modules"
