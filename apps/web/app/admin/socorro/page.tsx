@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { useDispatchFormReducer } from "@/hooks/reducers/form-reducer"
 import { AppShell } from "@/components/app-shell"
 import { Button } from "@/components/ui/button"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
@@ -39,14 +40,7 @@ export default function SocorroPage() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
 
   // Estados para o formulário de despacho
-  const [routesWithProblems, setRoutesWithProblems] = useState<any[]>([])
-  const [availableDrivers, setAvailableDrivers] = useState<any[]>([])
-  const [availableVehicles, setAvailableVehicles] = useState<any[]>([])
-  const [selectedRouteId, setSelectedRouteId] = useState<string>("")
-  const [selectedDriverId, setSelectedDriverId] = useState<string>("")
-  const [selectedVehicleId, setSelectedVehicleId] = useState<string>("")
-  const [dispatching, setDispatching] = useState(false)
-  const [loadingResources, setLoadingResources] = useState(false)
+  const [dispatchFormState, dispatchFormDispatch] = useDispatchFormReducer()
 
   const handleSaveFilters = () => {
     setFilterStatus(tempFilterStatus)
@@ -69,42 +63,42 @@ export default function SocorroPage() {
 
   const loadEmergencyResources = async () => {
     try {
-      setLoadingResources(true)
+      dispatchFormDispatch({ type: 'SET_LOADING_RESOURCES', payload: true })
       
       // Carregar rotas com problemas
       const routesResponse = await fetch('/api/admin/emergency/routes-with-problems')
       const routesResult = await routesResponse.json()
       if (routesResult.success) {
-        setRoutesWithProblems(routesResult.routes || [])
+        dispatchFormDispatch({ type: 'SET_ROUTES', payload: routesResult.routes || [] })
       }
 
       // Carregar motoristas disponíveis
       const driversResponse = await fetch('/api/admin/emergency/available-motoristas')
       const driversResult = await driversResponse.json()
       if (driversResult.success) {
-        setAvailableDrivers(driversResult.motoristas || [])
+        dispatchFormDispatch({ type: 'SET_DRIVERS', payload: driversResult.motoristas || [] })
       }
 
       // Carregar veículos disponíveis
       const vehiclesResponse = await fetch('/api/admin/emergency/available-veiculos')
       const vehiclesResult = await vehiclesResponse.json()
       if (vehiclesResult.success) {
-        setAvailableVehicles(vehiclesResult.veiculos || [])
+        dispatchFormDispatch({ type: 'SET_VEHICLES', payload: vehiclesResult.veiculos || [] })
       }
     } catch (error) {
       console.error('Erro ao carregar recursos de emergência:', error)
     } finally {
-      setLoadingResources(false)
+      dispatchFormDispatch({ type: 'SET_LOADING_RESOURCES', payload: false })
     }
   }
 
   const handleDispatchEmergency = async () => {
-    if (!selectedRouteId || !selectedDriverId || !selectedVehicleId) {
+    if (!dispatchFormState.selections.routeId || !dispatchFormState.selections.driverId || !dispatchFormState.selections.vehicleId) {
       notifyError('Por favor, preencha todos os campos obrigatórios')
       return
     }
 
-    setDispatching(true)
+    dispatchFormDispatch({ type: 'SET_DISPATCHING', payload: true })
     try {
       const response = await fetch('/api/admin/emergency/dispatch', {
         method: 'POST',
@@ -112,9 +106,9 @@ export default function SocorroPage() {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          routeId: selectedRouteId,
-          driverId: selectedDriverId,
-          vehicleId: selectedVehicleId
+          routeId: dispatchFormState.selections.routeId,
+          driverId: dispatchFormState.selections.driverId,
+          vehicleId: dispatchFormState.selections.vehicleId
         })
       })
 
@@ -127,9 +121,7 @@ export default function SocorroPage() {
       notifySuccess('Socorro despachado com sucesso!')
       
       // Limpar formulário
-      setSelectedRouteId("")
-      setSelectedDriverId("")
-      setSelectedVehicleId("")
+      dispatchFormDispatch({ type: 'RESET_SELECTIONS' })
       
       // Recarregar recursos e ocorrências
       await loadEmergencyResources()
@@ -138,7 +130,7 @@ export default function SocorroPage() {
       console.error('Erro ao despachar socorro:', error)
       notifyError(error.message || 'Erro ao despachar socorro')
     } finally {
-      setDispatching(false)
+      dispatchFormDispatch({ type: 'SET_DISPATCHING', payload: false })
     }
   }
 
@@ -236,20 +228,20 @@ export default function SocorroPage() {
                   Selecione a Rota com Problema
                 </Label>
                 <Select 
-                  value={selectedRouteId} 
-                  onValueChange={setSelectedRouteId}
-                  disabled={loadingResources}
+                  value={dispatchFormState.selections.routeId} 
+                  onValueChange={(value) => dispatchFormDispatch({ type: 'SET_ROUTE_ID', payload: value })}
+                  disabled={dispatchFormState.loading.loadingResources}
                 >
                   <SelectTrigger className={`h-12 text-base ${!selectedRouteId ? 'border-error-light' : ''}`}>
                     <SelectValue placeholder="Selecione uma rota com problema" />
                   </SelectTrigger>
                   <SelectContent>
-                    {routesWithProblems.length === 0 ? (
+                    {dispatchFormState.resources.routes.length === 0 ? (
                       <SelectItem value="none" disabled>
-                        {loadingResources ? 'Carregando rotas...' : 'Nenhuma rota com problema encontrada'}
+                        {dispatchFormState.loading.loadingResources ? 'Carregando rotas...' : 'Nenhuma rota com problema encontrada'}
                       </SelectItem>
                     ) : (
-                      routesWithProblems.map((route) => (
+                      dispatchFormState.resources.routes.map((route) => (
                         <SelectItem key={route.id} value={route.id}>
                           {route.displayName}
                         </SelectItem>
@@ -266,20 +258,20 @@ export default function SocorroPage() {
                   Escolha o Motorista de Socorro
                 </Label>
                 <Select 
-                  value={selectedDriverId} 
-                  onValueChange={setSelectedDriverId}
-                  disabled={loadingResources}
+                  value={dispatchFormState.selections.driverId} 
+                  onValueChange={(value) => dispatchFormDispatch({ type: 'SET_DRIVER_ID', payload: value })}
+                  disabled={dispatchFormState.loading.loadingResources}
                 >
                   <SelectTrigger className="h-12 text-base">
                     <SelectValue placeholder="Selecione um motorista de socorro" />
                   </SelectTrigger>
                   <SelectContent>
-                    {availableDrivers.length === 0 ? (
+                    {dispatchFormState.resources.drivers.length === 0 ? (
                       <SelectItem value="none" disabled>
-                        {loadingResources ? 'Carregando motoristas...' : 'Nenhum motorista disponível'}
+                        {dispatchFormState.loading.loadingResources ? 'Carregando motoristas...' : 'Nenhum motorista disponível'}
                       </SelectItem>
                     ) : (
-                      availableDrivers.map((motorista) => (
+                      dispatchFormState.resources.drivers.map((motorista) => (
                         <SelectItem key={motorista.id} value={motorista.id}>
                           {motorista.displayName}
                         </SelectItem>
@@ -296,20 +288,20 @@ export default function SocorroPage() {
                   Escolha o Veículo de Socorro
                 </Label>
                 <Select 
-                  value={selectedVehicleId} 
-                  onValueChange={setSelectedVehicleId}
-                  disabled={loadingResources}
+                  value={dispatchFormState.selections.vehicleId} 
+                  onValueChange={(value) => dispatchFormDispatch({ type: 'SET_VEHICLE_ID', payload: value })}
+                  disabled={dispatchFormState.loading.loadingResources}
                 >
                   <SelectTrigger className="h-12 text-base">
                     <SelectValue placeholder="Selecione um veículo de socorro" />
                   </SelectTrigger>
                   <SelectContent>
-                    {availableVehicles.length === 0 ? (
+                    {dispatchFormState.resources.vehicles.length === 0 ? (
                       <SelectItem value="none" disabled>
-                        {loadingResources ? 'Carregando veículos...' : 'Nenhum veículo disponível'}
+                        {dispatchFormState.loading.loadingResources ? 'Carregando veículos...' : 'Nenhum veículo disponível'}
                       </SelectItem>
                     ) : (
-                      availableVehicles.map((veiculo) => (
+                      dispatchFormState.resources.vehicles.map((veiculo) => (
                         <SelectItem key={veiculo.id} value={veiculo.id}>
                           {veiculo.displayName}
                         </SelectItem>
@@ -323,12 +315,12 @@ export default function SocorroPage() {
               <div className="pt-4">
                 <Button
                   onClick={handleDispatchEmergency}
-                  disabled={dispatching || !selectedRouteId || !selectedDriverId || !selectedVehicleId || loadingResources}
+                  disabled={dispatchFormState.loading.dispatching || !dispatchFormState.selections.routeId || !dispatchFormState.selections.driverId || !dispatchFormState.selections.vehicleId || dispatchFormState.loading.loadingResources}
                   className="w-full bg-text-error hover:bg-text-error/90 h-12 text-base font-semibold"
                   size="lg"
                 >
                   <Send className="h-5 w-5 mr-2" />
-                  {dispatching ? 'Despachando...' : 'Despachar Socorro Agora'}
+                  {dispatchFormState.loading.dispatching ? 'Despachando...' : 'Despachar Socorro Agora'}
                 </Button>
               </div>
             </div>

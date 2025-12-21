@@ -1,12 +1,11 @@
 ﻿"use client"
 
-import { useEffect, useState, useCallback } from "react"
+import { useEffect, useState } from "react"
 import { AppShell } from "@/components/app-shell"
 import { Button } from "@/components/ui/button"
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card"
-import { supabase } from "@/lib/supabase"
-import { ensureSupabaseSession } from "@/lib/supabase-session"
 import { useRouter } from "@/lib/next-navigation"
+import { useAuth } from "@/components/providers/auth-provider"
 
 import { ControlTowerCards } from "@/components/empresa/control-tower-cards"
 import { useEmpresaTenant } from "@/components/providers/empresa-tenant-provider"
@@ -39,10 +38,9 @@ export default function EmpresaDashboard() {
         return
       }
     }
-  }, [])
+  }, [router])
   const { tenantCompanyId, companyName, loading: tenantLoading, error: tenantError } = useEmpresaTenant()
-  const [user, setUser] = useState<any>(null)
-  const [loading, setLoading] = useState(true)
+  const { user, loading } = useAuth()
   const [period, setPeriod] = useState<PeriodFilterType>("today")
 
   // Usar React Query para KPIs e Control Tower
@@ -70,91 +68,26 @@ export default function EmpresaDashboard() {
     openAssistance: 0
   }
 
-  const [error, setError] = useState<string | null>(null)
-
+  // Redirecionar para login se não autenticado
   useEffect(() => {
-    const getUser = async () => {
-      try {
-        // ✅ PRIMEIRO: Tentar obter do cookie de sessão customizado (mais rápido e confiável)
-        if (typeof document !== 'undefined') {
-          const cookieMatch = document.cookie.match(/golffox-session=([^;]+)/)
-          if (cookieMatch) {
-            try {
-              const decoded = atob(cookieMatch[1])
-              const userData = JSON.parse(decoded)
-              if (userData?.id && userData?.email && userData?.role) {
-                console.log('✅ Usuário obtido do cookie:', {
-                  id: userData.id,
-                  email: userData.email,
-                  role: userData.role
-                })
-                setUser(userData)
-                await ensureSupabaseSession()
-                setLoading(false)
-                return
-              }
-            } catch (cookieErr) {
-              console.warn('⚠️ Erro ao decodificar cookie de sessão:', cookieErr)
-            }
-          }
-        }
-
-        // ✅ FALLBACK: Tentar obter sessão do Supabase Auth
-        const session = await ensureSupabaseSession()
-
-        if (!session) {
-          // Se não há sessão Supabase e não há cookie, redirecionar para login
-          if (typeof document !== 'undefined' && !document.cookie.includes('golffox-session')) {
-            console.log('⚠️ Sem sessão detectada, redirecionando para login')
-            router.push("/")
-            return
-          }
-          // Se há cookie mas não há sessão Supabase, continuar com cookie
-          setLoading(false)
-          return
-        }
-
-        // Buscar dados completos do usuário no banco
-        const { data: userData, error: userError } = await supabase
-          .from("users")
-          .select("*")
-          .eq("id", session.user.id)
-          .maybeSingle()
-
-        if (userError) {
-          console.warn('⚠️ Erro ao buscar dados do usuário:', userError)
-        }
-
-        if (userData) {
-          setUser({ ...session.user, ...userData })
-        } else {
-          setUser({ ...session.user })
-        }
-      } catch (err: any) {
-        console.error('❌ Erro ao obter usuário:', err)
-        // Não definir erro fatal - pode ser apenas problema temporário
-        // A página pode funcionar mesmo sem dados completos do usuário
-      } finally {
-        setLoading(false)
-      }
+    if (!loading && !user) {
+      router.push("/")
     }
-
-    getUser()
-  }, [router])
+  }, [loading, user, router])
 
   // Removido - agora usando React Query hooks
 
   if (loading || tenantLoading || kpisLoading || controlTowerLoading) {
     return (
-      <AppShell user={{ id: user?.id || "", name: user?.name || "Empresa", email: user?.email || "", role: "empresa", avatar_url: (user as any)?.avatar_url }}>
+      <AppShell user={{ id: user?.id || "", name: user?.name || "Empresa", email: user?.email || "", role: user?.role || "empresa", avatar_url: user?.avatar_url }}>
         <DashboardSkeleton />
       </AppShell>
     )
   }
 
-  if (tenantError || error) {
+  if (tenantError) {
     return (
-      <AppShell user={{ id: user?.id || "", name: user?.name || "Empresa", email: user?.email || "", role: "empresa", avatar_url: (user as any)?.avatar_url }}>
+      <AppShell user={{ id: user?.id || "", name: user?.name || "Empresa", email: user?.email || "", role: user?.role || "empresa", avatar_url: user?.avatar_url }}>
         <div className="min-h-screen flex items-center justify-center p-4">
           <Card className="p-8 max-w-md w-full text-center">
             <h2 className="text-xl font-bold mb-2 text-error">Erro ao carregar</h2>
@@ -170,7 +103,7 @@ export default function EmpresaDashboard() {
 
   if (!tenantCompanyId) {
     return (
-      <AppShell user={{ id: user?.id || "", name: user?.name || "Empresa", email: user?.email || "", role: "empresa", avatar_url: (user as any)?.avatar_url }}>
+      <AppShell user={{ id: user?.id || "", name: user?.name || "Empresa", email: user?.email || "", role: user?.role || "empresa", avatar_url: user?.avatar_url }}>
         <div className="min-h-screen flex items-center justify-center p-4">
           <Card className="p-8 max-w-md w-full text-center">
             <h2 className="text-xl font-bold mb-2">Nenhuma empresa selecionada</h2>
@@ -187,8 +120,8 @@ export default function EmpresaDashboard() {
       id: user?.id || "",
       name: user?.name || "Empresa",
       email: user?.email || "",
-      role: "empresa",
-      avatar_url: (user as any)?.avatar_url
+      role: user?.role || "empresa",
+      avatar_url: user?.avatar_url
     }}>
       <div className="space-y-4 sm:space-y-6 lg:space-y-8 w-full">
         {/* Filtros de Período */}

@@ -1,6 +1,7 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react"
+import { useTransportadoraRealtime } from "@/hooks/use-transportadora-realtime"
 import { AppShell } from "@/components/app-shell"
 import { Button } from "@/components/ui/button"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
@@ -41,8 +42,8 @@ import {
   Minus
 } from "lucide-react"
 import { supabase } from "@/lib/supabase"
-import { ensureSupabaseSession } from "@/lib/supabase-session"
 import { useRouter } from "@/lib/next-navigation"
+import { useAuth } from "@/components/providers/auth-provider"
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts"
 import { t } from "@/lib/i18n"
 import { cn } from "@/lib/utils"
@@ -50,98 +51,17 @@ import { cn } from "@/lib/utils"
 export default function TransportadoraDashboard() {
   const router = useRouter()
   const isMobile = useMobile()
-  const [user, setUser] = useState<any>(null)
-  const [userData, setUserData] = useState<any>(null)
-  const [loading, setLoading] = useState(true)
-
+  const { user, loading } = useAuth()
+  
+  // Redirecionar para login se não autenticado ou sem role adequada
   useEffect(() => {
-    const getUser = async () => {
-      console.log('🔍 [Transportadora] Iniciando verificação de autenticação...')
-      try {
-        // ✅ PRIMEIRO: Tentar obter do cookie de sessão customizado (mais rápido e confiável)
-        // Nota: Se o cookie for httpOnly, isso não funcionará, mas tentaremos mesmo assim
-        if (typeof document !== 'undefined') {
-          try {
-            console.log('🔍 [Transportadora] Chamando API /api/auth/me...')
-            const meResponse = await fetch('/api/auth/me', {
-              credentials: 'include'
-            })
-            console.log('🔍 [Transportadora] Resposta da API /api/auth/me:', { status: meResponse.status, ok: meResponse.ok })
-
-            if (meResponse.ok) {
-              const meData = await meResponse.json()
-              console.log('✅ [Transportadora] Resposta da API /api/auth/me:', { success: meData.success, hasUser: !!meData.user, role: meData.user?.role })
-
-              if (
-                meData.success &&
-                meData.user &&
-                ['transportadora', 'operador', 'transportadora', 'admin'].includes(meData.user.role)
-              ) {
-                console.log('✅ [Transportadora] Usuário transportadora autenticado via API /api/auth/me, definindo usuário...')
-                setUser(meData.user)
-                setUserData(meData.user)
-                await ensureSupabaseSession()
-                setLoading(false)
-                console.log('✅ [Transportadora] Autenticação concluída com sucesso')
-                return
-              } else {
-                console.warn('⚠️ [Transportadora] API /api/auth/me retornou OK mas sem usuário transportadora:', meData)
-              }
-            } else {
-              const errorText = await meResponse.text()
-              console.warn('⚠️ [Transportadora] API /api/auth/me retornou erro:', meResponse.status, errorText)
-            }
-          } catch (apiError) {
-            console.warn('⚠️ [Transportadora] Erro ao chamar API /api/auth/me:', apiError)
-          }
-        }
-
-        // ✅ FALLBACK: Tentar obter sessão do Supabase Auth
-        try {
-          const { data: { session }, error: sessionError } = await supabase.auth.getSession()
-          if (sessionError) {
-            console.error('Erro ao verificar sessão Supabase:', sessionError)
-          }
-
-          if (session) {
-            console.log('✅ Sessão Supabase encontrada, buscando dados do usuário')
-            const { data, error: dbError } = await supabase
-              .from("users")
-              .select("*")
-              .eq("id", session.user.id)
-              .single()
-
-            if (dbError) {
-              console.warn('⚠️ Erro ao buscar dados do usuário:', dbError)
-            }
-
-            if (data && ['transportadora', 'operador', 'transportadora', 'admin'].includes(data.role)) {
-              console.log('✅ Usuário transportadora autenticado via Supabase Auth')
-              setUser({ ...session.user, ...data })
-              setUserData(data)
-              setLoading(false)
-              return
-            } else {
-              console.warn('⚠️ Usuário não tem role transportadora/operador:', data?.role)
-            }
-          } else {
-            console.warn('⚠️ Nenhuma sessão Supabase encontrada')
-          }
-        } catch (supabaseError) {
-          console.warn('⚠️ Erro ao verificar sessão Supabase:', supabaseError)
-        }
-
-        // Se chegou aqui, não há autenticação válida
-        console.warn('⚠️ Usuário não autenticado ou sem role transportadora, redirecionando para login')
-        router.push("/")
-      } catch (error) {
-        console.error('❌ Erro ao verificar autenticação:', error)
-        router.push("/")
-      }
+    if (!loading && (!user || !['transportadora', 'operador', 'admin'].includes(user.role || ''))) {
+      router.push("/")
     }
+  }, [loading, user, router])
 
-    getUser()
-  }, [router])
+  // Obter transportadora_id do usuário
+  const transportadoraId = user?.companyId || user?.company_id || null
 
   const [fleet, setFleet] = useState<any[]>([])
   const [motoristas, setMotoristas] = useState<any[]>([])
@@ -169,115 +89,15 @@ export default function TransportadoraDashboard() {
   const [topDrivers, setTopDrivers] = useState<any[]>([])
   const [recentActivities, setRecentActivities] = useState<any[]>([])
 
-  useEffect(() => {
-    if (user && userData?.transportadora_id) {
-      loadFleetData()
-
-      // Configurar Realtime subscription para atualização automática
-      const channel = supabase
-        .channel('transportadora-dashboard-realtime')
-        .on(
-          'postgres_changes',
-          {
-            event: '*',
-            schema: 'public',
-            table: 'motorista_positions'
-          },
-          () => {
-            loadFleetData()
-          }
-        )
-        .on(
-          'postgres_changes',
-          {
-            event: '*',
-            schema: 'public',
-            table: 'trips'
-          },
-          () => {
-            loadFleetData()
-          }
-        )
-        .on(
-          'postgres_changes',
-          {
-            event: '*',
-            schema: 'public',
-            table: 'trip_passageiros'
-          },
-          () => {
-            loadFleetData()
-          }
-        )
-        .on(
-          'postgres_changes',
-          {
-            event: '*',
-            schema: 'public',
-            table: 'driver_documents'
-          },
-          () => {
-            loadFleetData()
-          }
-        )
-        .on(
-          'postgres_changes',
-          {
-            event: '*',
-            schema: 'public',
-            table: 'vehicle_maintenances'
-          },
-          () => {
-            loadFleetData()
-          }
-        )
-        .on(
-          'postgres_changes',
-          {
-            event: '*',
-            schema: 'public',
-            table: 'vehicle_costs'
-          },
-          () => {
-            loadFleetData()
-          }
-        )
-        .on(
-          'postgres_changes',
-          {
-            event: '*',
-            schema: 'public',
-            table: 'route_costs'
-          },
-          () => {
-            loadFleetData()
-          }
-        )
-        .subscribe()
-
-      // Fallback: polling a cada 60 segundos
-      const interval = setInterval(() => {
-        loadFleetData()
-      }, 60000)
-
-      return () => {
-        supabase.removeChannel(channel as any)
-        clearInterval(interval)
-      }
-    }
-  }, [user, userData?.transportadora_id])
-
-  const loadFleetData = async () => {
+  const loadFleetData = useCallback(async () => {
     try {
       // Buscar dados da transportadora (preferir cookie para evitar RLS no client)
-      const transportadoraData = { transportadora_id: (userData as any)?.transportadora_id || (user as any)?.transportadora_id || null }
+      const transportadoraData = { transportadora_id: (user as any)?.transportadora_id || null }
 
-      if (!transportadoraData?.transportadora_id) {
+      if (!transportadoraId) {
         console.error("Usuário não está associado a uma transportadora")
         return
       }
-
-      const transportadoraId = transportadoraData.transportadora_id
 
       // Carregar veículos
       const { data: veiculos } = await supabase
@@ -533,14 +353,25 @@ export default function TransportadoraDashboard() {
       setRecentActivities(activities)
 
       // Atualizar userData para usar no FleetMap
-      setUserData((prev: any) => ({
-        ...prev,
-        ...transportadoraData,
-      }))
     } catch (error) {
       console.error("Erro ao carregar dados da frota:", error)
     }
-  }
+  }, [transportadoraId])
+
+  // Carregar dados iniciais
+  useEffect(() => {
+    if (user && transportadoraId) {
+      loadFleetData()
+    }
+  }, [user, transportadoraId, loadFleetData])
+
+  // Configurar Realtime subscription e polling
+  useTransportadoraRealtime({
+    transportadoraId: user && transportadoraId ? transportadoraId : null,
+    onDataUpdate: loadFleetData,
+    enablePolling: true,
+    pollingInterval: 60000,
+  })
 
   if (loading) {
     return (
@@ -559,7 +390,7 @@ export default function TransportadoraDashboard() {
       name: user?.name || "Transportadora",
       email: user?.email || "",
       role: "transportadora",
-      avatar_url: (user as any)?.avatar_url
+      avatar_url: user?.avatar_url
     }}>
       <div className="space-y-4 sm:space-y-6 lg:space-y-8 w-full">
         {/* Header */}
@@ -828,7 +659,7 @@ export default function TransportadoraDashboard() {
               )}>
                 <LazyWrapper>
                   <FleetMap
-                    transportadoraId={userData?.transportadora_id}
+                    transportadoraId={transportadoraId}
                   />
                 </LazyWrapper>
               </div>

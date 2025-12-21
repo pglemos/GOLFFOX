@@ -11,13 +11,13 @@ import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
 import { supabase } from "@/lib/supabase"
 import { useRouter, useSearchParams } from "@/lib/next-navigation"
+import { useAuth } from "@/components/providers/auth-provider"
 import { Map, Filter, Layers, Navigation, RefreshCw, Maximize2 } from "lucide-react"
 
 function TransportadoraMapaContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const [user, setUser] = useState<any>(null)
-  const [loading, setLoading] = useState(true)
+  const { user, loading } = useAuth()
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const [showRoutes, setShowRoutes] = useState(true)
   const [mapType, setMapType] = useState<"roadmap" | "satellite" | "terrain">("roadmap")
@@ -28,7 +28,9 @@ function TransportadoraMapaContent() {
   const latParam = searchParams.get('lat')
   const lngParam = searchParams.get('lng')
   const zoomParam = searchParams.get('zoom')
-  const [transportadoraId, setTransportadoraId] = useState<string | null>(null)
+  
+  // Obter transportadora_id do usuário
+  const transportadoraId = user?.companyId || user?.company_id || null
 
   const initialCenter = latParam && lngParam 
     ? { lat: parseFloat(latParam), lng: parseFloat(lngParam) }
@@ -36,43 +38,32 @@ function TransportadoraMapaContent() {
 
   const initialZoom = zoomParam ? parseFloat(zoomParam) : undefined
 
+  // Carregar rotas da transportadora
   useEffect(() => {
-    const getUser = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
-      if (!session) {
-        router.push("/")
-        return
-      }
-      
-      // Buscar transportadora_id do usuário
-      const { data: userData } = await supabase
-        .from('users')
-        .select('transportadora_id')
-        .eq('id', session.user.id)
-        .single()
-      
-      setUser({ ...session.user })
-      setTransportadoraId(userData?.transportadora_id || null)
-      setLoading(false)
-
-      // Carregar rotas da transportadora
-      if (userData?.transportadora_id) {
-        const { data: routesData } = await supabase
-          .from('routes')
-          .select('id, name')
-          .eq('transportadora_id', userData.transportadora_id)
-        setRoutes(routesData || [])
-      }
+    if (transportadoraId) {
+      supabase
+        .from('routes')
+        .select('id, name')
+        .eq('transportadora_id', transportadoraId)
+        .then(({ data }) => {
+          setRoutes(data || [])
+        })
     }
-    getUser()
-  }, [router])
+  }, [transportadoraId])
+
+  // Redirecionar para login se não autenticado
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push("/")
+    }
+  }, [loading, user, router])
 
   if (loading) {
     return <div className="min-h-screen flex items-center justify-center"><div className="w-16 h-16 border-4 border-text-brand border-t-transparent rounded-full animate-spin mx-auto"></div></div>
   }
 
   return (
-    <AppShell user={{ id: user?.id || "", name: user?.name || "Transportadora", email: user?.email || "", role: "transportadora", avatar_url: user?.avatar_url }}>
+    <AppShell user={{ id: user?.id || "", name: user?.name || "Transportadora", email: user?.email || "", role: user?.role || "transportadora", avatar_url: user?.avatar_url }}>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>

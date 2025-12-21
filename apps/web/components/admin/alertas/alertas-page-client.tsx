@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useMemo, useCallback, useEffect, useOptimistic } from "react"
+import { useFiltersReducer } from "@/hooks/reducers/filters-reducer"
 import dynamic from "next/dynamic"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -61,27 +62,17 @@ export function AlertasPageClient({ initialAlertas }: AlertasPageClientProps) {
   const [dataLoading, setDataLoading] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
   const debouncedSearchQuery = useDebounce(searchQuery, 300)
-  const [filtersExpanded, setFiltersExpanded] = useState(false)
-  const [tempFilterSeverity, setTempFilterSeverity] = useState<string>("all")
-  const [tempFilterStatus, setTempFilterStatus] = useState<string>("all")
-  const [filterSeverity, setFilterSeverity] = useState<string>("all")
-  const [filterStatus, setFilterStatus] = useState<string>("all")
+  const [filtersState, filtersDispatch] = useFiltersReducer()
   const [selectedAlertForEdit, setSelectedAlertForEdit] = useState<Alerta | null>(null)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
 
   const handleSaveFilters = () => {
-    setFilterSeverity(tempFilterSeverity)
-    setFilterStatus(tempFilterStatus)
-    setFiltersExpanded(false)
+    filtersDispatch({ type: 'SAVE_FILTERS' })
     loadAlertas()
   }
 
   const handleResetFilters = () => {
-    setTempFilterSeverity("all")
-    setTempFilterStatus("all")
-    setFilterSeverity("all")
-    setFilterStatus("all")
-    setFiltersExpanded(false)
+    filtersDispatch({ type: 'RESET_FILTERS' })
     loadAlertas()
   }
 
@@ -89,11 +80,11 @@ export function AlertasPageClient({ initialAlertas }: AlertasPageClientProps) {
     try {
       setDataLoading(true)
       const params = new URLSearchParams()
-      if (filterSeverity !== "all") {
-        params.append('severity', filterSeverity)
+      if (filtersState.active.severity !== "all") {
+        params.append('severity', filtersState.active.severity)
       }
-      if (filterStatus !== "all") {
-        params.append('status', filterStatus)
+      if (filtersState.active.status !== "all") {
+        params.append('status', filtersState.active.status)
       }
 
       const response = await fetch(`/api/admin/alerts-list?${params.toString()}`)
@@ -115,7 +106,7 @@ export function AlertasPageClient({ initialAlertas }: AlertasPageClientProps) {
     } finally {
       setDataLoading(false)
     }
-  }, [filterSeverity, filterStatus])
+  }, [filtersState.active.severity, filtersState.active.status])
 
   // Escutar eventos de sincronização global
   useGlobalSync(
@@ -285,10 +276,10 @@ export function AlertasPageClient({ initialAlertas }: AlertasPageClientProps) {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => setFiltersExpanded(!filtersExpanded)}
+              onClick={() => filtersDispatch({ type: 'TOGGLE_EXPANDED' })}
               className="gap-2 w-full sm:w-auto min-h-[44px] touch-manipulation"
             >
-              {filtersExpanded ? (
+              {filtersState.expanded ? (
                 <>
                   <ChevronUp className="h-4 w-4" />
                   <span className="hidden sm:inline">Minimizar</span>
@@ -304,7 +295,7 @@ export function AlertasPageClient({ initialAlertas }: AlertasPageClientProps) {
             </Button>
           </div>
         </CardHeader>
-        {filtersExpanded && (
+        {filtersState.expanded && (
           <CardContent className="p-3 sm:p-6 pt-0">
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-4">
               <div className="relative w-full sm:flex-1 min-w-0">
@@ -328,8 +319,8 @@ export function AlertasPageClient({ initialAlertas }: AlertasPageClientProps) {
               </select>
               <select
                 className="px-3 py-2 rounded-lg border border-border bg-white text-sm w-full sm:w-auto min-h-[44px] touch-manipulation"
-                value={tempFilterStatus}
-                onChange={(e) => setTempFilterStatus(e.target.value)}
+                value={filtersState.temp.status}
+                onChange={(e) => filtersDispatch({ type: 'UPDATE_TEMP_STATUS', payload: e.target.value })}
               >
                 <option value="all">Todos Status</option>
                 <option value="open">Aberto</option>

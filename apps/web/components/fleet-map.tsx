@@ -78,8 +78,6 @@ interface FleetMapProps {
 }
 
 export const FleetMap = memo(function FleetMap({ companyId, transportadoraId, routeId, initialCenter, initialZoom }: FleetMapProps) {
-  const router = useRouter()
-  const searchParams = useSearchParams()
   const mapRef = useRef<HTMLDivElement>(null)
   const mapInstanceRef = useRef<google.maps.Map | null>(null)
   const markersRef = useRef<Map<string, google.maps.Marker>>(new Map())
@@ -87,7 +85,6 @@ export const FleetMap = memo(function FleetMap({ companyId, transportadoraId, ro
   const shadowPolylineRef = useRef<google.maps.Polyline | null>(null)
   const clustererRef = useRef<MarkerClusterer | null>(null)
   const infoWindowsRef = useRef<Map<string, google.maps.InfoWindow>>(new Map())
-  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null)
   
   const [selectedBus, setSelectedBus] = useState<Bus | null>(null)
   const [buses, setBuses] = useState<Bus[]>([])
@@ -99,42 +96,14 @@ export const FleetMap = memo(function FleetMap({ companyId, transportadoraId, ro
   const [hotspotPosition, setHotspotPosition] = useState<{ x: number; y: number } | null>(null)
   
   // Filtros persistidos na URL
-  const [filters, setFilters] = useState({
-    company: companyId || searchParams?.get('company') || '',
-    transportadora: transportadoraId || searchParams?.get('transportadora') || '',
-    route: routeId || searchParams?.get('route') || '',
-    status: searchParams?.get('status') || ''
+  const { filters, setFilters } = useUrlFilters({
+    initialFilters: {
+      company: companyId || null,
+      transportadora: transportadoraId || null,
+      route: routeId || null,
+    },
+    debounceMs: 300,
   })
-
-  useEffect(() => {
-    setFilters((prev) => ({
-      ...prev,
-      company: companyId ?? prev.company,
-      transportadora: transportadoraId ?? prev.transportadora,
-      route: routeId ?? prev.route,
-    }))
-  }, [companyId, transportadoraId, routeId])
-
-  // Atualizar URL quando filtros mudarem (debounce)
-  const updateUrlFilters = useCallback((newFilters: typeof filters) => {
-    if (debounceTimerRef.current) {
-      clearTimeout(debounceTimerRef.current)
-    }
-    
-    debounceTimerRef.current = setTimeout(() => {
-      const params = new URLSearchParams()
-      if (newFilters.company) params.set('company', newFilters.company)
-      if (newFilters.route) params.set('route', newFilters.route)
-      if (newFilters.status) params.set('status', newFilters.status)
-      
-      const queryString = params.toString()
-      const newUrl = queryString 
-        ? `${window.location.pathname}?${queryString}`
-        : window.location.pathname
-      
-      router.replace(newUrl, { scroll: false })
-    }, 300) // Debounce 300ms
-  }, [router])
 
   // Cores dos ônibus
   const busColors = {
@@ -161,7 +130,7 @@ export const FleetMap = memo(function FleetMap({ companyId, transportadoraId, ro
   }, [])
 
   // Carregar dados do mapa
-  const loadMapData = useCallback(async () => {
+  const loadMapData = useCallback(async (signal?: AbortSignal) => {
     try {
       const { data, error } = await (supabase as any).rpc('gf_map_snapshot_full', {
         p_company_id: filters.company || null,
@@ -169,11 +138,16 @@ export const FleetMap = memo(function FleetMap({ companyId, transportadoraId, ro
         p_route_id: filters.route || null
       })
 
+      // Verificar se foi abortado
+      if (signal?.aborted) return
+
       if (error) {
-        warn('Erro ao carregar dados do mapa', { error: error.message }, 'FleetMap')
-        setBuses([])
-        setStops([])
-        setRoutes([])
+        if (!signal?.aborted) {
+          warn('Erro ao carregar dados do mapa', { error: error.message }, 'FleetMap')
+          setBuses([])
+          setStops([])
+          setRoutes([])
+        }
         return
       }
 

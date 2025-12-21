@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState, useCallback, useRef, memo, useTransition } from "react"
+import { usePlaybackReducer, useUIReducer, useNavigationReducer } from "@/hooks/reducers/playback-reducer"
 import { setOptions, importLibrary } from "@googlemaps/js-api-loader"
 import { Card } from "./ui/card"
 import { Button } from "./ui/button"
@@ -66,25 +67,14 @@ export const AdvancedRouteMap = memo(function AdvancedRouteMap({
   const [error, setError] = useState<string | null>(null)
   const [routeData, setRouteData] = useState<RouteData | null>(null)
   const [selectedStop, setSelectedStop] = useState<RouteStop | null>(null)
-  const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 })
-  const [showTooltip, setShowTooltip] = useState(false)
-  const [isFullscreen, setIsFullscreen] = useState(false)
   const [currentTime, setCurrentTime] = useState(new Date())
-  const [isPlaying, setIsPlaying] = useState(false)
   const [mapLoaded, setMapLoaded] = useState(false)
-  
-  // Estados interativos avançados
-  const [hotspotPosition, setHotspotPosition] = useState<{ x: number; y: number } | null>(null)
-  const [showHotspot, setShowHotspot] = useState(false)
-  const [playbackSpeed, setPlaybackSpeed] = useState(1)
-  const [isLooping, setIsLooping] = useState(false)
-  const [isMuted, setIsMuted] = useState(false)
-  const [volume, setVolume] = useState(80)
   const [isOnline, setIsOnline] = useState(navigator.onLine)
   
-  // Estados para navegação por teclado
-  const [focusedMarkerIndex, setFocusedMarkerIndex] = useState<number>(-1)
-  const [keyboardNavigationActive, setKeyboardNavigationActive] = useState(false)
+  // Estados gerenciados por reducers
+  const [playbackState, playbackDispatch] = usePlaybackReducer()
+  const [uiState, uiDispatch] = useUIReducer()
+  const [navigationState, navigationDispatch] = useNavigationReducer()
   const mapContainerRef = useRef<HTMLDivElement>(null)
 
   // Hook de cache
@@ -105,7 +95,7 @@ export const AdvancedRouteMap = memo(function AdvancedRouteMap({
     
     // Selecionar parada e mostrar informações
     setSelectedStop(stop || null)
-    setFocusedMarkerIndex(index)
+    navigationDispatch({ type: 'SET_FOCUSED_MARKER', payload: index })
     
     // Anunciar para leitores de tela
     if (stop) {
@@ -114,20 +104,20 @@ export const AdvancedRouteMap = memo(function AdvancedRouteMap({
   }, [routeData, announce])
 
   const handleKeyboardNavigation = useCallback((event: KeyboardEvent) => {
-    if (!keyboardNavigationActive || !routeData) return
+    if (!navigationState.keyboardNavigationActive || !routeData) return
     
     switch (event.key) {
       case 'ArrowRight':
       case 'ArrowDown':
         event.preventDefault()
-        const nextIndex = Math.min(focusedMarkerIndex + 1, routeData.stops.length - 1)
+        const nextIndex = Math.min(navigationState.focusedMarkerIndex + 1, routeData.stops.length - 1)
         focusMarker(nextIndex)
         break
         
       case 'ArrowLeft':
       case 'ArrowUp':
         event.preventDefault()
-        const prevIndex = Math.max(focusedMarkerIndex - 1, 0)
+        const prevIndex = Math.max(navigationState.focusedMarkerIndex - 1, 0)
         focusMarker(prevIndex)
         break
         
@@ -144,8 +134,8 @@ export const AdvancedRouteMap = memo(function AdvancedRouteMap({
       case 'Enter':
       case ' ':
         event.preventDefault()
-        if (focusedMarkerIndex >= 0) {
-          const stop = routeData.stops[focusedMarkerIndex]
+        if (navigationState.focusedMarkerIndex >= 0) {
+          const stop = routeData.stops[navigationState.focusedMarkerIndex]
           setSelectedStop(stop || null)
           if (stop) {
             announce(`Detalhes da parada: ${stop.passenger_name}`)
@@ -155,16 +145,16 @@ export const AdvancedRouteMap = memo(function AdvancedRouteMap({
         
       case 'Escape':
         event.preventDefault()
-        setKeyboardNavigationActive(false)
-        setFocusedMarkerIndex(-1)
+        navigationDispatch({ type: 'SET_KEYBOARD_NAV_ACTIVE', payload: false })
+        navigationDispatch({ type: 'SET_FOCUSED_MARKER', payload: -1 })
         setSelectedStop(null)
         announce('Navegação por teclado desativada')
         break
     }
-  }, [keyboardNavigationActive, routeData, focusedMarkerIndex, focusMarker, announce])
+  }, [navigationState.keyboardNavigationActive, routeData, navigationState.focusedMarkerIndex, focusMarker, announce])
 
   const activateKeyboardNavigation = useCallback(() => {
-    setKeyboardNavigationActive(true)
+    navigationDispatch({ type: 'SET_KEYBOARD_NAV_ACTIVE', payload: true })
     if (routeData && routeData.stops.length > 0) {
       focusMarker(0)
     }
@@ -193,14 +183,14 @@ export const AdvancedRouteMap = memo(function AdvancedRouteMap({
 
   // Event listener para navegação por teclado
   useEffect(() => {
-    if (keyboardNavigationActive) {
+    if (navigationState.keyboardNavigationActive) {
       document.addEventListener('keydown', handleKeyboardNavigation)
       return () => {
         document.removeEventListener('keydown', handleKeyboardNavigation)
       }
     }
     return undefined
-  }, [keyboardNavigationActive, handleKeyboardNavigation])
+  }, [navigationState.keyboardNavigationActive, handleKeyboardNavigation])
 
   // Carregar dados da rota
   const loadRouteData = useCallback(async () => {
@@ -379,32 +369,32 @@ export const AdvancedRouteMap = memo(function AdvancedRouteMap({
 
     // Função para criar marcador individual
     const createSingleMarker = (stop: RouteStop, index: number) => {
-      const markerIcon = createCustomMarkerIcon(stop.stop_type, index + 1, focusedMarkerIndex === index)
+      const markerIcon = createCustomMarkerIcon(stop.stop_type, index + 1, navigationState.focusedMarkerIndex === index)
       
       const marker = new google.maps.Marker({
         position: { lat: stop.lat, lng: stop.lng },
         map,
         icon: markerIcon,
         title: `Parada ${index + 1}: ${stop.passenger_name} - ${stop.address}`,
-        zIndex: focusedMarkerIndex === index ? 20 : 10,
+        zIndex: navigationState.focusedMarkerIndex === index ? 20 : 10,
         optimized: !prefersReducedMotion // Usar otimização quando motion reduzido está desabilitado
       })
 
       // Adicionar eventos de hover e clique
       marker.addListener('mouseover', (event: google.maps.MapMouseEvent) => {
         if (event.domEvent && 'pageX' in event.domEvent && 'pageY' in event.domEvent) {
-          setTooltipPosition({
+          uiDispatch({ type: 'SET_TOOLTIP_POSITION', payload: {
             x: event.domEvent.pageX,
             y: event.domEvent.pageY
-          })
+          }})
           setSelectedStop(stop)
-          setShowTooltip(true)
+          uiDispatch({ type: 'SET_SHOW_TOOLTIP', payload: true })
         }
       })
 
       marker.addListener('mouseout', () => {
-        if (!keyboardNavigationActive) {
-          setShowTooltip(false)
+        if (!navigationState.keyboardNavigationActive) {
+          uiDispatch({ type: 'SET_SHOW_TOOLTIP', payload: false })
           setSelectedStop(null)
         }
       })
@@ -461,7 +451,7 @@ export const AdvancedRouteMap = memo(function AdvancedRouteMap({
         markersRef.current.push(marker)
       })
     }
-  }, [routeData, focusedMarkerIndex, keyboardNavigationActive, announce, prefersReducedMotion, createCustomMarkerIcon])
+  }, [routeData, navigationState.focusedMarkerIndex, navigationState.keyboardNavigationActive, announce, prefersReducedMotion, createCustomMarkerIcon])
 
   // Effects
   useEffect(() => {
@@ -480,45 +470,45 @@ export const AdvancedRouteMap = memo(function AdvancedRouteMap({
       markersRef.current.forEach((marker, index) => {
         const stop = routeData.stops[index]
         if (stop) {
-          const isFocused = focusedMarkerIndex === index
+          const isFocused = navigationState.focusedMarkerIndex === index
           const newIcon = createCustomMarkerIcon(stop.stop_type, index + 1, isFocused)
           marker.setIcon(newIcon)
           marker.setZIndex(isFocused ? 20 : 10)
         }
       })
     }
-  }, [focusedMarkerIndex, routeData, createCustomMarkerIcon])
+  }, [navigationState.focusedMarkerIndex, routeData, createCustomMarkerIcon])
 
   // Simulação de tempo real (para demonstração)
   useEffect(() => {
-    if (!isPlaying) return
+    if (!playbackState.isPlaying) return
 
     const interval = setInterval(() => {
       setCurrentTime(prev => new Date(prev.getTime() + 60000)) // Avançar 1 minuto
     }, 1000) // A cada segundo
 
     return () => clearInterval(interval)
-  }, [isPlaying])
+  }, [playbackState.isPlaying])
 
   // Handlers para controles avançados
   const handleSpeedChange = useCallback((speed: number) => {
-    setPlaybackSpeed(speed)
-  }, [])
+    playbackDispatch({ type: 'SET_SPEED', payload: speed })
+  }, [playbackDispatch])
 
   const handleToggleLoop = useCallback(() => {
-    setIsLooping(prev => !prev)
-  }, [])
+    playbackDispatch({ type: 'TOGGLE_LOOPING' })
+  }, [playbackDispatch])
 
   const handleToggleMute = useCallback(() => {
-    setIsMuted(prev => !prev)
-  }, [])
+    playbackDispatch({ type: 'TOGGLE_MUTED' })
+  }, [playbackDispatch])
 
   const handleVolumeChange = useCallback((newVolume: number) => {
-    setVolume(newVolume)
-    if (newVolume > 0 && isMuted) {
-      setIsMuted(false)
+    playbackDispatch({ type: 'SET_VOLUME', payload: newVolume })
+    if (newVolume > 0 && playbackState.isMuted) {
+      playbackDispatch({ type: 'SET_MUTED', payload: false })
     }
-  }, [isMuted])
+  }, [playbackDispatch, playbackState.isMuted])
 
   const handlePreviousStop = useCallback(() => {
     if (!routeData?.stops || routeData.stops.length === 0) return
@@ -585,20 +575,20 @@ export const AdvancedRouteMap = memo(function AdvancedRouteMap({
       const y = event.domEvent.pageY
       
       setSelectedStop(stop)
-      setTooltipPosition({ x, y })
-      setShowTooltip(true)
-      setShowHotspot(false)
+      uiDispatch({ type: 'SET_TOOLTIP_POSITION', payload: { x, y } })
+      uiDispatch({ type: 'SET_SHOW_TOOLTIP', payload: true })
+      uiDispatch({ type: 'SET_SHOW_HOTSPOT', payload: false })
     }
   }, [])
 
   const handleMarkerLeave = useCallback(() => {
-    setShowTooltip(false)
-    setTooltipPosition({ x: 0, y: 0 })
+    uiDispatch({ type: 'SET_SHOW_TOOLTIP', payload: false })
+    uiDispatch({ type: 'SET_TOOLTIP_POSITION', payload: { x: 0, y: 0 } })
   }, [])
 
   const handleCloseHotspot = useCallback(() => {
-    setShowHotspot(false)
-    setHotspotPosition(null)
+    uiDispatch({ type: 'SET_SHOW_HOTSPOT', payload: false })
+    uiDispatch({ type: 'SET_HOTSPOT_POSITION', payload: null })
     setSelectedStop(null)
   }, [])
 
@@ -609,11 +599,11 @@ export const AdvancedRouteMap = memo(function AdvancedRouteMap({
     }
   }, [])
   const handlePlayPause = (playing: boolean) => {
-    setIsPlaying(playing)
+    playbackDispatch({ type: 'SET_PLAYING', payload: playing })
   }
 
   const handleReset = () => {
-    setIsPlaying(false)
+    playbackDispatch({ type: 'SET_PLAYING', payload: false })
     setCurrentTime(new Date())
   }
 
@@ -633,7 +623,7 @@ export const AdvancedRouteMap = memo(function AdvancedRouteMap({
   }
 
   const toggleFullscreen = () => {
-    setIsFullscreen(!isFullscreen)
+    uiDispatch({ type: 'TOGGLE_FULLSCREEN' })
   }
 
   // Funções de formatação usando utilitários do kpi-utils
@@ -692,7 +682,7 @@ export const AdvancedRouteMap = memo(function AdvancedRouteMap({
   }
 
   return (
-    <div className={`relative ${isFullscreen ? 'fixed inset-0 z-50 bg-white' : className}`}>
+    <div className={`relative ${uiState.isFullscreen ? 'fixed inset-0 z-50 bg-white' : className}`}>
       {/* Indicador de conectividade e performance */}
       <div className={`flex items-center justify-between mb-4 ${
         isMobile ? 'flex-col gap-2' : 'flex-row'
@@ -720,7 +710,7 @@ export const AdvancedRouteMap = memo(function AdvancedRouteMap({
           formatDistance={formatDistanceHelper}
           onReset={handleReset}
           onToggleFullscreen={toggleFullscreen}
-          isFullscreen={isFullscreen}
+          isFullscreen={uiState.isFullscreen}
           onClose={onClose}
           showControls={showControls}
         />
@@ -730,11 +720,11 @@ export const AdvancedRouteMap = memo(function AdvancedRouteMap({
       <Card className="overflow-hidden shadow-lg">
         <div 
           ref={mapContainerRef}
-          className={isFullscreen ? "h-[calc(100vh-200px)] w-full" : "h-96 w-full"}
+          className={uiState.isFullscreen ? "h-[calc(100vh-200px)] w-full" : "h-96 w-full"}
           role="application"
           aria-label={`Mapa interativo da rota ${routeData?.name || routeId} com ${routeData?.stops.length || 0} paradas`}
           aria-describedby="map-instructions"
-          tabIndex={keyboardNavigationActive ? 0 : -1}
+          tabIndex={navigationState.keyboardNavigationActive ? 0 : -1}
         />
         
         {/* Instruções para navegação por teclado (ocultas visualmente) */}
@@ -770,14 +760,14 @@ export const AdvancedRouteMap = memo(function AdvancedRouteMap({
             type: stop.stop_type
           }))}
           currentTime={currentTime}
-          isPlaying={isPlaying}
+          isPlaying={playbackState.isPlaying}
           onPlayPause={handlePlayPause}
           onProgressChange={handleProgressChange}
         />
       )}
 
       {/* Tooltip avançado */}
-      {selectedStop && showTooltip && (
+      {selectedStop && uiState.showTooltip && (
         <AdvancedTooltip
           stop={{
             id: selectedStop.id,
@@ -791,15 +781,15 @@ export const AdvancedRouteMap = memo(function AdvancedRouteMap({
             },
             coordinates: { lat: selectedStop.lat, lng: selectedStop.lng }
           }}
-          isVisible={showTooltip}
-          position={tooltipPosition}
-          onClose={() => setShowTooltip(false)}
+          isVisible={uiState.showTooltip}
+          position={uiState.tooltipPosition}
+          onClose={() => uiDispatch({ type: 'SET_SHOW_TOOLTIP', payload: false })}
         />
       )}
 
       {/* Hotspot interativo */}
       <AnimatePresence>
-        {selectedStop && showHotspot && hotspotPosition && (
+        {selectedStop && uiState.showHotspot && uiState.hotspotPosition && (
           <InteractiveMarkerHotspot
             stop={{
               id: selectedStop.id,
@@ -823,7 +813,7 @@ export const AdvancedRouteMap = memo(function AdvancedRouteMap({
               isCompleted: false,
               isCurrent: true
             }}
-            position={hotspotPosition}
+            position={uiState.hotspotPosition}
             onClose={handleCloseHotspot}
             onCenterMap={handleCenterMap}
           />
@@ -832,7 +822,7 @@ export const AdvancedRouteMap = memo(function AdvancedRouteMap({
 
       {/* Modal de detalhes da parada */}
       <AnimatePresence>
-        {selectedStop && !showTooltip && !showHotspot && (
+        {selectedStop && !uiState.showTooltip && !uiState.showHotspot && (
           <motion.div
             className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
             initial={{ opacity: 0 }}
@@ -969,7 +959,7 @@ export const AdvancedRouteMap = memo(function AdvancedRouteMap({
           {isMobile && <span className="ml-2">Acessibilidade</span>}
         </Button>
         <Button
-          variant={keyboardNavigationActive ? "default" : "outline"}
+          variant={navigationState.keyboardNavigationActive ? "default" : "outline"}
           size={isMobile ? "default" : "sm"}
           onClick={activateKeyboardNavigation}
           className="bg-white/90 backdrop-blur-sm shadow-lg"

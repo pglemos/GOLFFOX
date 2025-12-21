@@ -44,6 +44,9 @@ import { debug, warn, error as logError } from '@/lib/logger'
 import { formatError, getErrorMeta } from '@/lib/error-utils'
 import { t } from '@/lib/i18n'
 import type { Veiculo, RoutePolyline, MapAlert, MapsBillingStatus, HistoricalTrajectory, RouteStop } from '@/types/map'
+import { useMapFilters } from '@/stores/map-filters'
+import { useMapSelection } from '@/stores/map-selection'
+import { useMapPlayback } from '@/stores/map-playback'
 import type { SupabaseRoute, SupabaseStopWithRoute, SupabaseTripWithDates, SupabaseVeiculo } from '@/types/supabase-data'
 import { Database } from '@/types/supabase'
 import { toError } from '@/lib/types/errors'
@@ -82,52 +85,56 @@ export function AdminMap({
   const [isPending, startTransition] = useTransition()
   const [loading, setLoading] = useState(true)
   const [mapError, setMapError] = useState<string | null>(null)
+  // Stores Zustand para estado do mapa
+  const companyFilter = useMapFilters(state => state.company)
+  const routeFilter = useMapFilters(state => state.route)
+  const veiculoFilter = useMapFilters(state => state.veiculo)
+  const motoristaFilter = useMapFilters(state => state.motorista)
+  const setCompanyFilter = useMapFilters(state => state.setCompany)
+  const setRouteFilter = useMapFilters(state => state.setRoute)
+  const setVeiculoFilter = useMapFilters(state => state.setVeiculo)
+  
+  const selection = useMapSelection()
+  const playback = useMapPlayback()
+
+  // Estados locais (não compartilhados)
   const [veiculos, setVeiculos] = useState<Veiculo[]>([])
   const [routes, setRoutes] = useState<RoutePolyline[]>([])
   const [alerts, setAlerts] = useState<MapAlert[]>([])
-  const [selectedVeiculo, setSelectedVeiculo] = useState<Veiculo | null>(null)
-  const [selectedRoute, setSelectedRoute] = useState<RoutePolyline | null>(null)
-  const [selectedAlert, setSelectedAlert] = useState<MapAlert | null>(null)
-  const [mode, setMode] = useState<'live' | 'history'>('live')
   const [historicalTrajectories, setHistoricalTrajectories] = useState<HistoricalTrajectory[]>([])
   const [routeStops, setRouteStops] = useState<RouteStop[]>([])
-  const [showTrajectories, setShowTrajectories] = useState(false)
-  const [isPlaying, setIsPlaying] = useState(false)
   const [billingStatus, setBillingStatus] = useState<MapsBillingStatus | null>(null)
   const [listMode, setListMode] = useState(false) // Fallback modo lista
-  const [playbackProgress, setPlaybackProgress] = useState(0)
-  const [playbackFrom, setPlaybackFrom] = useState<Date>(new Date(Date.now() - 2 * 60 * 60 * 1000)) // Últimas 2h
-  const [playbackTo, setPlaybackTo] = useState<Date>(new Date())
-  const [playbackSpeed, setPlaybackSpeed] = useState<1 | 2 | 4>(1)
-  const [showHeatmap, setShowHeatmap] = useState(false)
-  const [showTrajectoryAnalysis, setShowTrajectoryAnalysis] = useState(false)
   const [trajectoryAnalysis, setTrajectoryAnalysis] = useState<TrajectoryAnalysis | null>(null)
   const [notifiedDeviations, setNotifiedDeviations] = useState<Set<string>>(new Set())
-  
-  // Filtros
-  const [filters, setFilters] = useState({
-    company: companyId || '',
-    route: routeId || '',
-    veiculo: vehicleId || '',
-    motorista: '',
-    status: '',
-    shift: '',
-    search: '',
-  })
+
+  // Inicializar filtros com props iniciais
+  useEffect(() => {
+    if (companyId) setCompanyFilter(companyId)
+    if (routeId) setRouteFilter(routeId)
+    if (vehicleId) setVeiculoFilter(vehicleId)
+  }, [companyId, routeId, vehicleId, setCompanyFilter, setRouteFilter, setVeiculoFilter])
 
   // Inicializar mapa
   useEffect(() => {
+    let isMounted = true
+    const abortController = new AbortController()
+
     const initMap = async () => {
       const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
       if (!apiKey) {
-        setMapError(t('common', 'errors.mapApiKeyMissing'))
-        setLoading(false)
+        if (isMounted) {
+          setMapError(t('common', 'errors.mapApiKeyMissing'))
+          setLoading(false)
+        }
         return
       }
 
       if (!mapRef.current) {
-        setMapError(t('common', 'errors.mapElementMissing'))
-        setLoading(false)
+        if (isMounted) {
+          setMapError(t('common', 'errors.mapElementMissing'))
+          setLoading(false)
+        }
         return
       }
 
@@ -135,13 +142,19 @@ export function AdminMap({
         // Verificar quota antes de carregar
         const billingMonitor = getMapsBillingMonitor()
         const billingStatus = billingMonitor.getStatus()
-        setBillingStatus(billingStatus)
+        if (isMounted) {
+          setBillingStatus(billingStatus)
+        }
 
         if (billingMonitor.isQuotaExceeded()) {
-          setMapError(t('common', 'errors.mapsQuotaExceededListMode'))
-          setListMode(true)
-          setLoading(false)
-          await loadInitialData()
+          if (isMounted) {
+            setMapError(t('common', 'errors.mapsQuotaExceededListMode'))
+            setListMode(true)
+            setLoading(false)
+          }
+          if (!abortController.signal.aborted) {
+            await loadInitialData(abortController.signal)
+          }
           return
         }
 
@@ -259,16 +272,22 @@ export function AdminMap({
         
         // Carregar dados iniciais
         debug('Iniciando carregamento de dados iniciais', {}, 'AdminMap')
-        try {
-          await loadInitialData()
-          debug('Dados iniciais carregados com sucesso', {
-            veiculos: veiculos.length,
-            routes: routes.length,
-            alerts: alerts.length
-          }, 'AdminMap')
-        } catch (error: unknown) {
-          logError('Erro ao carregar dados iniciais', { error }, 'AdminMap')
-          notifyError(error, 'Erro ao carregar dados do mapa')
+        if (!abortController.signal.aborted) {
+          try {
+            await loadInitialData(abortController.signal)
+            if (isMounted) {
+              debug('Dados iniciais carregados com sucesso', {
+                veiculos: veiculos.length,
+                routes: routes.length,
+                alerts: alerts.length
+              }, 'AdminMap')
+            }
+          } catch (error: unknown) {
+            if (isMounted) {
+              logError('Erro ao carregar dados iniciais', { error }, 'AdminMap')
+              notifyError(error, 'Erro ao carregar dados do mapa')
+            }
+          }
         }
         
         // Configurar listener para lazy loading após dados iniciais
@@ -283,21 +302,25 @@ export function AdminMap({
         })
         
         // Inicializar realtime ou playback baseado no modo
-        if (mode === 'live') {
-          debug('Inicializando modo realtime', {}, 'AdminMap')
-          initRealtime()
-        } else {
-          debug('Inicializando modo playback', {}, 'AdminMap')
-          initPlayback()
+        if (!abortController.signal.aborted && isMounted) {
+          if (mode === 'live') {
+            debug('Inicializando modo realtime', {}, 'AdminMap')
+            initRealtime()
+          } else {
+            debug('Inicializando modo playback', {}, 'AdminMap')
+            initPlayback()
+          }
         }
         
-        setLoading(false)
-        debug('Mapa inicializado com sucesso', {
-          veiculos: veiculos.length,
-          routes: routes.length,
-          alerts: alerts.length,
-          mode
-        }, 'AdminMap')
+        if (isMounted) {
+          setLoading(false)
+          debug('Mapa inicializado com sucesso', {
+            veiculos: veiculos.length,
+            routes: routes.length,
+            alerts: alerts.length,
+            mode
+          }, 'AdminMap')
+        }
         
         // Cleanup
         return () => {
@@ -307,18 +330,29 @@ export function AdminMap({
           }
         }
       } catch (error: unknown) {
-        logError('Erro ao inicializar mapa', { error }, 'AdminMap')
-        setMapError(t('common', 'errors.mapLoadFailedListMode'))
-        setListMode(true)
-        setLoading(false)
-        // Carregar dados em modo lista
-        loadInitialData().catch((err) => logError('Erro ao carregar dados iniciais', { error: err }, 'AdminMap'))
+        if (isMounted) {
+          logError('Erro ao inicializar mapa', { error }, 'AdminMap')
+          setMapError(t('common', 'errors.mapLoadFailedListMode'))
+          setListMode(true)
+          setLoading(false)
+          // Carregar dados em modo lista
+          if (!abortController.signal.aborted) {
+            loadInitialData(abortController.signal).catch((err) => {
+              if (isMounted) {
+                logError('Erro ao carregar dados iniciais', { error: err }, 'AdminMap')
+              }
+            })
+          }
+        }
       }
     }
 
     initMap()
 
     return () => {
+      isMounted = false
+      abortController.abort()
+      
       // Cleanup
       if (realtimeServiceRef.current) {
         realtimeServiceRef.current.disconnect()
@@ -346,7 +380,7 @@ export function AdminMap({
     // Limitar a 50 rotas por vez
     const LIMIT = 50
     const currentZoom = mapInstanceRef.current.getZoom() || 0
-    const currentCompany = filters.company || null
+    const currentCompany = companyFilter || null
     
     // Limpar cache se empresa mudou
     if (lastCompanyRef.current !== currentCompany) {
@@ -446,12 +480,15 @@ export function AdminMap({
   }, [filters.company])
 
   // Carregar dados iniciais
-  const loadInitialData = useCallback(async () => {
+  const loadInitialData = useCallback(async (signal?: AbortSignal) => {
     try {
-      debug('Carregando dados iniciais com filtros', { filters }, 'AdminMap')
+      debug('Carregando dados iniciais com filtros', { company: companyFilter }, 'AdminMap')
       
       // Carregar veículos usando o serviço extraído
-      const vehicles = await loadVehicles(filters.company || undefined)
+      const vehicles = await loadVehicles(companyFilter || undefined)
+      
+      // Verificar se foi abortado antes de atualizar estado
+      if (signal?.aborted) return
       
       // Normalizar coordenadas dos veículos
       const normalizedVehicles = vehicles.map((v: Veiculo) => {
@@ -496,7 +533,7 @@ export function AdminMap({
       // CÓDIGO REMOVIDO - lógica de carregamento de veículos movida para loadVehicles service
       /*
       // Carregar veículos usando o serviço extraído
-      const vehicles = await loadVehicles(filters.company || undefined)
+      const vehicles = await loadVehicles(companyFilter || undefined)
       
       // Normalizar coordenadas dos veículos
       const normalizedVehicles = vehicles.map((v: Veiculo) => {
@@ -560,8 +597,8 @@ export function AdminMap({
             .select('id, company_id, route_id, veiculo_id, severity, description, created_at, status')
             .eq('status', 'open')
 
-          if (filters.company) {
-            incidentsQuery = incidentsQuery.eq('company_id', filters.company)
+          if (companyFilter) {
+            incidentsQuery = incidentsQuery.eq('company_id', companyFilter)
           }
 
           const result = await incidentsQuery
@@ -596,9 +633,9 @@ export function AdminMap({
             .eq('tipo', 'socorro')
             .eq('status', 'open')
 
-          if (filters.company) {
+          if (companyFilter) {
             // Nota: coluna é empresa_id em gf_service_requests
-            assistanceQuery = assistanceQuery.eq('empresa_id', filters.company)
+            assistanceQuery = assistanceQuery.eq('empresa_id', companyFilter)
           }
 
           const result = await assistanceQuery
@@ -725,7 +762,7 @@ export function AdminMap({
     } catch (error) {
       logError('Erro ao carregar dados iniciais', { error }, 'AdminMap')
     }
-  }, [filters.company])
+  }, [companyFilter])
 
   // Processar atualizações do realtime
   const handleRealtimeUpdate = useCallback(async (update: RealtimeUpdateType) => {
@@ -919,11 +956,11 @@ export function AdminMap({
 
     // Carregar posições históricas
     const positions = await playbackServiceRef.current.loadPositions(
-      filters.company || null,
-      filters.route || null,
-      filters.veiculo || null,
-      playbackFrom,
-      playbackTo,
+      companyFilter || null,
+      routeFilter || null,
+      veiculoFilter || null,
+      playback.playbackFrom,
+      playback.playbackTo,
       1 // 1 minuto de intervalo
     )
 
@@ -965,9 +1002,9 @@ export function AdminMap({
     }))
 
     setHistoricalTrajectories(trajectories)
-    setShowTrajectories(true)
+    playback.setShowTrajectories(true)
     notifySuccess(t('common','success.positionsLoaded', { count: positions.length, trajectories: trajectories.length }))
-  }, [filters.company, filters.route, filters.veiculo, playbackFrom, playbackTo])
+  }, [companyFilter, routeFilter, veiculoFilter, playback.playbackFrom, playback.playbackTo, playback.setShowTrajectories])
 
   // Visualizar histórico e análise de trajeto
   const handleViewVehicleHistory = useCallback(async (veiculo: veiculo) => {
@@ -1133,43 +1170,43 @@ export function AdminMap({
 
   // Carregar trajeto quando veículo selecionado
   useEffect(() => {
-    if (selectedVeiculo && mode === 'live') {
-      loadVeiculoTrajectory(selectedVeiculo)
-    } else if (!selectedVeiculo && mode === 'live') {
+    if (selection.selectedVeiculo && playback.mode === 'live') {
+      loadVeiculoTrajectory(selection.selectedVeiculo)
+    } else if (!selection.selectedVeiculo && playback.mode === 'live') {
       setHistoricalTrajectories([])
-      setShowTrajectories(false)
+      playback.setShowTrajectories(false)
     }
-  }, [selectedVeiculo, mode, loadVeiculoTrajectory])
+  }, [selection.selectedVeiculo, playback.mode, loadVeiculoTrajectory, playback.setShowTrajectories])
 
   // Atalhos de teclado
   useKeyboardShortcuts({
     onPlayPause: () => {
-      if (mode === 'history') {
-        if (isPlaying) {
+      if (playback.mode === 'history') {
+        if (playback.isPlaying) {
           playbackServiceRef.current?.pause()
-          setIsPlaying(false)
+          playback.setIsPlaying(false)
         } else {
           // Reativar playback se necessário
           if (playbackServiceRef.current) {
             playbackServiceRef.current.play({
-              speed: playbackSpeed,
-              from: playbackFrom,
-              to: playbackTo,
+              speed: playback.playbackSpeed,
+              from: playback.playbackFrom,
+              to: playback.playbackTo,
               onPositionUpdate: () => {},
-              onComplete: () => setIsPlaying(false),
-              onPause: () => setIsPlaying(false),
-              onPlay: () => setIsPlaying(true),
+              onComplete: () => playback.setIsPlaying(false),
+              onPause: () => playback.setIsPlaying(false),
+              onPlay: () => playback.setIsPlaying(true),
             })
-            setIsPlaying(true)
+            playback.setIsPlaying(true)
           }
         }
       }
     },
     onStop: () => {
-      if (mode === 'history') {
+      if (playback.mode === 'history') {
         playbackServiceRef.current?.stop()
-        setIsPlaying(false)
-        setPlaybackProgress(0)
+        playback.setIsPlaying(false)
+        playback.setPlaybackProgress(0)
       }
     },
     onZoomIn: () => {
@@ -1185,29 +1222,29 @@ export function AdminMap({
       }
     },
     onSpeedUp: () => {
-      if (mode === 'history') {
+      if (playback.mode === 'history') {
         const speeds: (1 | 2 | 4)[] = [1, 2, 4]
-        const currentIndex = speeds.indexOf(playbackSpeed)
+        const currentIndex = speeds.indexOf(playback.playbackSpeed)
         if (currentIndex < speeds.length - 1) {
           const newSpeed = speeds[currentIndex + 1]
-          setPlaybackSpeed(newSpeed)
+          playback.setPlaybackSpeed(newSpeed)
           playbackServiceRef.current?.setSpeed(newSpeed)
         }
       }
     },
     onSpeedDown: () => {
-      if (mode === 'history') {
+      if (playback.mode === 'history') {
         const speeds: (1 | 2 | 4)[] = [1, 2, 4]
-        const currentIndex = speeds.indexOf(playbackSpeed)
+        const currentIndex = speeds.indexOf(playback.playbackSpeed)
         if (currentIndex > 0) {
           const newSpeed = speeds[currentIndex - 1]
-          setPlaybackSpeed(newSpeed)
+          playback.setPlaybackSpeed(newSpeed)
           playbackServiceRef.current?.setSpeed(newSpeed)
         }
       }
     },
     onToggleHeatmap: () => {
-      setShowHeatmap(!showHeatmap)
+      playback.setShowHeatmap(!playback.showHeatmap)
     },
     enabled: !loading && !mapError,
   })
@@ -1297,12 +1334,12 @@ export function AdminMap({
   // Sincronizar URL com filtros (deep-link)
   useEffect(() => {
     const params = new URLSearchParams()
-    if (filters.company) params.set('company_id', filters.company)
-    if (filters.route) params.set('route_id', filters.route)
-    if (filters.veiculo) params.set('veiculo_id', filters.veiculo)
-    if (filters.motorista) params.set('motorista_id', filters.motorista)
-    if (filters.status) params.set('status', filters.status)
-    if (filters.shift) params.set('shift', filters.shift)
+    if (companyFilter) params.set('company_id', companyFilter)
+    if (routeFilter) params.set('route_id', routeFilter)
+    if (veiculoFilter) params.set('veiculo_id', veiculoFilter)
+    if (motoristaFilter) params.set('motorista_id', motoristaFilter)
+    if (statusFilter) params.set('status', statusFilter)
+    if (shiftFilter) params.set('shift', shiftFilter)
     
     // Sincronizar centro e zoom do mapa
     if (mapInstanceRef.current) {
@@ -1339,16 +1376,26 @@ export function AdminMap({
       {/* Filtros na topbar */}
       <div className="absolute top-4 left-4 right-4 z-20">
         <MapFilters
-          filters={filters}
-          onFiltersChange={setFilters}
+          filters={{
+            company: companyFilter,
+            route: routeFilter,
+            veiculo: veiculoFilter,
+            motorista: motoristaFilter,
+            status: statusFilter,
+            shift: shiftFilter,
+            search: searchFilter,
+          }}
+          onFiltersChange={(newFilters) => filters.setFilters(newFilters)}
           vehiclesCount={veiculos.length}
           routesCount={routes.length}
           alertsCount={alerts.length}
-          mode={mode}
-          onModeChange={setMode}
-          playbackFrom={playbackFrom}
-          playbackTo={playbackTo}
+          mode={playback.mode}
+          onModeChange={playback.setMode}
+          playbackFrom={playback.playbackFrom}
+          playbackTo={playback.playbackTo}
           onPlaybackPeriodChange={(from, to) => {
+            playback.setPlaybackFrom(from)
+            playback.setPlaybackTo(to)
             setPlaybackFrom(from)
             setPlaybackTo(to)
             // Recarregar posições se estiver em modo histórico
@@ -1383,7 +1430,7 @@ export function AdminMap({
       {mode === 'history' && (
         <div className="absolute bottom-4 left-4 right-4 z-20">
         <PlaybackControls
-          isPlaying={isPlaying}
+          isPlaying={playback.isPlaying}
           onPlay={async () => {
             if (!playbackServiceRef.current) {
               await initPlayback()
@@ -1391,9 +1438,9 @@ export function AdminMap({
             
             if (playbackServiceRef.current) {
               playbackServiceRef.current.play({
-                speed: playbackSpeed,
-                from: playbackFrom,
-                to: playbackTo,
+                speed: playback.playbackSpeed,
+                from: playback.playbackFrom,
+                to: playback.playbackTo,
                 onPositionUpdate: (position, timestamp) => {
                   // Atualizar marcador do veículo no mapa
                   const marker = markersRef.current.get(position.veiculo_id)
@@ -1456,7 +1503,7 @@ export function AdminMap({
                         route_name: 'Rota',
                         motorista_id: position.motorista_id,
                         motorista_name: 'Motorista',
-                        company_id: filters.company || '',
+                        company_id: companyFilter || '',
                         company_name: '',
                         plate: 'VEÍCULO',
                         model: '',
@@ -1472,92 +1519,92 @@ export function AdminMap({
                   })
 
                   // Atualizar progresso
-                  const totalDuration = playbackTo.getTime() - playbackFrom.getTime()
-                  const elapsed = timestamp.getTime() - playbackFrom.getTime()
-                  setPlaybackProgress(Math.max(0, Math.min(100, (elapsed / totalDuration) * 100)))
+                  const totalDuration = playback.playbackTo.getTime() - playback.playbackFrom.getTime()
+                  const elapsed = timestamp.getTime() - playback.playbackFrom.getTime()
+                  playback.setPlaybackProgress(Math.max(0, Math.min(100, (elapsed / totalDuration) * 100)))
                 },
                 onComplete: () => {
-                  setIsPlaying(false)
+                  playback.setIsPlaying(false)
   notifySuccess('Playback concluído')
                 },
                 onPause: () => {
-                  setIsPlaying(false)
+                  playback.setIsPlaying(false)
                 },
                 onPlay: () => {
-                  setIsPlaying(true)
+                  playback.setIsPlaying(true)
                 },
               })
-              setIsPlaying(true)
+              playback.setIsPlaying(true)
             }
           }}
           onPause={() => {
-            setIsPlaying(false)
+            playback.setIsPlaying(false)
             playbackServiceRef.current?.pause()
           }}
           onStop={() => {
-            setIsPlaying(false)
+            playback.setIsPlaying(false)
             playbackServiceRef.current?.stop()
-            setPlaybackProgress(0)
+            playback.setPlaybackProgress(0)
           }}
           onSpeedChange={(speed) => {
-            setPlaybackSpeed(speed)
+            playback.setPlaybackSpeed(speed)
             playbackServiceRef.current?.setSpeed(speed)
           }}
-          progress={playbackProgress}
-          currentTime={playbackFrom}
-          duration={playbackTo}
+          progress={playback.playbackProgress}
+          currentTime={playback.playbackFrom}
+          duration={playback.playbackTo}
         />
         </div>
       )}
 
       {/* Painéis Laterais */}
       <AnimatePresence>
-        {selectedVeiculo && (
+        {selection.selectedVeiculo && (
           <VehiclePanel
-            veiculo={selectedVeiculo}
-            onClose={() => setSelectedVeiculo(null)}
+            veiculo={selection.selectedVeiculo}
+            onClose={() => selection.setSelectedVeiculo(null)}
             onFollow={() => {
               // Seguir veículo (auto-center)
-              if (selectedVeiculo && mapInstanceRef.current) {
+              if (selection.selectedVeiculo && mapInstanceRef.current) {
                 mapInstanceRef.current.setCenter({
-                  lat: selectedVeiculo.lat,
-                  lng: selectedVeiculo.lng,
+                  lat: selection.selectedVeiculo.lat,
+                  lng: selection.selectedVeiculo.lng,
                 })
                 mapInstanceRef.current.setZoom(15)
               }
             }}
             onDispatch={async () => {
-              if (selectedVeiculo) {
+              if (selection.selectedVeiculo) {
                 // Confirmar despacho
                 const confirmed = window.confirm(
-                  `Despachar socorro para o veículo ${selectedVeiculo.plate}?\n\n` +
-                  `Motorista: ${selectedVeiculo.motorista_name}\n` +
-                  `Rota: ${selectedVeiculo.route_name}\n` +
-                  `Posição: ${selectedVeiculo.lat.toFixed(6)}, ${selectedVeiculo.lng.toFixed(6)}`
+                  `Despachar socorro para o veículo ${selection.selectedVeiculo.plate}?\n\n` +
+                  `Motorista: ${selection.selectedVeiculo.motorista_name}\n` +
+                  `Rota: ${selection.selectedVeiculo.route_name}\n` +
+                  `Posição: ${selection.selectedVeiculo.lat.toFixed(6)}, ${selection.selectedVeiculo.lng.toFixed(6)}`
                 )
                 
                 if (confirmed) {
-                  await handleDispatchAssistance(selectedVeiculo)
+                  await handleDispatchAssistance(selection.selectedVeiculo)
                 }
               }
             }}
             onViewHistory={async () => {
-              if (selectedVeiculo) {
-                await handleViewVehicleHistory(selectedVeiculo)
+              if (selection.selectedVeiculo) {
+                await handleViewVehicleHistory(selection.selectedVeiculo)
               }
             }}
           />
         )}
-        {selectedRoute && (
+        {selection.selectedRoute && (
           <RoutePanel
-            route={selectedRoute}
-            onClose={() => setSelectedRoute(null)}
+            route={selection.selectedRoute}
+            onClose={() => selection.setSelectedRoute(null)}
           />
         )}
-        {selectedAlert && (
+        {selection.selectedAlert && (
           <AlertsPanel
-            alerts={[selectedAlert]}
-            onClose={() => setSelectedAlert(null)}
+            alerts={[selection.selectedAlert]}
+            onClose={() => selection.setSelectedAlert(null)}
           />
         )}
         {showTrajectoryAnalysis && trajectoryAnalysis && selectedVeiculo && (
@@ -1581,11 +1628,11 @@ export function AdminMap({
             veiculos={veiculos}
             routes={routes}
             alerts={alerts}
-            selectedVeiculo={selectedVeiculo}
-            onVehicleClick={setSelectedVeiculo}
-            onRouteClick={setSelectedRoute}
+            selectedVeiculo={selection.selectedVeiculo}
+            onVehicleClick={selection.setSelectedVeiculo}
+            onRouteClick={selection.setSelectedRoute}
             onAlertClick={(alert) => {
-              setSelectedAlert(alert)
+              selection.setSelectedAlert(alert)
               // Navegar para localização do alerta no mapa
               if (alert.lat && alert.lng && mapInstanceRef.current) {
                 mapInstanceRef.current.setCenter({ lat: alert.lat, lng: alert.lng })
@@ -1595,16 +1642,16 @@ export function AdminMap({
             clustererRef={clustererRef}
             historicalTrajectories={historicalTrajectories}
             routeStops={routeStops}
-            selectedRouteId={selectedRoute?.route_id || null}
-            showTrajectories={showTrajectories}
-            mode={mode}
+            selectedRouteId={selection.selectedRouteId}
+            showTrajectories={playback.showTrajectories}
+            mode={playback.mode}
           />
           {/* Heatmap Layer */}
           <HeatmapLayer
             map={mapInstanceRef.current}
             veiculos={veiculos}
-            enabled={showHeatmap}
-            mode={mode}
+            enabled={playback.showHeatmap}
+            mode={playback.mode}
           />
         </>
       )}

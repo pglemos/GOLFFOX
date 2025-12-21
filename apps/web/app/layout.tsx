@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import "./mobile-optimizations.css";
 import { ToasterProvider } from "@/components/providers/toaster-provider";
+import { AuthProvider } from "@/components/providers/auth-provider";
 import { WebVitalsInit } from "@/components/web-vitals-init";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { ReactQueryProvider } from "@/lib/react-query-provider";
@@ -76,13 +77,15 @@ export default function RootLayout({
         <ErrorBoundary>
           <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
             <ReactQueryProvider>
-              <WebVitalsInit />
-              {children}
-              <ToasterProvider />
-              {/* Analytics e SpeedInsights desabilitados temporariamente - incompatibilidade com Next.js 16
-              <Analytics />
-              <SpeedInsights />
-              */}
+              <AuthProvider>
+                <WebVitalsInit />
+                {children}
+                <ToasterProvider />
+                {/* Analytics e SpeedInsights desabilitados temporariamente - incompatibilidade com Next.js 16
+                <Analytics />
+                <SpeedInsights />
+                */}
+              </AuthProvider>
             </ReactQueryProvider>
           </ThemeProvider>
         </ErrorBoundary>
