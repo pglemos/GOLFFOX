@@ -744,7 +744,7 @@ function LoginContent() {
                 type: typeof isAllowed,
                 isBoolean: typeof isAllowed === 'boolean'
               })
-              
+
               // ✅ VALIDAÇÃO: Garantir que isAllowed é um booleano, não uma função
               if (isAllowed === true) {
                 redirectUrl = safeNext
@@ -867,14 +867,14 @@ function LoginContent() {
         if (typeof window !== "undefined") {
           // Definir flag para evitar interferência do useEffect
           (window as any).__golffox_redirecting = true
-          (window as any).__golffox_just_logged_in = true
+            (window as any).__golffox_just_logged_in = true
 
           // ✅ CORREÇÃO: Usar window.location.replace para garantir redirecionamento completo
           // window.location.replace não adiciona ao histórico, evitando loops
           // window.location.href força um reload completo e garante que o middleware veja o cookie
           // Isso também remove o parâmetro ?next= da URL
           debug('LOGIN - Redirecionando', { finalRedirectUrl }, 'LoginPage')
-          
+
           // ✅ IMPORTANTE: Não usar setTimeout - redirecionar imediatamente
           // O cookie já foi definido na resposta HTTP, então está disponível
           // O delay pode causar problemas com o middleware interceptando antes
@@ -1001,6 +1001,7 @@ function LoginContent() {
       searchParams,
       rememberMe,
       resolvedAuthEndpoint,
+      isAllowedForRole,
     ]
   )
 

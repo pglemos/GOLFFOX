@@ -38,41 +38,59 @@ export const metadata: Metadata = {
 }
 
 async function fetchKPIs(): Promise<KpiData[]> {
+  console.log('[ADMIN DEBUG] fetchKPIs chamado')
   try {
     const supabaseAdmin = getSupabaseAdmin()
-    
-    // Tentar diferentes views em ordem de prioridade
-    const views = [
-      'v_admin_kpis_materialized',
-      'v_admin_kpis',
-      'v_operador_kpis'
-    ]
+    console.log('[ADMIN DEBUG] supabaseAdmin obtido')
 
-    for (const viewName of views) {
-      try {
-        const { data, error } = await supabaseAdmin
-          .from(viewName)
-          .select('*')
-        
-        if (error) {
-          const code = (error as { code?: string })?.code
-          if (code === 'PGRST205') {
-            continue
-          }
-          continue
-        }
+    // Buscar da view de dashboard admin
+    const { data, error } = await supabaseAdmin
+      .from('v_admin_dashboard_kpis')
+      .select('*')
 
-        if (data && data.length > 0) {
-          return data as KpiData[]
-        }
-      } catch (err) {
-        continue
-      }
+    console.log('[ADMIN DEBUG] Query executada', { error: error?.message, dataLength: data?.length })
+
+    if (error) {
+      console.error('[ADMIN DEBUG] Erro ao buscar KPIs:', error)
+      return []
     }
 
-    return []
+    if (!data || data.length === 0) {
+      console.log('[ADMIN DEBUG] Sem dados retornados')
+      return []
+    }
+
+    console.log('[ADMIN DEBUG] Dados brutos:', JSON.stringify(data[0]))
+
+    // Mapear campos da view para a interface esperada
+    // A view v_admin_dashboard_kpis retorna: total_companies, total_operators, total_drivers, total_passengers, active_trips, active_vehicles
+    // Precisamos mapear para: company_id, company_name, trips_today, vehicles_active, employees_in_transit, critical_alerts, routes_today, trips_completed, trips_in_progress
+    const viewData = data[0] as {
+      total_companies?: number
+      total_operators?: number
+      total_drivers?: number
+      total_passengers?: number
+      active_trips?: number
+      active_vehicles?: number
+    }
+
+    // Retornar KPIs agregados como um único item
+    const result = [{
+      company_id: 'all',
+      company_name: 'Todas as Empresas',
+      trips_today: viewData.active_trips || 0,
+      vehicles_active: viewData.active_vehicles || 0,
+      employees_in_transit: viewData.total_passengers || 0,
+      critical_alerts: 0, // Não disponível na view atualmente
+      routes_today: viewData.active_trips || 0, // Aproximação
+      trips_completed: 0, // Não disponível na view atualmente
+      trips_in_progress: viewData.active_trips || 0,
+    }]
+
+    console.log('[ADMIN DEBUG] KPIs mapeados:', JSON.stringify(result))
+    return result
   } catch (error) {
-    console.error('Erro ao buscar KPIs:', error)
+    console.error('[ADMIN DEBUG] Erro crítico ao buscar KPIs:', error)
     return []
   }
 }
@@ -81,7 +99,7 @@ async function fetchAuditLogs(): Promise<AuditLog[]> {
   try {
     const supabaseAdmin = getSupabaseAdmin()
     const auditColumns = 'id,actor_id,action_type,resource_type,resource_id,details,created_at'
-    
+
     const { data, error } = await supabaseAdmin
       .from('gf_audit_log')
       .select(auditColumns)
