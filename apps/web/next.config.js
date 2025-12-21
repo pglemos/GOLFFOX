@@ -28,10 +28,11 @@ let nextConfig = {
   // Transpile pacotes ESM problemáticos para CommonJS
   transpilePackages: ['@supabase/supabase-js'],
 
+  // ✅ React Compiler: Otimização automática de componentes React
+  reactCompiler: true,
+
   // ✅ Code splitting avançado
   experimental: {
-    // React Compiler: Otimização automática de componentes React
-    reactCompiler: true,
     // useWasmBinary: apenas em Windows local, Vercel usa Linux
     // Otimizar imports de pacotes grandes
     optimizePackageImports: [
