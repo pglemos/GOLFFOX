@@ -42,7 +42,8 @@ import { notifySuccess, notifyError } from '@/lib/toast'
 import { debug, warn, error as logError } from '@/lib/logger'
 import { formatError, getErrorMeta } from '@/lib/error-utils'
 import { t } from '@/lib/i18n'
-
+import type { Veiculo, RoutePolyline, MapAlert, MapsBillingStatus, HistoricalTrajectory, RouteStop } from '@/types/map'
+import { toError } from '@/lib/types/errors'
 
 export interface AdminMapProps {
   companyId?: string
@@ -52,50 +53,9 @@ export interface AdminMapProps {
   initialZoom?: number
 }
 
-// Interfaces exportadas
-export interface veiculo {
-  veiculo_id: string
-  trip_id: string
-  route_id: string
-  route_name: string
-  motorista_id: string
-  motorista_name: string
-  company_id: string
-  company_name: string
-  plate: string
-  model: string
-  lat: number
-  lng: number
-  speed: number | null
-  heading: number | null
-  vehicle_status: 'moving' | 'stopped_short' | 'stopped_long' | 'garage'
-  passenger_count: number
-  last_position_time?: string
-}
-
-export interface RoutePolyline {
-  route_id: string
-  route_name: string
-  company_id: string
-  company_name?: string // Nome da empresa (opcional)
-  polyline_points: Array<{ lat: number; lng: number; order: number }>
-  stops_count: number
-  origin_address?: string // Endereço de origem (opcional)
-  destination_address?: string // Endereço de destino (opcional)
-}
-
-export interface Alert {
-  alert_id: string
-  alert_type: 'incident' | 'assistance'
-  company_id: string
-  route_id?: string
-  veiculo_id?: string
-  severity: 'low' | 'medium' | 'high' | 'critical'
-  lat?: number
-  lng?: number
-  description: string
-  created_at: string
-}
+// Re-exportar tipos para compatibilidade
+export type veiculo = Veiculo
+export type Alert = MapAlert
 
 export function AdminMap({
   companyId,
@@ -119,32 +79,18 @@ export function AdminMap({
   const [isPending, startTransition] = useTransition()
   const [loading, setLoading] = useState(true)
   const [mapError, setMapError] = useState<string | null>(null)
-  const [veiculos, setVeiculos] = useState<veiculo[]>([])
+  const [veiculos, setVeiculos] = useState<Veiculo[]>([])
   const [routes, setRoutes] = useState<RoutePolyline[]>([])
-  const [alerts, setAlerts] = useState<Alert[]>([])
-  const [selectedVeiculo, setSelectedVeiculo] = useState<veiculo | null>(null)
+  const [alerts, setAlerts] = useState<MapAlert[]>([])
+  const [selectedVeiculo, setSelectedVeiculo] = useState<Veiculo | null>(null)
   const [selectedRoute, setSelectedRoute] = useState<RoutePolyline | null>(null)
-  const [selectedAlert, setSelectedAlert] = useState<Alert | null>(null)
+  const [selectedAlert, setSelectedAlert] = useState<MapAlert | null>(null)
   const [mode, setMode] = useState<'live' | 'history'>('live')
-  const [historicalTrajectories, setHistoricalTrajectories] = useState<Array<{
-    veiculo_id: string
-    trip_id: string
-    positions: Array<{ lat: number; lng: number; timestamp: Date }>
-    color?: string
-  }>>([])
-  const [routeStops, setRouteStops] = useState<Array<{
-    id: string
-    route_id: string
-    route_name: string
-    seq: number
-    name: string
-    lat: number
-    lng: number
-    radius_m: number
-  }>>([])
+  const [historicalTrajectories, setHistoricalTrajectories] = useState<HistoricalTrajectory[]>([])
+  const [routeStops, setRouteStops] = useState<RouteStop[]>([])
   const [showTrajectories, setShowTrajectories] = useState(false)
   const [isPlaying, setIsPlaying] = useState(false)
-  const [billingStatus, setBillingStatus] = useState<any>(null)
+  const [billingStatus, setBillingStatus] = useState<MapsBillingStatus | null>(null)
   const [listMode, setListMode] = useState(false) // Fallback modo lista
   const [playbackProgress, setPlaybackProgress] = useState(0)
   const [playbackFrom, setPlaybackFrom] = useState<Date>(new Date(Date.now() - 2 * 60 * 60 * 1000)) // Últimas 2h
@@ -317,7 +263,7 @@ export function AdminMap({
             routes: routes.length,
             alerts: alerts.length
           }, 'AdminMap')
-        } catch (error: any) {
+        } catch (error: unknown) {
           logError('Erro ao carregar dados iniciais', { error }, 'AdminMap')
           notifyError(error, 'Erro ao carregar dados do mapa')
         }
@@ -453,7 +399,7 @@ export function AdminMap({
           // Agrupar stops por route_id
           const stopsByRoute = new Map()
           if (stopsData) {
-            stopsData.forEach((stop: any) => {
+            (stopsData || []).forEach((stop: SupabaseStop) => {
               if (!stopsByRoute.has(stop.route_id)) {
                 stopsByRoute.set(stop.route_id, [])
               }
@@ -466,7 +412,7 @@ export function AdminMap({
           }
           
           // Converter dados da tabela para o formato esperado
-          const formattedRoutes = routesData.map((r: any) => ({
+          const formattedRoutes = (routesData || []).map((r: SupabaseRoute) => ({
             route_id: r.id,
             route_name: r.name,
             company_id: r.company_id,
@@ -475,11 +421,11 @@ export function AdminMap({
           }))
           
           // Filtrar apenas rotas não carregadas
-          const newRoutes = formattedRoutes.filter((r: any) => !loadedRouteIdsRef.current.has(r.route_id))
+          const newRoutes = formattedRoutes.filter((r: RoutePolyline) => !loadedRouteIdsRef.current.has(r.route_id))
           
           if (newRoutes.length > 0) {
             // Adicionar ao cache
-            newRoutes.forEach((route: any) => {
+            newRoutes.forEach((route: RoutePolyline) => {
               routesCacheRef.current.set(route.route_id, route)
               loadedRouteIdsRef.current.add(route.route_id)
             })
@@ -540,7 +486,7 @@ export function AdminMap({
       
       const { data: veiculosData, error: vehiclesError } = await vehiclesQuery
       
-      let finalVeiculosData: any[] = []
+      let finalVeiculosData: SupabaseVeiculo[] = []
       
       // Log detalhado para debug
       if (vehiclesError) {
@@ -557,7 +503,7 @@ export function AdminMap({
             
             if (!fallbackError && fallbackData) {
               debug(`Query alternativa retornou ${fallbackData.length} veículos`, { count: fallbackData.length }, 'AdminMap')
-              finalVeiculosData = fallbackData as any
+              finalVeiculosData = fallbackData as SupabaseVeiculo[]
             }
           } catch (fallbackErr) {
             logError('Query alternativa também falhou', { error: fallbackErr }, 'AdminMap')
@@ -568,7 +514,7 @@ export function AdminMap({
         debug(`Query retornou ${finalVeiculosData.length} veículos`, { count: finalVeiculosData.length }, 'AdminMap')
         if (finalVeiculosData.length > 0) {
           debug('Primeiros veículos', {
-            veiculos: finalVeiculosData.slice(0, 3).map((v: any) => ({
+            veiculos: finalVeiculosData.slice(0, 3).map((v: SupabaseVeiculo) => ({
               id: v.id,
               plate: v.plate,
               is_active: v.is_active,
@@ -600,7 +546,7 @@ export function AdminMap({
         debug(`Processando ${finalVeiculosData.length} veículos ativos`, { count: finalVeiculosData.length }, 'AdminMap')
         
         // Buscar trips ativas para esses veículos
-        const vehicleIds = finalVeiculosData.map((v: any) => v.id)
+        const vehicleIds = finalVeiculosData.map((v: SupabaseVeiculo) => v.id)
         
         // Buscar trips ativas (inProgress) para obter informações de rota e motorista
         const { data: activeTrips } = await supabase
@@ -618,9 +564,9 @@ export function AdminMap({
           .eq('status', 'inProgress')
         
         // Mapear trips por veiculo_id
-        const tripsByVehicle = new Map()
+        const tripsByVehicle = new Map<string, SupabaseTrip>()
         if (activeTrips) {
-          activeTrips.forEach((trip: any) => {
+          activeTrips.forEach((trip: SupabaseTrip) => {
             if (!tripsByVehicle.has(trip.veiculo_id)) {
               tripsByVehicle.set(trip.veiculo_id, trip)
             }
@@ -628,8 +574,8 @@ export function AdminMap({
         }
         
         // Buscar últimas posições conhecidas
-        const tripIds = activeTrips?.map((t: any) => t.id) || []
-        let lastPositions: any[] = []
+        const tripIds = activeTrips?.map((t: SupabaseTrip) => t.id) || []
+        let lastPositions: SupabasePosition[] = []
         
         if (tripIds.length > 0) {
           // Buscar posições recentes (últimas 5 minutos) primeiro
@@ -643,8 +589,8 @@ export function AdminMap({
           
           if (recentPositions && recentPositions.length > 0) {
             // Mapear posições para veiculo_id via trips
-            const tripToVehicle = new Map(activeTrips?.map((t: any) => [t.id, t.veiculo_id]) || [])
-            lastPositions = recentPositions.map((pos: any) => ({
+            const tripToVehicle = new Map(activeTrips?.map((t: SupabaseTrip) => [t.id, t.veiculo_id]) || [])
+            lastPositions = (recentPositions || []).map((pos: SupabasePosition) => ({
               ...pos,
               veiculo_id: tripToVehicle.get(pos.trip_id)
             }))
@@ -658,8 +604,8 @@ export function AdminMap({
               .limit(tripIds.length * 10)
             
             if (allPositions) {
-              const tripToVehicle = new Map(activeTrips?.map((t: any) => [t.id, t.veiculo_id]) || [])
-              lastPositions = allPositions.map((pos: any) => ({
+              const tripToVehicle = new Map(activeTrips?.map((t: SupabaseTrip) => [t.id, t.veiculo_id]) || [])
+              lastPositions = (allPositions || []).map((pos: SupabasePosition) => ({
                 ...pos,
                 veiculo_id: tripToVehicle.get(pos.trip_id)
               }))
@@ -668,15 +614,15 @@ export function AdminMap({
         }
         
         // Agrupar posições por veiculo_id e pegar a mais recente
-        const positionsByVehicle = new Map()
-        lastPositions.forEach((pos: any) => {
+        const positionsByVehicle = new Map<string, SupabasePosition & { veiculo_id?: string }>()
+        lastPositions.forEach((pos: SupabasePosition) => {
           if (pos.veiculo_id && !positionsByVehicle.has(pos.veiculo_id)) {
             positionsByVehicle.set(pos.veiculo_id, pos)
           }
         })
         
         // Montar dados finais dos veículos - MOSTRAR TODOS OS VEÍCULOS ATIVOS
-        const processedVehicles = finalVeiculosData.map((v: any) => {
+        const processedVehicles = finalVeiculosData.map((v: SupabaseVeiculo) => {
           const trip = tripsByVehicle.get(v.id)
           const lastPos = positionsByVehicle.get(v.id)
           
@@ -734,47 +680,22 @@ export function AdminMap({
           }
         })
         
-        finalVeiculosData = processedVehicles
-        debug(`Montados ${finalVeiculosData.length} veículos com dados completos`, { count: finalVeiculosData.length }, 'AdminMap')
-      } else if (vehiclesError) {
-        logError('Erro ao carregar veículos', { error: vehiclesError }, 'AdminMap')
-        finalVeiculosData = []
-      } else {
-        debug('Nenhum veículo ativo encontrado', {}, 'AdminMap')
-        finalVeiculosData = []
-      }
-      
-      debug('Resultado final da query de veículos', {
-        filtroCompany: filters.company || '(nenhum)',
-        totalRetornado: finalVeiculosData?.length || 0,
-        erro: vehiclesError?.message || null,
-        primeirosVeiculos: finalVeiculosData?.slice(0, 2).map((v: any) => ({
-          veiculo_id: v.veiculo_id,
-          plate: v.plate,
-          lat: v.lat,
-          lng: v.lng,
-          company_id: v.company_id
-        })) || []
-      })
-
-      if (finalVeiculosData && finalVeiculosData.length > 0) {
+        const processedVehiclesFinal = processedVehicles as Veiculo[]
+        debug(`Montados ${processedVehiclesFinal.length} veículos com dados completos`, { count: processedVehiclesFinal.length }, 'AdminMap')
+        
         // Processar TODOS os veículos - não filtrar por coordenadas
         // Veículos sem coordenadas ainda aparecerão na lista e podem ser visualizados
-        const processedVehicles = finalVeiculosData
-          .map((v: any) => {
+        const normalizedVehicles = processedVehiclesFinal
+          .map((v: Veiculo) => {
             // Normalizar coordenadas se existirem
             if (v.lat !== null && v.lng !== null && isValidCoordinate(v.lat, v.lng)) {
               const normalized = normalizeCoordinate(v.lat, v.lng)
               if (normalized) {
-                v.lat = normalized.lat
-                v.lng = normalized.lng
+                return { ...v, lat: normalized.lat, lng: normalized.lng }
               }
             } else {
               // Veículo sem coordenadas - ainda assim incluir
               debug(`Veículo ${v.plate} (${v.veiculo_id}) sem coordenadas GPS - será exibido como "na garagem"`, { vehicleId: v.veiculo_id, plate: v.plate }, 'AdminMap')
-              v.lat = null
-              v.lng = null
-              v.vehicle_status = 'garage'
             }
             
             return {
@@ -785,11 +706,11 @@ export function AdminMap({
             }
           })
         
-        setVeiculos(processedVehicles as any)
+        setVeiculos(normalizedVehicles)
         
         // Contar veículos com e sem coordenadas
-        const withCoords = processedVehicles.filter((v: any) => v.lat !== null && v.lng !== null).length
-        const withoutCoords = processedVehicles.length - withCoords
+        const withCoords = normalizedVehicles.filter((v: Veiculo) => v.lat !== null && v.lng !== null).length
+        const withoutCoords = normalizedVehicles.length - withCoords
         
         debug(`Carregados ${processedVehicles.length} veículos ativos`, { 
           total: processedVehicles.length,
@@ -837,18 +758,19 @@ export function AdminMap({
       
       /*
       // CÓDIGO DESABILITADO - Carregamento de alertas comentado devido a problemas de schema cache
-      let combinedAlerts: any[] = []
+      let combinedAlerts: MapAlert[] = []
       let alertsErrorMsg: string | null = null
       try {
         // Helper: detectar erro de tabela ausente no cache do PostgREST
-        const isMissingTableError = (err: any, table: string) => {
-          const msg = (err as any)?.message || ''
+        const isMissingTableError = (err: unknown, table: string) => {
+          const error = toError(err)
+          const msg = error.message || ''
           return typeof msg === 'string' && msg.includes(`Could not find the table 'public.${table}'`)
         }
 
         // Incidentes abertos (sem lat/lng pois a tabela não tem essas colunas)
-        let incidentsData: any[] = []
-        let incidentsError: any = null
+        let incidentsData: SupabaseIncident[] = []
+        let incidentsError: unknown = null
         
         try {
           let incidentsQuery = supabase
@@ -863,7 +785,7 @@ export function AdminMap({
           const result = await incidentsQuery
           incidentsData = result.data || []
           incidentsError = result.error
-        } catch (error: any) {
+        } catch (error: unknown) {
           // Se erro for sobre coluna inexistente, ignorar silenciosamente
           if (error?.message?.includes('does not exist') || error?.message?.includes('column')) {
             warn('Erro ao carregar incidentes (coluna inexistente), continuando sem incidentes', { message: error.message }, 'AdminMap')
@@ -882,8 +804,8 @@ export function AdminMap({
         }
 
         // Solicitações de socorro abertas (painel operador)
-        let assistanceData: any[] = []
-        let assistanceError: any = null
+        let assistanceData: SupabaseAssistance[] = []
+        let assistanceError: unknown = null
         
         try {
           let assistanceQuery = supabase
@@ -900,7 +822,7 @@ export function AdminMap({
           const result = await assistanceQuery
           assistanceData = result.data || []
           assistanceError = result.error
-        } catch (error: any) {
+        } catch (error: unknown) {
           // Se erro for sobre coluna inexistente, ignorar silenciosamente
           if (error?.message?.includes('does not exist') || error?.message?.includes('column')) {
             warn('Erro ao carregar assistência (coluna inexistente), continuando sem assistência', { message: error.message }, 'AdminMap')
@@ -919,10 +841,12 @@ export function AdminMap({
         }
 
         if (incidentsError && assistanceError) {
-          const msg = (incidentsError as any)?.message ?? (assistanceError as any)?.message ?? (() => { try { return JSON.stringify(incidentsError || assistanceError) } catch { return String(incidentsError || assistanceError) } })()
+          const incidentsErr = incidentsError ? toError(incidentsError) : null
+          const assistanceErr = assistanceError ? toError(assistanceError) : null
+          const msg = incidentsErr?.message ?? assistanceErr?.message ?? (() => { try { return JSON.stringify(incidentsError || assistanceError) } catch { return String(incidentsError || assistanceError) } })()
           alertsErrorMsg = msg
         } else {
-          const mappedIncidents = (incidentsData || []).map((i: any) => ({
+          const mappedIncidents = (incidentsData || []).map((i: SupabaseIncident) => ({
             alert_id: i.id,
             alert_type: 'incident',
             company_id: i.company_id,
@@ -936,7 +860,7 @@ export function AdminMap({
           }))
 
           // Extrair lat/lng se presente no payload
-          const mappedAssistance = (assistanceData || []).map((a: any) => {
+          const mappedAssistance = (assistanceData || []).map((a: SupabaseAssistance) => {
             const payload = a.payload || {}
             const lat = payload.lat ?? payload.latitude ?? null
             const lng = payload.lng ?? payload.longitude ?? null
@@ -1548,7 +1472,7 @@ export function AdminMap({
           const { exportMapPNG } = await import('@/lib/export-map-png')
           await exportMapPNG('map-container')
           notifySuccess(t('common','success.exportPng'))
-        } catch (error: any) {
+        } catch (error: unknown) {
           logError('Erro ao exportar PNG', { error }, 'AdminMap')
           notifyError(formatError(error, t('common','errors.exportPng')))
         }

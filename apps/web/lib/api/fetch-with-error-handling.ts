@@ -1,11 +1,12 @@
 import { notifyError, notifySuccess } from "@/lib/toast"
+import type { AsyncResult } from "@/lib/types/api"
 
-export interface FetchErrorHandlingOptions {
+export interface FetchErrorHandlingOptions<T = unknown> {
     successMessage?: string
     errorMessages?: Record<number, string>
     showSuccessToast?: boolean
     showErrorToast?: boolean
-    onSuccess?: (data: any) => void
+    onSuccess?: (data: T) => void
     onError?: (error: Error) => void
 }
 
@@ -29,11 +30,11 @@ export interface FetchErrorHandlingOptions {
  *   console.error(result.error)
  * }
  */
-export async function fetchWithErrorHandling(
+export async function fetchWithErrorHandling<T = unknown>(
     url: string,
     init?: RequestInit,
-    options: FetchErrorHandlingOptions = {}
-): Promise<{ success: true; data: any } | { success: false; error: Error }> {
+    options: FetchErrorHandlingOptions<T> = {}
+): Promise<AsyncResult<T, Error>> {
     const {
         successMessage,
         errorMessages = {},
@@ -110,8 +111,8 @@ export async function fetchWithErrorHandling(
             onSuccess(data)
         }
 
-        return { success: true, data }
-    } catch (error) {
+        return { success: true, data: data as T }
+    } catch (error: unknown) {
         const errorObj = error instanceof Error ? error : new Error('Erro desconhecido')
         
         if (showErrorToast) {
@@ -133,10 +134,8 @@ export async function fetchWithErrorHandling(
 export async function fetchWithLoading<T>(
     url: string,
     init?: RequestInit,
-    options: FetchErrorHandlingOptions = {}
-): Promise<{ success: true; data: T } | { success: false; error: Error; loading: false }> {
-    return fetchWithErrorHandling(url, init, options) as Promise<
-        { success: true; data: T } | { success: false; error: Error; loading: false }
-    >
+    options: FetchErrorHandlingOptions<T> = {}
+): Promise<AsyncResult<T, Error>> {
+    return fetchWithErrorHandling<T>(url, init, options)
 }
 
