@@ -1,10 +1,10 @@
 "use client"
 
 import { useFormStatus } from 'react-dom'
-import { Button, type ButtonProps } from './button'
+import { Button } from './button'
 import { Loader2 } from 'lucide-react'
 
-interface FormSubmitButtonProps extends ButtonProps {
+interface FormSubmitButtonProps extends React.ComponentProps<typeof Button> {
   children: React.ReactNode
   loadingText?: string
 }
@@ -13,17 +13,17 @@ interface FormSubmitButtonProps extends ButtonProps {
  * Botão de submit que usa useFormStatus do React 19
  * Automaticamente mostra estado de loading quando o formulário está sendo submetido
  */
-export function FormSubmitButton({ 
-  children, 
+export function FormSubmitButton({
+  children,
   loadingText,
   disabled,
-  ...props 
+  ...props
 }: FormSubmitButtonProps) {
   const { pending } = useFormStatus()
-  
+
   return (
-    <Button 
-      type="submit" 
+    <Button
+      type="submit"
       disabled={disabled || pending}
       {...props}
     >

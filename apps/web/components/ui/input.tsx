@@ -37,8 +37,8 @@ const inputVariants = cva(
 )
 
 export interface InputProps
-  extends React.InputHTMLAttributes<HTMLInputElement>,
-    VariantProps<typeof inputVariants> {}
+  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'>,
+  VariantProps<typeof inputVariants> { }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ({ className, type, focus, state, size, hover, ...props }, ref) => {
@@ -46,8 +46,8 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     const inputState = props.disabled
       ? "disabled"
       : props["aria-invalid"]
-      ? "invalid"
-      : state
+        ? "invalid"
+        : state
 
     return (
       <input

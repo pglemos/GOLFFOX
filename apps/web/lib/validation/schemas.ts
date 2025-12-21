@@ -236,6 +236,23 @@ export const updateTripSchema = createTripSchema.partial().extend({
 })
 
 // ============================================
+// Schemas de Documentos
+// ============================================
+
+export const documentSchema = z.object({
+  document_type: z.string().min(1, 'Tipo de documento é obrigatório'),
+  document_number: z.string().optional().nullable(),
+  expiry_date: z.string().optional().nullable(),
+  issue_date: z.string().optional().nullable(),
+  file_url: z.string().url('URL inválida').optional().nullable(),
+  file_name: z.string().optional().nullable(),
+  file_size: z.number().optional().nullable(),
+  file_type: z.string().optional().nullable(),
+  status: z.enum(['valid', 'expired', 'pending', 'rejected']).default('valid'),
+  notes: z.string().optional().nullable(),
+})
+
+// ============================================
 // Schemas de Paginação
 // ============================================
 
