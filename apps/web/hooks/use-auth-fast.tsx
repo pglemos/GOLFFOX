@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react"
 import { supabase } from "@/lib/supabase"
+import { logError, warn } from "@/lib/logger"
 
 interface User {
   id: string
@@ -31,15 +32,6 @@ export function useAuthFast() {
         if (cookieMatch) {
           const decoded = atob(cookieMatch[1])
           const u = JSON.parse(decoded)
-          // #region agent log
-          console.log('[DEBUG useAuthFast] 🍪 Cookie RAW data:', JSON.stringify(u, null, 2));
-          console.log('[DEBUG useAuthFast] 🖼️ avatar_url status:', {
-            hasAvatarUrl: !!u?.avatar_url,
-            avatarUrl: u?.avatar_url,
-            avatarUrlType: typeof u?.avatar_url,
-            cookieKeys: u ? Object.keys(u) : []
-          });
-          // #endregion
           if (u?.id && u?.email) {
             return {
               id: u.id,
@@ -56,84 +48,96 @@ export function useAuthFast() {
       return null
     }
 
-    const checkAuth = () => {
+    const checkAuth = async () => {
       // Primeiro, tentar cookie (instantâneo)
       const cookieUser = getCookieUser()
       if (cookieUser && mounted) {
-
         setUser(cookieUser)
         setLoading(false)
         return
       }
 
-      // Fallback rápido: perguntar ao servidor (lê cookie httpOnly)
-      fetch('/api/auth/me', { credentials: 'include' })
-        .then(async (res) => {
-          if (!mounted) return
-          if (res.ok) {
-            const data = await res.json().catch(() => null)
+      try {
+        // Fallback rápido: perguntar ao servidor (lê cookie httpOnly)
+        const res = await fetch('/api/auth/me', { credentials: 'include' })
+        
+        if (!mounted) return
+        
+        if (res.ok) {
+          try {
+            const data = await res.json()
             const u = data?.user
 
             if (u?.id && u?.role) {
-              setUser({ id: u.id, email: u.email || '', name: u.name || u.email?.split('@')[0] || '', role: u.role, avatar_url: u.avatar_url })
+              setUser({ 
+                id: u.id, 
+                email: u.email || '', 
+                name: u.name || u.email?.split('@')[0] || '', 
+                role: u.role, 
+                avatar_url: u.avatar_url 
+              })
               setLoading(false)
               return
             }
+          } catch (parseError) {
+            warn('Erro ao fazer parse da resposta de /api/auth/me', { error: parseError }, 'useAuthFast')
           }
-          // Continua para Supabase
-          return supabase.auth.getSession()
-        })
-        .then((result: any) => {
-          if (!mounted || !result) return
-          const { data: { session }, error } = result
-          if (error) {
-            console.error('Erro ao obter sessão:', error)
-            setLoading(false)
-            return
-          }
-          if (session?.user) {
-            setUser({
-              id: session.user.id,
-              email: session.user.email || '',
-              name: session.user.user_metadata?.name || session.user.email?.split('@')[0] || '',
-              role: session.user.user_metadata?.role || 'admin',
-              avatar_url: session.user.user_metadata?.avatar_url
-            })
-          }
+        }
+        
+        // Continua para Supabase se servidor não retornou usuário válido
+        const { data: { session }, error } = await supabase.auth.getSession()
+        
+        if (!mounted) return
+        
+        if (error) {
+          logError('Erro ao obter sessão do Supabase', { error }, 'useAuthFast')
           setLoading(false)
-        })
-        .catch(() => {
-          if (!mounted) return
-          setLoading(false)
-        })
+          return
+        }
+        
+        if (session?.user) {
+          setUser({
+            id: session.user.id,
+            email: session.user.email || '',
+            name: session.user.user_metadata?.name || session.user.email?.split('@')[0] || '',
+            role: session.user.user_metadata?.role || 'admin',
+            avatar_url: session.user.user_metadata?.avatar_url
+          })
+        }
+        setLoading(false)
+      } catch (error: unknown) {
+        if (!mounted) return
+        logError('Erro ao verificar autenticação', { error }, 'useAuthFast')
+        setLoading(false)
+      }
     }
 
     checkAuth()
 
-    const handleAuthUpdate = (event?: Event) => {
-      console.log('[DEBUG useAuthFast] 🔄 auth:update EVENT RECEIVED at', new Date().toISOString());
+    const handleAuthUpdate = async (event?: Event) => {
       setLoading(true)
 
       // Adicionar delay para garantir que o banco foi atualizado
-      setTimeout(() => {
-        // Forçar busca no servidor (ignorar cookie desatualizado)
-        fetch('/api/auth/me', {
-          credentials: 'include',
-          // Forçar sem cache
-          cache: 'no-store',
-          headers: {
-            'Cache-Control': 'no-cache',
-            'Pragma': 'no-cache'
-          }
-        })
-          .then(async (res) => {
-            if (!mounted) return
-            console.log('[DEBUG useAuthFast] 🔄 /api/auth/me response status:', res.status);
-            if (res.ok) {
-              const data = await res.json().catch(() => null)
+      setTimeout(async () => {
+        try {
+          // Forçar busca no servidor (ignorar cookie desatualizado)
+          const res = await fetch('/api/auth/me', {
+            credentials: 'include',
+            // Forçar sem cache
+            cache: 'no-store',
+            headers: {
+              'Cache-Control': 'no-cache',
+              'Pragma': 'no-cache'
+            }
+          })
+          
+          if (!mounted) return
+          
+          if (res.ok) {
+            try {
+              const data = await res.json()
               const u = data?.user
-              console.log('[DEBUG useAuthFast] 🔄 auth:update - FULL Server response:', JSON.stringify(u, null, 2));
-              console.log('[DEBUG useAuthFast] 🔄 auth:update - Avatar URL received:', u?.avatar_url);
+              
               if (u?.id && u?.role) {
                 const newUser = {
                   id: u.id,
@@ -142,21 +146,22 @@ export function useAuthFast() {
                   role: u.role,
                   avatar_url: u.avatar_url
                 }
-                console.log('[DEBUG useAuthFast] 🔄 Setting NEW user state:', JSON.stringify(newUser, null, 2));
                 setUser(newUser)
                 setLoading(false)
                 return
               }
+            } catch (parseError) {
+              warn('Erro ao fazer parse da resposta de /api/auth/me no handleAuthUpdate', { error: parseError }, 'useAuthFast')
             }
-            // Fallback para cookie se servidor falhar
-            console.log('[DEBUG useAuthFast] ⚠️ Falling back to cookie (server failed)');
-            checkAuth()
-          })
-          .catch((err) => {
-            console.error('[DEBUG useAuthFast] ❌ Error fetching /api/auth/me:', err);
-            if (!mounted) return
-            checkAuth()
-          })
+          }
+          
+          // Fallback para cookie se servidor falhar
+          await checkAuth()
+        } catch (err: unknown) {
+          logError('Erro ao buscar autenticação após update', { error: err }, 'useAuthFast')
+          if (!mounted) return
+          await checkAuth()
+        }
       }, 200) // Pequeno delay para garantir propagação no banco
     }
 

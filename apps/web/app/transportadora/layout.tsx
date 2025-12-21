@@ -1,4 +1,7 @@
+'use client'
+
 import { TransportadoraTenantProvider } from "@/components/providers/transportadora-tenant-provider"
+import { TransportadoraErrorBoundary } from "./error-boundary"
 
 export default function TransportadoraLayout({
     children,
@@ -6,8 +9,10 @@ export default function TransportadoraLayout({
     children: React.ReactNode
 }) {
     return (
-        <TransportadoraTenantProvider>
-            {children}
-        </TransportadoraTenantProvider>
+        <TransportadoraErrorBoundary>
+            <TransportadoraTenantProvider>
+                {children}
+            </TransportadoraTenantProvider>
+        </TransportadoraErrorBoundary>
     )
 }

@@ -41,14 +41,19 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: any) {
-    // ✅ Log estruturado do erro
-    logError('ErrorBoundary capturou um erro', {
+    const context = {
       error: error.message,
       stack: error.stack,
       name: error.name,
       componentStack: errorInfo.componentStack,
-      url: typeof window !== 'undefined' ? window.location.href : 'unknown'
-    }, 'ErrorBoundary')
+      url: typeof window !== 'undefined' ? window.location.href : 'unknown',
+      timestamp: new Date().toISOString(),
+      userAgent: typeof window !== 'undefined' ? window.navigator.userAgent : undefined,
+      area: 'global'
+    }
+
+    // ✅ Log estruturado do erro com contexto completo
+    logError('ErrorBoundary capturou um erro', context, 'ErrorBoundary')
 
     // Registrar alerta operacional (com tratamento de erro - não bloquear renderização)
     createAlert({
@@ -56,11 +61,7 @@ export class ErrorBoundary extends Component<Props, State> {
       severity: 'error',
       title: 'Erro de React capturado',
       message: error.message || 'Erro desconhecido',
-      details: {
-        componentStack: errorInfo.componentStack,
-        stack: error.stack,
-        url: typeof window !== 'undefined' ? window.location.href : 'unknown',
-      },
+      details: context,
       source: 'error-boundary',
     }).catch((alertError) => {
       // Não bloquear se createAlert falhar, mas logar o erro

@@ -18,6 +18,7 @@ import { notifySuccess, notifyError } from "@/lib/toast"
 import { globalSyncManager } from "@/lib/global-sync"
 import { formatPhone, formatCEP, formatCPF, formatCNPJ } from "@/lib/format-utils"
 import { AddressForm, AddressData } from "@/components/address-form"
+import { fetchWithErrorHandling } from "@/lib/api/fetch-with-error-handling"
 
 interface CreateOperadorModalProps {
   isOpen: boolean
@@ -137,60 +138,48 @@ export function CreateOperatorModal({
         return
       }
 
-      const response = await fetch('/api/admin/create-operador', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.access_token}`,
+      const result = await fetchWithErrorHandling<{
+        companyId?: string
+        company_id?: string
+        company?: any
+        operador?: any
+        userId?: string
+        operatorId?: string
+        email?: string
+      }>(
+        '/api/admin/create-operador',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify(requestBody),
+          credentials: 'include',
         },
-        body: JSON.stringify(requestBody),
-        credentials: 'include',
-      })
-
-      if (!response.ok) {
-        let errorMessage = 'Erro ao criar empresa'
-        let errorDetails = ''
-
-        try {
-          const errorData = await response.json()
-          errorMessage = errorData.error || errorData.message || errorMessage
-          errorDetails = errorData.details || ''
-          console.error('❌ Erro da API create-operador:', {
-            status: response.status,
-            statusText: response.statusText,
-            errorData
-          })
-        } catch (parseError) {
-          console.error('❌ Erro da API create-operador (sem JSON):', {
-            status: response.status,
-            statusText: response.statusText
-          })
+        {
+          errorMessages: {
+            401: 'Sessão expirada. Por favor, faça login novamente.',
+            403: 'Você não tem permissão para criar empresas. Contacte o administrador.',
+            404: 'API não encontrada. Por favor, contacte o suporte técnico.',
+            500: 'Erro no servidor. Por favor, tente novamente ou entre em contato com o suporte.',
+          },
+          showErrorToast: true,
+          showSuccessToast: false,
         }
+      )
 
-        if (response.status === 401) {
-          errorMessage = 'Sessão expirada. Por favor, faça login novamente.'
-        } else if (response.status === 403) {
-          errorMessage = 'Você não tem permissão para criar empresas. Contacte o administrador.'
-        } else if (response.status === 404) {
-          errorMessage = 'API não encontrada. Por favor, contacte o suporte técnico.'
-        } else if (response.status === 500) {
-          errorMessage = errorDetails ? `Erro no servidor: ${errorMessage}\n\nDetalhes: ${errorDetails}` : `Erro no servidor: ${errorMessage}`
-        } else if (response.status >= 400) {
-          errorMessage = errorDetails ? `${errorMessage}\n\nDetalhes: ${errorDetails}` : errorMessage
-        }
-
-        notifyError(new Error(errorMessage), errorMessage)
+      if (!result.success) {
         setLoading(false)
         setProgress('')
         setStep(1)
         return
       }
 
-      const result = await response.json()
+      const data = result.data
 
-      if (!result.companyId && !result.company_id) {
+      if (!data?.companyId && !data?.company_id) {
         const errorMsg = 'Resposta inválida da API: companyId não encontrado'
-        console.error('❌ Resposta da API create-operador:', result)
         notifyError(new Error(errorMsg), errorMsg)
         setLoading(false)
         setProgress('')

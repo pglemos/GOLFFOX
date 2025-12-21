@@ -1,0 +1,213 @@
+/**
+ * Componente Container para formulário de custo
+ * Gerencia lógica de negócio e estado
+ */
+
+"use client"
+
+import { useState, useCallback } from "react"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { z } from "zod"
+import { format } from "date-fns"
+import { notifyError } from "@/lib/toast"
+import { useCreateCost } from "@/hooks/use-costs"
+import { CostFormPresentational } from "./cost-form-presentational"
+import type { ManualCostInsert, ProfileType, CostCategory } from "@/types/financial"
+
+// Schema de validação
+const costFormSchema = z.object({
+    categoryId: z.string().optional(),
+    description: z.string().min(3, "Descrição deve ter pelo menos 3 caracteres"),
+    amount: z.string()
+        .min(1, "Valor é obrigatório")
+        .refine(val => !isNaN(parseFloat(val.replace(',', '.'))) && parseFloat(val.replace(',', '.')) > 0, {
+            message: "Valor deve ser maior que zero"
+        }),
+    costDate: z.date({ required_error: "Data é obrigatória" }),
+    isRecurring: z.boolean().default(false),
+    recurringInterval: z.enum(['daily', 'weekly', 'monthly', 'yearly']).optional(),
+    recurringEndDate: z.date().optional(),
+    vehicleId: z.string().optional(),
+    routeId: z.string().optional(),
+    notes: z.string().optional(),
+})
+
+type CostFormValues = z.infer<typeof costFormSchema>
+
+export interface CostFormContainerProps {
+    profileType: ProfileType
+    companyId?: string
+    carrierId?: string
+    veiculos?: { id: string; plate: string; model?: string }[]
+    routes?: { id: string; name: string }[]
+    onSuccess?: () => void
+    onCancel?: () => void
+    initialData?: Partial<CostFormValues>
+}
+
+export function CostFormContainer({
+    profileType,
+    companyId,
+    carrierId,
+    veiculos = [],
+    routes = [],
+    onSuccess,
+    onCancel,
+    initialData,
+}: CostFormContainerProps) {
+    const [selectedCategory, setSelectedCategory] = useState<CostCategory | null>(null)
+    const [attachment, setAttachment] = useState<File | null>(null)
+    const [uploadProgress, setUploadProgress] = useState(0)
+
+    const createCostMutation = useCreateCost()
+
+    const form = useForm<CostFormValues>({
+        resolver: zodResolver(costFormSchema),
+        defaultValues: {
+            description: initialData?.description || "",
+            amount: initialData?.amount || "",
+            costDate: initialData?.costDate || new Date(),
+            isRecurring: initialData?.isRecurring || false,
+            categoryId: initialData?.categoryId,
+            vehicleId: initialData?.vehicleId,
+            routeId: initialData?.routeId,
+            notes: initialData?.notes,
+        },
+    })
+
+    // Upload de anexo
+    const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0]
+        if (file) {
+            // Validar tamanho (máx 5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                notifyError('Arquivo deve ter no máximo 5MB')
+                return
+            }
+            // Validar tipo
+            const allowedTypes = ['image/jpeg', 'image/png', 'application/pdf']
+            if (!allowedTypes.includes(file.type)) {
+                notifyError('Apenas imagens (JPG, PNG) e PDFs são aceitos')
+                return
+            }
+            setAttachment(file)
+        }
+    }, [])
+
+    const handleRemoveFile = useCallback(() => {
+        setAttachment(null)
+    }, [])
+
+    // Upload do arquivo para Supabase Storage
+    const uploadFile = async (file: File): Promise<string | null> => {
+        try {
+            const formData = new FormData()
+            formData.append('file', file)
+            formData.append('folder', 'costs')
+
+            const response = await fetch('/api/upload', {
+                method: 'POST',
+                body: formData,
+            })
+
+            if (!response.ok) throw new Error('Falha no upload')
+
+            const { url } = await response.json()
+            return url
+        } catch (error) {
+            console.error('Erro no upload:', error)
+            return null
+        }
+    }
+
+    // Submit
+    const onSubmit = useCallback(async (e: React.FormEvent) => {
+        e.preventDefault()
+        const data = form.getValues()
+        
+        try {
+            // Fazer upload do anexo se houver
+            let attachmentUrl = null
+            let attachmentName = null
+            if (attachment) {
+                setUploadProgress(50)
+                attachmentUrl = await uploadFile(attachment)
+                attachmentName = attachment.name
+                setUploadProgress(100)
+            }
+
+            // Montar payload
+            const payload: ManualCostInsert = {
+                companyId,
+                carrierId,
+                categoryId: data.categoryId,
+                description: data.description,
+                amount: parseFloat(data.amount.replace(',', '.')),
+                costDate: format(data.costDate, 'yyyy-MM-dd'),
+                isRecurring: data.isRecurring,
+                recurringInterval: data.isRecurring ? data.recurringInterval : undefined,
+                recurringEndDate: data.isRecurring && data.recurringEndDate
+                    ? format(data.recurringEndDate, 'yyyy-MM-dd')
+                    : undefined,
+                vehicleId: data.vehicleId || undefined,
+                routeId: data.routeId || undefined,
+                notes: data.notes,
+                attachmentUrl,
+                attachmentName,
+            }
+
+            await createCostMutation.mutateAsync(payload)
+
+            form.reset()
+            setAttachment(null)
+            setSelectedCategory(null)
+            setUploadProgress(0)
+            onSuccess?.()
+        } catch (error) {
+            console.error('Erro ao salvar custo:', error)
+            // Erro já é tratado pelo hook
+        } finally {
+            setUploadProgress(0)
+        }
+    }, [form, attachment, companyId, carrierId, createCostMutation, onSuccess])
+
+    const handleSaveAndAdd = useCallback(async () => {
+        await onSubmit(new Event('submit') as any)
+        // Manter formulário aberto para novo lançamento
+    }, [onSubmit])
+
+    // Formatação de moeda
+    const handleAmountChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+        let value = e.target.value
+        // Remover caracteres não numéricos exceto vírgula e ponto
+        value = value.replace(/[^\d,\.]/g, '')
+        form.setValue('amount', value)
+    }, [form])
+
+    const handleCategoryChange = useCallback((id: string, category: CostCategory | null) => {
+        form.setValue("categoryId", id)
+        setSelectedCategory(category || null)
+    }, [form])
+
+    return (
+        <CostFormPresentational
+            form={form}
+            profileType={profileType}
+            veiculos={veiculos}
+            routes={routes}
+            selectedCategory={selectedCategory}
+            attachment={attachment}
+            loading={createCostMutation.isPending}
+            uploadProgress={uploadProgress}
+            onCategoryChange={handleCategoryChange}
+            onFileChange={handleFileChange}
+            onRemoveFile={handleRemoveFile}
+            onAmountChange={handleAmountChange}
+            onSubmit={onSubmit}
+            onSaveAndAdd={handleSaveAndAdd}
+            onCancel={onCancel}
+        />
+    )
+}
+

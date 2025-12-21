@@ -4,6 +4,7 @@ import { Suspense } from 'react'
 export const dynamic = 'force-dynamic'
 import { EmpresaTenantProvider } from '@/components/providers/empresa-tenant-provider'
 import { RealtimeProvider } from '@/components/providers/realtime-provider'
+import { EmpresaErrorBoundary } from './error-boundary'
 
 function LoadingFallback() {
   return (
@@ -22,12 +23,14 @@ export default function EmpresaLayout({
   children: React.ReactNode
 }) {
   return (
-    <Suspense fallback={<LoadingFallback />}>
-      <EmpresaTenantProvider>
-        <RealtimeProvider>
-          {children}
-        </RealtimeProvider>
-      </EmpresaTenantProvider>
-    </Suspense>
+    <EmpresaErrorBoundary>
+      <Suspense fallback={<LoadingFallback />}>
+        <EmpresaTenantProvider>
+          <RealtimeProvider>
+            {children}
+          </RealtimeProvider>
+        </EmpresaTenantProvider>
+      </Suspense>
+    </EmpresaErrorBoundary>
   )
 }

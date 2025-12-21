@@ -3,6 +3,9 @@
 import { useState, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { notifyError, notifySuccess } from '@/lib/toast'
+import { safeAsync } from '@/lib/safe-async'
+import { formatUserErrorMessage, getErrorActionSuggestion } from '@/lib/error-messages'
+import { logError } from '@/lib/logger'
 
 /**
  * Opções para o hook de upload de arquivos
@@ -130,52 +133,89 @@ export function useFileUpload(options: UseFileUploadOptions): UseFileUploadRetur
         setProgress(0)
         setError(null)
 
-        try {
-            const formData = new FormData()
-            formData.append('file', file)
-            formData.append('bucket', bucket)
-            if (folder) formData.append('folder', folder)
-            if (customFolder) formData.append('folder', customFolder)
-            if (entityId) formData.append('entityId', entityId)
+        const formData = new FormData()
+        formData.append('file', file)
+        formData.append('bucket', bucket)
+        if (folder) formData.append('folder', folder)
+        if (customFolder) formData.append('folder', customFolder)
+        if (entityId) formData.append('entityId', entityId)
 
-            setProgress(10)
+        // Usar safeAsync para upload com retry e timeout
+        const result = await safeAsync(
+            async () => {
+                setProgress(10)
 
-            const response = await fetch('/api/upload', {
-                method: 'POST',
-                body: formData,
-            })
+                const response = await fetch('/api/upload', {
+                    method: 'POST',
+                    body: formData,
+                })
 
-            setProgress(50)
+                setProgress(50)
 
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}))
-                throw new Error(errorData.error || errorData.details || 'Erro ao enviar arquivo')
+                if (!response.ok) {
+                    let errorData: any = {}
+                    try {
+                        errorData = await response.json()
+                    } catch {
+                        // Se não conseguir fazer parse, usar mensagem padrão
+                    }
+                    
+                    const error = new Error(errorData.error || errorData.details || 'Erro ao enviar arquivo')
+                    error.name = `HTTP${response.status}`
+                    throw error
+                }
+
+                const result = await response.json()
+
+                if (!result.success) {
+                    throw new Error(result.error || 'Erro desconhecido no upload')
+                }
+
+                setProgress(100)
+                return result
+            },
+            {
+                timeout: 60000, // 60 segundos para uploads
+                maxRetries: 2, // 2 tentativas adicionais
+                initialDelay: 2000, // 2 segundos entre tentativas
+                context: {
+                    component: 'useFileUpload',
+                    action: 'upload',
+                    bucket,
+                    fileName: file.name,
+                    fileSize: file.size,
+                },
             }
+        )
 
-            const result = await response.json()
+        setUploading(false)
 
-            if (!result.success) {
-                throw new Error(result.error || 'Erro desconhecido no upload')
-            }
-
-            setProgress(100)
-
-            notifySuccess('Arquivo enviado com sucesso!')
-
-            return {
-                url: result.url,
-                path: result.path,
-                size: result.size,
-                name: result.name,
-                type: result.type,
-            }
-        } catch (err) {
-            const errorMsg = err instanceof Error ? err.message : 'Erro ao enviar arquivo'
-            setError(errorMsg)
-            notifyError(err, 'Erro ao enviar arquivo')
+        if (!result.success) {
+            const errorMsg = formatUserErrorMessage(result.error)
+            const suggestion = getErrorActionSuggestion(result.error)
+            
+            setError(suggestion ? `${errorMsg}\n\n${suggestion}` : errorMsg)
+            
+            logError('Erro ao fazer upload de arquivo', {
+                error: result.error?.message,
+                stack: result.error?.stack,
+                attempts: result.attempts,
+                bucket,
+                fileName: file.name,
+            }, 'useFileUpload')
+            
+            notifyError(result.error, errorMsg)
             return null
-        } finally {
-            setUploading(false)
+        }
+
+        notifySuccess('Arquivo enviado com sucesso!')
+
+        return {
+            url: result.data.url,
+            path: result.data.path,
+            size: result.data.size,
+            name: result.data.name,
+            type: result.data.type,
         }
     }, [bucket, folder, maxSize, allowedTypes])
 
