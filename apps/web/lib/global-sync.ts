@@ -3,12 +3,14 @@
  * quando dados são criados/atualizados no Supabase
  */
 
-type SyncEventType = 
-  | 'company.created' 
-  | 'company.updated' 
+import { logError } from '@/lib/logger'
+
+type SyncEventType =
+  | 'company.created'
+  | 'company.updated'
   | 'company.deleted'
   | 'user.created'
-  | 'user.updated' 
+  | 'user.updated'
   | 'user.deleted'
   | 'veiculo.created'
   | 'veiculo.updated'
@@ -159,7 +161,7 @@ class GlobalSyncManager {
 
   cleanup() {
     if (typeof window === 'undefined') return
-    
+
     import('@/lib/supabase').then(({ supabase }) => {
       this.channels.forEach((channel) => {
         (supabase as any).removeChannel(channel)

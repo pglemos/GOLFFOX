@@ -60,7 +60,7 @@ export async function GET(req: NextRequest) {
       tripsQuery = tripsQuery.lte('created_at', endDate)
     }
 
-    const { data: trips, error: tripsError } = await tripsQuery
+    const { data: trips, error: tripsError } = await (tripsQuery as any)
 
     if (tripsError) throw tripsError
 
@@ -101,9 +101,9 @@ export async function GET(req: NextRequest) {
         top_performer: driverPerformance[0] || null
       }
     })
-  } catch (err) {
+  } catch (err: any) {
     logError('Erro ao gerar relatório de performance', { error: err }, 'DriverPerformanceReportAPI')
-    const errorMessage = err instanceof Error ? err.message : 'Erro ao gerar relatório'
+    const errorMessage = err?.message || 'Erro ao gerar relatório'
     return NextResponse.json(
       { error: errorMessage },
       { status: 500 }

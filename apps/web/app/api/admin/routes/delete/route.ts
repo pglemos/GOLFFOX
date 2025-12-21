@@ -79,7 +79,7 @@ export async function DELETE(request: NextRequest) {
       // o trigger pode falhar, mas não deve bloquear a exclusão se tratarmos o erro corretamente
       logger.log('   2. Excluindo motorista_positions...')
       const { error: positionsError } = await supabaseAdmin
-        .from('motorista_positions')
+        .from('motorista_positions' as any)
         .delete()
         .in('trip_id', tripIds)
 
@@ -111,7 +111,7 @@ export async function DELETE(request: NextRequest) {
 
       for (const table of dependentTables) {
         const { error: depError } = await supabaseAdmin
-          .from(table)
+          .from(table as any)
           .delete()
           .in('trip_id', tripIds)
 
@@ -170,8 +170,8 @@ export async function DELETE(request: NextRequest) {
     if (error) {
       logError('Erro ao excluir rota', { error, routeId, errorDetails: JSON.stringify(error, null, 2) }, 'RoutesDeleteAPI')
       return NextResponse.json(
-        { 
-          error: 'Erro ao excluir rota', 
+        {
+          error: 'Erro ao excluir rota',
           message: error.message,
           details: error.details || error.hint || 'Sem detalhes adicionais',
           code: error.code

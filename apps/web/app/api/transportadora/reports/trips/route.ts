@@ -52,7 +52,7 @@ export async function GET(req: NextRequest) {
       tripsQuery = tripsQuery.lte('created_at', endDate)
     }
 
-    const { data: trips, error: tripsError } = await tripsQuery.order('created_at', { ascending: false })
+    const { data: trips, error: tripsError } = await (tripsQuery.order('created_at', { ascending: false }) as any)
 
     if (tripsError) throw tripsError
 
@@ -106,10 +106,10 @@ export async function GET(req: NextRequest) {
           : 0
       }
     })
-  } catch (error: any) {
-    logError('Erro ao gerar relatório de viagens', { error }, 'TripsReportAPI')
+  } catch (err: any) {
+    logError('Erro ao gerar relatório de viagens', { error: err }, 'TripsReportAPI')
     return NextResponse.json(
-      { error: error.message || 'Erro ao gerar relatório' },
+      { error: err?.message || 'Erro ao gerar relatório' },
       { status: 500 }
     )
   }

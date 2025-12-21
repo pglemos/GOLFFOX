@@ -59,7 +59,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
         // Buscar documentos
         const { data: documents, error } = await supabaseAdmin
-            .from('gf_veiculo_documents')
+            .from('gf_veiculo_documents' as any)
             .select('*')
             .eq('veiculo_id', vehicleId)
             .order('document_type', { ascending: true })
@@ -74,6 +74,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
         return NextResponse.json(documents || [])
     } catch (error) {
+        const { vehicleId } = await params
         logError('Erro na API de documentos', { error, vehicleId, method: 'GET' }, 'VehicleDocumentsAPI')
         return NextResponse.json(
             { error: 'Erro interno do servidor' },
@@ -132,7 +133,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
         // Verificar se já existe documento do mesmo tipo
         const { data: existing } = await supabaseAdmin
-            .from('gf_veiculo_documents')
+            .from('gf_veiculo_documents' as any)
             .select('id')
             .eq('veiculo_id', vehicleId)
             .eq('document_type', documentData.document_type)
@@ -140,13 +141,13 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
         if (existing) {
             // Atualizar documento existente
-            const { data: updated, error: updateError } = await supabaseAdmin
-                .from('gf_veiculo_documents')
+            const { data: updated, error: updateError } = await (supabaseAdmin
+                .from('gf_veiculo_documents') as any)
                 .update({
                     ...documentData,
                     updated_at: new Date().toISOString(),
                 })
-                .eq('id', existing.id)
+                .eq('id', (existing as any).id)
                 .select()
                 .single()
 
@@ -162,8 +163,8 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         }
 
         // Criar novo documento
-        const { data: created, error: createError } = await supabaseAdmin
-            .from('gf_veiculo_documents')
+        const { data: created, error: createError } = await (supabaseAdmin
+            .from('gf_veiculo_documents') as any)
             .insert({
                 veiculo_id: vehicleId,
                 ...documentData,
@@ -181,7 +182,8 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
         return NextResponse.json(created, { status: 201 })
     } catch (error) {
-        logError('Erro na API de documentos', { error, vehicleId, method: 'GET' }, 'VehicleDocumentsAPI')
+        const { vehicleId } = await params
+        logError('Erro na API de documentos', { error, vehicleId, method: 'POST' }, 'VehicleDocumentsAPI')
         return NextResponse.json(
             { error: 'Erro interno do servidor' },
             { status: 500 }
@@ -211,7 +213,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
 
         // Verificar se documento existe e pertence ao veículo
         const { data: document, error: docError } = await supabaseAdmin
-            .from('gf_veiculo_documents')
+            .from('gf_veiculo_documents' as any)
             .select('id, file_url')
             .eq('id', documentId)
             .eq('veiculo_id', vehicleId)
@@ -226,7 +228,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
 
         // Remover do banco
         const { error: deleteError } = await supabaseAdmin
-            .from('gf_veiculo_documents')
+            .from('gf_veiculo_documents' as any)
             .delete()
             .eq('id', documentId)
 
@@ -243,7 +245,8 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
 
         return NextResponse.json({ success: true })
     } catch (error) {
-        logError('Erro na API de documentos', { error, vehicleId, method: 'GET' }, 'VehicleDocumentsAPI')
+        const { vehicleId } = await params
+        logError('Erro na API de documentos', { error, vehicleId, method: 'DELETE' }, 'VehicleDocumentsAPI')
         return NextResponse.json(
             { error: 'Erro interno do servidor' },
             { status: 500 }

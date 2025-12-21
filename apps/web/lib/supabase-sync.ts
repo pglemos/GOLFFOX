@@ -13,9 +13,9 @@ export interface SyncOperation {
   resourceType: string
   resourceId: string
   action: 'create' | 'update' | 'delete'
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   data: Record<string, any>
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   metadata?: Record<string, any>
 }
 

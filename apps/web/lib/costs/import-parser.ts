@@ -34,7 +34,7 @@ export async function parseCSV(
 
   // Parse header
   const header = lines[0].split(',').map(h => h.trim().toLowerCase())
-  
+
   // Default mapping se não fornecido
   const mapping: Record<string, string> = columnMapping || {
     'data': 'date',
@@ -52,9 +52,9 @@ export async function parseCSV(
     'rota': 'route_name',
     'route': 'route_name',
     'veiculo': 'vehicle_plate',
-    'veiculo': 'vehicle_plate',
+    'vehicle': 'vehicle_plate',
     'motorista': 'driver_email',
-    'motorista': 'driver_email',
+    'driver': 'driver_email',
     'observacoes': 'notes',
     'notes': 'notes'
   }
@@ -68,7 +68,7 @@ export async function parseCSV(
 
   // Parse rows
   const results: ParsedCostRow[] = []
-  
+
   for (let i = 1; i < lines.length; i++) {
     const line = lines[i]
     if (!line.trim()) continue

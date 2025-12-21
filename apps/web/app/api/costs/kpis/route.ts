@@ -26,7 +26,7 @@ async function getCostsKpisHandler(request: NextRequest) {
       const user = await validateAuth(request)
       if (!user || user.role !== 'admin') {
         return NextResponse.json(
-          { 
+          {
             error: 'company_id é obrigatório',
             message: 'O parâmetro company_id é obrigatório para operadores. Admins podem omitir para listar KPIs de todas as empresas.'
           },
@@ -36,7 +36,7 @@ async function getCostsKpisHandler(request: NextRequest) {
       // Admin pode listar sem filtro de company (mas precisamos de pelo menos um company_id para a view)
       // Por enquanto, retornar erro mais descritivo
       return NextResponse.json(
-        { 
+        {
           error: 'company_id é obrigatório',
           message: 'O parâmetro company_id é obrigatório. A view v_costs_kpis requer um company_id específico.'
         },
@@ -59,14 +59,14 @@ async function getCostsKpisHandler(request: NextRequest) {
     // Buscar KPIs da view (view materializada - selecionar todas as colunas)
     const supabase = getSupabaseAdmin()
     const { data, error } = await supabase
-      .from('v_costs_kpis')
+      .from('v_costs_kpis' as any)
       .select('*')
       .eq('company_id', companyId)
       .maybeSingle()
 
     if (error) {
       logError('Erro ao buscar KPIs de custos', { error, companyId }, 'CostsKpisAPI')
-      
+
       // Verificar se erro é porque view não existe
       if (error.code === 'PGRST205' || error.message?.includes('Could not find the table') || error.message?.includes('does not exist') || error.message?.includes('relation') || error.message?.includes('view')) {
         if (isDevelopment) {
@@ -79,7 +79,7 @@ async function getCostsKpisHandler(request: NextRequest) {
           }, { status: 200 })
         }
         return NextResponse.json(
-          { 
+          {
             error: 'View v_costs_kpis não encontrada',
             message: 'A view v_costs_kpis não existe no banco de dados. Execute as migrações de views de custos para criar a view.',
             hint: 'Verifique se a migração v44_costs_views.sql foi executada'
@@ -87,16 +87,16 @@ async function getCostsKpisHandler(request: NextRequest) {
           { status: 500 }
         )
       }
-      
+
       return NextResponse.json(
-        { 
+        {
           error: error.message || 'Erro ao buscar KPIs de custos',
           details: process.env.NODE_ENV === 'development' ? error : undefined
         },
         { status: 500 }
       )
     }
-    
+
     // Se não há dados, retornar valores padrão
     if (!data) {
       return NextResponse.json({
@@ -111,13 +111,13 @@ async function getCostsKpisHandler(request: NextRequest) {
     // Adicionar variação vs orçamento se houver
     const periodDays = period === '90' ? 90 : 30
     const { data: budgetData, error: budgetError } = await supabase
-      .from('v_costs_vs_budget')
+      .from('v_costs_vs_budget' as any)
       .select('budgeted_amount, actual_amount, variance_percent')
       .eq('company_id', companyId)
       .gte('period_year', new Date().getFullYear())
       .limit(1)
       .maybeSingle()
-    
+
     // Se view não existe, não é erro crítico, apenas não teremos dados de budget
     if (budgetError && !budgetError.message?.includes('does not exist') && !budgetError.message?.includes('relation')) {
       logger.warn('Erro ao buscar dados de budget:', budgetError)
@@ -136,7 +136,8 @@ async function getCostsKpisHandler(request: NextRequest) {
 
     return NextResponse.json(response)
   } catch (err) {
-    logError('Erro ao buscar KPIs de custos', { error: err, companyId }, 'CostsKpisAPI')
+    const errorCompanyId = request.nextUrl.searchParams.get('company_id')
+    logError('Erro ao buscar KPIs de custos', { error: err, companyId: errorCompanyId }, 'CostsKpisAPI')
     const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'
     return NextResponse.json(
       { error: errorMessage },

@@ -115,7 +115,7 @@ export function RotasPageContent() {
     if (!loading && user) {
       void loadRotas()
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [loading, user])
 
   // Escutar eventos de sincronização global (apenas após carregamento inicial)

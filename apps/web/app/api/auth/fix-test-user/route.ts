@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { logError } from '@/lib/logger'
+import { logError, logger } from '@/lib/logger'
 
 export const runtime = 'nodejs'
 
@@ -84,7 +84,7 @@ export async function GET(req: NextRequest) {
         role: 'operador',
         is_active: true
       }, { onConflict: 'id' })
-    
+
     if (upsertError) {
       logger.warn('⚠️ Falha ao upsert users:', upsertError.message)
     } else {
@@ -99,24 +99,24 @@ export async function GET(req: NextRequest) {
         user_id: existing.id,
         company_id: companyId
       }, { onConflict: 'user_id,company_id' })
-    
+
     if (mapError) {
       logger.warn('⚠️ Falha ao garantir mapeamento empresa:', mapError.message)
     } else {
       logger.log('✅ Mapeamento com empresa garantido')
     }
 
-    return NextResponse.json({ 
-      ok: true, 
+    return NextResponse.json({
+      ok: true,
       email: testEmail,
       userId: existing.id,
       message: 'Usuário de teste configurado com sucesso'
     })
-  } catch (error: unknown) {
-    logError('Erro ao configurar usuário de teste', { error }, 'FixTestUserAPI')
-    return NextResponse.json({ 
-      error: error?.message || 'Erro ao configurar usuário de teste',
-      details: error?.stack 
+  } catch (err: any) {
+    logError('Erro ao configurar usuário de teste', { error: err }, 'FixTestUserAPI')
+    return NextResponse.json({
+      error: err?.message || 'Erro ao configurar usuário de teste',
+      details: err?.stack
     }, { status: 500 })
   }
 }

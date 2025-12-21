@@ -123,7 +123,7 @@ export default function RelatoriosPage() {
     if (user && !authLoading) {
       loadSchedules()
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [user, authLoading])
 
   const loadSchedules = async () => {

@@ -29,14 +29,14 @@ export async function GET(request: NextRequest) {
         let profile: { role: string; company_id?: string; transportadora_id?: string } | null = null
 
         if (token) {
-            const { data: { user } } = await supabaseAdmin.auth.getUser(token)
-            if (user) {
+            const { data: authData } = await supabaseAdmin.auth.getUser(token)
+            if (authData.user) {
                 const { data: p } = await supabaseAdmin
                     .from('profiles')
                     .select('role, company_id, transportadora_id')
-                    .eq('id', user.id)
+                    .eq('id', authData.user.id)
                     .single()
-                profile = p
+                profile = p as any
             }
         }
 
@@ -67,7 +67,7 @@ export async function GET(request: NextRequest) {
 
         // Construir query
         let query = supabaseAdmin
-            .from('gf_manual_costs_v2')
+            .from('gf_manual_costs_v2' as any)
             .select(`
         *,
         category:gf_cost_categories(id, name, icon, color),
@@ -122,7 +122,7 @@ export async function GET(request: NextRequest) {
             .order(sortBy, { ascending: sortOrder })
             .range(offset, offset + pageSize - 1)
 
-        const { data, error, count } = await query
+        const { data, error, count } = await (query as any)
 
         if (error) {
             logError('[API] Erro ao buscar custos', { error }, 'CostsManualV2API')
@@ -145,35 +145,35 @@ export async function GET(request: NextRequest) {
         }
 
         // Transformar para camelCase
-        const costs: ManualCost[] = (data || []).map((row: Record<string, unknown>) => ({
-            id: row.id as string,
-            companyId: row.company_id as string | null,
-            carrierId: row.transportadora_id as string | null,
-            categoryId: row.category_id as string | null,
-            description: row.description as string,
-            amount: parseFloat(row.amount as string),
-            costDate: row.cost_date as string,
-            isRecurring: row.is_recurring as boolean,
-            recurringInterval: row.recurring_interval as ManualCost['recurringInterval'],
-            recurringEndDate: row.recurring_end_date as string | null,
-            parentRecurringId: row.parent_recurring_id as string | null,
-            vehicleId: row.veiculo_id as string | null,
-            routeId: row.route_id as string | null,
-            driverId: row.motorista_id as string | null,
-            attachmentUrl: row.attachment_url as string | null,
-            attachmentName: row.attachment_name as string | null,
-            notes: row.notes as string | null,
-            status: row.status as 'pending' | 'confirmed' | 'cancelled',
-            createdBy: row.created_by as string | null,
-            approvedBy: row.approved_by as string | null,
-            approvedAt: row.approved_at as string | null,
-            createdAt: row.created_at as string,
-            updatedAt: row.updated_at as string,
-            category: row.category as ManualCost['category'],
-            veiculo: row.veiculo as ManualCost['veiculo'],
-            route: row.route as ManualCost['route'],
-            company: row.company as ManualCost['company'],
-            transportadora: row.transportadora as ManualCost['transportadora'],
+        const costs: ManualCost[] = (data || []).map((row: any) => ({
+            id: row.id,
+            companyId: row.company_id,
+            carrierId: row.transportadora_id,
+            categoryId: row.category_id,
+            description: row.description,
+            amount: parseFloat(row.amount),
+            costDate: row.cost_date,
+            isRecurring: row.is_recurring,
+            recurringInterval: row.recurring_interval,
+            recurringEndDate: row.recurring_end_date,
+            parentRecurringId: row.parent_recurring_id,
+            vehicleId: row.veiculo_id,
+            routeId: row.route_id,
+            driverId: row.motorista_id,
+            attachmentUrl: row.attachment_url,
+            attachmentName: row.attachment_name,
+            notes: row.notes,
+            status: row.status,
+            createdBy: row.created_by,
+            approvedBy: row.approved_by,
+            approvedAt: row.approved_at,
+            createdAt: row.created_at,
+            updatedAt: row.updated_at,
+            category: row.category,
+            veiculo: row.veiculo,
+            route: row.route,
+            company: row.company,
+            transportadora: row.transportadora,
         }))
 
         const totalPages = count ? Math.ceil(count / pageSize) : 0
@@ -209,15 +209,15 @@ export async function POST(request: NextRequest) {
         let profile: { role: string; company_id?: string; transportadora_id?: string } | null = null
 
         if (token) {
-            const { data: { user } } = await supabaseAdmin.auth.getUser(token)
-            if (user) {
-                userId = user.id
+            const { data: authData } = await supabaseAdmin.auth.getUser(token)
+            if (authData.user) {
+                userId = authData.user.id
                 const { data: p } = await supabaseAdmin
                     .from('profiles')
                     .select('role, company_id, transportadora_id')
-                    .eq('id', user.id)
+                    .eq('id', authData.user.id)
                     .single()
-                profile = p
+                profile = p as any
             }
         }
 
@@ -235,18 +235,18 @@ export async function POST(request: NextRequest) {
             notes: body.notes,
             ...body
         })
-        
+
         if (!validation.success) {
             return NextResponse.json(
-                { 
-                    success: false, 
-                    error: 'Dados inválidos', 
-                    details: validation.error.errors 
+                {
+                    success: false,
+                    error: 'Dados inválidos',
+                    details: validation.error.errors
                 },
                 { status: 400 }
             )
         }
-        
+
         const validated = validation.data
 
         // Definir tenant baseado no papel
@@ -271,8 +271,8 @@ export async function POST(request: NextRequest) {
         }
 
         // Inserir custo
-        const { data, error } = await supabaseAdmin
-            .from('gf_manual_costs_v2')
+        const { data, error } = await (supabaseAdmin
+            .from('gf_manual_costs_v2' as any)
             .insert({
                 company_id: companyId,
                 transportadora_id: carrierId,
@@ -296,7 +296,7 @@ export async function POST(request: NextRequest) {
         *,
         category:gf_cost_categories(id, name, icon, color)
       `)
-            .single()
+            .single() as any)
 
         if (error) {
             logError('[API] Erro ao criar custo', { error }, 'CostsManualV2API')

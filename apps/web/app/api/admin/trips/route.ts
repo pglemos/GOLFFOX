@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAuth } from '@/lib/api-auth'
-import { logError } from '@/lib/logger'
+import { logError, logger } from '@/lib/logger'
 import { getSupabaseAdmin } from '@/lib/supabase-client'
+import { createTripSchema } from '@/lib/validation/schemas'
 
 export const runtime = 'nodejs'
 
@@ -31,7 +32,7 @@ export async function GET(request: NextRequest) {
 
     const supabaseAdmin = getSupabaseAdmin()
     const searchParams = request.nextUrl.searchParams
-    
+
     // Filtros opcionais
     const companyId = searchParams.get('company_id')
     const vehicleId = searchParams.get('veiculo_id')
@@ -137,17 +138,17 @@ export async function POST(request: NextRequest) {
       notes: body?.notes,
       ...body
     })
-    
+
     if (!validation.success) {
       return NextResponse.json(
-        { 
-          error: 'Dados inválidos', 
-          details: validation.error.errors 
+        {
+          error: 'Dados inválidos',
+          details: validation.error.errors
         },
         { status: 400 }
       )
     }
-    
+
     const validated = validation.data
     const routeId = validated.route_id
     const vehicleId = validated.veiculo_id
@@ -186,7 +187,7 @@ export async function POST(request: NextRequest) {
       // Em modo de teste, tentar criar route automaticamente se não existir
       const isTestMode = request.headers.get('x-test-mode') === 'true'
       const isDevelopment = process.env.NODE_ENV === 'development'
-      
+
       if (isTestMode || isDevelopment) {
         // Buscar company_id do veículo se disponível
         let companyIdForRoute = null
@@ -196,12 +197,12 @@ export async function POST(request: NextRequest) {
             .select('company_id')
             .eq('id', vehicleId)
             .single()
-          
+
           if (veiculo?.company_id) {
             companyIdForRoute = veiculo.company_id
           }
         }
-        
+
         // Se não tem company_id do veículo, buscar primeira empresa ativa
         if (!companyIdForRoute) {
           const { data: companies } = await supabaseAdmin
@@ -209,12 +210,12 @@ export async function POST(request: NextRequest) {
             .select('id')
             .eq('is_active', true)
             .limit(1)
-          
+
           if (companies && companies.length > 0) {
             companyIdForRoute = companies[0].id
           }
         }
-        
+
         if (companyIdForRoute) {
           // Criar route automaticamente
           const { data: newRoute, error: createRouteError } = await supabaseAdmin
@@ -226,17 +227,17 @@ export async function POST(request: NextRequest) {
               origin: 'Origem',
               destination: 'Destino',
               is_active: true
-            })
+            } as any)
             .select('id, company_id')
             .single()
-          
+
           if (!createRouteError && newRoute) {
             route = newRoute
             logger.log(`✅ Rota criada automaticamente para teste: ${routeId}`)
           }
         }
       }
-      
+
       // Se ainda não tem route, retornar erro
       if (!route) {
         return NextResponse.json(
@@ -322,7 +323,7 @@ export async function POST(request: NextRequest) {
     if (createError) {
       logError('Erro ao criar viagem', { error: createError }, 'TripsAPI')
       return NextResponse.json(
-        { 
+        {
           error: 'Erro ao criar viagem',
           message: createError.message || 'Erro desconhecido ao criar viagem',
           details: process.env.NODE_ENV === 'development' ? createError : undefined
@@ -339,7 +340,7 @@ export async function POST(request: NextRequest) {
   } catch (error: unknown) {
     logError('Erro ao criar viagem', { error }, 'TripsAPI')
     return NextResponse.json(
-      { 
+      {
         error: 'Erro ao criar viagem',
         message: error instanceof Error ? error.message : 'Erro desconhecido',
         details: process.env.NODE_ENV === 'development' ? error : undefined

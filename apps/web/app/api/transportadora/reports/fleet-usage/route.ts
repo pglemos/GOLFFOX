@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'transportadora_id é obrigatório' }, { status: 400 })
     }
 
-    const supabase = createClient(supabaseUrl, supabaseServiceKey)
+    const supabase = getSupabaseAdmin()
 
     // Buscar veículos da transportadora
     const { data: veiculos, error: vehiclesError } = await supabase
@@ -48,7 +48,7 @@ export async function GET(req: NextRequest) {
       tripsQuery = tripsQuery.lte('created_at', endDate)
     }
 
-    const { data: trips, error: tripsError } = await tripsQuery
+    const { data: trips, error: tripsError } = await (tripsQuery as any)
 
     if (tripsError) throw tripsError
 
@@ -69,7 +69,7 @@ export async function GET(req: NextRequest) {
       }) || []
 
       const vehiclePositions = positions?.filter(p => p.veiculo_id === veiculo.id) || []
-      
+
       return {
         veiculo_id: veiculo.id,
         plate: veiculo.plate,
@@ -97,10 +97,10 @@ export async function GET(req: NextRequest) {
         average_utilization: vehicleUsage.reduce((sum, v) => sum + v.utilization_rate, 0) / (vehicleUsage.length || 1)
       }
     })
-  } catch (error: any) {
-    logError('Erro ao gerar relatório de frota', { error }, 'FleetUsageReportAPI')
+  } catch (err: any) {
+    logError('Erro ao gerar relatório de frota', { error: err }, 'FleetUsageReportAPI')
     return NextResponse.json(
-      { error: error.message || 'Erro ao gerar relatório' },
+      { error: err?.message || 'Erro ao gerar relatório' },
       { status: 500 }
     )
   }

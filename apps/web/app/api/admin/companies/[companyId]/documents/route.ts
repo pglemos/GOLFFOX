@@ -37,7 +37,7 @@ export async function GET(
         const supabase = getSupabaseAdmin()
 
         const { data, error } = await supabase
-            .from('gf_company_documents')
+            .from('gf_company_documents' as any)
             .select('id, company_id, document_type, document_number, expiry_date, issue_date, file_url, file_name, file_size, file_type, status, notes, created_at, updated_at')
             .eq('company_id', companyId)
             .order('created_at', { ascending: false })
@@ -83,7 +83,7 @@ export async function POST(
 
         // Verificar se já existe documento deste tipo
         const { data: existing } = await supabase
-            .from('gf_company_documents')
+            .from('gf_company_documents' as any)
             .select('id')
             .eq('company_id', companyId)
             .eq('document_type', validatedData.document_type)
@@ -93,7 +93,7 @@ export async function POST(
         if (existing) {
             // Atualizar documento existente
             result = await (supabase
-                .from('gf_company_documents') as any)
+                .from('gf_company_documents' as any) as any)
                 .update({
                     ...validatedData,
                     updated_at: new Date().toISOString(),
@@ -104,7 +104,7 @@ export async function POST(
         } else {
             // Criar novo documento
             result = await (supabase
-                .from('gf_company_documents') as any)
+                .from('gf_company_documents' as any) as any)
                 .insert({
                     company_id: companyId,
                     ...validatedData,
@@ -158,7 +158,7 @@ export async function DELETE(
         const supabase = getSupabaseAdmin()
 
         const { error } = await supabase
-            .from('gf_company_documents')
+            .from('gf_company_documents' as any)
             .delete()
             .eq('id', documentId)
             .eq('company_id', companyId)

@@ -6,15 +6,14 @@
 
 // Commands
 export * from './commands/create-company.command'
-export * from './commands/update-veiculo.command'
-export * from './commands/create-veiculo.command'
-export * from './commands/create-motorista.command'
+export * from './commands/update-vehicle.command'
+export * from './commands/create-vehicle.command'
+export * from './commands/create-driver.command'
 export * from './commands/create-route.command'
-export * from './commands/create-transportadora.command'
+export * from './commands/create-carrier.command'
 
 // Queries
 export * from './queries/get-company.query'
-export * from './queries/list-veiculos.query'
 
 // Handlers
 export * from './handlers/command-handler.interface'

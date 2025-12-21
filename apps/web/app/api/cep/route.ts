@@ -76,7 +76,7 @@ async function cepHandler(request: NextRequest) {
                 })
             }
         } catch (brasilApiError) {
-            logger.warn('BrasilAPI também falhou', { cep: cleanCep, error: brasilApiError })
+            warn('BrasilAPI também falhou', { cep: cleanCep, error: brasilApiError }, 'CEPAPI')
         }
 
         // Nenhuma API encontrou

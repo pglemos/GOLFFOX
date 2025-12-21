@@ -33,11 +33,11 @@ export async function DELETE(req: NextRequest) {
     const supabase = getSupabaseAdmin()
 
     // Verificar se a transportadora existe
-    const { data: transportadora, error: carrierError } = await supabase
-      .from('transportadoras')
+    const { data: transportadora, error: carrierError } = await (supabase
+      .from('transportadoras' as any)
       .select('id, name')
       .eq('id', carrierId)
-      .single()
+      .single())
 
     if (carrierError || !transportadora) {
       return NextResponse.json(
@@ -55,9 +55,9 @@ export async function DELETE(req: NextRequest) {
     if (usersError) {
       logError('Erro ao atualizar users', { error: usersError, carrierId }, 'TransportadorasDeleteAPI')
       return NextResponse.json(
-        { 
-          success: false, 
-          error: 'Erro ao remover referências de usuários', 
+        {
+          success: false,
+          error: 'Erro ao remover referências de usuários',
           message: usersError.message,
           details: 'Não foi possível atualizar os usuários relacionados à transportadora'
         },
@@ -74,9 +74,9 @@ export async function DELETE(req: NextRequest) {
     if (vehiclesError) {
       logError('Erro ao atualizar veiculos', { error: vehiclesError, carrierId }, 'TransportadorasDeleteAPI')
       return NextResponse.json(
-        { 
-          success: false, 
-          error: 'Erro ao remover referências de veículos', 
+        {
+          success: false,
+          error: 'Erro ao remover referências de veículos',
           message: vehiclesError.message,
           details: 'Não foi possível atualizar os veículos relacionados à transportadora'
         },
@@ -93,9 +93,9 @@ export async function DELETE(req: NextRequest) {
     if (routesError) {
       logError('Erro ao excluir routes', { error: routesError, carrierId }, 'TransportadorasDeleteAPI')
       return NextResponse.json(
-        { 
-          success: false, 
-          error: 'Erro ao excluir rotas relacionadas', 
+        {
+          success: false,
+          error: 'Erro ao excluir rotas relacionadas',
           message: routesError.message,
           details: 'Não foi possível excluir as rotas relacionadas à transportadora'
         },
@@ -131,17 +131,17 @@ export async function DELETE(req: NextRequest) {
     }
 
     // 5. Agora podemos excluir a transportadora
-    const { error: deleteError } = await supabase
-      .from('transportadoras')
+    const { error: deleteError } = await (supabase
+      .from('transportadoras' as any)
       .delete()
-      .eq('id', carrierId)
+      .eq('id', carrierId))
 
     if (deleteError) {
       logError('Erro ao excluir transportadora', { error: deleteError, carrierId }, 'TransportadorasDeleteAPI')
       return NextResponse.json(
-        { 
-          success: false, 
-          error: 'Erro ao excluir transportadora', 
+        {
+          success: false,
+          error: 'Erro ao excluir transportadora',
           message: deleteError.message,
           details: 'As referências foram removidas, mas houve erro ao excluir a transportadora'
         },

@@ -6,11 +6,12 @@
  */
 
 import { NextRequest } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { createClient, SupabaseClient } from '@supabase/supabase-js'
 import { supabaseServiceRole } from './supabase-server'
 import type { AuthenticatedUser } from './api-auth'
 import { validateAuth } from './api-auth'
 import { getSupabaseUrl, getSupabaseAnonKey, getSupabaseServiceKey } from '@/lib/env'
+import type { Database } from '@/types/supabase'
 
 /**
  * Obtém cliente Supabase com contexto do usuário autenticado
@@ -25,7 +26,7 @@ export async function getSupabaseClient(
      */
     forceServiceRole?: boolean
   }
-): Promise<ReturnType<typeof createClient>> {
+): Promise<SupabaseClient<Database>> {
   const supabaseUrl = getSupabaseUrl()
   const supabaseAnonKey = getSupabaseAnonKey()
 
@@ -51,7 +52,7 @@ export async function getSupabaseClient(
   // Com usuário autenticado - obter access token do request
   // Isso permite que RLS funcione corretamente com o contexto do usuário
   const authHeader = request.headers.get('authorization')
-  const accessToken = authHeader?.startsWith('Bearer ') 
+  const accessToken = authHeader?.startsWith('Bearer ')
     ? authHeader.substring(7)
     : null
 
@@ -61,10 +62,10 @@ export async function getSupabaseClient(
       auth: {
         autoRefreshToken: false,
         persistSession: false,
-        global: {
-          headers: {
-            Authorization: `Bearer ${accessToken}`
-          }
+      },
+      global: {
+        headers: {
+          Authorization: `Bearer ${accessToken}`
         }
       }
     })
@@ -83,6 +84,6 @@ export async function getSupabaseClient(
  * Obtém cliente Supabase com service-role (bypass RLS)
  * Use apenas quando absolutamente necessário (operações administrativas)
  */
-export function getSupabaseAdmin(): ReturnType<typeof createClient> {
-  return supabaseServiceRole
+export function getSupabaseAdmin(): SupabaseClient<Database> {
+  return supabaseServiceRole as unknown as SupabaseClient<Database>
 }

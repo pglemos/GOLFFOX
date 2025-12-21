@@ -22,10 +22,10 @@ export async function GET(req: NextRequest) {
     if (authErrorResponse) return authErrorResponse
 
     // Selecionar todas as colunas para evitar erros de colunas inexistentes
-    const { data, error } = await supabaseServiceRole
-      .from('transportadoras')
+    const { data, error } = await (supabaseServiceRole
+      .from('transportadoras' as any)
       .select('*')
-      .order('name', { ascending: true })
+      .order('name', { ascending: true }))
 
     if (error) {
       logError('Erro ao buscar carriers', { error }, 'TransportadorasListAPI')

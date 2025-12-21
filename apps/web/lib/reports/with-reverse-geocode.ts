@@ -3,6 +3,7 @@
  */
 
 import { reverseGeocode } from '@/lib/google-maps-reverse'
+import { warn } from '@/lib/logger'
 
 export interface PositionWithAddress {
   lat: number
@@ -43,7 +44,6 @@ export async function addAddressesToPositions<T extends { lat: number; lng: numb
           addressComponents: geocodeResult?.components || null
         }
       } catch (error) {
-        const { warn } = await import('../../logger')
         warn('Erro ao fazer reverse geocoding', { error }, 'ReportsReverseGeocode')
         return {
           ...position,

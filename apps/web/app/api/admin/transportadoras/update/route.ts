@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { supabaseServiceRole } from '@/lib/supabase-server'
 import { requireAuth } from '@/lib/api-auth'
 import { z } from 'zod'
-import { CarrierUpdate } from '@/types/transportadora'
+import { CarrierUpdate } from '@/types/carrier'
 import { invalidateEntityCache } from '@/lib/next-cache'
 
 export const runtime = 'nodejs'
@@ -101,12 +101,12 @@ export async function PUT(req: NextRequest) {
       }
     })
 
-    const { data, error } = await supabaseServiceRole
-      .from('transportadoras')
+    const { data, error } = await (supabaseServiceRole
+      .from('transportadoras' as any)
       .update(updateData)
       .eq('id', carrierId)
       .select()
-      .single()
+      .single())
 
     if (error) {
       return NextResponse.json(

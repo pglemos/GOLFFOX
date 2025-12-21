@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
 
     const supabase = getSupabaseAdmin()
     const searchParams = request.nextUrl.searchParams
-    
+
     // Filtros opcionais
     const page = parseInt(searchParams.get('page') || '1')
     const limit = parseInt(searchParams.get('limit') || '100')
@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
     const isActive = searchParams.get('is_active')
 
     let query = supabase
-      .from('transportadoras')
+      .from('transportadoras' as any)
       .select('id, name, address, phone, email, cnpj, contact_person, is_active, created_at, updated_at')
       .order('created_at', { ascending: false })
 
@@ -53,7 +53,7 @@ export async function GET(request: NextRequest) {
 
     // Contar total (para paginação)
     let countQuery = supabase
-      .from('transportadoras')
+      .from('transportadoras' as any)
       .select('id', { count: 'exact', head: true })
 
     if (search) {

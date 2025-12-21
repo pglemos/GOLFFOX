@@ -595,7 +595,7 @@ async function generatePDF(data: any[], columns: string[], reportKey: string) {
     // Dynamic import para PDFKit
     let PDFDocument
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
       PDFDocument = await import('pdfkit')
     } catch (importError) {
       logError('Erro ao importar PDFKit, retornando PDF vazio', { error: importError, reportKey }, 'ReportsRunAPI')

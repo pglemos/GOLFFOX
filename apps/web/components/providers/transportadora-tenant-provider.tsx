@@ -35,7 +35,7 @@ export function TransportadoraTenantProvider({ children }: { children: ReactNode
                     .eq('id', user.id)
                     .single()
 
-                let foundId = (userData as any)?.transportadora_id
+                const foundId = (userData as any)?.transportadora_id
 
                 // 2. Se não achou, tentar buscar na tabela carriers por e-mail ou dono?
                 // Assumindo que o usuário DEVE ter transportadora_id setado.

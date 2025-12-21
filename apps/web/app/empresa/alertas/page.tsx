@@ -26,10 +26,10 @@ function AlertasOperatorPageInner() {
   const [filterType, setFilterType] = useState<string>("all")
   const [currentPage, setCurrentPage] = useState(1)
   const [error, setError] = useState<string | null>(null)
-  
+
   const debouncedSearch = useDebounce(searchQuery, 300)
   const pageSize = 50
-  
+
   const urlFilter = searchParams?.get('filter')
   const filterMap: Record<string, string> = {
     delay: 'route_delayed',
@@ -37,7 +37,7 @@ function AlertasOperatorPageInner() {
     deviation: 'route_deviation',
   }
   const mappedUrlFilter = urlFilter ? filterMap[urlFilter] : undefined
-  
+
   // Usar React Query para alertas
   const { data: alertsData, isLoading: alertsLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useAlerts(
     tenantCompanyId,
@@ -49,12 +49,12 @@ function AlertasOperatorPageInner() {
       resolved: filterType === "resolved" ? true : filterType === "unresolved" ? false : undefined,
     }
   )
-  
+
   const resolveAlert = useResolveAlert()
-  
+
   // Infinite scroll
   const { ref, inView } = useInView()
-  
+
   useEffect(() => {
     if (inView && hasNextPage && !isFetchingNextPage) {
       fetchNextPage()
@@ -139,13 +139,14 @@ function AlertasOperatorPageInner() {
 
   // Flatten pages data
   const alertas = alertsData?.pages.flatMap(page => page.data) || []
-  
-  const filteredAlertas = alertas.filter(a => {
+
+  const filteredAlertas = alertas.filter((a: any) => {
     if (!a) return false
-    
-    const matchesSearch = !debouncedSearch || 
+
+    const matchesSearch = !debouncedSearch ||
       a.message?.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
-      (a as any).alert_type?.toLowerCase().includes(debouncedSearch.toLowerCase())
+      a.type?.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+      a.alert_type?.toLowerCase().includes(debouncedSearch.toLowerCase())
 
     return matchesSearch
   })
@@ -224,37 +225,36 @@ function AlertasOperatorPageInner() {
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-2 flex-wrap">
-                      <div className={`p-1.5 rounded-lg flex-shrink-0 ${
-                        alerta.severity === 'critical' || alerta.severity === 'error' ? 'bg-error-light' :
-                        alerta.severity === 'warning' ? 'bg-warning-light' :
-                        'bg-info-light'
-                      }`}>
-                        <AlertTriangle className={`h-4 w-4 ${getAlertColor(alerta.severity || undefined)}`} />
+                      <div className={`p-1.5 rounded-lg flex-shrink-0 ${(alerta as any).severity === 'critical' || (alerta as any).severity === 'error' ? 'bg-error-light' :
+                        (alerta as any).severity === 'warning' ? 'bg-warning-light' :
+                          'bg-info-light'
+                        }`}>
+                        <AlertTriangle className={`h-4 w-4 ${getAlertColor((alerta as any).severity || undefined)}`} />
                       </div>
                       <h3 className="font-bold text-lg capitalize truncate group-hover:text-brand transition-colors">
-                        {(alerta as any).alert_type?.replace(/_/g, ' ') || "Alerta"}
+                        {(alerta as any).type?.replace(/_/g, ' ') || (alerta as any).alert_type?.replace(/_/g, ' ') || "Alerta"}
                       </h3>
-                      <Badge className={`${getBadgeColor(alerta.severity || undefined)} flex-shrink-0`}>
-                        {alerta.severity || "normal"}
+                      <Badge className={`${getBadgeColor((alerta as any).severity || undefined)} flex-shrink-0`}>
+                        {(alerta as any).severity || "normal"}
                       </Badge>
                     </div>
                     <p className="text-sm text-ink-strong mb-2 break-words">
-                      {alerta.message || "Sem mensagem"}
+                      {(alerta as any).message || "Sem mensagem"}
                     </p>
-                    {alerta.created_at && (
+                    {(alerta as any).created_at && (
                       <div className="flex items-center gap-1 text-xs text-ink-muted">
                         <Clock className="h-3 w-3" />
-                        <span>{new Date(alerta.created_at).toLocaleString('pt-BR')}</span>
+                        <span>{new Date((alerta as any).created_at).toLocaleString('pt-BR')}</span>
                       </div>
                     )}
                   </div>
                   <div className="flex gap-2">
-                    {!alerta.is_resolved && (
+                    {!(alerta as any).is_resolved && (
                       <>
                         <Button
                           size="sm"
                           variant="outline"
-                          onClick={() => handleResolve(alerta.id || '', true)}
+                          onClick={() => handleResolve((alerta as any).id || '', true)}
                           disabled={resolveAlert.isPending}
                         >
                           <CheckCircle className="h-4 w-4 mr-1" />
@@ -263,18 +263,18 @@ function AlertasOperatorPageInner() {
                         <Button
                           size="sm"
                           variant="outline"
-                          onClick={() => handleCreateRequest(alerta)}
+                          onClick={() => handleCreateRequest(alerta as any)}
                         >
                           <Plus className="h-4 w-4 mr-1" />
                           Criar Solicitação
                         </Button>
                       </>
                     )}
-                    {alerta.is_resolved && (
+                    {(alerta as any).is_resolved && (
                       <Button
                         size="sm"
                         variant="outline"
-                          onClick={() => handleResolve(alerta.id || '', false)}
+                        onClick={() => handleResolve(alerta.id || '', false)}
                         disabled={resolveAlert.isPending}
                       >
                         <XCircle className="h-4 w-4 mr-1" />
@@ -286,7 +286,7 @@ function AlertasOperatorPageInner() {
               </Card>
             </motion.div>
           ))}
-          
+
           {/* Infinite scroll trigger */}
           {hasNextPage && (
             <div ref={ref} className="flex justify-center py-4">
@@ -295,7 +295,7 @@ function AlertasOperatorPageInner() {
               )}
             </div>
           )}
-          
+
           {filteredAlertas.length === 0 && !alertsLoading && (
             <Card className="p-12 text-center">
               <Bell className="h-12 w-12 text-ink-light mx-auto mb-4" />

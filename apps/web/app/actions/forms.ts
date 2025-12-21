@@ -81,8 +81,8 @@ export async function saveMotoristaAction(
 const veiculoSchema = z.object({
   plate: z.string().min(1, 'Placa é obrigatória'),
   model: z.string().optional(),
-  year: z.string().optional(),
-  capacity: z.string().optional(),
+  year: z.number().int().optional().nullable(),
+  capacity: z.number().int().optional().nullable(),
   prefix: z.string().optional(),
   transportadora_id: z.string().optional(),
   is_active: z.boolean().optional(),
@@ -97,8 +97,8 @@ export async function saveVeiculoAction(
     const data = {
       plate: formData.get('plate') as string,
       model: formData.get('model') as string || null,
-      year: formData.get('year') as string || null,
-      capacity: formData.get('capacity') as string || null,
+      year: formData.get('year') ? parseInt(formData.get('year') as string) : null,
+      capacity: formData.get('capacity') ? parseInt(formData.get('capacity') as string) : null,
       prefix: formData.get('prefix') as string || null,
       transportadora_id: formData.get('transportadora_id') as string || null,
       is_active: formData.get('is_active') === 'true',

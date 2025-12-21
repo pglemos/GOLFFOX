@@ -1,4 +1,4 @@
-import { NextRequest } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { requireAuth } from '@/lib/api-auth'
 import { withRateLimit } from '@/lib/rate-limit'
 import { logger, logError } from '@/lib/logger'
@@ -26,7 +26,7 @@ async function handleDelete(request: NextRequest) {
     // Aceitar tanto query param quanto body
     const { searchParams } = new URL(request.url)
     let userId = searchParams.get('id')
-    
+
     // Se não estiver na query, tentar no body
     if (!userId) {
       try {
@@ -50,15 +50,15 @@ async function handleDelete(request: NextRequest) {
     // A tabela users tem referência a auth.users com ON DELETE CASCADE,
     // então excluir da tabela users também excluirá do Auth automaticamente
     // As foreign keys com ON DELETE CASCADE vão excluir automaticamente dados relacionados
-    
+
     logger.log(`🗑️ Tentando excluir usuário: ${userId}`)
-    
-    // Primeiro, setar motorista_id para NULL em trips se o usuário for motorista
+
+    // Primeiro, setar driver_id para NULL em trips se o usuário for motorista
     await supabaseAdmin
       .from('trips')
-      .update({ motorista_id: null })
-      .eq('motorista_id', userId)
-    
+      .update({ driver_id: null })
+      .eq('driver_id', userId)
+
     // Agora excluir o usuário
     const { data, error } = await supabaseAdmin
       .from('users')

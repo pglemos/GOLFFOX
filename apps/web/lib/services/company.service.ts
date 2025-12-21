@@ -18,10 +18,10 @@ export interface CompanyFilters {
 
 export interface CreateCompanyData {
   name: string
-  cnpj?: string
-  address?: string
-  phone?: string
-  email?: string
+  cnpj?: string | null
+  address?: string | null
+  phone?: string | null
+  email?: string | null
 }
 
 export type Company = CompanyEntity
@@ -51,7 +51,7 @@ export class CompanyService {
 
       // Usar cache para listagens frequentes
       const cacheKey = `companies:list:${JSON.stringify({ isActive, search, page, limit })}`
-      
+
       return await withCache(cacheKey, async () => {
         // Passar busca para o repositório ANTES da paginação
         // Isso garante que count, totalPages, hasNext e hasPrev refletem os resultados filtrados

@@ -26,7 +26,7 @@ async function handleDelete(request: NextRequest) {
     // Aceitar tanto query param quanto body
     const { searchParams } = new URL(request.url)
     let companyId = searchParams.get('id')
-    
+
     // Se não estiver na query, tentar no body
     if (!companyId) {
       try {
@@ -64,7 +64,7 @@ async function handleDelete(request: NextRequest) {
 
     // 2. Excluir dependências que podem ter CASCADE mas vamos excluir explicitamente para garantir
     logger.log('   2. Excluindo dependências...')
-    
+
     // Excluir routes (e suas dependências serão excluídas via CASCADE)
     const { error: routesError } = await (supabaseAdmin
       .from('routes') as any)
@@ -94,9 +94,9 @@ async function handleDelete(request: NextRequest) {
     for (const table of dependentTables) {
       // Algumas tabelas podem usar empresa_id em vez de company_id
       const columnName = table === 'gf_service_requests' ? 'empresa_id' : 'company_id'
-      
+
       const { error: depError } = await (supabaseAdmin
-        .from(table) as any)
+        .from(table as any) as any)
         .delete()
         .eq(columnName, companyId)
 

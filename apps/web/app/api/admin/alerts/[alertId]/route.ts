@@ -14,7 +14,7 @@ export async function PUT(
 ) {
   const params = await context.params
 
-  const { alertId: alertIdParam  } = params
+  const { alertId: alertIdParam } = params
   try {
     const authErrorResponse = await requireAuth(request, 'admin')
     if (authErrorResponse) {
@@ -34,7 +34,7 @@ export async function PUT(
 
     // Verificar se alerta existe
     const { data: existingAlert, error: fetchError } = await supabaseAdmin
-      .from('alerts')
+      .from('alerts' as any)
       .select('id, description, severity, status, route_id, veiculo_id')
       .eq('id', alertId)
       .single()
@@ -65,7 +65,7 @@ export async function PUT(
     if (updateError) {
       logError('Erro ao atualizar alerta', { error: updateError, alertId }, 'AlertsUpdateAPI')
       return NextResponse.json(
-        { 
+        {
           error: 'Erro ao atualizar alerta',
           message: updateError.message || 'Erro desconhecido',
         },
@@ -84,7 +84,7 @@ export async function PUT(
     logError('Erro ao atualizar alerta', { error: err, alertId: (await context.params).alertId }, 'AlertsUpdateAPI')
     const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'
     return NextResponse.json(
-      { 
+      {
         error: 'Erro ao atualizar alerta',
         message: errorMessage,
       },

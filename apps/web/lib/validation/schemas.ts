@@ -57,6 +57,18 @@ export const createTransportadoraSchema = z.object({
   name: nameSchema,
   email: emailSchema.optional().nullable(),
   phone: z.string().optional().nullable(),
+  cnpj: z.string().optional().nullable(),
+  contact_person: z.string().optional().nullable(),
+  address: z.string().optional().nullable(),
+  address_zip_code: z.string().optional().nullable(),
+  address_street: z.string().optional().nullable(),
+  address_number: z.string().optional().nullable(),
+  address_neighborhood: z.string().optional().nullable(),
+  address_complement: z.string().optional().nullable(),
+  address_city: z.string().optional().nullable(),
+  address_state: z.string().optional().nullable(),
+  state_registration: z.string().optional().nullable(),
+  municipal_registration: z.string().optional().nullable(),
   is_active: z.boolean().default(true),
 })
 

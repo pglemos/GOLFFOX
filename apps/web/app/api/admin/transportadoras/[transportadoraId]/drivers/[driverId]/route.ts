@@ -82,7 +82,7 @@ export async function DELETE(
   const params = await context.params
 
   try {
-    const supabase = supabaseServiceRole
+    const supabase = getSupabaseAdmin()
     const transportadoraId = params.transportadoraId || params.carrierId
     const { driverId } = params
     if (!transportadoraId) {

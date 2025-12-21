@@ -46,7 +46,7 @@ export async function DELETE(
   try {
     // PRIMEIRO: Verificar se o veículo existe antes de qualquer outra operação
     const { data: existingVehicle, error: checkError } = await supabaseServiceRole
-      .from("veiculos")
+      .from("veiculos" as any)
       .select("id")
       .eq("id", vehicleId)
       .maybeSingle()
@@ -92,7 +92,7 @@ export async function DELETE(
 
     if ((tripsCount ?? 0) > 0) {
       const { error: archiveError } = await supabaseServiceRole
-        .from("veiculos")
+        .from("veiculos" as any)
         .update({ is_active: false } as any)
         .eq("id", vehicleId)
 
@@ -110,7 +110,7 @@ export async function DELETE(
 
     // TERCEIRO: Deletar dependências (manutenções e checklists)
     const { error: maintenanceError } = await supabaseServiceRole
-      .from("gf_vehicle_maintenance")
+      .from("gf_vehicle_maintenance" as any)
       .delete()
       .eq("veiculo_id", vehicleId)
 
@@ -120,7 +120,7 @@ export async function DELETE(
     }
 
     const { error: checklistError } = await supabaseServiceRole
-      .from("gf_veiculo_checklists")
+      .from("gf_veiculo_checklists" as any)
       .delete()
       .eq("veiculo_id", vehicleId)
 
@@ -131,7 +131,7 @@ export async function DELETE(
 
     // QUARTO: Deletar o veículo
     const { error: deleteError } = await supabaseServiceRole
-      .from("veiculos")
+      .from("veiculos" as any)
       .delete()
       .eq("id", vehicleId)
 
@@ -145,7 +145,7 @@ export async function DELETE(
           .eq("veiculo_id", vehicleId)
 
         const { error: archiveAfterFailure } = await supabaseServiceRole
-          .from("veiculos")
+          .from("veiculos" as any)
           .update({ is_active: false } as any)
           .eq("id", vehicleId)
 
@@ -215,7 +215,7 @@ export async function PATCH(
     }
 
     const { data, error } = await supabaseServiceRole
-      .from('veiculos')
+      .from('veiculos' as any)
       .update(updateData as any)
       .eq('id', vehicleId)
       .select()
