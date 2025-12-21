@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import { motion } from "framer-motion"
 import { useMobile } from "@/hooks/use-mobile"
 import { cn } from "@/lib/utils"
@@ -41,13 +41,41 @@ export function AdminDashboardClient({ initialKpis, initialAuditLogs }: AdminDas
   const isMobile = useMobile()
   const [kpisData, setKpisData] = useState<KpiData[]>(initialKpis)
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>(initialAuditLogs)
-  const [kpisLoading, setKpisLoading] = useState(false)
+  const [kpisLoading, setKpisLoading] = useState(initialKpis.length === 0)
   const [activitiesLoading, setActivitiesLoading] = useState(false)
   const [filters, setFilters] = useState({
     empresa: '',
     data: new Date().toISOString().split('T')[0],
     turno: ''
   })
+
+  // ✅ CORREÇÃO: Carregar KPIs via API se initialKpis vier vazio (fallback)
+  useEffect(() => {
+    if (initialKpis.length === 0) {
+      console.log('[AdminDashboard] initialKpis vazio, carregando via API...')
+      loadKpisFromApi()
+    }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const loadKpisFromApi = async () => {
+    setKpisLoading(true)
+    try {
+      const response = await fetch('/api/admin/kpis', {
+        credentials: 'include'
+      })
+      if (response.ok) {
+        const result = await response.json()
+        if (result.success && result.kpis) {
+          setKpisData(result.kpis)
+          console.log('[AdminDashboard] KPIs carregados via API:', result.kpis)
+        }
+      }
+    } catch (err) {
+      console.error('[AdminDashboard] Erro ao carregar KPIs via API:', err)
+    } finally {
+      setKpisLoading(false)
+    }
+  }
 
   // Memoizar cálculo de KPIs agregados
   const aggregatedKpis = useMemo(() => {

@@ -24,19 +24,19 @@ export async function GET(request: NextRequest) {
 
     // ✅ Cache Redis para KPIs (TTL: 1 hora - atualizado via cron)
     const cacheKey = createCacheKey('kpis', 'admin')
-    
+
     const cachedKPIs = await redisCacheService.get<{ success: boolean; kpis: unknown[] }>(cacheKey)
     if (cachedKPIs) {
       return NextResponse.json(cachedKPIs)
     }
 
     const supabaseAdmin = getSupabaseAdmin()
-    
+
     // Tentar diferentes views em ordem de prioridade
     const views = [
-      'v_admin_kpis_materialized',
-      'v_admin_kpis',
-      'v_operador_kpis'
+      'v_admin_dashboard_kpis',
+      'v_operador_dashboard_kpis',
+      'v_operador_dashboard_kpis_secure'
     ]
 
     let kpisData: unknown[] = []
@@ -49,7 +49,7 @@ export async function GET(request: NextRequest) {
         const { data, error } = await supabaseAdmin
           .from(viewName)
           .select('*')
-        
+
         if (error) {
           const code = (error as { code?: string })?.code
           if (code === 'PGRST205') {
@@ -74,9 +74,24 @@ export async function GET(request: NextRequest) {
       warn('Nenhuma view de KPIs disponível, retornando array vazio', {}, 'KPIsAPI')
     }
 
+    // Mapear campos da view para a interface esperada pelo componente AdminDashboardClient
+    // A view v_admin_dashboard_kpis retorna: total_companies, total_operators, total_drivers, total_passengers, active_trips, active_vehicles
+    // O componente espera: company_id, company_name, trips_today, vehicles_active, employees_in_transit, critical_alerts, routes_today, trips_completed, trips_in_progress
+    const mappedKpis = kpisData.map((viewData: any) => ({
+      company_id: 'all',
+      company_name: 'Todas as Empresas',
+      trips_today: viewData.active_trips || 0,
+      vehicles_active: viewData.active_vehicles || 0,
+      employees_in_transit: viewData.total_passengers || 0,
+      critical_alerts: 0, // Não disponível na view atualmente
+      routes_today: viewData.active_trips || 0, // Aproximação
+      trips_completed: 0, // Não disponível na view atualmente
+      trips_in_progress: viewData.active_trips || 0,
+    }))
+
     const response = {
       success: true,
-      kpis: kpisData
+      kpis: mappedKpis
     }
 
     // ✅ Armazenar no cache (TTL: 1 hora - 3600 segundos)
