@@ -231,8 +231,6 @@ export async function calculateETA(
     const estimatedSeconds = distance / avgSpeedMps
     return Math.ceil(estimatedSeconds / 60)
   } catch (error) {
-    console.error('Erro ao calcular ETA:', error)
-    
     // Fallback: calcular distância linear
     const distance = calculateDistance(
       currentLat,
@@ -258,7 +256,7 @@ export async function decodePolylineAsync(
     const { decodePolylineAsync } = await import('@/lib/polyline-decoder')
     return decodePolylineAsync(encoded)
   } catch (error) {
-    console.warn('Erro ao usar Web Worker, usando decodificação síncrona:', error)
+    // Fallback to sync decoding - error is handled silently
     return decodePolyline(encoded)
   }
 }

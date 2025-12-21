@@ -123,23 +123,40 @@ export async function POST(request: NextRequest) {
     const supabaseAdmin = getSupabaseAdmin()
     const body = await request.json()
 
-    // Aceitar tanto snake_case quanto camelCase
-    const routeId = body?.route_id || body?.routeId
-    const vehicleId = body?.veiculo_id || body?.vehicleId
-    const driverId = body?.motorista_id || body?.driverId
-    const scheduledDate = body?.scheduled_date || body?.scheduledDate
-    const scheduledStartTime = body?.scheduled_start_time || body?.scheduledStartTime
-    const startTime = body?.start_time || body?.startTime
-    const endTime = body?.end_time || body?.endTime
-    const status = body?.status || 'scheduled'
-
-    // Validação de campos obrigatórios
-    if (!routeId) {
+    // Validar com Zod (aceitar tanto snake_case quanto camelCase)
+    const validation = createTripSchema.safeParse({
+      route_id: body?.route_id || body?.routeId,
+      veiculo_id: body?.veiculo_id || body?.vehicleId,
+      motorista_id: body?.motorista_id || body?.driverId,
+      scheduled_date: body?.scheduled_date || body?.scheduledDate,
+      scheduled_start_time: body?.scheduled_start_time || body?.scheduledStartTime,
+      start_time: body?.start_time || body?.startTime,
+      end_time: body?.end_time || body?.endTime,
+      status: body?.status || 'scheduled',
+      passenger_count: body?.passenger_count || body?.passengerCount,
+      notes: body?.notes,
+      ...body
+    })
+    
+    if (!validation.success) {
       return NextResponse.json(
-        { error: 'route_id é obrigatório' },
+        { 
+          error: 'Dados inválidos', 
+          details: validation.error.errors 
+        },
         { status: 400 }
       )
     }
+    
+    const validated = validation.data
+    const routeId = validated.route_id
+    const vehicleId = validated.veiculo_id
+    const driverId = validated.motorista_id
+    const scheduledDate = validated.scheduled_date
+    const scheduledStartTime = validated.scheduled_start_time
+    const startTime = validated.start_time
+    const endTime = validated.end_time
+    const status = validated.status
 
     // Se scheduledDate não fornecido, tentar extrair de startTime
     let finalScheduledDate = scheduledDate

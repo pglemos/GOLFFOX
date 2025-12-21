@@ -11,6 +11,7 @@ import { getSupabaseAdmin } from '@/lib/supabase-client'
 import { requireAuth } from '@/lib/api-auth'
 import { logError } from '@/lib/logger'
 import type { ManualCost, ManualCostInsert, CostFilters } from '@/types/financial'
+import { createCostSchema } from '@/lib/validation/schemas'
 
 export const runtime = 'nodejs'
 
@@ -220,22 +221,33 @@ export async function POST(request: NextRequest) {
             }
         }
 
-        const body: ManualCostInsert = await request.json()
+        const body = await request.json()
 
-        // Validação básica
-        if (!body.description || body.amount === undefined || !body.costDate) {
+        // Validar com Zod
+        const validation = createCostSchema.safeParse({
+            description: body.description,
+            amount: body.amount,
+            cost_date: body.costDate || body.cost_date,
+            category_id: body.categoryId || body.category_id,
+            route_id: body.routeId || body.route_id,
+            veiculo_id: body.vehicleId || body.veiculo_id,
+            motorista_id: body.driverId || body.motorista_id,
+            notes: body.notes,
+            ...body
+        })
+        
+        if (!validation.success) {
             return NextResponse.json(
-                { success: false, error: 'Descrição, valor e data são obrigatórios' },
+                { 
+                    success: false, 
+                    error: 'Dados inválidos', 
+                    details: validation.error.errors 
+                },
                 { status: 400 }
             )
         }
-
-        if (body.amount < 0) {
-            return NextResponse.json(
-                { success: false, error: 'Valor não pode ser negativo' },
-                { status: 400 }
-            )
-        }
+        
+        const validated = validation.data
 
         // Definir tenant baseado no papel
         let companyId = body.companyId

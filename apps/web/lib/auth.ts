@@ -1,5 +1,5 @@
 import { supabase } from './supabase'
-import { debug, error } from './logger'
+import { debug, error, warn } from './logger'
 import { getUserRoleByEmail } from './user-role'
 
 export interface UserData {
@@ -139,7 +139,7 @@ export class AuthManager {
         return null
       default:
         // Fallback para empresa se role não for reconhecido
-        console.warn(`[AuthManager] Role não reconhecido: ${role}, redirecionando para /empresa`)
+        warn(`Role não reconhecido, redirecionando para /empresa`, { role }, 'AuthManager')
         return '/empresa'
     }
   }
@@ -155,35 +155,29 @@ export class AuthManager {
     }
   ): Promise<void> {
     try {
-      console.log('[AuthManager.persistSession] Iniciando', {
+      debug('Iniciando persistSession', {
         hasWindow: typeof window !== 'undefined',
         hasSupabase: !!supabase,
-        hasSupabaseAuth: !!supabase?.auth,
-        setSessionType: typeof supabase?.auth?.setSession,
-        setSessionIsFunction: typeof supabase?.auth?.setSession === 'function',
-        supabaseType: typeof supabase,
-        supabaseIsObject: typeof supabase === 'object' && supabase !== null,
-        supabaseAuthType: typeof supabase?.auth,
-        supabaseAuthIsObject: typeof supabase?.auth === 'object' && supabase?.auth !== null
-      })
+        hasSupabaseAuth: !!supabase?.auth
+      }, 'AuthManager')
       
       if (typeof window === 'undefined') {
-        console.log('[AuthManager.persistSession] window is undefined, retornando')
+        debug('window is undefined, retornando', {}, 'AuthManager')
         return Promise.resolve()
       }
 
       // ✅ VALIDAÇÃO: Garantir que supabase é um objeto válido
       if (!supabase) {
-        console.error('[AuthManager.persistSession] supabase não está definido')
+        warn('supabase não está definido', {}, 'AuthManager')
         // Continuar com o resto da função mesmo se Supabase não estiver disponível
       } else if (typeof supabase !== 'object' || supabase === null) {
-        console.error('[AuthManager.persistSession] supabase não é um objeto válido', { type: typeof supabase })
+        error('supabase não é um objeto válido', { type: typeof supabase }, 'AuthManager')
         // Continuar com o resto da função mesmo se Supabase não estiver disponível
       } else if (!supabase.auth) {
-        console.warn('[AuthManager] Supabase auth não está disponível, pulando sincronização de sessão')
+        warn('Supabase auth não está disponível, pulando sincronização de sessão', {}, 'AuthManager')
         // Continuar com o resto da função mesmo se Supabase não estiver disponível
       } else if (typeof supabase.auth !== 'object' || supabase.auth === null) {
-        console.warn('[AuthManager] supabase.auth não é um objeto válido', { type: typeof supabase.auth })
+        warn('supabase.auth não é um objeto válido', { type: typeof supabase.auth }, 'AuthManager')
         // Continuar com o resto da função mesmo se Supabase não estiver disponível
       }
 
@@ -198,37 +192,95 @@ export class AuthManager {
       try {
         // ✅ VALIDAÇÃO EXTRA: Verificar se supabase.auth existe e é um objeto válido
         if (!supabase || !supabase.auth || typeof supabase.auth !== 'object') {
-          console.warn('[AuthManager] supabase.auth não está disponível, pulando setSession')
+          warn('supabase.auth não está disponível, pulando setSession', {}, 'AuthManager')
         } else {
           // ✅ VALIDAÇÃO: Garantir que setSession é uma função antes de chamar
           const setSessionFn = supabase.auth.setSession
-          console.log('[AuthManager.persistSession] Verificando setSession', {
-            exists: !!setSessionFn,
-            type: typeof setSessionFn,
-            isFunction: typeof setSessionFn === 'function',
-            isBoolean: typeof setSessionFn === 'boolean',
-            value: setSessionFn
-          })
           
           if (setSessionFn && typeof setSessionFn === 'function') {
-            const { error } = await setSessionFn({
-              access_token: accessToken,
-              refresh_token: options.token // Usar mesmo token se não tiver refresh
-            })
-            if (error) {
-              console.warn('Erro ao sincronizar sessão Supabase:', error)
-            } else {
-              console.log('✅ Sessão Supabase sincronizada')
+            try {
+              // ✅ CORREÇÃO: Verificar se o Supabase está realmente inicializado
+              // O erro "initializePromise" ocorre quando o cliente ainda está inicializando
+              // Vamos tentar uma abordagem mais segura: verificar se o objeto auth está completo
+              let isReady = false
+              
+              if (supabase.auth && typeof supabase.auth.getSession === 'function') {
+                try {
+                  // Tentar obter sessão atual para verificar se está inicializado
+                  // Se getSession funcionar sem erro, o Supabase está pronto
+                  await Promise.race([
+                    supabase.auth.getSession(),
+                    new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 100))
+                  ])
+                  isReady = true
+                } catch (initCheckErr: any) {
+                  // Se getSession falhar ou timeout, o Supabase ainda não está pronto
+                  if (initCheckErr?.message?.includes('initializePromise') || 
+                      initCheckErr?.message?.includes('undefined') ||
+                      initCheckErr?.message === 'timeout') {
+                    debug('Supabase ainda inicializando, pulando setSession', {
+                      error: initCheckErr?.message
+                    }, 'AuthManager')
+                    // Sair do bloco try sem chamar setSession
+                    return
+                  }
+                  // Se for outro erro, tentar mesmo assim
+                  isReady = true
+                }
+              } else {
+                // Se não tiver getSession, assumir que está pronto
+                isReady = true
+              }
+              
+              if (!isReady) {
+                return
+              }
+              
+              // Aguardar um pouco mais para garantir que o Supabase está totalmente inicializado
+              await new Promise(resolve => setTimeout(resolve, 200))
+              
+              // ✅ CORREÇÃO: Usar try-catch interno para capturar erros de setSession
+              try {
+                const result = await setSessionFn({
+                  access_token: accessToken,
+                  refresh_token: options.token // Usar mesmo token se não tiver refresh
+                })
+                
+                if (result?.error) {
+                  warn('Erro ao sincronizar sessão Supabase', { error: result.error }, 'AuthManager')
+                } else {
+                  debug('Sessão Supabase sincronizada', {}, 'AuthManager')
+                }
+              } catch (setSessionErr: any) {
+                // Capturar erros específicos do setSession
+                if (setSessionErr?.message?.includes('initializePromise') || 
+                    setSessionErr?.message?.includes('Cannot read properties of undefined')) {
+                  debug('Supabase ainda inicializando durante setSession', { 
+                    error: setSessionErr?.message 
+                  }, 'AuthManager')
+                } else {
+                  warn('Erro ao chamar setSession', { error: setSessionErr }, 'AuthManager')
+                }
+              }
+            } catch (sessionErr: any) {
+              // Ignorar erros de inicialização do Supabase - não crítico
+              if (sessionErr?.message?.includes('initializePromise') || 
+                  sessionErr?.message?.includes('Cannot read properties of undefined')) {
+                debug('Supabase ainda inicializando, pulando setSession', { 
+                  error: sessionErr?.message 
+                }, 'AuthManager')
+              } else {
+                warn('Erro ao chamar setSession', { error: sessionErr }, 'AuthManager')
+              }
             }
           } else {
-            console.warn('[AuthManager] supabase.auth.setSession não está disponível ou não é uma função', {
-              type: typeof setSessionFn,
-              value: setSessionFn
-            })
+            warn('supabase.auth.setSession não está disponível ou não é uma função', {
+              type: typeof setSessionFn
+            }, 'AuthManager')
           }
         }
       } catch (e) {
-        console.warn('Falha ao setar sessão Supabase:', e)
+        warn('Falha ao setar sessão Supabase', { error: e }, 'AuthManager')
       }
     }
 
@@ -317,15 +369,15 @@ export class AuthManager {
         debug('[AuthManager] Sessão persistida', { role: userData.role })
       }
 
-      console.log('[AuthManager.persistSession] Concluído com sucesso')
+      debug('persistSession concluído com sucesso', {}, 'AuthManager')
       return Promise.resolve()
-    } catch (error: any) {
-      console.error('[AuthManager.persistSession] Erro inesperado:', {
-        error,
-        message: error?.message,
-        stack: error?.stack?.substring(0, 500),
-        name: error?.name
-      })
+    } catch (err: any) {
+      error('persistSession - Erro inesperado', {
+        error: err,
+        message: err?.message,
+        stack: err?.stack?.substring(0, 500),
+        name: err?.name
+      }, 'AuthManager')
       // Retornar Promise resolvida mesmo em caso de erro para não quebrar o fluxo
       return Promise.resolve()
     }

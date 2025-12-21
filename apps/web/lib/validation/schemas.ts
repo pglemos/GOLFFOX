@@ -203,6 +203,27 @@ export const updateRevenueSchema = createRevenueSchema.partial().extend({
 })
 
 // ============================================
+// Schemas de Viagem (Trip)
+// ============================================
+
+export const createTripSchema = z.object({
+  route_id: uuidSchema,
+  veiculo_id: uuidSchema.optional().nullable(),
+  motorista_id: uuidSchema.optional().nullable(),
+  scheduled_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Data inválida (use YYYY-MM-DD)').optional(),
+  scheduled_start_time: z.string().optional().nullable(),
+  start_time: z.string().optional().nullable(),
+  end_time: z.string().optional().nullable(),
+  status: z.enum(['scheduled', 'inProgress', 'completed', 'cancelled']).default('scheduled'),
+  passenger_count: z.number().int().min(0).optional().nullable(),
+  notes: z.string().optional().nullable(),
+})
+
+export const updateTripSchema = createTripSchema.partial().extend({
+  id: uuidSchema,
+})
+
+// ============================================
 // Schemas de Paginação
 // ============================================
 

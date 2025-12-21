@@ -5,6 +5,7 @@
  */
 
 import { supabase } from './supabase'
+import { warn, error as logError } from './logger'
 
 export interface AuditLogDetails {
   [key: string]: any
@@ -77,7 +78,7 @@ export async function logAudit(params: LogAuditParams): Promise<void> {
     const { data: { session } } = await supabase.auth.getSession()
     
     if (!session?.user) {
-      console.warn('logAudit: Nenhuma sessão encontrada, log não registrado')
+      warn('Nenhuma sessão encontrada, log não registrado', {}, 'AuditLog')
       return
     }
 
@@ -110,9 +111,9 @@ export async function logAudit(params: LogAuditParams): Promise<void> {
       resource_id: params.resourceId || null,
       details: sanitizedDetails,
     })
-  } catch (error) {
+  } catch (err) {
     // Não quebrar o fluxo se log falhar
-    console.error('Erro ao registrar log de auditoria:', error)
+    logError('Erro ao registrar log de auditoria', { error: err }, 'AuditLog')
   }
 }
 

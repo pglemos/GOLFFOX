@@ -9,6 +9,7 @@ import { createClient } from '@supabase/supabase-js'
 import { requireAuth } from '@/lib/api-auth'
 import { logError } from '@/lib/logger'
 import type { ManualRevenue, ManualRevenueInsert, RevenueFilters } from '@/types/financial'
+import { createRevenueSchema } from '@/lib/validation/schemas'
 
 export const runtime = 'nodejs'
 
@@ -205,22 +206,32 @@ export async function POST(request: NextRequest) {
             }
         }
 
-        const body: ManualRevenueInsert = await request.json()
+        const body = await request.json()
 
-        // Validação básica
-        if (!body.category || !body.description || body.amount === undefined || !body.revenueDate) {
+        // Validar com Zod
+        const validation = createRevenueSchema.safeParse({
+            category: body.category,
+            description: body.description,
+            amount: body.amount,
+            revenue_date: body.revenueDate || body.revenue_date,
+            contract_reference: body.contractReference || body.contract_reference,
+            invoice_number: body.invoiceNumber || body.invoice_number,
+            notes: body.notes,
+            ...body
+        })
+        
+        if (!validation.success) {
             return NextResponse.json(
-                { success: false, error: 'Categoria, descrição, valor e data são obrigatórios' },
+                { 
+                    success: false, 
+                    error: 'Dados inválidos', 
+                    details: validation.error.errors 
+                },
                 { status: 400 }
             )
         }
-
-        if (body.amount < 0) {
-            return NextResponse.json(
-                { success: false, error: 'Valor não pode ser negativo' },
-                { status: 400 }
-            )
-        }
+        
+        const validated = validation.data
 
         // Definir tenant baseado no papel
         let companyId = body.companyId

@@ -9,7 +9,7 @@ import { Mail, Lock, Eye, EyeOff, ArrowRight, Sparkles, Shield, Zap } from "luci
 import { motion, AnimatePresence } from "framer-motion"
 import { AuthManager } from "@/lib/auth"
 import { getUserRoleByEmail } from "@/lib/user-role"
-import { debug, error as logError } from "@/lib/logger"
+import { debug, error as logError, warn as logWarn } from "@/lib/logger"
 import { LoginErrorBoundary } from "./login-error-boundary"
 
 const EMAIL_REGEX =
@@ -248,20 +248,20 @@ function LoginContent() {
               router.push(redirectUrl)
             } catch (err) {
               // Fallback para window.location.href se router.push falhar
-              console.warn('Router.push failed, using window.location.href:', err)
+              logWarn('Router.push failed, using window.location.href', { error: err }, 'LoginPage')
               window.location.href = redirectUrl
             }
           }
         } catch (err) {
           // Erro ao decodificar cookie - limpar e continuar na página de login
-          console.warn('⚠️ Erro ao decodificar cookie:', err)
+          logWarn('Erro ao decodificar cookie', { error: err }, 'LoginPage')
           try {
             document.cookie = 'golffox-session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT'
           } catch { }
         }
       } catch (err) {
         // Erro geral - apenas logar e continuar na página de login
-        console.error('❌ Erro ao verificar sessão:', err)
+        logError('Erro ao verificar sessão', { error: err }, 'LoginPage')
       }
     }, 300) // Aguardar 300ms antes de verificar (aumentado de 100ms)
 
@@ -273,64 +273,64 @@ function LoginContent() {
   // Buscar CSRF token
   useEffect(() => {
     const fetchCsrf = async () => {
-      console.log('🔍 [CSRF] Iniciando busca do CSRF token...')
+      debug('CSRF - Iniciando busca do token', {}, 'LoginPage')
       try {
         const res = await fetch('/api/auth/csrf', {
           method: 'GET',
           credentials: 'include' // Incluir cookies na requisição
         })
-        console.log('🔍 [CSRF] Resposta da API:', { status: res.status, ok: res.ok })
+        debug('CSRF - Resposta da API', { status: res.status, ok: res.ok }, 'LoginPage')
         if (res.ok) {
           const data = await res.json()
-          console.log('🔍 [CSRF] Dados recebidos:', { hasCsrfToken: !!data?.csrfToken, hasToken: !!data?.token, hasData: !!data?.data, keys: Object.keys(data) })
+          debug('CSRF - Dados recebidos', { hasCsrfToken: !!data?.csrfToken, hasToken: !!data?.token, hasData: !!data?.data }, 'LoginPage')
           // A API retorna { success: true, data: { token, csrfToken } }
           // Aceitar tanto 'token' quanto 'csrfToken' e também dentro de 'data'
           const token = data?.data?.token || data?.data?.csrfToken || data?.csrfToken || data?.token
           if (token) {
             setCsrfToken(token)
-            console.log('✅ [CSRF] Token obtido e definido:', token.substring(0, 10) + '...')
+            debug('CSRF - Token obtido e definido', { tokenPrefix: token.substring(0, 10) }, 'LoginPage')
           } else {
-            console.warn('⚠️ [CSRF] Token não encontrado na resposta:', data)
+            logWarn('CSRF - Token não encontrado na resposta', { data }, 'LoginPage')
             // Tentar ler do cookie
             const cookieMatch = document.cookie.match(/golffox-csrf=([^;]+)/)
             if (cookieMatch) {
               setCsrfToken(cookieMatch[1])
-              console.log('✅ [CSRF] Token obtido do cookie após resposta vazia')
+              debug('CSRF - Token obtido do cookie após resposta vazia', {}, 'LoginPage')
             }
           }
         } else {
           const errorText = await res.text().catch(() => '')
-          console.error('❌ [CSRF] Erro ao obter CSRF token:', res.status, res.statusText, errorText)
+          logError('CSRF - Erro ao obter token', { status: res.status, statusText: res.statusText, errorText }, 'LoginPage')
           // Tentar ler do cookie se a API falhar
           const cookieMatch = document.cookie.match(/golffox-csrf=([^;]+)/)
           if (cookieMatch) {
             setCsrfToken(cookieMatch[1])
-            console.log('✅ [CSRF] Token obtido do cookie após erro da API')
+            debug('CSRF - Token obtido do cookie após erro da API', {}, 'LoginPage')
           } else {
             // Gerar token local como fallback
             const token = Math.random().toString(36).slice(2) + Date.now().toString(36)
             document.cookie = `golffox-csrf=${token}; path=/; SameSite=Lax; max-age=900`
             setCsrfToken(token)
-            console.log('✅ [CSRF] Token gerado localmente após erro da API')
+            debug('CSRF - Token gerado localmente após erro da API', {}, 'LoginPage')
           }
         }
       } catch (e: any) {
-        console.error('❌ [CSRF] Erro ao buscar CSRF token:', e?.message || e)
+        logError('CSRF - Erro ao buscar token', { error: e }, 'LoginPage')
         // Tentar ler do cookie como fallback
         try {
           const cookieMatch = document.cookie.match(/golffox-csrf=([^;]+)/)
           if (cookieMatch) {
             setCsrfToken(cookieMatch[1])
-            console.log('✅ [CSRF] Token obtido do cookie (fallback)')
+            debug('CSRF - Token obtido do cookie (fallback)', {}, 'LoginPage')
           } else {
             // Último recurso: gerar token local
             const token = Math.random().toString(36).slice(2) + Date.now().toString(36)
             document.cookie = `golffox-csrf=${token}; path=/; SameSite=Lax; max-age=900`
             setCsrfToken(token)
-            console.log('✅ [CSRF] Token gerado localmente (fallback)')
+            debug('CSRF - Token gerado localmente (fallback)', {}, 'LoginPage')
           }
         } catch (cookieErr) {
-          console.error('❌ [CSRF] Erro ao gerar CSRF token local:', cookieErr)
+          logError('CSRF - Erro ao gerar token local', { error: cookieErr }, 'LoginPage')
         }
       }
     }
@@ -374,14 +374,19 @@ function LoginContent() {
     }
   }
 
-  const isAllowedForRole = (role: string, path: string): boolean => {
+  // ✅ Função para verificar se role tem permissão para acessar um path
+  // ✅ CRÍTICO: Esta função deve sempre retornar um booleano, nunca ser sobrescrita
+  const isAllowedForRole = useCallback((role: string, path: string): boolean => {
+    if (!role || !path || typeof role !== 'string' || typeof path !== 'string') {
+      return false
+    }
     if (path.startsWith('/admin')) return role === 'admin'
     // empresa = empresa contratante (antigo operador)
     if (path.startsWith('/empresa')) return ['admin', 'empresa', 'operador'].includes(role)
     // operador = gestor da transportadora
-    if (path.startsWith('/transportadora')) return ['admin', 'operador', 'transportadora', 'transportadora'].includes(role)
+    if (path.startsWith('/transportadora')) return ['admin', 'operador', 'transportadora'].includes(role)
     return true
-  }
+  }, [])
 
   const handleLogin = useCallback(
     async (demoEmail?: string, demoPassword?: string) => {
@@ -455,13 +460,13 @@ function LoginContent() {
         let finalCsrfToken = csrfToken
 
         if (!finalCsrfToken) {
-          console.log('🔍 [CSRF] Token não encontrado no estado, tentando obter...')
+          debug('CSRF - Token não encontrado no estado, tentando obter', {}, 'LoginPage')
           // Tentar ler do cookie primeiro
           const cookieMatch = document.cookie.match(/golffox-csrf=([^;]+)/)
           if (cookieMatch) {
             finalCsrfToken = cookieMatch[1]
             setCsrfToken(finalCsrfToken)
-            console.log('✅ [CSRF] Token obtido do cookie')
+            debug('CSRF - Token obtido do cookie', {}, 'LoginPage')
           } else {
             // Tentar buscar da API
             try {
@@ -476,9 +481,9 @@ function LoginContent() {
                 if (token) {
                   finalCsrfToken = token
                   setCsrfToken(token)
-                  console.log('✅ [CSRF] Token obtido da API')
+                  debug('CSRF - Token obtido da API', {}, 'LoginPage')
                 } else {
-                  console.error('❌ [CSRF] Token não encontrado na resposta da API')
+                  logWarn('CSRF - Token não encontrado na resposta da API', {}, 'LoginPage')
                   setError("Erro de segurança. Por favor, recarregue a página.")
                   setLoading(false)
                   setTransitioning(false)
@@ -486,7 +491,7 @@ function LoginContent() {
                   return
                 }
               } else {
-                console.error('❌ [CSRF] Erro ao obter token da API:', res.status, res.statusText)
+                logError('CSRF - Erro ao obter token da API', { status: res.status, statusText: res.statusText }, 'LoginPage')
                 setError("Erro de segurança. Por favor, recarregue a página.")
                 setLoading(false)
                 setTransitioning(false)
@@ -494,7 +499,7 @@ function LoginContent() {
                 return
               }
             } catch (e: any) {
-              console.error('❌ [CSRF] Erro ao buscar token:', e?.message || e)
+              logError('CSRF - Erro ao buscar token', { error: e }, 'LoginPage')
               setError("Erro de segurança. Por favor, recarregue a página.")
               setLoading(false)
               setTransitioning(false)
@@ -505,7 +510,7 @@ function LoginContent() {
         }
 
         if (!finalCsrfToken) {
-          console.error('❌ [CSRF] Token não encontrado após todas as tentativas')
+          logError('CSRF - Token não encontrado após todas as tentativas', {}, 'LoginPage')
           setError("Erro de segurança. Por favor, recarregue a página.")
           setLoading(false)
           setTransitioning(false)
@@ -513,8 +518,8 @@ function LoginContent() {
           return
         }
 
-        console.log('✅ [CSRF] Token final obtido:', finalCsrfToken.substring(0, 10) + '...')
-        console.log('🔍 [LOGIN] Preparando requisição:', {
+        debug('CSRF - Token final obtido', { tokenPrefix: finalCsrfToken.substring(0, 10) }, 'LoginPage')
+        debug('LOGIN - Preparando requisição', {
           endpoint: resolvedAuthEndpoint,
           hasEmail: !!sanitizedEmail,
           hasPassword: !!sanitizedPassword,
@@ -534,13 +539,13 @@ function LoginContent() {
             signal: controller.signal,
             credentials: "include",
           })
-          console.log('✅ [LOGIN] Resposta recebida:', {
+          debug('LOGIN - Resposta recebida', {
             status: response.status,
             ok: response.ok,
             statusText: response.statusText
           })
         } catch (fetchError: any) {
-          console.error('❌ [LOGIN] Erro na requisição fetch:', {
+          logError('LOGIN - Erro na requisição fetch', {
             name: fetchError?.name,
             message: fetchError?.message,
             stack: fetchError?.stack?.substring(0, 500)
@@ -556,7 +561,7 @@ function LoginContent() {
           const normalized = message.toLowerCase()
           const code = String(apiError?.code || '')
 
-          console.error('❌ Erro na API de login:', {
+          logError('LOGIN - Erro na API', {
             status: response.status,
             message,
             code,
@@ -600,15 +605,15 @@ function LoginContent() {
         let data: any
         try {
           const responseText = await response.text()
-          console.log('🔍 [LOGIN] Resposta texto (primeiros 200 chars):', responseText.substring(0, 200))
+          debug('LOGIN - Resposta texto', { preview: responseText.substring(0, 200) }, 'LoginPage')
           data = JSON.parse(responseText)
-          console.log('✅ [LOGIN] JSON parseado com sucesso:', {
+          debug('LOGIN - JSON parseado com sucesso', {
             hasToken: !!data?.token,
             hasUser: !!data?.user,
             hasSession: !!data?.session
           })
         } catch (parseError: any) {
-          console.error('❌ [LOGIN] Erro ao fazer parse do JSON:', {
+          logError('LOGIN - Erro ao fazer parse do JSON', {
             message: parseError?.message,
             stack: parseError?.stack?.substring(0, 500)
           })
@@ -623,7 +628,7 @@ function LoginContent() {
           user.email = sessionData.user.email
         }
 
-        console.log('✅ Login via API bem-sucedido (banco de dados verificado):', {
+        debug('LOGIN - Login via API bem-sucedido', {
           hasToken: !!token,
           hasUser: !!user,
           hasSession: !!sessionData,
@@ -633,7 +638,7 @@ function LoginContent() {
         })
 
         if (!token || !user?.email || !user?.id) {
-          console.error('❌ Resposta inválida da API:', {
+          logError('LOGIN - Resposta inválida da API', {
             token: !!token,
             user: !!user,
             hasEmail: !!user?.email,
@@ -651,7 +656,7 @@ function LoginContent() {
         const userRoleFromDatabase = user.role
 
         if (!userRoleFromDatabase) {
-          console.error('❌ Role não encontrado na resposta da API')
+          logError('LOGIN - Role não encontrado na resposta da API', {}, 'LoginPage')
           setError("Erro ao determinar permissões do usuário")
           setLoading(false)
           setTransitioning(false)
@@ -659,9 +664,7 @@ function LoginContent() {
           return
         }
 
-        console.log('📊 Role obtido do banco de dados:', userRoleFromDatabase)
-        console.log('📧 Email do usuário:', user.email)
-        console.log('🆔 ID do usuário:', user.id)
+        debug('LOGIN - Dados do usuário', { role: userRoleFromDatabase, email: user.email, id: user.id }, 'LoginPage')
 
         // ✅ OTIMIZADO: Processar sessão de forma síncrona e rápida
         // O cookie já foi definido pelo servidor, então apenas persistir no cliente
@@ -681,7 +684,7 @@ function LoginContent() {
             { accessToken: token, refreshToken, storage: storageMode }
           )
         } catch (persistError: any) {
-          console.error('❌ [LOGIN] Erro ao persistir sessão:', {
+          logError('LOGIN - Erro ao persistir sessão', {
             error: persistError,
             message: persistError?.message,
             stack: persistError?.stack?.substring(0, 500),
@@ -698,8 +701,12 @@ function LoginContent() {
         setSuccess(true)
 
         if (typeof window !== "undefined") {
-          window.dispatchEvent(new CustomEvent("golffox:auth-success", { detail: user }))
-          sessionStorage.setItem("golffox-last-login", new Date().toISOString())
+          try {
+            window.dispatchEvent(new CustomEvent("golffox:auth-success", { detail: user }))
+            sessionStorage.setItem("golffox-last-login", new Date().toISOString())
+          } catch (eventError: any) {
+            logWarn('Erro ao disparar evento de sucesso', { error: eventError }, 'LoginPage')
+          }
         }
 
         // ✅ Verificar se o role permite acesso web
@@ -714,7 +721,7 @@ function LoginContent() {
           try {
             await AuthManager.logout()
           } catch (err) {
-            console.warn('Erro ao limpar sessão:', err)
+            logWarn('Erro ao limpar sessão', { error: err }, 'LoginPage')
           }
 
           return
@@ -723,25 +730,16 @@ function LoginContent() {
         // ✅ Determinar URL de redirecionamento baseado no role do banco de dados
         const rawNext = searchParams.get("next")
         const safeNext = sanitizePath(rawNext)
-        let redirectUrl: string | null
+        let redirectUrl: string | null = null
 
         // ✅ VALIDAÇÃO: Garantir que safeNext é uma string válida antes de usar
         // Verificar se safeNext é string E se isAllowedForRole retorna true
         if (safeNext && typeof safeNext === 'string' && safeNext.trim() !== '') {
           // ✅ VALIDAÇÃO: Garantir que isAllowedForRole é uma função antes de chamar
-          // ✅ CRÍTICO: Verificar se isAllowedForRole não foi sobrescrito ou corrompido
-          const isAllowedForRoleFn = isAllowedForRole
-          console.log('[LOGIN] Verificando isAllowedForRole:', {
-            type: typeof isAllowedForRoleFn,
-            isFunction: typeof isAllowedForRoleFn === 'function',
-            value: isAllowedForRoleFn,
-            isBoolean: typeof isAllowedForRoleFn === 'boolean'
-          })
-          
-          if (isAllowedForRoleFn && typeof isAllowedForRoleFn === 'function') {
+          if (typeof isAllowedForRole === 'function') {
             try {
-              const isAllowed = isAllowedForRoleFn(userRoleFromDatabase, safeNext)
-              console.log('[LOGIN] Resultado de isAllowedForRole:', {
+              const isAllowed = isAllowedForRole(userRoleFromDatabase, safeNext)
+              debug('LOGIN - Resultado de isAllowedForRole', {
                 isAllowed,
                 type: typeof isAllowed,
                 isBoolean: typeof isAllowed === 'boolean'
@@ -755,11 +753,11 @@ function LoginContent() {
                 redirectUrl = AuthManager.getRedirectUrl(userRoleFromDatabase)
               } else {
                 // Se retornar algo inesperado, usar o role do banco
-                console.warn('[LOGIN] isAllowedForRole retornou valor inesperado:', isAllowed)
+                logWarn('LOGIN - isAllowedForRole retornou valor inesperado', { isAllowed }, 'LoginPage')
                 redirectUrl = AuthManager.getRedirectUrl(userRoleFromDatabase)
               }
             } catch (roleCheckError: any) {
-              console.error('❌ [LOGIN] Erro ao verificar permissão de role:', {
+              logError('LOGIN - Erro ao verificar permissão de role', {
                 error: roleCheckError,
                 message: roleCheckError?.message,
                 stack: roleCheckError?.stack?.substring(0, 500),
@@ -770,22 +768,31 @@ function LoginContent() {
               redirectUrl = AuthManager.getRedirectUrl(userRoleFromDatabase)
             }
           } else {
-            console.error('❌ [LOGIN] isAllowedForRole não é uma função:', {
-              type: typeof isAllowedForRoleFn,
-              value: isAllowedForRoleFn,
-              isBoolean: typeof isAllowedForRoleFn === 'boolean',
-              isTrue: isAllowedForRoleFn === true
-            })
+            logError('LOGIN - isAllowedForRole não é uma função', {
+              type: typeof isAllowedForRole,
+              value: isAllowedForRole
+            }, 'LoginPage')
             // Em caso de erro, usar o role do banco para determinar o painel
             redirectUrl = AuthManager.getRedirectUrl(userRoleFromDatabase)
           }
         } else {
           // Caso contrário, usar o role do banco para determinar o painel
-          redirectUrl = AuthManager.getRedirectUrl(userRoleFromDatabase)
+          try {
+            const defaultRedirect = AuthManager.getRedirectUrl(userRoleFromDatabase)
+            if (typeof defaultRedirect === 'string' && defaultRedirect.trim() !== '') {
+              redirectUrl = defaultRedirect
+            } else {
+              // Fallback seguro
+              redirectUrl = '/empresa'
+            }
+          } catch (redirectError: any) {
+            logError('LOGIN - Erro ao obter URL de redirecionamento padrão', { error: redirectError }, 'LoginPage')
+            redirectUrl = '/empresa' // Fallback seguro
+          }
         }
 
         // Se não houver URL de redirecionamento (motorista/passageiro), mostrar erro
-        if (!redirectUrl || typeof redirectUrl !== 'string') {
+        if (!redirectUrl || typeof redirectUrl !== 'string' || redirectUrl.trim() === '') {
           setError(`Seu perfil (${userRoleFromDatabase}) deve acessar o sistema através do aplicativo mobile. Por favor, baixe o app GolfFox no seu dispositivo móvel.`)
           setLoading(false)
           setTransitioning(false)
@@ -795,7 +802,7 @@ function LoginContent() {
           try {
             await AuthManager.logout()
           } catch (err) {
-            console.warn('Erro ao limpar sessão:', err)
+            logWarn('Erro ao limpar sessão', { error: err }, 'LoginPage')
           }
 
           return
@@ -803,7 +810,7 @@ function LoginContent() {
 
         // ✅ VALIDAÇÃO CRÍTICA: Garantir que redirectUrl é uma string válida ANTES de usar
         if (!redirectUrl || typeof redirectUrl !== 'string' || redirectUrl.trim() === '') {
-          console.error('❌ [LOGIN] redirectUrl inválido antes de split:', { redirectUrl, type: typeof redirectUrl })
+          logError('LOGIN - redirectUrl inválido antes de split', { redirectUrl, type: typeof redirectUrl }, 'LoginPage')
           setError("Erro ao determinar rota de redirecionamento. Entre em contato com o administrador.")
           setLoading(false)
           setTransitioning(false)
@@ -819,14 +826,14 @@ function LoginContent() {
           if (typeof redirectUrl.split === 'function') {
             finalRedirectUrl = redirectUrl.split("?")[0]
           } else {
-            console.error('❌ [LOGIN] redirectUrl.split não é uma função:', {
+            logError('LOGIN - redirectUrl.split não é uma função', {
               type: typeof redirectUrl.split,
               redirectUrl
             })
             finalRedirectUrl = redirectUrl
           }
         } else {
-          console.error('❌ [LOGIN] redirectUrl inválido antes de split:', {
+          logError('LOGIN - redirectUrl inválido antes de split', {
             redirectUrl,
             type: typeof redirectUrl
           })
@@ -839,7 +846,7 @@ function LoginContent() {
 
         // ✅ VALIDAÇÃO FINAL: Garantir que redirectUrl ainda é válido após split
         if (!finalRedirectUrl || finalRedirectUrl.trim() === '') {
-          console.error('❌ [LOGIN] redirectUrl inválido após split:', finalRedirectUrl)
+          logError('LOGIN - redirectUrl inválido após split', { finalRedirectUrl }, 'LoginPage')
           setError("Erro ao determinar rota de redirecionamento. Entre em contato com o administrador.")
           setLoading(false)
           setTransitioning(false)
@@ -866,7 +873,7 @@ function LoginContent() {
           // window.location.replace não adiciona ao histórico, evitando loops
           // window.location.href força um reload completo e garante que o middleware veja o cookie
           // Isso também remove o parâmetro ?next= da URL
-          console.log('🔄 Redirecionando para:', finalRedirectUrl)
+          debug('LOGIN - Redirecionando', { finalRedirectUrl }, 'LoginPage')
           
           // ✅ IMPORTANTE: Não usar setTimeout - redirecionar imediatamente
           // O cookie já foi definido na resposta HTTP, então está disponível
@@ -874,23 +881,41 @@ function LoginContent() {
           // ✅ VALIDAÇÃO CRÍTICA: Garantir que finalRedirectUrl é uma string válida
           if (typeof finalRedirectUrl === 'string' && finalRedirectUrl.trim() !== '') {
             try {
-              console.log('🔄 [LOGIN] Redirecionando para:', finalRedirectUrl, { type: typeof finalRedirectUrl })
-              window.location.replace(finalRedirectUrl)
-            } catch (redirectError: any) {
-              console.error('❌ [LOGIN] Erro ao redirecionar com window.location.replace:', redirectError)
-              // Fallback para router se window.location.replace falhar
-              if (typeof router.replace === 'function') {
-                router.replace(finalRedirectUrl)
+              debug('LOGIN - Redirecionando', { finalRedirectUrl, type: typeof finalRedirectUrl }, 'LoginPage')
+              // ✅ CORREÇÃO: Garantir que window.location.replace existe e é uma função
+              if (typeof window.location.replace === 'function') {
+                window.location.replace(finalRedirectUrl)
+                // Não retornar aqui - deixar o código continuar normalmente
+                // O redirecionamento vai acontecer, mas não vamos bloquear o código
               } else {
-                console.error('❌ [LOGIN] router.replace não é uma função:', { type: typeof router.replace })
+                // Fallback para href se replace não estiver disponível
                 window.location.href = finalRedirectUrl
+              }
+            } catch (redirectError: any) {
+              logError('LOGIN - Erro ao redirecionar com window.location.replace', { error: redirectError }, 'LoginPage')
+              // Fallback para router se window.location.replace falhar
+              try {
+                if (typeof router.replace === 'function') {
+                  router.replace(finalRedirectUrl)
+                } else {
+                  logError('LOGIN - router.replace não é uma função', { type: typeof router.replace }, 'LoginPage')
+                  if (typeof window.location.href !== 'undefined') {
+                    window.location.href = finalRedirectUrl
+                  }
+                }
+              } catch (fallbackError: any) {
+                logError('LOGIN - Erro no fallback de redirecionamento', { error: fallbackError }, 'LoginPage')
+                // Último recurso: tentar href diretamente
+                if (typeof window !== 'undefined' && typeof window.location !== 'undefined') {
+                  window.location.href = finalRedirectUrl
+                }
               }
             }
           } else {
-            console.error('❌ [LOGIN] finalRedirectUrl inválido antes de redirecionar:', {
+            logError('LOGIN - finalRedirectUrl inválido antes de redirecionar', {
               finalRedirectUrl,
               type: typeof finalRedirectUrl
-            })
+            }, 'LoginPage')
             setError("Erro ao determinar rota de redirecionamento. Entre em contato com o administrador.")
             setLoading(false)
             setTransitioning(false)
@@ -900,19 +925,27 @@ function LoginContent() {
         } else {
           // ✅ VALIDAÇÃO: Garantir que finalRedirectUrl é uma string válida antes de usar router.replace
           if (typeof finalRedirectUrl === 'string' && finalRedirectUrl.trim() !== '') {
-            if (typeof router.replace === 'function') {
-              router.replace(finalRedirectUrl)
-            } else {
-              console.error('❌ [LOGIN] router.replace não é uma função:', { type: typeof router.replace })
-              if (typeof window !== 'undefined') {
+            try {
+              if (typeof router.replace === 'function') {
+                router.replace(finalRedirectUrl)
+              } else {
+                logError('LOGIN - router.replace não é uma função', { type: typeof router.replace }, 'LoginPage')
+                if (typeof window !== 'undefined' && typeof window.location !== 'undefined') {
+                  window.location.href = finalRedirectUrl
+                }
+              }
+            } catch (routerError: any) {
+              logError('LOGIN - Erro ao usar router.replace', { error: routerError }, 'LoginPage')
+              // Fallback para window.location.href
+              if (typeof window !== 'undefined' && typeof window.location !== 'undefined') {
                 window.location.href = finalRedirectUrl
               }
             }
           } else {
-            console.error('❌ [LOGIN] finalRedirectUrl inválido antes de router.replace:', {
+            logError('LOGIN - finalRedirectUrl inválido antes de router.replace', {
               finalRedirectUrl,
               type: typeof finalRedirectUrl
-            })
+            }, 'LoginPage')
             setError("Erro ao determinar rota de redirecionamento. Entre em contato com o administrador.")
             setLoading(false)
             setTransitioning(false)
@@ -925,7 +958,7 @@ function LoginContent() {
       } catch (err: any) {
         clearTimeout(timeoutId)
 
-        console.error('❌ [LOGIN] Erro capturado no catch:', {
+        logError('LOGIN - Erro capturado no catch', {
           name: err?.name,
           message: err?.message,
           stack: err?.stack?.substring(0, 500),
@@ -937,7 +970,7 @@ function LoginContent() {
           setError("Tempo limite excedido. Verifique sua conexão.")
         } else {
           const errorMessage = err?.message || 'Erro desconhecido'
-          console.error('❌ [LOGIN] Mensagem de erro:', errorMessage)
+          logError('LOGIN - Mensagem de erro', { errorMessage }, 'LoginPage')
           setError(`Erro inesperado durante o login: ${errorMessage}`)
         }
         setFieldErrors((prev) => ({ ...prev, password: "Não foi possível autenticar" }))
@@ -1406,7 +1439,7 @@ function LoginContent() {
                     </motion.label>
                     <motion.button
                       type="button"
-                      onClick={() => console.log("Forgot password clicked")}
+                      onClick={() => debug('Forgot password clicked', {}, 'LoginPage')}
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                       className="text-brand hover:text-brand-hover font-semibold transition-colors touch-manipulation text-sm whitespace-nowrap"

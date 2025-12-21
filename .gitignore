@@ -100,6 +100,10 @@ lerna-debug.log*
 .tmp/
 temp/
 .cache/
+tmp-*
+*.debug.*
+*.debug.html
+*.debug.png
 
 # Archive or backup files
 *.orig

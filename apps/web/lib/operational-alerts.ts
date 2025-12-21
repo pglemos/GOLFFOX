@@ -4,6 +4,7 @@
  */
 
 import { supabase } from './supabase'
+import { error as logError } from './logger'
 
 function formatSupabaseError(error: any): string {
   if (!error) return 'Erro desconhecido'
@@ -48,8 +49,8 @@ export async function createAlert(alert: OperationalAlert): Promise<void> {
       created_at: new Date().toISOString(),
       is_resolved: false,
     })
-  } catch (error) {
-    console.error('Erro ao criar alerta operacional:', formatSupabaseError(error))
+  } catch (err) {
+    logError('Erro ao criar alerta operacional', { error: formatSupabaseError(err) }, 'OperationalAlerts')
     // Não falhar silenciosamente - logar erro
   }
 }
@@ -177,7 +178,7 @@ export async function getUnresolvedAlerts(
     // @ts-ignore - Type mismatch between database schema and expected return type
     return mappedData
   } catch (error) {
-    console.error('Erro ao buscar alertas:', formatSupabaseError(error))
+    logError('Erro ao buscar alertas', { error: formatSupabaseError(error) }, 'OperationalAlerts')
     return []
   }
 }
@@ -196,7 +197,7 @@ export async function resolveAlert(alertId: string, notes?: string): Promise<voi
       })
       .eq('id', alertId)
   } catch (error) {
-    console.error('Erro ao resolver alerta:', formatSupabaseError(error))
+    logError('Erro ao resolver alerta', { error: formatSupabaseError(error) }, 'OperationalAlerts')
   }
 }
 
@@ -229,7 +230,7 @@ export async function hasCriticalAlerts(): Promise<boolean> {
     // Retornar true se houver pelo menos um alerta
     return Array.isArray(data) && data.length > 0
   } catch (error) {
-    console.error('Erro ao verificar alertas críticos:', formatSupabaseError(error))
+    logError('Erro ao verificar alertas críticos', { error: formatSupabaseError(error) }, 'OperationalAlerts')
     return false
   }
 }

@@ -22,7 +22,7 @@ export interface ServerUser {
  */
 export async function getServerUser(): Promise<ServerUser | null> {
   try {
-    const cookieStore = cookies()
+    const cookieStore = await cookies()
     
     // Tentar obter do cookie customizado primeiro
     const sessionCookie = cookieStore.get('golffox-session')

@@ -9,6 +9,7 @@ import { createClient } from '@supabase/supabase-js'
 import { requireAuth } from '@/lib/api-auth'
 import { logError } from '@/lib/logger'
 import type { Budget, BudgetInsert } from '@/types/financial'
+import { budgetSchema } from '@/lib/validation/schemas'
 
 export const runtime = 'nodejs'
 
@@ -151,29 +152,33 @@ export async function POST(request: NextRequest) {
             }
         }
 
-        const body: BudgetInsert = await request.json()
+        const body = await request.json()
 
-        // Validação básica
-        if (!body.periodYear || !body.periodMonth || body.budgetedAmount === undefined) {
+        // Validar com Zod
+        const validation = budgetSchema.safeParse({
+            period_year: body.periodYear || body.period_year,
+            period_month: body.periodMonth || body.period_month,
+            budgeted_amount: body.budgetedAmount || body.budgeted_amount,
+            company_id: body.companyId || body.company_id,
+            transportadora_id: body.transportadoraId || body.transportadora_id,
+            category_id: body.categoryId || body.category_id,
+            alert_threshold_percent: body.alertThresholdPercent || body.alert_threshold_percent,
+            notes: body.notes,
+            ...body
+        })
+        
+        if (!validation.success) {
             return NextResponse.json(
-                { success: false, error: 'Ano, mês e valor orçado são obrigatórios' },
+                { 
+                    success: false, 
+                    error: 'Dados inválidos', 
+                    details: validation.error.errors 
+                },
                 { status: 400 }
             )
         }
-
-        if (body.periodMonth < 1 || body.periodMonth > 12) {
-            return NextResponse.json(
-                { success: false, error: 'Mês deve estar entre 1 e 12' },
-                { status: 400 }
-            )
-        }
-
-        if (body.budgetedAmount < 0) {
-            return NextResponse.json(
-                { success: false, error: 'Valor orçado não pode ser negativo' },
-                { status: 400 }
-            )
-        }
+        
+        const validated = validation.data
 
         // Definir tenant baseado no papel
         let companyId = body.companyId

@@ -2,9 +2,26 @@ import { createClient } from '@supabase/supabase-js';
 import * as SecureStore from 'expo-secure-store';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
+import { getSupabaseUrl, getSupabaseAnonKey } from '@/utils/env';
 
-const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL || '';
-const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || '';
+// Validar variáveis de ambiente antes de criar cliente
+let supabaseUrl: string;
+let supabaseAnonKey: string;
+
+try {
+  supabaseUrl = getSupabaseUrl();
+  supabaseAnonKey = getSupabaseAnonKey();
+} catch (error) {
+  // Em desenvolvimento, permitir valores vazios com warning
+  if (__DEV__) {
+    console.warn('⚠️ Variáveis de ambiente do Supabase não configuradas:', error instanceof Error ? error.message : String(error));
+    supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL || '';
+    supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || '';
+  } else {
+    // Em produção, lançar erro
+    throw new Error(`Configuração inválida: ${error instanceof Error ? error.message : String(error)}`);
+  }
+}
 
 // Adaptador de storage híbrido: SecureStore (Native) / AsyncStorage (Web)
 const StorageAdapter = {

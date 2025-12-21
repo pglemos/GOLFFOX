@@ -72,7 +72,8 @@ export async function exportMapPNG(containerId: string = 'map-container'): Promi
       throw error
     }
   } catch (error: any) {
-    console.error('Erro ao exportar mapa como PNG:', error)
+    const { error: logError } = await import('./logger')
+    logError('Erro ao exportar mapa como PNG', { error }, 'ExportMapPNG')
     throw error
   }
 }
@@ -153,7 +154,8 @@ export async function exportMapPNGWithLegends(
     link.click()
     document.body.removeChild(link)
   } catch (error: any) {
-    console.error('Erro ao exportar mapa com legendas:', error)
+    const { error: logError } = await import('./logger')
+    logError('Erro ao exportar mapa com legendas', { error }, 'ExportMapPNG')
     throw error
   }
 }

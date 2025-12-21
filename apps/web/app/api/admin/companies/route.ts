@@ -3,6 +3,7 @@ import { requireAuth } from '@/lib/api-auth'
 import { withRateLimit } from '@/lib/rate-limit'
 import { CompanyService, type CompanyFilters, type CreateCompanyData } from '@/lib/services'
 import { formatError } from '@/lib/error-utils'
+import { createCompanySchema } from '@/lib/validation/schemas'
 // CQRS (opcional - pode usar diretamente o service ou via command)
 // import { CreateCompanyCommand, cqrsBus } from '@/lib/cqrs'
 // import '@/lib/cqrs/bus/register-handlers'
@@ -74,8 +75,21 @@ async function createCompanyHandler(request: NextRequest) {
       return authErrorResponse
     }
 
-    const body = await request.json() as CreateCompanyData
-    const company = await CompanyService.createCompany(body)
+    const body = await request.json()
+    
+    // Validar com Zod
+    const validation = createCompanySchema.safeParse(body)
+    if (!validation.success) {
+      return NextResponse.json(
+        { 
+          error: 'Dados inválidos', 
+          details: validation.error.errors 
+        },
+        { status: 400 }
+      )
+    }
+    
+    const company = await CompanyService.createCompany(validation.data)
 
     return NextResponse.json({ data: company }, { status: 201 })
   } catch (err) {

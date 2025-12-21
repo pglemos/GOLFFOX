@@ -3,6 +3,9 @@
  * Monitora uso da API e alerta quando quota excedida
  */
 
+import { supabase } from './supabase'
+import { error as logError } from './logger'
+
 export interface MapsBillingStatus {
   usage: number
   quota: number
@@ -59,8 +62,8 @@ export class MapsBillingMonitor {
           this.usage = data.usage || 0
         }
       }
-    } catch (error) {
-      console.error('Erro ao carregar uso do Maps:', error)
+    } catch (err) {
+      logError('Erro ao carregar uso do Maps', { error: err }, 'MapsBillingMonitor')
     }
   }
 
@@ -73,8 +76,8 @@ export class MapsBillingMonitor {
         usage: this.usage,
         lastReset: new Date().toISOString(),
       }))
-    } catch (error) {
-      console.error('Erro ao salvar uso do Maps:', error)
+    } catch (err) {
+      logError('Erro ao salvar uso do Maps', { error: err }, 'MapsBillingMonitor')
     }
   }
 

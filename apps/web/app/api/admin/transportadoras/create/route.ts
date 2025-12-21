@@ -6,26 +6,9 @@ import { z } from 'zod'
 import { CarrierInsert } from '@/types/transportadora'
 import { logger, logError } from '@/lib/logger'
 import { successResponse, errorResponse, validationErrorResponse } from '@/lib/api-response'
+import { createTransportadoraSchema } from '@/lib/validation/schemas'
 
 export const runtime = 'nodejs'
-
-const carrierSchema = z.object({
-  name: z.string().min(1, 'Nome é obrigatório'),
-  address: z.string().optional().nullable(),
-  phone: z.string().optional().nullable(),
-  contact_person: z.string().optional().nullable(),
-  email: z.string().email().optional().or(z.literal('').transform(() => null)).nullable(),
-  cnpj: z.string().optional().nullable(),
-  state_registration: z.string().optional().nullable(),
-  municipal_registration: z.string().optional().nullable(),
-  address_zip_code: z.string().optional().nullable(),
-  address_street: z.string().optional().nullable(),
-  address_number: z.string().optional().nullable(),
-  address_neighborhood: z.string().optional().nullable(),
-  address_complement: z.string().optional().nullable(),
-  address_city: z.string().optional().nullable(),
-  address_state: z.string().optional().nullable(),
-})
 
 export async function OPTIONS() {
   return new NextResponse(null, {
@@ -53,7 +36,12 @@ export async function POST(req: NextRequest) {
     const body = await req.json()
     logger.debug('[CREATE transportadora] Request body received:', JSON.stringify(body, null, 2))
 
-    const validated = carrierSchema.parse(body)
+    // Validar com schema compartilhado
+    const validation = createTransportadoraSchema.safeParse(body)
+    if (!validation.success) {
+      return validationErrorResponse('Dados inválidos', { details: validation.error.errors })
+    }
+    const validated = validation.data
     logger.debug('[CREATE transportadora] Validation passed:', JSON.stringify(validated, null, 2))
 
     const insertData: CarrierInsert = {

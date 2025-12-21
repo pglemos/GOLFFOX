@@ -47,7 +47,10 @@ export function decodePolylineAsync(
         worker = new Worker(URL.createObjectURL(blob))
       } catch (error) {
         // Fallback: decodificar sem worker
-        console.warn('Erro ao criar worker, usando decodificação síncrona:', error)
+        if (typeof window !== 'undefined') {
+          const { warn } = await import('./logger')
+          warn('Erro ao criar worker, usando decodificação síncrona', { error }, 'PolylineDecoder')
+        }
         try {
           const points = decodePolylineSync(encoded, options)
           resolve(points)

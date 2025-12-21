@@ -2,15 +2,15 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { requireAuth } from '@/lib/api-auth'
 import { logger, logError } from '@/lib/logger'
+import { createRouteSchema } from '@/lib/validation/schemas'
 
 export const runtime = 'nodejs'
 
+import { getSupabaseUrl, getSupabaseServiceKey } from '@/lib/env'
+
 function getSupabaseAdmin() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-  if (!url || !serviceKey) {
-    throw new Error('Supabase não configurado: defina NEXT_PUBLIC_SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY')
-  }
+  const url = getSupabaseUrl()
+  const serviceKey = getSupabaseServiceKey()
   return createClient(url, serviceKey)
 }
 
@@ -41,11 +41,30 @@ export async function POST(request: NextRequest) {
     const supabaseAdmin = getSupabaseAdmin()
     const body = await request.json()
 
-    // Aceitar tanto snake_case quanto camelCase
-    const name = body?.name || body?.route_name || 'Rota Teste'
-    const companyId = body?.company_id || body?.companyId
-    const origin = body?.origin || body?.origin_address || 'Origem'
-    const destination = body?.destination || body?.destination_address || 'Destino'
+    // Validar com Zod (aceitar tanto snake_case quanto camelCase)
+    const validation = createRouteSchema.safeParse({
+      name: body?.name || body?.route_name,
+      company_id: body?.company_id || body?.companyId,
+      origin: body?.origin || body?.origin_address,
+      destination: body?.destination || body?.destination_address,
+      ...body
+    })
+    
+    if (!validation.success) {
+      return NextResponse.json(
+        { 
+          error: 'Dados inválidos', 
+          details: validation.error.errors 
+        },
+        { status: 400 }
+      )
+    }
+    
+    const validated = validation.data
+    const name = validated.name || 'Rota Teste'
+    const companyId = validated.company_id
+    const origin = validated.origin || 'Origem'
+    const destination = validated.destination || 'Destino'
 
     // Se não tem companyId, buscar primeira empresa ativa
     // Em modo de teste/desenvolvimento, criar empresa automaticamente se não existir

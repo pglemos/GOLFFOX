@@ -6,6 +6,7 @@ import { getUserRoleByEmail } from '@/lib/user-role'
 import { normalizeRole } from '@/lib/role-mapper'
 import { debug, error as logError } from '@/lib/logger'
 import { withRateLimit } from '@/lib/rate-limit'
+import { getSupabaseUrl, getSupabaseAnonKey, getSupabaseServiceKey } from '@/lib/env'
 
 const EMAIL_REGEX =
   /^(?:[a-zA-Z0-9_'^&\/+\-])+(?:\.(?:[a-zA-Z0-9_'^&\/+\-])+)*@(?:(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,})$/
@@ -60,11 +61,8 @@ function getRedirectPath(role: string): string {
 }
 
 function getSupabaseAdmin() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-  if (!url || !serviceKey) {
-    throw new Error('Supabase não configurado: defina NEXT_PUBLIC_SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY')
-  }
+  const url = getSupabaseUrl()
+  const serviceKey = getSupabaseServiceKey()
   // ✅ CRÍTICO: Criar cliente service role com opções específicas para garantir que não seja afetado por sessões de usuário
   // Não usar persistSession e não permitir que funções de auth substituam a service key
   // IMPORTANTE: O segundo parâmetro é a service key, não a anon key
@@ -177,11 +175,14 @@ async function loginHandler(req: NextRequest) {
     }
   }
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY
-
-  if (!supabaseUrl || !supabaseAnonKey) {
-    logError('Variáveis de ambiente do Supabase não configuradas', {}, 'AuthAPI')
+  let supabaseUrl: string
+  let supabaseAnonKey: string
+  
+  try {
+    supabaseUrl = getSupabaseUrl()
+    supabaseAnonKey = getSupabaseAnonKey()
+  } catch (error) {
+    logError('Variáveis de ambiente do Supabase não configuradas', { error }, 'AuthAPI')
     return NextResponse.json({ error: 'missing_supabase_env' }, { status: 500 })
   }
 
@@ -229,9 +230,7 @@ async function loginHandler(req: NextRequest) {
         supabaseAdmin = getSupabaseAdmin()
       } catch (adminErr: any) {
         logError('Erro ao criar cliente Supabase Admin', {
-          error: adminErr instanceof Error ? adminErr.message : String(adminErr),
-          hasUrl: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
-          hasServiceKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY
+          error: adminErr instanceof Error ? adminErr.message : String(adminErr)
         }, 'AuthAPI')
         return NextResponse.json({
           error: 'Erro de configuração do servidor. Entre em contato com o suporte.',
@@ -241,9 +240,7 @@ async function loginHandler(req: NextRequest) {
 
       debug('Buscando usuário na tabela users com service role...', {
         userId: data.user.id,
-        email: data.user.email || email,
-        supabaseUrl: (process.env.NEXT_PUBLIC_SUPABASE_URL || '').substring(0, 30) + '...',
-        hasServiceKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY
+        email: data.user.email || email
       }, 'AuthAPI')
 
       // ✅ ESTRATÉGIA: Tentar múltiplas abordagens para garantir que funcione
@@ -288,8 +285,8 @@ async function loginHandler(req: NextRequest) {
       // Tentativa 2: Se RPC não funcionou, usar SQL direto via REST API
       if (!rpcWorked && !existingUser) {
         try {
-          const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL
-          const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+          const supabaseUrl = getSupabaseUrl()
+          const serviceKey = getSupabaseServiceKey()
 
           if (supabaseUrl && serviceKey) {
             // Usar fetch direto para chamar a função RPC via REST API
@@ -532,18 +529,21 @@ async function loginHandler(req: NextRequest) {
       : new NextResponse(null, { status: 303, headers: { Location: redirectPath } })
 
     // ✅ Criar cookie customizado no servidor para autenticação nas rotas API
-    // ✅ SEGURANÇA: NÃO incluir access_token no cookie customizado
-    // O token será obtido do cookie do Supabase (sb-{project}-auth-token) ou header Authorization
-    const sessionCookieValue = Buffer.from(JSON.stringify({
+    // ✅ CORREÇÃO: Incluir access_token para que validateAuth funcione corretamente
+    // O cookie é usado pelo proxy/middleware para validar sessão via Supabase
+    const sessionPayload = {
       id: userPayload.id,
       email: userPayload.email,
       name: userPayload.name,
       role: userPayload.role,
       companyId: userPayload.companyId,
       transportadoraId: userPayload.transportadoraId,
-      avatar_url: userPayload.avatar_url
-      // ✅ REMOVIDO: access_token não deve estar no cookie por segurança
-    })).toString('base64')
+      avatar_url: userPayload.avatar_url,
+      // ✅ CORRIGIDO: access_token DEVE estar no cookie para validateAuth funcionar
+      accessToken: data.session.access_token,
+      refreshToken: data.session.refresh_token
+    }
+    const sessionCookieValue = Buffer.from(JSON.stringify(sessionPayload)).toString('base64')
 
     const isDev = process.env.NODE_ENV === 'development'
     // Force secure=false in development locally to avoid issues with localhost

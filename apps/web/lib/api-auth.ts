@@ -10,6 +10,7 @@ import { createClient } from '@supabase/supabase-js'
 import { normalizeRole } from '@/lib/role-mapper'
 import { debug, warn, error as logError } from '@/lib/logger'
 import { getCachedAuth, setCachedAuth, invalidateCachedAuth } from './auth-cache'
+import { getSupabaseUrl, getSupabaseAnonKey, getSupabaseServiceKey } from '@/lib/env'
 
 export interface AuthenticatedUser {
   id: string
@@ -54,17 +55,9 @@ function decodeBase64Json(raw: string): Record<string, unknown> | null {
  */
 export async function validateAuth(request: NextRequest): Promise<AuthenticatedUser | null> {
   try {
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-
-    if (!supabaseUrl || !supabaseAnonKey) {
-      logError('Supabase não configurado', {
-        hasUrl: !!supabaseUrl,
-        hasAnonKey: !!supabaseAnonKey
-      }, 'ApiAuth')
-      return null
-    }
+    const supabaseUrl = getSupabaseUrl()
+    const supabaseAnonKey = getSupabaseAnonKey()
+    const serviceKey = getSupabaseServiceKey()
 
     debug('Verificando autenticação', {
       path: request.nextUrl.pathname,
@@ -120,10 +113,26 @@ export async function validateAuth(request: NextRequest): Promise<AuthenticatedU
       }
     }
 
-    // 3. ✅ REMOVIDO: Não tentar obter token do cookie customizado (golffox-session)
-    // O cookie customizado não contém mais access_token por segurança
-    // O token deve vir sempre do cookie do Supabase ou header Authorization
-    // Isso garante que o token seja sempre validado pelo Supabase Auth
+    // 3. ✅ CORREÇÃO: Tentar obter token do cookie customizado (golffox-session)
+    // O cookie customizado PODE conter access_token quando setado via API de login
+    if (!accessToken) {
+      const sessionCookie = request.cookies.get('golffox-session')?.value
+      if (sessionCookie) {
+        try {
+          const sessionData = decodeBase64Json(sessionCookie)
+          if (sessionData) {
+            const token = sessionData.accessToken as string || sessionData.access_token as string
+            if (token) {
+              accessToken = token
+              tokenSource = 'golffox-session'
+              debug('Token encontrado no cookie golffox-session', {}, 'ApiAuth')
+            }
+          }
+        } catch (e) {
+          warn('Erro ao processar cookie golffox-session', { error: e }, 'ApiAuth')
+        }
+      }
+    }
 
     if (!accessToken) {
       warn('Token de acesso não encontrado em nenhum lugar', {
@@ -320,11 +329,32 @@ export async function requireCompanyAccess(
   }
 
   // Verificar se usuário tem acesso à empresa via gf_user_company_map
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  let supabaseUrl: string | null = null
+  let supabaseAnonKey: string | null = null
+  
+  try {
+    supabaseUrl = getSupabaseUrl()
+    supabaseAnonKey = getSupabaseAnonKey()
+  } catch {
+    // Variáveis não configuradas - retornar erro
+    return {
+      user: null as any,
+      error: NextResponse.json(
+        { error: 'Server configuration error' },
+        { status: 500 }
+      )
+    }
+  }
 
   if (supabaseUrl && supabaseAnonKey) {
-    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+    let serviceKey: string | null = null
+    try {
+      serviceKey = getSupabaseServiceKey()
+    } catch {
+      // Service key não configurado - continuar sem ela
+      serviceKey = null
+    }
+    
     if (serviceKey) {
       const supabaseAdmin = createClient(supabaseUrl, serviceKey, {
         auth: { persistSession: false, autoRefreshToken: false }

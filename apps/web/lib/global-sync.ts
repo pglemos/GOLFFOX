@@ -90,8 +90,8 @@ class GlobalSyncManager {
     this.listeners.forEach(callback => {
       try {
         callback(event)
-      } catch (error) {
-        console.error('Erro ao executar callback de sincronização:', error)
+      } catch (err) {
+        logError('Erro ao executar callback de sincronização', { error: err }, 'GlobalSync')
       }
     })
   }
@@ -151,8 +151,8 @@ class GlobalSyncManager {
     this.listeners.forEach(callback => {
       try {
         callback(event)
-      } catch (error) {
-        console.error('Erro ao executar callback de sincronização:', error)
+      } catch (err) {
+        logError('Erro ao executar callback de sincronização', { error: err }, 'GlobalSync')
       }
     })
   }

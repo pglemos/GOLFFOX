@@ -37,7 +37,7 @@ export async function ensureSupabaseSession(): Promise<Session | null> {
         refresh_token: token,
       })
       if (error) {
-        console.warn('[ensureSupabaseSession] Failed to set Supabase session from golffox-session cookie:', error)
+        warn('Failed to set Supabase session from golffox-session cookie', { error }, 'SupabaseSession')
         return null
       }
       return data.session

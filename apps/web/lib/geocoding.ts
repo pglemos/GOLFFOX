@@ -1,3 +1,5 @@
+import { warn, error as logError } from './logger'
+
 export interface GeocodeResult {
   lat: number
   lng: number
@@ -7,7 +9,7 @@ export interface GeocodeResult {
 export async function geocodeAddress(address: string): Promise<GeocodeResult | null> {
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
   if (!apiKey) {
-    console.warn('Google Maps API key não configurada')
+    warn('Google Maps API key não configurada', {}, 'Geocoding')
     return null
   }
 
@@ -27,8 +29,8 @@ export async function geocodeAddress(address: string): Promise<GeocodeResult | n
     }
 
     return null
-  } catch (error) {
-    console.error('Erro na geocodificação:', error)
+  } catch (err) {
+    logError('Erro na geocodificação', { error: err }, 'Geocoding')
     return null
   }
 }

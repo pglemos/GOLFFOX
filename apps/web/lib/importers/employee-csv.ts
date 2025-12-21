@@ -2,6 +2,7 @@ import Papa from 'papaparse'
 import { z } from 'zod'
 import { geocodeAddress } from '@/lib/google-maps'
 import { supabase } from '@/lib/supabase'
+import { warn, error as logError } from '@/lib/logger'
 
 // Função para validar CPF
 function validateCPF(cpf: string): boolean {
@@ -175,7 +176,10 @@ export async function geocodeBatch(
           break
         }
       } catch (error: any) {
-        console.warn(`Erro ao geocodificar endereço "${address}" (tentativa ${attempts + 1}/${maxAttempts}):`, error.message || error)
+        warn(`Erro ao geocodificar endereço (tentativa ${attempts + 1}/${maxAttempts})`, { 
+          address, 
+          error: error.message || error 
+        }, 'EmployeeCSVImporter')
         
         if (attempts < maxAttempts - 1) {
           await delay(Math.pow(2, attempts) * 1000)
@@ -265,7 +269,7 @@ export async function importEmployees(
             .eq('id', userId)
         } catch (updateError) {
           // Ignorar erro de atualização, continuar com importação
-          console.warn('Erro ao atualizar dados do usuário:', updateError)
+          warn('Erro ao atualizar dados do usuário', { error: updateError }, 'EmployeeCSVImporter')
         }
       } else {
         // Criar novo usuário via API
@@ -357,7 +361,7 @@ export async function importEmployees(
         employee: emp.nome,
         error: error.message || 'Erro desconhecido'
       })
-      console.error(`Erro ao importar funcionário ${emp.nome}:`, error)
+      logError(`Erro ao importar funcionário`, { employeeName: emp.nome, error }, 'EmployeeCSVImporter')
     }
 
     onProgress?.(i + 1, employees.length)

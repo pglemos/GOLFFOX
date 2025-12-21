@@ -45,8 +45,7 @@ const STATIC_ROUTES = [
  */
 const ROUTE_REDIRECTS: Record<string, string> = {
   '/transportadora': '/transportadora',
-  '/operador': '/empresa',
-  '/operador': '/transportadora',
+  '/operador': '/transportadora', // Operador mapeia para transportadora (painel do operador)
   '/login': '/',
 }
 

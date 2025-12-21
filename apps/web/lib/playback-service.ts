@@ -3,6 +3,9 @@
  * Gerencia animação de marcadores no tempo histórico
  */
 
+import { supabase } from './supabase'
+import { error as logError, warn } from './logger'
+
 export interface HistoricalPosition {
   position_id: string
   trip_id: string
@@ -66,7 +69,7 @@ export class PlaybackService {
       )
 
     if (error) {
-      console.error('Erro ao carregar posições históricas:', error)
+      logError('Erro ao carregar posições históricas', { error }, 'PlaybackService')
       return []
     }
 
@@ -98,7 +101,7 @@ export class PlaybackService {
    */
   play(options: PlaybackOptions): void {
     if (this.positions.length === 0) {
-      console.warn('Nenhuma posição carregada para playback')
+      warn('Nenhuma posição carregada para playback', {}, 'PlaybackService')
       return
     }
 

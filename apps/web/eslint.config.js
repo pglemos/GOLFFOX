@@ -19,11 +19,11 @@ module.exports = [
   },
   {
     rules: {
-      "@typescript-eslint/no-explicit-any": "warn",
+      "@typescript-eslint/no-explicit-any": "error",
       "@typescript-eslint/ban-ts-comment": "warn",
       "@typescript-eslint/no-empty-object-type": "warn",
-      "@typescript-eslint/no-unused-vars": "warn",
-      "prefer-const": "warn",
+      "@typescript-eslint/no-unused-vars": "error",
+      "prefer-const": "error",
       "react-hooks/exhaustive-deps": "warn",
       "react-hooks/immutability": "warn",
       "react-hooks/preserve-manual-memoization": "warn",

@@ -4,6 +4,7 @@
  */
 
 import { supabase } from './supabase'
+import { error as logError, warn } from './logger'
 
 /**
  * Obtém o token de acesso da sessão do Supabase
@@ -13,18 +14,18 @@ export async function getAuthToken(): Promise<string | null> {
     const { data: { session }, error } = await supabase.auth.getSession()
     
     if (error) {
-      console.error('❌ Erro ao obter sessão do Supabase:', error)
+      logError('Erro ao obter sessão do Supabase', { error }, 'FetchWithAuth')
       return null
     }
     
     if (!session?.access_token) {
-      console.warn('⚠️ Nenhuma sessão ativa do Supabase')
+      warn('Nenhuma sessão ativa do Supabase', {}, 'FetchWithAuth')
       return null
     }
     
     return session.access_token
-  } catch (error) {
-    console.error('❌ Erro ao obter token de autenticação:', error)
+  } catch (err) {
+    logError('Erro ao obter token de autenticação', { error: err }, 'FetchWithAuth')
     return null
   }
 }

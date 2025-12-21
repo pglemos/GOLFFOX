@@ -6,6 +6,7 @@
 
 import { supabase } from './supabase'
 import { SupabaseClient } from '@supabase/supabase-js'
+import { error as logError } from './logger'
 
 export interface SyncOperation {
   id?: string
@@ -56,8 +57,8 @@ function saveSyncHistory(entry: SyncHistoryEntry): void {
       history.shift()
     }
     localStorage.setItem(SYNC_HISTORY_KEY, JSON.stringify(history))
-  } catch (error) {
-    console.error('Erro ao salvar histórico de sincronização:', error)
+  } catch (err) {
+    logError('Erro ao salvar histórico de sincronização', { error: err }, 'SupabaseSync')
   }
 }
 
@@ -68,8 +69,8 @@ export function getSyncHistory(): SyncHistoryEntry[] {
   try {
     const stored = localStorage.getItem(SYNC_HISTORY_KEY)
     return stored ? JSON.parse(stored) : []
-  } catch (error) {
-    console.error('Erro ao recuperar histórico de sincronização:', error)
+  } catch (err) {
+    logError('Erro ao recuperar histórico de sincronização', { error: err }, 'SupabaseSync')
     return []
   }
 }
@@ -87,8 +88,8 @@ function saveFailedSync(operation: SyncOperation, result: SyncResult): void {
       retryCount: result.attempts,
     })
     localStorage.setItem(FAILED_SYNC_KEY, JSON.stringify(failed))
-  } catch (error) {
-    console.error('Erro ao salvar sincronização falha:', error)
+  } catch (err) {
+    logError('Erro ao salvar sincronização falha', { error: err }, 'SupabaseSync')
   }
 }
 
@@ -104,8 +105,8 @@ export function getFailedSyncs(): Array<{
   try {
     const stored = localStorage.getItem(FAILED_SYNC_KEY)
     return stored ? JSON.parse(stored) : []
-  } catch (error) {
-    console.error('Erro ao recuperar sincronizações falhas:', error)
+  } catch (err) {
+    logError('Erro ao recuperar sincronizações falhas', { error: err }, 'SupabaseSync')
     return []
   }
 }
@@ -120,8 +121,8 @@ export function clearFailedSync(operationId: string): void {
       (item) => item.operation.id !== operationId
     )
     localStorage.setItem(FAILED_SYNC_KEY, JSON.stringify(filtered))
-  } catch (error) {
-    console.error('Erro ao limpar sincronização falha:', error)
+  } catch (err) {
+    logError('Erro ao limpar sincronização falha', { error: err }, 'SupabaseSync')
   }
 }
 
@@ -417,7 +418,7 @@ async function executeSyncWithRetry(
       },
     }
 
-    console.error('[SYNC ERROR]', JSON.stringify(logEntry, null, 2))
+    logError('Erro de sincronização', logEntry, 'SupabaseSync')
 
     result.error = {
       code: errorCode,

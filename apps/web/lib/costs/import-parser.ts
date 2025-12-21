@@ -98,7 +98,8 @@ export async function parseCSV(
       results.push(row)
     } catch (err) {
       // Ignorar erros de parse e continuar
-      console.warn(`Erro ao parsear linha ${i + 1}:`, err)
+      const { warn } = await import('../logger')
+      warn(`Erro ao parsear linha`, { lineNumber: i + 1, error: err }, 'CostsImportParser')
     }
   }
 

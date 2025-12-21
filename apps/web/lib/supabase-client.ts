@@ -10,6 +10,7 @@ import { createClient } from '@supabase/supabase-js'
 import { supabaseServiceRole } from './supabase-server'
 import type { AuthenticatedUser } from './api-auth'
 import { validateAuth } from './api-auth'
+import { getSupabaseUrl, getSupabaseAnonKey, getSupabaseServiceKey } from '@/lib/env'
 
 /**
  * Obtém cliente Supabase com contexto do usuário autenticado
@@ -25,19 +26,12 @@ export async function getSupabaseClient(
     forceServiceRole?: boolean
   }
 ): Promise<ReturnType<typeof createClient>> {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-
-  if (!supabaseUrl) {
-    throw new Error('NEXT_PUBLIC_SUPABASE_URL não configurado')
-  }
+  const supabaseUrl = getSupabaseUrl()
+  const supabaseAnonKey = getSupabaseAnonKey()
 
   // Forçar service-role se especificado (operações administrativas)
   if (options?.forceServiceRole) {
-    if (!serviceKey) {
-      throw new Error('SUPABASE_SERVICE_ROLE_KEY não configurado')
-    }
+    const serviceKey = getSupabaseServiceKey()
     return createClient(supabaseUrl, serviceKey, {
       auth: { autoRefreshToken: false, persistSession: false }
     })
@@ -48,9 +42,7 @@ export async function getSupabaseClient(
 
   if (!user) {
     // Sem usuário autenticado - usar anon key (RLS aplicado)
-    if (!supabaseAnonKey) {
-      throw new Error('NEXT_PUBLIC_SUPABASE_ANON_KEY não configurado')
-    }
+    // supabaseAnonKey já validado acima
     return createClient(supabaseUrl, supabaseAnonKey, {
       auth: { autoRefreshToken: false, persistSession: false }
     })

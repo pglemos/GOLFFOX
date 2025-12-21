@@ -2,6 +2,8 @@
  * Reverse Geocoding - Converte coordenadas em endereços legíveis
  */
 
+import { warn, error as logError } from './logger'
+
 export interface ReverseGeocodeResult {
   address: string
   components: {
@@ -29,7 +31,7 @@ export async function reverseGeocode(
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
   
   if (!apiKey) {
-    console.warn('Google Maps API key não configurada para reverse geocoding')
+    warn('Google Maps API key não configurada para reverse geocoding', {}, 'GoogleMapsReverse')
     return null
   }
 
@@ -79,7 +81,7 @@ export async function reverseGeocode(
     
     return null
   } catch (error) {
-    console.error('Erro ao fazer reverse geocoding:', error)
+    logError('Erro ao fazer reverse geocoding', { error }, 'GoogleMapsReverse')
     return null
   }
 }

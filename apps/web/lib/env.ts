@@ -141,6 +141,63 @@ export function getEnvVars() {
 }
 
 /**
+ * Obtém URL do Supabase validada
+ * @throws Error se não configurado
+ */
+export function getSupabaseUrl(): string {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  if (!url) {
+    throw new Error('NEXT_PUBLIC_SUPABASE_URL não configurado')
+  }
+  if (!isValidSupabaseUrl(url)) {
+    throw new Error('NEXT_PUBLIC_SUPABASE_URL inválida')
+  }
+  return url
+}
+
+/**
+ * Obtém chave anon do Supabase validada
+ * @throws Error se não configurado
+ */
+export function getSupabaseAnonKey(): string {
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  if (!key) {
+    throw new Error('NEXT_PUBLIC_SUPABASE_ANON_KEY não configurado')
+  }
+  if (!isValidSupabaseKey(key)) {
+    throw new Error('NEXT_PUBLIC_SUPABASE_ANON_KEY inválida')
+  }
+  return key
+}
+
+/**
+ * Obtém chave service role do Supabase validada
+ * @throws Error se não configurado
+ */
+export function getSupabaseServiceKey(): string {
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY
+  if (!key) {
+    throw new Error('SUPABASE_SERVICE_ROLE_KEY não configurado')
+  }
+  return key
+}
+
+/**
+ * Obtém chave do Google Maps validada
+ * @throws Error se não configurado
+ */
+export function getGoogleMapsApiKey(): string {
+  const key = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
+  if (!key) {
+    throw new Error('NEXT_PUBLIC_GOOGLE_MAPS_API_KEY não configurado')
+  }
+  if (!isValidGoogleMapsKey(key)) {
+    throw new Error('NEXT_PUBLIC_GOOGLE_MAPS_API_KEY inválida')
+  }
+  return key
+}
+
+/**
  * Verifica se está em modo desenvolvimento
  */
 export function isDevelopment(): boolean {

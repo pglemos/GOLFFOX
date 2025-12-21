@@ -43,7 +43,8 @@ export async function addAddressesToPositions<T extends { lat: number; lng: numb
           addressComponents: geocodeResult?.components || null
         }
       } catch (error) {
-        console.warn('Erro ao fazer reverse geocoding:', error)
+        const { warn } = await import('../../logger')
+        warn('Erro ao fazer reverse geocoding', { error }, 'ReportsReverseGeocode')
         return {
           ...position,
           address: null,
