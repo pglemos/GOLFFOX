@@ -22,7 +22,7 @@ export async function GET(req: NextRequest) {
 
     // Buscar veículos da transportadora
     const { data: veiculos, error: vehiclesError } = await supabase
-      .from('veiculos')
+      .from('veiculos' as any)
       .select('id, plate, model, is_active, transportadora_id')
       .eq('transportadora_id', transportadoraId)
 
@@ -54,7 +54,7 @@ export async function GET(req: NextRequest) {
 
     // Buscar posições dos veículos para calcular tempo em rota
     const { data: positions, error: positionsError } = await supabase
-      .from('motorista_positions')
+      .from('motorista_positions' as any)
       .select('veiculo_id, created_at')
       .in('veiculo_id', vehicleIds)
       .order('created_at', { ascending: false })

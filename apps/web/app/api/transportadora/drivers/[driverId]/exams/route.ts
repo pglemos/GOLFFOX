@@ -42,7 +42,7 @@ export async function GET(
     // Selecionar apenas colunas necessárias para listagem (otimização de performance)
     const examColumns = 'id,motorista_id,exam_type,exam_date,expiry_date,result,file_url,file_name,clinic_name,doctor_name,doctor_crm,notes,created_at,updated_at'
     const { data, error } = await supabaseServiceRole
-      .from('driver_medical_exams')
+      .from('driver_medical_exams' as any)
       .select(examColumns)
       .eq('motorista_id', params.driverId)
       .order('exam_date', { ascending: false })
@@ -78,7 +78,7 @@ export async function POST(
     const validated = examSchema.parse(body)
 
     const { data, error } = await supabaseServiceRole
-      .from('driver_medical_exams')
+      .from('driver_medical_exams' as any)
       .insert({
         motorista_id: params.driverId,
         ...validated,

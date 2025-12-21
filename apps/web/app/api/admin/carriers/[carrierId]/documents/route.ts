@@ -143,7 +143,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
             // Atualizar documento existente
             const existingId = (existing as any).id
             const { data: updated, error: updateError } = await (supabaseAdmin
-                .from('gf_transportadora_documents') as any)
+                .from('gf_transportadora_documents' as any) as any)
                 .update({
                     ...documentData,
                     updated_at: new Date().toISOString(),

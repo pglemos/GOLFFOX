@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseServiceRole } from '@/lib/supabase-server'
+import { getSupabaseAdmin } from '@/lib/supabase-client'
+import { logError } from '@/lib/logger'
 
 export async function GET(request: NextRequest) {
   try {
@@ -14,8 +15,9 @@ export async function GET(request: NextRequest) {
     }
 
     // Buscar dados da view v_costs_vs_budget (view materializada - selecionar todas as colunas)
-    const { data, error } = await supabaseServiceRole
-      .from('v_costs_vs_budget')
+    const supabase = getSupabaseAdmin()
+    const { data, error } = await supabase
+      .from('v_costs_vs_budget' as any)
       .select('*')
       .eq('company_id', companyId)
       .order('period_year', { ascending: false })

@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { checkProximity, findNearestStop, shouldNotify } from '@/lib/notifications/proximity-service'
 import { debug, error as logError } from '@/lib/logger'
+import { applyRateLimit } from '@/lib/rate-limit'
+import { requireAuth } from '@/lib/api-auth'
 
 const GOOGLE_MAPS_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
 
@@ -125,7 +127,7 @@ export async function POST(request: NextRequest) {
         }
 
         const proximity = await checkProximity(busPosition, stopPosition, thresholdMeters)
-        
+
         return {
           stopId: stop.id,
           stopName: stop.name,

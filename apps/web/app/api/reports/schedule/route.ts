@@ -44,7 +44,7 @@ async function schedulePostHandler(request: NextRequest) {
 
     if (missingFields.length > 0) {
       return NextResponse.json(
-        { 
+        {
           error: 'Campos obrigatórios faltando',
           message: `Os seguintes campos são obrigatórios: ${missingFields.join(', ')}`,
           missingFields
@@ -60,11 +60,11 @@ async function schedulePostHandler(request: NextRequest) {
     const allowAuthBypass = isTestMode || isDevelopment
 
     const authenticatedUser = await validateAuth(request)
-    
+
     if (!authenticatedUser && !allowAuthBypass) {
       return NextResponse.json(
-        { 
-          error: 'Unauthorized', 
+        {
+          error: 'Unauthorized',
           message: 'Autenticação obrigatória para agendar relatórios. Forneça um token de autenticação no header Authorization: Bearer <token>',
           hint: 'Em modo de teste, envie header x-test-mode: true para bypass de autenticação'
         },
@@ -74,7 +74,7 @@ async function schedulePostHandler(request: NextRequest) {
 
     // Se companyId não foi fornecido, tentar obter do usuário autenticado
     let finalCompanyId = companyId
-    
+
     // Se não há usuário autenticado mas está em modo de teste, criar usuário mock
     // Em modo de teste, não definir created_by (será null)
     if (!authenticatedUser && allowAuthBypass) {
@@ -82,7 +82,7 @@ async function schedulePostHandler(request: NextRequest) {
       // Não criar usuário mock com ID inválido - deixar authenticatedUser como null
       // O created_by será null em modo de teste
     }
-    
+
     if (!finalCompanyId) {
       if (authenticatedUser && authenticatedUser.role === 'admin') {
         // Admin pode criar agendamentos sem companyId (global)
@@ -97,7 +97,7 @@ async function schedulePostHandler(request: NextRequest) {
           finalCompanyId = null
         } else {
           return NextResponse.json(
-            { 
+            {
               error: 'companyId obrigatório',
               message: 'O campo companyId é obrigatório para usuários não-admin ou quando o usuário não está associado a uma empresa',
               hint: 'Forneça companyId no payload ou certifique-se de que o usuário está associado a uma empresa'
@@ -120,7 +120,7 @@ async function schedulePostHandler(request: NextRequest) {
     const cronParts = finalCron.trim().split(/\s+/)
     if (cronParts.length < 5 || cronParts.length > 6) {
       return NextResponse.json(
-        { 
+        {
           error: 'Formato cron inválido',
           message: 'O formato cron deve ter 5 ou 6 campos. Exemplo: "0 8 * * *" (minuto hora dia mês dia-semana)',
           received: finalCron,
@@ -150,7 +150,7 @@ async function schedulePostHandler(request: NextRequest) {
     if (!validReportKeys.includes(normalizedReportKey)) {
       const validAliases = Object.keys(reportKeyAliases)
       return NextResponse.json(
-        { 
+        {
           error: 'reportKey inválido',
           message: `O reportKey deve ser um dos seguintes: ${validReportKeys.join(', ')}`,
           received: finalReportKey,
@@ -170,7 +170,7 @@ async function schedulePostHandler(request: NextRequest) {
     const invalidEmails = recipients.filter((email: string) => !emailRegex.test(email))
     if (invalidEmails.length > 0) {
       return NextResponse.json(
-        { 
+        {
           error: 'Emails inválidos nos recipients',
           message: `Os seguintes emails têm formato inválido: ${invalidEmails.join(', ')}`,
           invalidEmails
@@ -192,14 +192,14 @@ async function schedulePostHandler(request: NextRequest) {
         is_active: isActive,
         updated_at: new Date().toISOString()
       }
-      
+
       // Adicionar company_id apenas se fornecido (pode ser null para admin)
       if (finalCompanyId !== undefined) {
         updateData.company_id = finalCompanyId
       }
 
       const { data, error } = await supabase
-        .from('gf_report_schedules')
+        .from('gf_report_schedules' as any)
         .update(updateData)
         .eq('id', scheduleId)
         .select()
@@ -210,7 +210,7 @@ async function schedulePostHandler(request: NextRequest) {
         // Verificar se erro é porque tabela não existe
         if (error.message?.includes('does not exist') || error.message?.includes('relation') || error.message?.includes('table')) {
           return NextResponse.json(
-            { 
+            {
               error: 'Tabela gf_report_schedules não encontrada',
               message: 'A tabela gf_report_schedules não existe no banco de dados. Execute a migração v43_report_scheduling.sql para criar a tabela.',
               hint: 'Verifique se a migração de agendamento de relatórios foi executada'
@@ -230,7 +230,7 @@ async function schedulePostHandler(request: NextRequest) {
         recipients,
         is_active: isActive
       }
-      
+
       // Adicionar company_id - em modo de teste, tentar obter uma empresa existente se não fornecido
       if (finalCompanyId !== undefined && finalCompanyId !== null) {
         insertData.company_id = finalCompanyId
@@ -242,14 +242,14 @@ async function schedulePostHandler(request: NextRequest) {
             .select('id')
             .limit(1)
             .single()
-          
+
           if (!companiesError && companies) {
             insertData.company_id = companies.id
             logger.log(`⚠️ Modo de teste: usando companyId existente: ${companies.id}`)
           } else {
             // Se não há empresas, retornar erro informativo
             return NextResponse.json(
-              { 
+              {
                 error: 'companyId obrigatório',
                 message: 'O campo companyId é obrigatório. Em modo de teste, forneça um companyId válido ou certifique-se de que há empresas no banco de dados.',
                 hint: 'Forneça companyId no payload ou crie uma empresa no banco de dados'
@@ -259,7 +259,7 @@ async function schedulePostHandler(request: NextRequest) {
           }
         } catch (err) {
           return NextResponse.json(
-            { 
+            {
               error: 'companyId obrigatório',
               message: 'O campo companyId é obrigatório e não foi possível obter uma empresa existente.',
               hint: 'Forneça companyId no payload'
@@ -270,7 +270,7 @@ async function schedulePostHandler(request: NextRequest) {
       } else {
         // Em modo normal, companyId é obrigatório
         return NextResponse.json(
-          { 
+          {
             error: 'companyId obrigatório',
             message: 'O campo companyId é obrigatório para criar agendamentos',
             hint: 'Forneça companyId no payload'
@@ -278,7 +278,7 @@ async function schedulePostHandler(request: NextRequest) {
           { status: 400 }
         )
       }
-      
+
       // Adicionar created_by apenas se houver usuário autenticado (não em modo de teste sem auth)
       if (authenticatedUser?.id) {
         insertData.created_by = authenticatedUser.id
@@ -286,7 +286,7 @@ async function schedulePostHandler(request: NextRequest) {
       // Se não houver usuário autenticado, created_by será null (aceitável em modo de teste)
 
       const { data, error } = await supabase
-        .from('gf_report_schedules')
+        .from('gf_report_schedules' as any)
         .insert(insertData)
         .select()
         .single()
@@ -300,14 +300,14 @@ async function schedulePostHandler(request: NextRequest) {
             logger.log('⚠️ Erro com created_by, tentando sem essa coluna...')
             delete insertData.created_by
             const retryResult = await supabase
-              .from('gf_report_schedules')
+              .from('gf_report_schedules' as any)
               .insert(insertData)
               .select()
               .single()
-            
+
             if (retryResult.error) {
               return NextResponse.json(
-                { 
+                {
                   error: 'Erro ao criar agendamento',
                   message: error.message || 'Erro desconhecido',
                   hint: 'Verifique se a tabela gf_report_schedules existe e tem a estrutura correta',
@@ -318,9 +318,9 @@ async function schedulePostHandler(request: NextRequest) {
             }
             return NextResponse.json({ schedule: retryResult.data }, { status: 201 })
           }
-          
+
           return NextResponse.json(
-            { 
+            {
               error: 'Tabela gf_report_schedules não encontrada',
               message: 'A tabela gf_report_schedules não existe no banco de dados. Execute a migração v43_report_scheduling.sql para criar a tabela.',
               hint: 'Verifique se a migração de agendamento de relatórios foi executada'
@@ -328,10 +328,10 @@ async function schedulePostHandler(request: NextRequest) {
             { status: 500 }
           )
         }
-        
+
         // Outros erros (validação, etc)
         return NextResponse.json(
-          { 
+          {
             error: 'Erro ao criar agendamento',
             message: error.message || 'Erro desconhecido',
             details: process.env.NODE_ENV === 'development' ? error : undefined
@@ -346,7 +346,7 @@ async function schedulePostHandler(request: NextRequest) {
     logger.error('Erro ao agendar relatório', { error: err }, 'ReportsScheduleAPI')
     const errorMessage = err instanceof Error ? err.message : 'Erro ao agendar relatório'
     return NextResponse.json(
-      { 
+      {
         error: errorMessage,
         details: process.env.NODE_ENV === 'development' ? String(err) : undefined
       },
@@ -368,7 +368,7 @@ async function scheduleGetHandler(request: NextRequest) {
     // Selecionar apenas colunas necessárias para listagem (otimização de performance)
     const scheduleColumns = 'id,company_id,report_key,cron,recipients,is_active,created_by,created_at,updated_at'
     let query = supabase
-      .from('gf_report_schedules')
+      .from('gf_report_schedules' as any)
       .select(scheduleColumns)
       .order('created_at', { ascending: false })
 
@@ -409,7 +409,7 @@ async function scheduleDeleteHandler(request: NextRequest) {
     }
 
     const { error } = await supabase
-      .from('gf_report_schedules')
+      .from('gf_report_schedules' as any)
       .delete()
       .eq('id', scheduleId)
 

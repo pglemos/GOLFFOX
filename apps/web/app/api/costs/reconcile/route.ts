@@ -37,7 +37,7 @@ async function reconcileHandler(request: NextRequest) {
 
     if (conciliationError && validated.route_id) {
       // Tentar sem route_id
-      const { data: conciliation2 } = await supabaseServiceRole
+      const { data: conciliation2 } = await supabase
         .from('v_costs_conciliation')
         .select('*')
         .eq('invoice_id', validated.invoice_id)
@@ -52,7 +52,7 @@ async function reconcileHandler(request: NextRequest) {
       }
     }
 
-    const conciliationData = conciliation || await supabaseServiceRole
+    const conciliationData = conciliation || await supabase
       .from('v_costs_conciliation')
       .select('*')
       .eq('invoice_id', validated.invoice_id)
@@ -69,7 +69,7 @@ async function reconcileHandler(request: NextRequest) {
 
     // Verificar se há divergência significativa
     const conciliationDataTyped = conciliationData as any
-    const hasSignificantDiscrepancy = 
+    const hasSignificantDiscrepancy =
       Math.abs(conciliationDataTyped.discrepancy_amount || 0) > validated.discrepancy_threshold_amount ||
       (conciliationDataTyped.discrepancy_percent || 0) > validated.discrepancy_threshold_percent
 
@@ -93,7 +93,7 @@ async function reconcileHandler(request: NextRequest) {
       updateData.approved_at = new Date().toISOString()
     }
 
-    const { data: updatedInvoice, error: updateError } = await supabaseServiceRole
+    const { data: updatedInvoice, error: updateError } = await supabase
       .from('gf_invoices')
       .update(updateData)
       .eq('id', validated.invoice_id)

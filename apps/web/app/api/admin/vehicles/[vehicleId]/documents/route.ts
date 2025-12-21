@@ -142,7 +142,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         if (existing) {
             // Atualizar documento existente
             const { data: updated, error: updateError } = await (supabaseAdmin
-                .from('gf_veiculo_documents') as any)
+                .from('gf_veiculo_documents' as any) as any)
                 .update({
                     ...documentData,
                     updated_at: new Date().toISOString(),
@@ -164,7 +164,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
         // Criar novo documento
         const { data: created, error: createError } = await (supabaseAdmin
-            .from('gf_veiculo_documents') as any)
+            .from('gf_veiculo_documents' as any) as any)
             .insert({
                 veiculo_id: vehicleId,
                 ...documentData,

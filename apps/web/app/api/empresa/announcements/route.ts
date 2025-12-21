@@ -45,7 +45,8 @@ export async function GET(request: NextRequest) {
 
         return NextResponse.json({ data });
     } catch (error) {
-        logError('Announcements API error', { error, companyId }, 'AnnouncementsAPI');
+        const errorCompanyId = request.nextUrl.searchParams.get('company_id');
+        logError('Announcements API error', { error, companyId: errorCompanyId }, 'AnnouncementsAPI');
         return NextResponse.json(
             { error: 'Erro ao buscar avisos' },
             { status: 500 }
@@ -88,13 +89,13 @@ export async function POST(request: NextRequest) {
             .single();
 
         if (error) {
-            logError('Error creating announcement', { error, companyId }, 'AnnouncementsAPI');
+            logError('Error creating announcement', { error, companyId: company_id }, 'AnnouncementsAPI');
             return NextResponse.json({ error: error.message }, { status: 500 });
         }
 
         return NextResponse.json({ data });
     } catch (error) {
-        logError('Announcements POST API error', { error, companyId }, 'AnnouncementsAPI');
+        logError('Announcements POST API error', { error }, 'AnnouncementsAPI');
         return NextResponse.json(
             { error: 'Erro ao criar aviso' },
             { status: 500 }
@@ -134,7 +135,7 @@ export async function PUT(request: NextRequest) {
 
         return NextResponse.json({ data });
     } catch (error) {
-        logError('Announcements PUT API error', { error, announcementId }, 'AnnouncementsAPI');
+        logError('Announcements PUT API error', { error }, 'AnnouncementsAPI');
         return NextResponse.json(
             { error: 'Erro ao atualizar aviso' },
             { status: 500 }

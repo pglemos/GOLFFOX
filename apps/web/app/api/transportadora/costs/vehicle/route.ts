@@ -51,7 +51,7 @@ export async function GET(req: NextRequest) {
       .single()
 
     let query = supabaseServiceRole
-      .from('vehicle_costs')
+      .from('vehicle_costs' as any)
       .select(`
         *,
         veiculos(plate, model, transportadora_id)
@@ -132,7 +132,7 @@ export async function POST(req: NextRequest) {
     }
 
     const { data, error } = await supabaseServiceRole
-      .from('vehicle_costs')
+      .from('vehicle_costs' as any)
       .insert({
         ...validated,
         created_by: user.id,

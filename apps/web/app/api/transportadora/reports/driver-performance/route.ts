@@ -34,7 +34,7 @@ export async function GET(req: NextRequest) {
     // Buscar dados de gamificação/ranking (selecionar apenas colunas necessárias)
     const rankingColumns = 'id,motorista_id,trips_completed,total_points,average_rating,on_time_percentage,safety_score,created_at,updated_at'
     const { data: rankings, error: rankingsError } = await supabase
-      .from('gf_gamification_scores')
+      .from('gf_gamification_scores' as any)
       .select(rankingColumns)
       .in('motorista_id', driverIds)
 
@@ -66,8 +66,8 @@ export async function GET(req: NextRequest) {
 
     // Calcular performance por motorista
     const driverPerformance = motoristas?.map(motorista => {
-      const driverRanking = rankings?.find(r => r.motorista_id === motorista.id)
-      const driverTrips = trips?.filter(t => t.motorista_id === motorista.id) || []
+      const driverRanking = (rankings as any[])?.find(r => r.motorista_id === motorista.id)
+      const driverTrips = (trips as any[])?.filter(t => t.motorista_id === motorista.id) || []
 
       return {
         motorista_id: motorista.id,
