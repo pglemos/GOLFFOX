@@ -313,4 +313,4 @@ export function VeiculoDocumentsSection({
     )
 }
 
-export default VehicleDocumentsSection
+export default VeiculoDocumentsSection

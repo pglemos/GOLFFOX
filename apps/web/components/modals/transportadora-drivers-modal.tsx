@@ -132,7 +132,7 @@ export function TransportadoraDriversModal({ transportadora, isOpen, onClose }: 
       }
 
       notifySuccess('Motorista criado com sucesso')
-      await loadDrivers()
+      await loadMotoristas()
       resetForm()
     } catch (error: any) {
       notifyError(error, error.message || 'Erro ao criar motorista')
@@ -161,7 +161,7 @@ export function TransportadoraDriversModal({ transportadora, isOpen, onClose }: 
       }
 
       notifySuccess('Motorista atualizado com sucesso')
-      await loadDrivers()
+      await loadMotoristas()
       resetForm()
     } catch (error: any) {
       notifyError(error, error.message || 'Erro ao atualizar motorista')
@@ -189,7 +189,7 @@ export function TransportadoraDriversModal({ transportadora, isOpen, onClose }: 
       }
 
       notifySuccess('Motorista excluído com sucesso')
-      await loadDrivers()
+      await loadMotoristas()
     } catch (error: any) {
       notifyError(error, error.message || 'Erro ao excluir motorista')
     } finally {

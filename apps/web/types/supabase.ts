@@ -531,7 +531,7 @@ export type Database = {
             foreignKeyName: "gf_alerts_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "mv_operator_kpis"
+            referencedRelation: "mv_operador_kpis"
             referencedColumns: ["company_id"]
           },
           {
@@ -552,14 +552,14 @@ export type Database = {
             foreignKeyName: "gf_alerts_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis"
+            referencedRelation: "v_operador_dashboard_kpis"
             referencedColumns: ["empresa_id"]
           },
           {
             foreignKeyName: "gf_alerts_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis_secure"
+            referencedRelation: "v_operador_dashboard_kpis_secure"
             referencedColumns: ["company_id"]
           },
           {
@@ -622,28 +622,28 @@ export type Database = {
             foreignKeyName: "gf_alerts_route_id_fkey"
             columns: ["route_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_costs"
+            referencedRelation: "v_operador_costs"
             referencedColumns: ["route_id"]
           },
           {
             foreignKeyName: "gf_alerts_route_id_fkey"
             columns: ["route_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_costs_secure"
+            referencedRelation: "v_operador_costs_secure"
             referencedColumns: ["route_id"]
           },
           {
             foreignKeyName: "gf_alerts_route_id_fkey"
             columns: ["route_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_routes"
+            referencedRelation: "v_operador_routes"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "gf_alerts_route_id_fkey"
             columns: ["route_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_routes_secure"
+            referencedRelation: "v_operador_routes_secure"
             referencedColumns: ["id"]
           },
           {
@@ -783,7 +783,7 @@ export type Database = {
             foreignKeyName: "gf_announcement_templates_empresa_id_fkey"
             columns: ["empresa_id"]
             isOneToOne: false
-            referencedRelation: "mv_operator_kpis"
+            referencedRelation: "mv_operador_kpis"
             referencedColumns: ["company_id"]
           },
           {
@@ -804,14 +804,14 @@ export type Database = {
             foreignKeyName: "gf_announcement_templates_empresa_id_fkey"
             columns: ["empresa_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis"
+            referencedRelation: "v_operador_dashboard_kpis"
             referencedColumns: ["empresa_id"]
           },
           {
             foreignKeyName: "gf_announcement_templates_empresa_id_fkey"
             columns: ["empresa_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis_secure"
+            referencedRelation: "v_operador_dashboard_kpis_secure"
             referencedColumns: ["company_id"]
           },
         ]
@@ -868,7 +868,7 @@ export type Database = {
             foreignKeyName: "gf_announcements_empresa_id_fkey"
             columns: ["empresa_id"]
             isOneToOne: false
-            referencedRelation: "mv_operator_kpis"
+            referencedRelation: "mv_operador_kpis"
             referencedColumns: ["company_id"]
           },
           {
@@ -889,14 +889,14 @@ export type Database = {
             foreignKeyName: "gf_announcements_empresa_id_fkey"
             columns: ["empresa_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis"
+            referencedRelation: "v_operador_dashboard_kpis"
             referencedColumns: ["empresa_id"]
           },
           {
             foreignKeyName: "gf_announcements_empresa_id_fkey"
             columns: ["empresa_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis_secure"
+            referencedRelation: "v_operador_dashboard_kpis_secure"
             referencedColumns: ["company_id"]
           },
           {
@@ -972,7 +972,7 @@ export type Database = {
             foreignKeyName: "gf_assigned_carriers_carrier_id_fkey"
             columns: ["transportadora_id"]
             isOneToOne: false
-            referencedRelation: "mv_operator_kpis"
+            referencedRelation: "mv_operador_kpis"
             referencedColumns: ["company_id"]
           },
           {
@@ -993,14 +993,14 @@ export type Database = {
             foreignKeyName: "gf_assigned_carriers_carrier_id_fkey"
             columns: ["transportadora_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis"
+            referencedRelation: "v_operador_dashboard_kpis"
             referencedColumns: ["empresa_id"]
           },
           {
             foreignKeyName: "gf_assigned_carriers_carrier_id_fkey"
             columns: ["transportadora_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis_secure"
+            referencedRelation: "v_operador_dashboard_kpis_secure"
             referencedColumns: ["company_id"]
           },
           {
@@ -1014,7 +1014,7 @@ export type Database = {
             foreignKeyName: "gf_assigned_carriers_empresa_id_fkey"
             columns: ["empresa_id"]
             isOneToOne: false
-            referencedRelation: "mv_operator_kpis"
+            referencedRelation: "mv_operador_kpis"
             referencedColumns: ["company_id"]
           },
           {
@@ -1035,14 +1035,14 @@ export type Database = {
             foreignKeyName: "gf_assigned_carriers_empresa_id_fkey"
             columns: ["empresa_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis"
+            referencedRelation: "v_operador_dashboard_kpis"
             referencedColumns: ["empresa_id"]
           },
           {
             foreignKeyName: "gf_assigned_carriers_empresa_id_fkey"
             columns: ["empresa_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis_secure"
+            referencedRelation: "v_operador_dashboard_kpis_secure"
             referencedColumns: ["company_id"]
           },
         ]
@@ -1180,28 +1180,28 @@ export type Database = {
             foreignKeyName: "gf_assistance_requests_route_id_fkey"
             columns: ["route_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_costs"
+            referencedRelation: "v_operador_costs"
             referencedColumns: ["route_id"]
           },
           {
             foreignKeyName: "gf_assistance_requests_route_id_fkey"
             columns: ["route_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_costs_secure"
+            referencedRelation: "v_operador_costs_secure"
             referencedColumns: ["route_id"]
           },
           {
             foreignKeyName: "gf_assistance_requests_route_id_fkey"
             columns: ["route_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_routes"
+            referencedRelation: "v_operador_routes"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "gf_assistance_requests_route_id_fkey"
             columns: ["route_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_routes_secure"
+            referencedRelation: "v_operador_routes_secure"
             referencedColumns: ["id"]
           },
           {
@@ -1372,7 +1372,7 @@ export type Database = {
             foreignKeyName: "gf_budgets_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "mv_operator_kpis"
+            referencedRelation: "mv_operador_kpis"
             referencedColumns: ["company_id"]
           },
           {
@@ -1393,14 +1393,14 @@ export type Database = {
             foreignKeyName: "gf_budgets_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis"
+            referencedRelation: "v_operador_dashboard_kpis"
             referencedColumns: ["empresa_id"]
           },
           {
             foreignKeyName: "gf_budgets_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis_secure"
+            referencedRelation: "v_operador_dashboard_kpis_secure"
             referencedColumns: ["company_id"]
           },
           {
@@ -1459,7 +1459,7 @@ export type Database = {
             foreignKeyName: "gf_company_branding_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: true
-            referencedRelation: "mv_operator_kpis"
+            referencedRelation: "mv_operador_kpis"
             referencedColumns: ["company_id"]
           },
           {
@@ -1480,14 +1480,14 @@ export type Database = {
             foreignKeyName: "gf_company_branding_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: true
-            referencedRelation: "v_operator_dashboard_kpis"
+            referencedRelation: "v_operador_dashboard_kpis"
             referencedColumns: ["empresa_id"]
           },
           {
             foreignKeyName: "gf_company_branding_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: true
-            referencedRelation: "v_operator_dashboard_kpis_secure"
+            referencedRelation: "v_operador_dashboard_kpis_secure"
             referencedColumns: ["company_id"]
           },
         ]
@@ -1568,7 +1568,7 @@ export type Database = {
             foreignKeyName: "gf_cost_centers_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "mv_operator_kpis"
+            referencedRelation: "mv_operador_kpis"
             referencedColumns: ["company_id"]
           },
           {
@@ -1589,14 +1589,14 @@ export type Database = {
             foreignKeyName: "gf_cost_centers_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis"
+            referencedRelation: "v_operador_dashboard_kpis"
             referencedColumns: ["empresa_id"]
           },
           {
             foreignKeyName: "gf_cost_centers_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis_secure"
+            referencedRelation: "v_operador_dashboard_kpis_secure"
             referencedColumns: ["company_id"]
           },
         ]
@@ -1701,7 +1701,7 @@ export type Database = {
             foreignKeyName: "gf_costs_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "mv_operator_kpis"
+            referencedRelation: "mv_operador_kpis"
             referencedColumns: ["company_id"]
           },
           {
@@ -1722,14 +1722,14 @@ export type Database = {
             foreignKeyName: "gf_costs_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis"
+            referencedRelation: "v_operador_dashboard_kpis"
             referencedColumns: ["empresa_id"]
           },
           {
             foreignKeyName: "gf_costs_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis_secure"
+            referencedRelation: "v_operador_dashboard_kpis_secure"
             referencedColumns: ["company_id"]
           },
           {
@@ -1778,28 +1778,28 @@ export type Database = {
             foreignKeyName: "gf_costs_route_id_fkey"
             columns: ["route_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_costs"
+            referencedRelation: "v_operador_costs"
             referencedColumns: ["route_id"]
           },
           {
             foreignKeyName: "gf_costs_route_id_fkey"
             columns: ["route_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_costs_secure"
+            referencedRelation: "v_operador_costs_secure"
             referencedColumns: ["route_id"]
           },
           {
             foreignKeyName: "gf_costs_route_id_fkey"
             columns: ["route_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_routes"
+            referencedRelation: "v_operador_routes"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "gf_costs_route_id_fkey"
             columns: ["route_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_routes_secure"
+            referencedRelation: "v_operador_routes_secure"
             referencedColumns: ["id"]
           },
           {
@@ -1818,7 +1818,7 @@ export type Database = {
           },
         ]
       }
-      gf_driver_documents: {
+      gf_motorista_documents: {
         Row: {
           created_at: string | null
           document_number: string | null
@@ -2011,7 +2011,7 @@ export type Database = {
             foreignKeyName: "gf_employee_company_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "mv_operator_kpis"
+            referencedRelation: "mv_operador_kpis"
             referencedColumns: ["company_id"]
           },
           {
@@ -2032,14 +2032,14 @@ export type Database = {
             foreignKeyName: "gf_employee_company_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis"
+            referencedRelation: "v_operador_dashboard_kpis"
             referencedColumns: ["empresa_id"]
           },
           {
             foreignKeyName: "gf_employee_company_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis_secure"
+            referencedRelation: "v_operador_dashboard_kpis_secure"
             referencedColumns: ["company_id"]
           },
           {
@@ -2095,7 +2095,7 @@ export type Database = {
             foreignKeyName: "gf_holidays_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "mv_operator_kpis"
+            referencedRelation: "mv_operador_kpis"
             referencedColumns: ["company_id"]
           },
           {
@@ -2116,14 +2116,14 @@ export type Database = {
             foreignKeyName: "gf_holidays_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis"
+            referencedRelation: "v_operador_dashboard_kpis"
             referencedColumns: ["empresa_id"]
           },
           {
             foreignKeyName: "gf_holidays_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis_secure"
+            referencedRelation: "v_operador_dashboard_kpis_secure"
             referencedColumns: ["company_id"]
           },
         ]
@@ -2180,7 +2180,7 @@ export type Database = {
             foreignKeyName: "gf_incidents_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "mv_operator_kpis"
+            referencedRelation: "mv_operador_kpis"
             referencedColumns: ["company_id"]
           },
           {
@@ -2201,14 +2201,14 @@ export type Database = {
             foreignKeyName: "gf_incidents_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis"
+            referencedRelation: "v_operador_dashboard_kpis"
             referencedColumns: ["empresa_id"]
           },
           {
             foreignKeyName: "gf_incidents_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis_secure"
+            referencedRelation: "v_operador_dashboard_kpis_secure"
             referencedColumns: ["company_id"]
           },
           {
@@ -2257,28 +2257,28 @@ export type Database = {
             foreignKeyName: "gf_incidents_route_id_fkey"
             columns: ["route_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_costs"
+            referencedRelation: "v_operador_costs"
             referencedColumns: ["route_id"]
           },
           {
             foreignKeyName: "gf_incidents_route_id_fkey"
             columns: ["route_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_costs_secure"
+            referencedRelation: "v_operador_costs_secure"
             referencedColumns: ["route_id"]
           },
           {
             foreignKeyName: "gf_incidents_route_id_fkey"
             columns: ["route_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_routes"
+            referencedRelation: "v_operador_routes"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "gf_incidents_route_id_fkey"
             columns: ["route_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_routes_secure"
+            referencedRelation: "v_operador_routes_secure"
             referencedColumns: ["id"]
           },
           {
@@ -2379,28 +2379,28 @@ export type Database = {
             foreignKeyName: "gf_invoice_lines_route_id_fkey"
             columns: ["route_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_costs"
+            referencedRelation: "v_operador_costs"
             referencedColumns: ["route_id"]
           },
           {
             foreignKeyName: "gf_invoice_lines_route_id_fkey"
             columns: ["route_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_costs_secure"
+            referencedRelation: "v_operador_costs_secure"
             referencedColumns: ["route_id"]
           },
           {
             foreignKeyName: "gf_invoice_lines_route_id_fkey"
             columns: ["route_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_routes"
+            referencedRelation: "v_operador_routes"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "gf_invoice_lines_route_id_fkey"
             columns: ["route_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_routes_secure"
+            referencedRelation: "v_operador_routes_secure"
             referencedColumns: ["id"]
           },
         ]
@@ -2477,7 +2477,7 @@ export type Database = {
             foreignKeyName: "gf_invoices_carrier_id_fkey"
             columns: ["transportadora_id"]
             isOneToOne: false
-            referencedRelation: "mv_operator_kpis"
+            referencedRelation: "mv_operador_kpis"
             referencedColumns: ["company_id"]
           },
           {
@@ -2498,14 +2498,14 @@ export type Database = {
             foreignKeyName: "gf_invoices_carrier_id_fkey"
             columns: ["transportadora_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis"
+            referencedRelation: "v_operador_dashboard_kpis"
             referencedColumns: ["empresa_id"]
           },
           {
             foreignKeyName: "gf_invoices_carrier_id_fkey"
             columns: ["transportadora_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis_secure"
+            referencedRelation: "v_operador_dashboard_kpis_secure"
             referencedColumns: ["company_id"]
           },
           {
@@ -2519,7 +2519,7 @@ export type Database = {
             foreignKeyName: "gf_invoices_empresa_id_fkey"
             columns: ["empresa_id"]
             isOneToOne: false
-            referencedRelation: "mv_operator_kpis"
+            referencedRelation: "mv_operador_kpis"
             referencedColumns: ["company_id"]
           },
           {
@@ -2540,14 +2540,14 @@ export type Database = {
             foreignKeyName: "gf_invoices_empresa_id_fkey"
             columns: ["empresa_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis"
+            referencedRelation: "v_operador_dashboard_kpis"
             referencedColumns: ["empresa_id"]
           },
           {
             foreignKeyName: "gf_invoices_empresa_id_fkey"
             columns: ["empresa_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis_secure"
+            referencedRelation: "v_operador_dashboard_kpis_secure"
             referencedColumns: ["company_id"]
           },
           {
@@ -2566,7 +2566,7 @@ export type Database = {
           },
         ]
       }
-      gf_operator_audits: {
+      gf_operador_audits: {
         Row: {
           audit_type: string
           checklist_data: Json | null
@@ -2620,7 +2620,7 @@ export type Database = {
             foreignKeyName: "gf_operator_audits_empresa_id_fkey"
             columns: ["empresa_id"]
             isOneToOne: false
-            referencedRelation: "mv_operator_kpis"
+            referencedRelation: "mv_operador_kpis"
             referencedColumns: ["company_id"]
           },
           {
@@ -2641,19 +2641,19 @@ export type Database = {
             foreignKeyName: "gf_operator_audits_empresa_id_fkey"
             columns: ["empresa_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis"
+            referencedRelation: "v_operador_dashboard_kpis"
             referencedColumns: ["empresa_id"]
           },
           {
             foreignKeyName: "gf_operator_audits_empresa_id_fkey"
             columns: ["empresa_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis_secure"
+            referencedRelation: "v_operador_dashboard_kpis_secure"
             referencedColumns: ["company_id"]
           },
         ]
       }
-      gf_operator_documents: {
+      gf_operador_documents: {
         Row: {
           created_at: string | null
           created_by: string | null
@@ -2710,7 +2710,7 @@ export type Database = {
             foreignKeyName: "gf_operator_documents_empresa_id_fkey"
             columns: ["empresa_id"]
             isOneToOne: false
-            referencedRelation: "mv_operator_kpis"
+            referencedRelation: "mv_operador_kpis"
             referencedColumns: ["company_id"]
           },
           {
@@ -2731,19 +2731,19 @@ export type Database = {
             foreignKeyName: "gf_operator_documents_empresa_id_fkey"
             columns: ["empresa_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis"
+            referencedRelation: "v_operador_dashboard_kpis"
             referencedColumns: ["empresa_id"]
           },
           {
             foreignKeyName: "gf_operator_documents_empresa_id_fkey"
             columns: ["empresa_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis_secure"
+            referencedRelation: "v_operador_dashboard_kpis_secure"
             referencedColumns: ["company_id"]
           },
         ]
       }
-      gf_operator_incidents: {
+      gf_operador_incidents: {
         Row: {
           created_at: string | null
           created_by: string | null
@@ -2809,7 +2809,7 @@ export type Database = {
             foreignKeyName: "gf_operator_incidents_empresa_id_fkey"
             columns: ["empresa_id"]
             isOneToOne: false
-            referencedRelation: "mv_operator_kpis"
+            referencedRelation: "mv_operador_kpis"
             referencedColumns: ["company_id"]
           },
           {
@@ -2830,14 +2830,14 @@ export type Database = {
             foreignKeyName: "gf_operator_incidents_empresa_id_fkey"
             columns: ["empresa_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis"
+            referencedRelation: "v_operador_dashboard_kpis"
             referencedColumns: ["empresa_id"]
           },
           {
             foreignKeyName: "gf_operator_incidents_empresa_id_fkey"
             columns: ["empresa_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis_secure"
+            referencedRelation: "v_operador_dashboard_kpis_secure"
             referencedColumns: ["company_id"]
           },
           {
@@ -2872,33 +2872,33 @@ export type Database = {
             foreignKeyName: "gf_operator_incidents_route_id_fkey"
             columns: ["route_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_costs"
+            referencedRelation: "v_operador_costs"
             referencedColumns: ["route_id"]
           },
           {
             foreignKeyName: "gf_operator_incidents_route_id_fkey"
             columns: ["route_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_costs_secure"
+            referencedRelation: "v_operador_costs_secure"
             referencedColumns: ["route_id"]
           },
           {
             foreignKeyName: "gf_operator_incidents_route_id_fkey"
             columns: ["route_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_routes"
+            referencedRelation: "v_operador_routes"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "gf_operator_incidents_route_id_fkey"
             columns: ["route_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_routes_secure"
+            referencedRelation: "v_operador_routes_secure"
             referencedColumns: ["id"]
           },
         ]
       }
-      gf_operator_settings: {
+      gf_operador_settings: {
         Row: {
           created_at: string | null
           empresa_id: string
@@ -2938,7 +2938,7 @@ export type Database = {
             foreignKeyName: "gf_operator_settings_empresa_id_fkey"
             columns: ["empresa_id"]
             isOneToOne: true
-            referencedRelation: "mv_operator_kpis"
+            referencedRelation: "mv_operador_kpis"
             referencedColumns: ["company_id"]
           },
           {
@@ -2959,14 +2959,14 @@ export type Database = {
             foreignKeyName: "gf_operator_settings_empresa_id_fkey"
             columns: ["empresa_id"]
             isOneToOne: true
-            referencedRelation: "v_operator_dashboard_kpis"
+            referencedRelation: "v_operador_dashboard_kpis"
             referencedColumns: ["empresa_id"]
           },
           {
             foreignKeyName: "gf_operator_settings_empresa_id_fkey"
             columns: ["empresa_id"]
             isOneToOne: true
-            referencedRelation: "v_operator_dashboard_kpis_secure"
+            referencedRelation: "v_operador_dashboard_kpis_secure"
             referencedColumns: ["company_id"]
           },
         ]
@@ -3017,7 +3017,7 @@ export type Database = {
             foreignKeyName: "gf_report_history_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "mv_operator_kpis"
+            referencedRelation: "mv_operador_kpis"
             referencedColumns: ["company_id"]
           },
           {
@@ -3038,14 +3038,14 @@ export type Database = {
             foreignKeyName: "gf_report_history_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis"
+            referencedRelation: "v_operador_dashboard_kpis"
             referencedColumns: ["empresa_id"]
           },
           {
             foreignKeyName: "gf_report_history_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis_secure"
+            referencedRelation: "v_operador_dashboard_kpis_secure"
             referencedColumns: ["company_id"]
           },
           {
@@ -3103,7 +3103,7 @@ export type Database = {
             foreignKeyName: "gf_report_schedules_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "mv_operator_kpis"
+            referencedRelation: "mv_operador_kpis"
             referencedColumns: ["company_id"]
           },
           {
@@ -3124,14 +3124,14 @@ export type Database = {
             foreignKeyName: "gf_report_schedules_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis"
+            referencedRelation: "v_operador_dashboard_kpis"
             referencedColumns: ["empresa_id"]
           },
           {
             foreignKeyName: "gf_report_schedules_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis_secure"
+            referencedRelation: "v_operador_dashboard_kpis_secure"
             referencedColumns: ["company_id"]
           },
           {
@@ -3215,28 +3215,28 @@ export type Database = {
             foreignKeyName: "gf_route_optimization_cache_route_id_fkey"
             columns: ["route_id"]
             isOneToOne: true
-            referencedRelation: "v_operator_costs"
+            referencedRelation: "v_operador_costs"
             referencedColumns: ["route_id"]
           },
           {
             foreignKeyName: "gf_route_optimization_cache_route_id_fkey"
             columns: ["route_id"]
             isOneToOne: true
-            referencedRelation: "v_operator_costs_secure"
+            referencedRelation: "v_operador_costs_secure"
             referencedColumns: ["route_id"]
           },
           {
             foreignKeyName: "gf_route_optimization_cache_route_id_fkey"
             columns: ["route_id"]
             isOneToOne: true
-            referencedRelation: "v_operator_routes"
+            referencedRelation: "v_operador_routes"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "gf_route_optimization_cache_route_id_fkey"
             columns: ["route_id"]
             isOneToOne: true
-            referencedRelation: "v_operator_routes_secure"
+            referencedRelation: "v_operador_routes_secure"
             referencedColumns: ["id"]
           },
         ]
@@ -3338,28 +3338,28 @@ export type Database = {
             foreignKeyName: "gf_route_plan_route_id_fkey"
             columns: ["route_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_costs"
+            referencedRelation: "v_operador_costs"
             referencedColumns: ["route_id"]
           },
           {
             foreignKeyName: "gf_route_plan_route_id_fkey"
             columns: ["route_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_costs_secure"
+            referencedRelation: "v_operador_costs_secure"
             referencedColumns: ["route_id"]
           },
           {
             foreignKeyName: "gf_route_plan_route_id_fkey"
             columns: ["route_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_routes"
+            referencedRelation: "v_operador_routes"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "gf_route_plan_route_id_fkey"
             columns: ["route_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_routes_secure"
+            referencedRelation: "v_operador_routes_secure"
             referencedColumns: ["id"]
           },
         ]
@@ -3450,7 +3450,7 @@ export type Database = {
             foreignKeyName: "gf_service_requests_empresa_id_fkey"
             columns: ["empresa_id"]
             isOneToOne: false
-            referencedRelation: "mv_operator_kpis"
+            referencedRelation: "mv_operador_kpis"
             referencedColumns: ["company_id"]
           },
           {
@@ -3471,14 +3471,14 @@ export type Database = {
             foreignKeyName: "gf_service_requests_empresa_id_fkey"
             columns: ["empresa_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis"
+            referencedRelation: "v_operador_dashboard_kpis"
             referencedColumns: ["empresa_id"]
           },
           {
             foreignKeyName: "gf_service_requests_empresa_id_fkey"
             columns: ["empresa_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis_secure"
+            referencedRelation: "v_operador_dashboard_kpis_secure"
             referencedColumns: ["company_id"]
           },
         ]
@@ -3511,7 +3511,7 @@ export type Database = {
             foreignKeyName: "gf_user_company_map_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "mv_operator_kpis"
+            referencedRelation: "mv_operador_kpis"
             referencedColumns: ["company_id"]
           },
           {
@@ -3532,14 +3532,14 @@ export type Database = {
             foreignKeyName: "gf_user_company_map_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis"
+            referencedRelation: "v_operador_dashboard_kpis"
             referencedColumns: ["empresa_id"]
           },
           {
             foreignKeyName: "gf_user_company_map_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis_secure"
+            referencedRelation: "v_operador_dashboard_kpis_secure"
             referencedColumns: ["company_id"]
           },
         ]
@@ -3607,7 +3607,7 @@ export type Database = {
           },
         ]
       }
-      gf_vehicle_checklists: {
+      gf_veiculo_checklists: {
         Row: {
           created_at: string | null
           driver_id: string | null
@@ -3737,28 +3737,28 @@ export type Database = {
             foreignKeyName: "gf_vehicle_costs_route_id_fkey"
             columns: ["route_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_costs"
+            referencedRelation: "v_operador_costs"
             referencedColumns: ["route_id"]
           },
           {
             foreignKeyName: "gf_vehicle_costs_route_id_fkey"
             columns: ["route_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_costs_secure"
+            referencedRelation: "v_operador_costs_secure"
             referencedColumns: ["route_id"]
           },
           {
             foreignKeyName: "gf_vehicle_costs_route_id_fkey"
             columns: ["route_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_routes"
+            referencedRelation: "v_operador_routes"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "gf_vehicle_costs_route_id_fkey"
             columns: ["route_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_routes_secure"
+            referencedRelation: "v_operador_routes_secure"
             referencedColumns: ["id"]
           },
           {
@@ -4048,28 +4048,28 @@ export type Database = {
             foreignKeyName: "route_costs_route_id_fkey"
             columns: ["route_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_costs"
+            referencedRelation: "v_operador_costs"
             referencedColumns: ["route_id"]
           },
           {
             foreignKeyName: "route_costs_route_id_fkey"
             columns: ["route_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_costs_secure"
+            referencedRelation: "v_operador_costs_secure"
             referencedColumns: ["route_id"]
           },
           {
             foreignKeyName: "route_costs_route_id_fkey"
             columns: ["route_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_routes"
+            referencedRelation: "v_operador_routes"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "route_costs_route_id_fkey"
             columns: ["route_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_routes_secure"
+            referencedRelation: "v_operador_routes_secure"
             referencedColumns: ["id"]
           },
           {
@@ -4142,28 +4142,28 @@ export type Database = {
             foreignKeyName: "route_stops_route_id_fkey"
             columns: ["route_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_costs"
+            referencedRelation: "v_operador_costs"
             referencedColumns: ["route_id"]
           },
           {
             foreignKeyName: "route_stops_route_id_fkey"
             columns: ["route_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_costs_secure"
+            referencedRelation: "v_operador_costs_secure"
             referencedColumns: ["route_id"]
           },
           {
             foreignKeyName: "route_stops_route_id_fkey"
             columns: ["route_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_routes"
+            referencedRelation: "v_operador_routes"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "route_stops_route_id_fkey"
             columns: ["route_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_routes_secure"
+            referencedRelation: "v_operador_routes_secure"
             referencedColumns: ["id"]
           },
         ]
@@ -4212,7 +4212,7 @@ export type Database = {
             foreignKeyName: "routes_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "mv_operator_kpis"
+            referencedRelation: "mv_operador_kpis"
             referencedColumns: ["company_id"]
           },
           {
@@ -4233,14 +4233,14 @@ export type Database = {
             foreignKeyName: "routes_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis"
+            referencedRelation: "v_operador_dashboard_kpis"
             referencedColumns: ["empresa_id"]
           },
           {
             foreignKeyName: "routes_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis_secure"
+            referencedRelation: "v_operador_dashboard_kpis_secure"
             referencedColumns: ["company_id"]
           },
         ]
@@ -4314,7 +4314,7 @@ export type Database = {
           },
         ]
       }
-      trip_passengers: {
+      trip_passageiros: {
         Row: {
           passenger_id: string
           trip_id: string
@@ -4508,28 +4508,28 @@ export type Database = {
             foreignKeyName: "trips_route_id_fkey"
             columns: ["route_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_costs"
+            referencedRelation: "v_operador_costs"
             referencedColumns: ["route_id"]
           },
           {
             foreignKeyName: "trips_route_id_fkey"
             columns: ["route_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_costs_secure"
+            referencedRelation: "v_operador_costs_secure"
             referencedColumns: ["route_id"]
           },
           {
             foreignKeyName: "trips_route_id_fkey"
             columns: ["route_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_routes"
+            referencedRelation: "v_operador_routes"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "trips_route_id_fkey"
             columns: ["route_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_routes_secure"
+            referencedRelation: "v_operador_routes_secure"
             referencedColumns: ["id"]
           },
           {
@@ -4637,7 +4637,7 @@ export type Database = {
             foreignKeyName: "users_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "mv_operator_kpis"
+            referencedRelation: "mv_operador_kpis"
             referencedColumns: ["company_id"]
           },
           {
@@ -4658,14 +4658,14 @@ export type Database = {
             foreignKeyName: "users_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis"
+            referencedRelation: "v_operador_dashboard_kpis"
             referencedColumns: ["empresa_id"]
           },
           {
             foreignKeyName: "users_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis_secure"
+            referencedRelation: "v_operador_dashboard_kpis_secure"
             referencedColumns: ["company_id"]
           },
         ]
@@ -4766,7 +4766,7 @@ export type Database = {
           status: string | null
           updated_at: string | null
           value_brl: number | null
-          vehicle_id: string
+          veiculo_id: string
         }
         Insert: {
           created_at?: string | null
@@ -4783,7 +4783,7 @@ export type Database = {
           status?: string | null
           updated_at?: string | null
           value_brl?: number | null
-          vehicle_id: string
+          veiculo_id: string
         }
         Update: {
           created_at?: string | null
@@ -4800,7 +4800,7 @@ export type Database = {
           status?: string | null
           updated_at?: string | null
           value_brl?: number | null
-          vehicle_id?: string
+          veiculo_id?: string
         }
         Relationships: [
           {
@@ -4836,7 +4836,7 @@ export type Database = {
           status: string | null
           total_cost_brl: number | null
           updated_at: string | null
-          vehicle_id: string
+          veiculo_id: string
           workshop_name: string | null
         }
         Insert: {
@@ -4855,7 +4855,7 @@ export type Database = {
           status?: string | null
           total_cost_brl?: number | null
           updated_at?: string | null
-          vehicle_id: string
+          veiculo_id: string
           workshop_name?: string | null
         }
         Update: {
@@ -4874,20 +4874,20 @@ export type Database = {
           status?: string | null
           total_cost_brl?: number | null
           updated_at?: string | null
-          vehicle_id?: string
+          veiculo_id?: string
           workshop_name?: string | null
         }
         Relationships: [
           {
             foreignKeyName: "vehicle_maintenances_vehicle_id_fkey"
-            columns: ["vehicle_id"]
+            columns: ["veiculo_id"]
             isOneToOne: false
             referencedRelation: "v_carrier_vehicle_costs_summary"
             referencedColumns: ["vehicle_id"]
           },
           {
             foreignKeyName: "vehicle_maintenances_vehicle_id_fkey"
-            columns: ["vehicle_id"]
+            columns: ["veiculo_id"]
             isOneToOne: false
             referencedRelation: "veiculos"
             referencedColumns: ["id"]
@@ -4970,7 +4970,7 @@ export type Database = {
             foreignKeyName: "fk_vehicles_company"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "mv_operator_kpis"
+            referencedRelation: "mv_operador_kpis"
             referencedColumns: ["company_id"]
           },
           {
@@ -4991,14 +4991,14 @@ export type Database = {
             foreignKeyName: "fk_vehicles_company"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis"
+            referencedRelation: "v_operador_dashboard_kpis"
             referencedColumns: ["empresa_id"]
           },
           {
             foreignKeyName: "fk_vehicles_company"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis_secure"
+            referencedRelation: "v_operador_dashboard_kpis_secure"
             referencedColumns: ["company_id"]
           },
           {
@@ -5048,7 +5048,7 @@ export type Database = {
             foreignKeyName: "gf_costs_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "mv_operator_kpis"
+            referencedRelation: "mv_operador_kpis"
             referencedColumns: ["company_id"]
           },
           {
@@ -5069,19 +5069,19 @@ export type Database = {
             foreignKeyName: "gf_costs_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis"
+            referencedRelation: "v_operador_dashboard_kpis"
             referencedColumns: ["empresa_id"]
           },
           {
             foreignKeyName: "gf_costs_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis_secure"
+            referencedRelation: "v_operador_dashboard_kpis_secure"
             referencedColumns: ["company_id"]
           },
         ]
       }
-      mv_operator_kpis: {
+      mv_operador_kpis: {
         Row: {
           avg_occupancy: number | null
           company_id: string | null
@@ -5138,7 +5138,7 @@ export type Database = {
             foreignKeyName: "users_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "mv_operator_kpis"
+            referencedRelation: "mv_operador_kpis"
             referencedColumns: ["company_id"]
           },
           {
@@ -5159,14 +5159,14 @@ export type Database = {
             foreignKeyName: "users_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis"
+            referencedRelation: "v_operador_dashboard_kpis"
             referencedColumns: ["empresa_id"]
           },
           {
             foreignKeyName: "users_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis_secure"
+            referencedRelation: "v_operador_dashboard_kpis_secure"
             referencedColumns: ["company_id"]
           },
         ]
@@ -5209,7 +5209,7 @@ export type Database = {
             foreignKeyName: "routes_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "mv_operator_kpis"
+            referencedRelation: "mv_operador_kpis"
             referencedColumns: ["company_id"]
           },
           {
@@ -5230,14 +5230,14 @@ export type Database = {
             foreignKeyName: "routes_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis"
+            referencedRelation: "v_operador_dashboard_kpis"
             referencedColumns: ["empresa_id"]
           },
           {
             foreignKeyName: "routes_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis_secure"
+            referencedRelation: "v_operador_dashboard_kpis_secure"
             referencedColumns: ["company_id"]
           },
           {
@@ -5272,28 +5272,28 @@ export type Database = {
             foreignKeyName: "trips_route_id_fkey"
             columns: ["route_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_costs"
+            referencedRelation: "v_operador_costs"
             referencedColumns: ["route_id"]
           },
           {
             foreignKeyName: "trips_route_id_fkey"
             columns: ["route_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_costs_secure"
+            referencedRelation: "v_operador_costs_secure"
             referencedColumns: ["route_id"]
           },
           {
             foreignKeyName: "trips_route_id_fkey"
             columns: ["route_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_routes"
+            referencedRelation: "v_operador_routes"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "trips_route_id_fkey"
             columns: ["route_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_routes_secure"
+            referencedRelation: "v_operador_routes_secure"
             referencedColumns: ["id"]
           },
           {
@@ -5375,7 +5375,7 @@ export type Database = {
             foreignKeyName: "routes_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "mv_operator_kpis"
+            referencedRelation: "mv_operador_kpis"
             referencedColumns: ["company_id"]
           },
           {
@@ -5396,14 +5396,14 @@ export type Database = {
             foreignKeyName: "routes_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis"
+            referencedRelation: "v_operador_dashboard_kpis"
             referencedColumns: ["empresa_id"]
           },
           {
             foreignKeyName: "routes_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis_secure"
+            referencedRelation: "v_operador_dashboard_kpis_secure"
             referencedColumns: ["company_id"]
           },
         ]
@@ -5460,7 +5460,7 @@ export type Database = {
             foreignKeyName: "gf_costs_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "mv_operator_kpis"
+            referencedRelation: "mv_operador_kpis"
             referencedColumns: ["company_id"]
           },
           {
@@ -5481,14 +5481,14 @@ export type Database = {
             foreignKeyName: "gf_costs_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis"
+            referencedRelation: "v_operador_dashboard_kpis"
             referencedColumns: ["empresa_id"]
           },
           {
             foreignKeyName: "gf_costs_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis_secure"
+            referencedRelation: "v_operador_dashboard_kpis_secure"
             referencedColumns: ["company_id"]
           },
         ]
@@ -5523,7 +5523,7 @@ export type Database = {
             foreignKeyName: "gf_costs_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "mv_operator_kpis"
+            referencedRelation: "mv_operador_kpis"
             referencedColumns: ["company_id"]
           },
           {
@@ -5544,14 +5544,14 @@ export type Database = {
             foreignKeyName: "gf_costs_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis"
+            referencedRelation: "v_operador_dashboard_kpis"
             referencedColumns: ["empresa_id"]
           },
           {
             foreignKeyName: "gf_costs_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis_secure"
+            referencedRelation: "v_operador_dashboard_kpis_secure"
             referencedColumns: ["company_id"]
           },
           {
@@ -5572,28 +5572,28 @@ export type Database = {
             foreignKeyName: "gf_costs_route_id_fkey"
             columns: ["route_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_costs"
+            referencedRelation: "v_operador_costs"
             referencedColumns: ["route_id"]
           },
           {
             foreignKeyName: "gf_costs_route_id_fkey"
             columns: ["route_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_costs_secure"
+            referencedRelation: "v_operador_costs_secure"
             referencedColumns: ["route_id"]
           },
           {
             foreignKeyName: "gf_costs_route_id_fkey"
             columns: ["route_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_routes"
+            referencedRelation: "v_operador_routes"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "gf_costs_route_id_fkey"
             columns: ["route_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_routes_secure"
+            referencedRelation: "v_operador_routes_secure"
             referencedColumns: ["id"]
           },
           {
@@ -5634,7 +5634,7 @@ export type Database = {
             foreignKeyName: "gf_costs_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "mv_operator_kpis"
+            referencedRelation: "mv_operador_kpis"
             referencedColumns: ["company_id"]
           },
           {
@@ -5655,14 +5655,14 @@ export type Database = {
             foreignKeyName: "gf_costs_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis"
+            referencedRelation: "v_operador_dashboard_kpis"
             referencedColumns: ["empresa_id"]
           },
           {
             foreignKeyName: "gf_costs_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis_secure"
+            referencedRelation: "v_operador_dashboard_kpis_secure"
             referencedColumns: ["company_id"]
           },
         ]
@@ -5733,7 +5733,7 @@ export type Database = {
             foreignKeyName: "gf_costs_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "mv_operator_kpis"
+            referencedRelation: "mv_operador_kpis"
             referencedColumns: ["company_id"]
           },
           {
@@ -5754,14 +5754,14 @@ export type Database = {
             foreignKeyName: "gf_costs_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis"
+            referencedRelation: "v_operador_dashboard_kpis"
             referencedColumns: ["empresa_id"]
           },
           {
             foreignKeyName: "gf_costs_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis_secure"
+            referencedRelation: "v_operador_dashboard_kpis_secure"
             referencedColumns: ["company_id"]
           },
           {
@@ -5810,28 +5810,28 @@ export type Database = {
             foreignKeyName: "gf_costs_route_id_fkey"
             columns: ["route_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_costs"
+            referencedRelation: "v_operador_costs"
             referencedColumns: ["route_id"]
           },
           {
             foreignKeyName: "gf_costs_route_id_fkey"
             columns: ["route_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_costs_secure"
+            referencedRelation: "v_operador_costs_secure"
             referencedColumns: ["route_id"]
           },
           {
             foreignKeyName: "gf_costs_route_id_fkey"
             columns: ["route_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_routes"
+            referencedRelation: "v_operador_routes"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "gf_costs_route_id_fkey"
             columns: ["route_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_routes_secure"
+            referencedRelation: "v_operador_routes_secure"
             referencedColumns: ["id"]
           },
           {
@@ -5926,7 +5926,7 @@ export type Database = {
         }
         Relationships: []
       }
-      v_operator_alerts: {
+      v_operador_alerts: {
         Row: {
           created_at: string | null
           empresa_id: string | null
@@ -5960,7 +5960,7 @@ export type Database = {
             foreignKeyName: "gf_alerts_company_id_fkey"
             columns: ["empresa_id"]
             isOneToOne: false
-            referencedRelation: "mv_operator_kpis"
+            referencedRelation: "mv_operador_kpis"
             referencedColumns: ["company_id"]
           },
           {
@@ -5981,19 +5981,19 @@ export type Database = {
             foreignKeyName: "gf_alerts_company_id_fkey"
             columns: ["empresa_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis"
+            referencedRelation: "v_operador_dashboard_kpis"
             referencedColumns: ["empresa_id"]
           },
           {
             foreignKeyName: "gf_alerts_company_id_fkey"
             columns: ["empresa_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis_secure"
+            referencedRelation: "v_operador_dashboard_kpis_secure"
             referencedColumns: ["company_id"]
           },
         ]
       }
-      v_operator_alerts_secure: {
+      v_operador_alerts_secure: {
         Row: {
           company_id: string | null
           created_at: string | null
@@ -6033,7 +6033,7 @@ export type Database = {
             foreignKeyName: "gf_alerts_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "mv_operator_kpis"
+            referencedRelation: "mv_operador_kpis"
             referencedColumns: ["company_id"]
           },
           {
@@ -6054,19 +6054,19 @@ export type Database = {
             foreignKeyName: "gf_alerts_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis"
+            referencedRelation: "v_operador_dashboard_kpis"
             referencedColumns: ["empresa_id"]
           },
           {
             foreignKeyName: "gf_alerts_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis_secure"
+            referencedRelation: "v_operador_dashboard_kpis_secure"
             referencedColumns: ["company_id"]
           },
         ]
       }
-      v_operator_costs: {
+      v_operador_costs: {
         Row: {
           empresa_id: string | null
           period: string | null
@@ -6091,7 +6091,7 @@ export type Database = {
             foreignKeyName: "routes_company_id_fkey"
             columns: ["empresa_id"]
             isOneToOne: false
-            referencedRelation: "mv_operator_kpis"
+            referencedRelation: "mv_operador_kpis"
             referencedColumns: ["company_id"]
           },
           {
@@ -6112,19 +6112,19 @@ export type Database = {
             foreignKeyName: "routes_company_id_fkey"
             columns: ["empresa_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis"
+            referencedRelation: "v_operador_dashboard_kpis"
             referencedColumns: ["empresa_id"]
           },
           {
             foreignKeyName: "routes_company_id_fkey"
             columns: ["empresa_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis_secure"
+            referencedRelation: "v_operador_dashboard_kpis_secure"
             referencedColumns: ["company_id"]
           },
         ]
       }
-      v_operator_costs_secure: {
+      v_operador_costs_secure: {
         Row: {
           company_id: string | null
           period: string | null
@@ -6149,7 +6149,7 @@ export type Database = {
             foreignKeyName: "routes_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "mv_operator_kpis"
+            referencedRelation: "mv_operador_kpis"
             referencedColumns: ["company_id"]
           },
           {
@@ -6170,19 +6170,19 @@ export type Database = {
             foreignKeyName: "routes_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis"
+            referencedRelation: "v_operador_dashboard_kpis"
             referencedColumns: ["empresa_id"]
           },
           {
             foreignKeyName: "routes_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis_secure"
+            referencedRelation: "v_operador_dashboard_kpis_secure"
             referencedColumns: ["company_id"]
           },
         ]
       }
-      v_operator_dashboard_kpis: {
+      v_operador_dashboard_kpis: {
         Row: {
           avg_occupancy: number | null
           daily_cost: number | null
@@ -6195,7 +6195,7 @@ export type Database = {
         }
         Relationships: []
       }
-      v_operator_dashboard_kpis_secure: {
+      v_operador_dashboard_kpis_secure: {
         Row: {
           avg_occupancy: number | null
           company_id: string | null
@@ -6260,7 +6260,7 @@ export type Database = {
             foreignKeyName: "gf_employee_company_company_id_fkey"
             columns: ["empresa_id"]
             isOneToOne: false
-            referencedRelation: "mv_operator_kpis"
+            referencedRelation: "mv_operador_kpis"
             referencedColumns: ["company_id"]
           },
           {
@@ -6281,14 +6281,14 @@ export type Database = {
             foreignKeyName: "gf_employee_company_company_id_fkey"
             columns: ["empresa_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis"
+            referencedRelation: "v_operador_dashboard_kpis"
             referencedColumns: ["empresa_id"]
           },
           {
             foreignKeyName: "gf_employee_company_company_id_fkey"
             columns: ["empresa_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis_secure"
+            referencedRelation: "v_operador_dashboard_kpis_secure"
             referencedColumns: ["company_id"]
           },
         ]
@@ -6348,7 +6348,7 @@ export type Database = {
             foreignKeyName: "gf_employee_company_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "mv_operator_kpis"
+            referencedRelation: "mv_operador_kpis"
             referencedColumns: ["company_id"]
           },
           {
@@ -6369,14 +6369,14 @@ export type Database = {
             foreignKeyName: "gf_employee_company_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis"
+            referencedRelation: "v_operador_dashboard_kpis"
             referencedColumns: ["empresa_id"]
           },
           {
             foreignKeyName: "gf_employee_company_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis_secure"
+            referencedRelation: "v_operador_dashboard_kpis_secure"
             referencedColumns: ["company_id"]
           },
         ]
@@ -6437,7 +6437,7 @@ export type Database = {
             foreignKeyName: "gf_service_requests_empresa_id_fkey"
             columns: ["empresa_id"]
             isOneToOne: false
-            referencedRelation: "mv_operator_kpis"
+            referencedRelation: "mv_operador_kpis"
             referencedColumns: ["company_id"]
           },
           {
@@ -6458,19 +6458,19 @@ export type Database = {
             foreignKeyName: "gf_service_requests_empresa_id_fkey"
             columns: ["empresa_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis"
+            referencedRelation: "v_operador_dashboard_kpis"
             referencedColumns: ["empresa_id"]
           },
           {
             foreignKeyName: "gf_service_requests_empresa_id_fkey"
             columns: ["empresa_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis_secure"
+            referencedRelation: "v_operador_dashboard_kpis_secure"
             referencedColumns: ["company_id"]
           },
         ]
       }
-      v_operator_routes: {
+      v_operador_routes: {
         Row: {
           avg_delay_minutes: number | null
           carrier_name: string | null
@@ -6492,7 +6492,7 @@ export type Database = {
             foreignKeyName: "routes_company_id_fkey"
             columns: ["empresa_id"]
             isOneToOne: false
-            referencedRelation: "mv_operator_kpis"
+            referencedRelation: "mv_operador_kpis"
             referencedColumns: ["company_id"]
           },
           {
@@ -6513,19 +6513,19 @@ export type Database = {
             foreignKeyName: "routes_company_id_fkey"
             columns: ["empresa_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis"
+            referencedRelation: "v_operador_dashboard_kpis"
             referencedColumns: ["empresa_id"]
           },
           {
             foreignKeyName: "routes_company_id_fkey"
             columns: ["empresa_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis_secure"
+            referencedRelation: "v_operador_dashboard_kpis_secure"
             referencedColumns: ["company_id"]
           },
         ]
       }
-      v_operator_routes_secure: {
+      v_operador_routes_secure: {
         Row: {
           avg_delay_minutes: number | null
           company_id: string | null
@@ -6555,7 +6555,7 @@ export type Database = {
             foreignKeyName: "routes_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "mv_operator_kpis"
+            referencedRelation: "mv_operador_kpis"
             referencedColumns: ["company_id"]
           },
           {
@@ -6576,14 +6576,14 @@ export type Database = {
             foreignKeyName: "routes_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis"
+            referencedRelation: "v_operador_dashboard_kpis"
             referencedColumns: ["empresa_id"]
           },
           {
             foreignKeyName: "routes_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis_secure"
+            referencedRelation: "v_operador_dashboard_kpis_secure"
             referencedColumns: ["company_id"]
           },
         ]
@@ -6608,7 +6608,7 @@ export type Database = {
             foreignKeyName: "routes_company_id_fkey"
             columns: ["empresa_id"]
             isOneToOne: false
-            referencedRelation: "mv_operator_kpis"
+            referencedRelation: "mv_operador_kpis"
             referencedColumns: ["company_id"]
           },
           {
@@ -6629,14 +6629,14 @@ export type Database = {
             foreignKeyName: "routes_company_id_fkey"
             columns: ["empresa_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis"
+            referencedRelation: "v_operador_dashboard_kpis"
             referencedColumns: ["empresa_id"]
           },
           {
             foreignKeyName: "routes_company_id_fkey"
             columns: ["empresa_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis_secure"
+            referencedRelation: "v_operador_dashboard_kpis_secure"
             referencedColumns: ["company_id"]
           },
         ]
@@ -6666,7 +6666,7 @@ export type Database = {
             foreignKeyName: "routes_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "mv_operator_kpis"
+            referencedRelation: "mv_operador_kpis"
             referencedColumns: ["company_id"]
           },
           {
@@ -6687,14 +6687,14 @@ export type Database = {
             foreignKeyName: "routes_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis"
+            referencedRelation: "v_operador_dashboard_kpis"
             referencedColumns: ["empresa_id"]
           },
           {
             foreignKeyName: "routes_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis_secure"
+            referencedRelation: "v_operador_dashboard_kpis_secure"
             referencedColumns: ["company_id"]
           },
           {
@@ -6729,28 +6729,28 @@ export type Database = {
             foreignKeyName: "trips_route_id_fkey"
             columns: ["route_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_costs"
+            referencedRelation: "v_operador_costs"
             referencedColumns: ["route_id"]
           },
           {
             foreignKeyName: "trips_route_id_fkey"
             columns: ["route_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_costs_secure"
+            referencedRelation: "v_operador_costs_secure"
             referencedColumns: ["route_id"]
           },
           {
             foreignKeyName: "trips_route_id_fkey"
             columns: ["route_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_routes"
+            referencedRelation: "v_operador_routes"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "trips_route_id_fkey"
             columns: ["route_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_routes_secure"
+            referencedRelation: "v_operador_routes_secure"
             referencedColumns: ["id"]
           },
         ]
@@ -6775,7 +6775,7 @@ export type Database = {
             foreignKeyName: "routes_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "mv_operator_kpis"
+            referencedRelation: "mv_operador_kpis"
             referencedColumns: ["company_id"]
           },
           {
@@ -6796,14 +6796,14 @@ export type Database = {
             foreignKeyName: "routes_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis"
+            referencedRelation: "v_operador_dashboard_kpis"
             referencedColumns: ["empresa_id"]
           },
           {
             foreignKeyName: "routes_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis_secure"
+            referencedRelation: "v_operador_dashboard_kpis_secure"
             referencedColumns: ["company_id"]
           },
         ]
@@ -6831,7 +6831,7 @@ export type Database = {
             foreignKeyName: "routes_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "mv_operator_kpis"
+            referencedRelation: "mv_operador_kpis"
             referencedColumns: ["company_id"]
           },
           {
@@ -6852,14 +6852,14 @@ export type Database = {
             foreignKeyName: "routes_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis"
+            referencedRelation: "v_operador_dashboard_kpis"
             referencedColumns: ["empresa_id"]
           },
           {
             foreignKeyName: "routes_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis_secure"
+            referencedRelation: "v_operador_dashboard_kpis_secure"
             referencedColumns: ["company_id"]
           },
           {
@@ -6902,7 +6902,7 @@ export type Database = {
             foreignKeyName: "routes_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "mv_operator_kpis"
+            referencedRelation: "mv_operador_kpis"
             referencedColumns: ["company_id"]
           },
           {
@@ -6923,14 +6923,14 @@ export type Database = {
             foreignKeyName: "routes_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis"
+            referencedRelation: "v_operador_dashboard_kpis"
             referencedColumns: ["empresa_id"]
           },
           {
             foreignKeyName: "routes_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis_secure"
+            referencedRelation: "v_operador_dashboard_kpis_secure"
             referencedColumns: ["company_id"]
           },
           {
@@ -6951,28 +6951,28 @@ export type Database = {
             foreignKeyName: "trips_route_id_fkey"
             columns: ["route_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_costs"
+            referencedRelation: "v_operador_costs"
             referencedColumns: ["route_id"]
           },
           {
             foreignKeyName: "trips_route_id_fkey"
             columns: ["route_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_costs_secure"
+            referencedRelation: "v_operador_costs_secure"
             referencedColumns: ["route_id"]
           },
           {
             foreignKeyName: "trips_route_id_fkey"
             columns: ["route_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_routes"
+            referencedRelation: "v_operador_routes"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "trips_route_id_fkey"
             columns: ["route_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_routes_secure"
+            referencedRelation: "v_operador_routes_secure"
             referencedColumns: ["id"]
           },
         ]
@@ -6997,7 +6997,7 @@ export type Database = {
             foreignKeyName: "routes_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "mv_operator_kpis"
+            referencedRelation: "mv_operador_kpis"
             referencedColumns: ["company_id"]
           },
           {
@@ -7018,14 +7018,14 @@ export type Database = {
             foreignKeyName: "routes_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis"
+            referencedRelation: "v_operador_dashboard_kpis"
             referencedColumns: ["empresa_id"]
           },
           {
             foreignKeyName: "routes_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis_secure"
+            referencedRelation: "v_operador_dashboard_kpis_secure"
             referencedColumns: ["company_id"]
           },
         ]
@@ -7053,7 +7053,7 @@ export type Database = {
             foreignKeyName: "routes_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "mv_operator_kpis"
+            referencedRelation: "mv_operador_kpis"
             referencedColumns: ["company_id"]
           },
           {
@@ -7074,14 +7074,14 @@ export type Database = {
             foreignKeyName: "routes_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis"
+            referencedRelation: "v_operador_dashboard_kpis"
             referencedColumns: ["empresa_id"]
           },
           {
             foreignKeyName: "routes_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis_secure"
+            referencedRelation: "v_operador_dashboard_kpis_secure"
             referencedColumns: ["company_id"]
           },
           {
@@ -7116,28 +7116,28 @@ export type Database = {
             foreignKeyName: "trips_route_id_fkey"
             columns: ["route_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_costs"
+            referencedRelation: "v_operador_costs"
             referencedColumns: ["route_id"]
           },
           {
             foreignKeyName: "trips_route_id_fkey"
             columns: ["route_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_costs_secure"
+            referencedRelation: "v_operador_costs_secure"
             referencedColumns: ["route_id"]
           },
           {
             foreignKeyName: "trips_route_id_fkey"
             columns: ["route_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_routes"
+            referencedRelation: "v_operador_routes"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "trips_route_id_fkey"
             columns: ["route_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_routes_secure"
+            referencedRelation: "v_operador_routes_secure"
             referencedColumns: ["id"]
           },
         ]
@@ -7160,7 +7160,7 @@ export type Database = {
             foreignKeyName: "routes_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "mv_operator_kpis"
+            referencedRelation: "mv_operador_kpis"
             referencedColumns: ["company_id"]
           },
           {
@@ -7181,14 +7181,14 @@ export type Database = {
             foreignKeyName: "routes_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis"
+            referencedRelation: "v_operador_dashboard_kpis"
             referencedColumns: ["empresa_id"]
           },
           {
             foreignKeyName: "routes_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis_secure"
+            referencedRelation: "v_operador_dashboard_kpis_secure"
             referencedColumns: ["company_id"]
           },
         ]
@@ -7216,7 +7216,7 @@ export type Database = {
             foreignKeyName: "routes_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "mv_operator_kpis"
+            referencedRelation: "mv_operador_kpis"
             referencedColumns: ["company_id"]
           },
           {
@@ -7237,14 +7237,14 @@ export type Database = {
             foreignKeyName: "routes_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis"
+            referencedRelation: "v_operador_dashboard_kpis"
             referencedColumns: ["empresa_id"]
           },
           {
             foreignKeyName: "routes_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis_secure"
+            referencedRelation: "v_operador_dashboard_kpis_secure"
             referencedColumns: ["company_id"]
           },
           {
@@ -7265,28 +7265,28 @@ export type Database = {
             foreignKeyName: "trips_route_id_fkey"
             columns: ["route_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_costs"
+            referencedRelation: "v_operador_costs"
             referencedColumns: ["route_id"]
           },
           {
             foreignKeyName: "trips_route_id_fkey"
             columns: ["route_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_costs_secure"
+            referencedRelation: "v_operador_costs_secure"
             referencedColumns: ["route_id"]
           },
           {
             foreignKeyName: "trips_route_id_fkey"
             columns: ["route_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_routes"
+            referencedRelation: "v_operador_routes"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "trips_route_id_fkey"
             columns: ["route_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_routes_secure"
+            referencedRelation: "v_operador_routes_secure"
             referencedColumns: ["id"]
           },
         ]
@@ -7310,7 +7310,7 @@ export type Database = {
             foreignKeyName: "routes_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "mv_operator_kpis"
+            referencedRelation: "mv_operador_kpis"
             referencedColumns: ["company_id"]
           },
           {
@@ -7331,14 +7331,14 @@ export type Database = {
             foreignKeyName: "routes_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis"
+            referencedRelation: "v_operador_dashboard_kpis"
             referencedColumns: ["empresa_id"]
           },
           {
             foreignKeyName: "routes_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis_secure"
+            referencedRelation: "v_operador_dashboard_kpis_secure"
             referencedColumns: ["company_id"]
           },
         ]
@@ -7364,7 +7364,7 @@ export type Database = {
             foreignKeyName: "routes_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "mv_operator_kpis"
+            referencedRelation: "mv_operador_kpis"
             referencedColumns: ["company_id"]
           },
           {
@@ -7385,14 +7385,14 @@ export type Database = {
             foreignKeyName: "routes_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis"
+            referencedRelation: "v_operador_dashboard_kpis"
             referencedColumns: ["empresa_id"]
           },
           {
             foreignKeyName: "routes_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_dashboard_kpis_secure"
+            referencedRelation: "v_operador_dashboard_kpis_secure"
             referencedColumns: ["company_id"]
           },
         ]
@@ -7467,28 +7467,28 @@ export type Database = {
             foreignKeyName: "gf_route_plan_route_id_fkey"
             columns: ["route_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_costs"
+            referencedRelation: "v_operador_costs"
             referencedColumns: ["route_id"]
           },
           {
             foreignKeyName: "gf_route_plan_route_id_fkey"
             columns: ["route_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_costs_secure"
+            referencedRelation: "v_operador_costs_secure"
             referencedColumns: ["route_id"]
           },
           {
             foreignKeyName: "gf_route_plan_route_id_fkey"
             columns: ["route_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_routes"
+            referencedRelation: "v_operador_routes"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "gf_route_plan_route_id_fkey"
             columns: ["route_id"]
             isOneToOne: false
-            referencedRelation: "v_operator_routes_secure"
+            referencedRelation: "v_operador_routes_secure"
             referencedColumns: ["id"]
           },
         ]

@@ -33,8 +33,8 @@ const defaultLegalRepData: TransportadoraLegalRepData = {
 /**
  * Componente para gerenciar dados do representante legal da transportadora
  */
-export function CarrierLegalRepSection({
-    carrierId,
+export function TransportadoraLegalRepSection({
+    transportadoraId: carrierId,
     isEditing,
     initialData,
     onSave,
@@ -332,4 +332,4 @@ export function CarrierLegalRepSection({
     )
 }
 
-export default CarrierLegalRepSection
+export default TransportadoraLegalRepSection

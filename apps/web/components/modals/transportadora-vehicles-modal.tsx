@@ -23,7 +23,7 @@ export function TransportadoraVehiclesModal({ transportadora, isOpen, onClose }:
   const [veiculos, setVeiculos] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
   const [activeTab, setActiveTab] = useState("list")
-  
+
   // Form states
   const [editingVehicle, setEditingVehicle] = useState<any>(null)
   const [formData, setFormData] = useState({
@@ -102,7 +102,7 @@ export function TransportadoraVehiclesModal({ transportadora, isOpen, onClose }:
       }
 
       notifySuccess('Veículo criado com sucesso')
-      await loadVehicles()
+      await loadVeiculos()
       resetForm()
     } catch (error: any) {
       notifyError(error, error.message || 'Erro ao criar veículo')
@@ -135,7 +135,7 @@ export function TransportadoraVehiclesModal({ transportadora, isOpen, onClose }:
       }
 
       notifySuccess('Veículo atualizado com sucesso')
-      await loadVehicles()
+      await loadVeiculos()
       resetForm()
     } catch (error: any) {
       notifyError(error, error.message || 'Erro ao atualizar veículo')
@@ -163,7 +163,7 @@ export function TransportadoraVehiclesModal({ transportadora, isOpen, onClose }:
       }
 
       notifySuccess('Veículo excluído com sucesso')
-      await loadVehicles()
+      await loadVeiculos()
     } catch (error: any) {
       notifyError(error, error.message || 'Erro ao excluir veículo')
     } finally {
@@ -281,7 +281,7 @@ export function TransportadoraVehiclesModal({ transportadora, isOpen, onClose }:
                             <span>{veiculo.manufacturer} - {veiculo.model}</span>
                           </div>
                         )}
-                        
+
                         <div className="grid grid-cols-2 gap-2">
                           {veiculo.year && (
                             <div className="flex items-center gap-2 text-muted-foreground">
@@ -289,7 +289,7 @@ export function TransportadoraVehiclesModal({ transportadora, isOpen, onClose }:
                               <span>Ano: {veiculo.year}</span>
                             </div>
                           )}
-                          
+
                           {veiculo.capacity && (
                             <div className="flex items-center gap-2 text-muted-foreground">
                               <Capacity className="h-4 w-4" />
@@ -378,8 +378,8 @@ export function TransportadoraVehiclesModal({ transportadora, isOpen, onClose }:
                 </div>
                 <div>
                   <Label htmlFor="veiculo_type">Tipo de Veículo</Label>
-                  <Select 
-                    value={formData.veiculo_type} 
+                  <Select
+                    value={formData.veiculo_type}
                     onValueChange={(value) => setFormData({ ...formData, veiculo_type: value })}
                   >
                     <SelectTrigger>
@@ -423,11 +423,11 @@ export function TransportadoraVehiclesModal({ transportadora, isOpen, onClose }:
                   </Label>
                 </div>
               </div>
-              
+
               <div className="flex flex-col sm:flex-row gap-3 sm:gap-2 justify-end pt-4 sm:pt-6 border-t mt-4 sm:mt-6">
-                <Button 
-                  type="button" 
-                  variant="outline" 
+                <Button
+                  type="button"
+                  variant="outline"
                   onClick={resetForm}
                   disabled={loading}
                   className="w-full sm:w-auto order-2 sm:order-1 min-h-[44px] text-base font-medium"
@@ -435,8 +435,8 @@ export function TransportadoraVehiclesModal({ transportadora, isOpen, onClose }:
                   <X className="h-4 w-4 mr-2 flex-shrink-0" />
                   Cancelar
                 </Button>
-                <Button 
-                  type="submit" 
+                <Button
+                  type="submit"
                   disabled={loading || !formData.plate}
                   className="w-full sm:w-auto order-1 sm:order-2 bg-brand hover:bg-brand-hover min-h-[44px] text-base font-medium"
                 >

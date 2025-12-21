@@ -318,4 +318,4 @@ export function TransportadoraDocumentsSection({
     )
 }
 
-export default CarrierDocumentsSection
+export default TransportadoraDocumentsSection

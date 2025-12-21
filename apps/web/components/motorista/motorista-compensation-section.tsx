@@ -439,4 +439,4 @@ export function MotoristaCompensationSection({
     )
 }
 
-export default DriverCompensationSection
+export default MotoristaCompensationSection

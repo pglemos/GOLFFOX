@@ -57,7 +57,7 @@ export async function GET(req: NextRequest) {
     if (tripsError) throw tripsError
 
     // Buscar passageiros por viagem
-    const tripIds = trips?.map(t => t.id) || []
+    const tripIds = trips?.map((t: any) => t.id) || []
     const { data: passengers, error: passengersError } = await supabase
       .from('trip_passageiros')
       .select('trip_id')
@@ -72,7 +72,7 @@ export async function GET(req: NextRequest) {
     }, {}) || {}
 
     // Formatar dados das viagens
-    const tripsData = trips?.map(trip => ({
+    const tripsData = trips?.map((trip: any) => ({
       trip_id: trip.id,
       route_name: (trip.routes as any)?.name || 'N/A',
       motorista_name: (trip.users as any)?.name || 'N/A',
@@ -87,8 +87,8 @@ export async function GET(req: NextRequest) {
     })) || []
 
     // Calcular estatísticas
-    const completedTrips = tripsData.filter(t => t.status === 'completed')
-    const totalPassengers = tripsData.reduce((sum, t) => sum + t.passenger_count, 0)
+    const completedTrips = tripsData.filter((t: any) => t.status === 'completed')
+    const totalPassengers = tripsData.reduce((sum: number, t: any) => sum + t.passenger_count, 0)
     const averagePassengers = completedTrips.length > 0
       ? totalPassengers / completedTrips.length
       : 0

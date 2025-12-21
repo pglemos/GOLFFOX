@@ -310,4 +310,4 @@ export function MotoristaDocumentsSection({
     )
 }
 
-export default DriverDocumentsSection
+export default MotoristaDocumentsSection

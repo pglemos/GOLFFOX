@@ -42,8 +42,8 @@ const defaultBankingData: TransportadoraBankingData = {
 /**
  * Componente para gerenciar dados bancários de uma transportadora
  */
-export function CarrierBankingSection({
-    carrierId,
+export function TransportadoraBankingSection({
+    transportadoraId: carrierId,
     isEditing,
     initialData,
     onSave,
@@ -261,4 +261,4 @@ export function CarrierBankingSection({
     )
 }
 
-export default CarrierBankingSection
+export default TransportadoraBankingSection
