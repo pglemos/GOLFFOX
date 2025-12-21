@@ -100,3 +100,27 @@ export interface SupabaseAssistance {
   created_at: string
 }
 
+/**
+ * Dados brutos de trip do Supabase com campos de data
+ */
+export interface SupabaseTripWithDates {
+  id: string
+  started_at: string | null
+  completed_at: string | null
+  route_id?: string
+}
+
+/**
+ * Dados brutos de parada do Supabase com relação de rota
+ */
+export interface SupabaseStopWithRoute {
+  id: string
+  route_id: string
+  seq: number
+  name: string
+  lat: number
+  lng: number
+  radius_m: number
+  routes?: { name: string } | null
+}
+

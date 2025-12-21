@@ -14,9 +14,9 @@ export interface SyncOperation {
   resourceId: string
   action: 'create' | 'update' | 'delete'
    
-  data: Record<string, any>
+  data: Record<string, unknown>
    
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
 }
 
 export interface SyncResult {
@@ -25,7 +25,7 @@ export interface SyncResult {
   error?: {
     code: number
     message: string
-    body: any
+    body: unknown
     timestamp: string
   }
   syncedAt?: string
@@ -131,7 +131,7 @@ export function clearFailedSync(operationId: string): void {
  */
 function validateSyncData(
   resourceType: string,
-  data: Record<string, any>
+  data: Record<string, unknown>
 ): { valid: boolean; errors: string[] } {
   const errors: string[] = []
 
@@ -207,7 +207,7 @@ function validateSyncData(
  */
 function mapDataToSupabase(
   resourceType: string,
-  data: Record<string, any>
+  data: Record<string, unknown>
 ): Record<string, any> {
   const mapped: Record<string, any> = { ...data }
 
@@ -397,7 +397,7 @@ async function executeSyncWithRetry(
       // Status HTTP fora do intervalo 200-299
       throw new Error(`HTTP ${httpStatus}: ${JSON.stringify(response)}`)
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     const errorMessage = error.message || 'Erro desconhecido'
     const errorCode = error.code || error.status || 500
     const errorBody = error.response?.data || error.body || error

@@ -13,7 +13,11 @@ interface TransportadoraContextType {
 
 const TenantContext = createContext<TransportadoraContextType | undefined>(undefined)
 
-export function TransportadoraTenantProvider({ children }: { children: ReactNode }) {
+export interface TransportadoraTenantProviderProps {
+    children: ReactNode
+}
+
+export function TransportadoraTenantProvider({ children }: TransportadoraTenantProviderProps) {
     const [transportadoraId, setTransportadoraId] = useState<string | null>(null)
     const [transportadoraName, setTransportadoraName] = useState('Transportadora')
     const [logoUrl, setLogoUrl] = useState<string | null>(null)
@@ -35,15 +39,15 @@ export function TransportadoraTenantProvider({ children }: { children: ReactNode
                     .eq('id', user.id)
                     .single()
 
-                const foundId = (userData as any)?.transportadora_id
+                const foundId = (userData as { transportadora_id?: string })?.transportadora_id
 
                 // 2. Se não achou, tentar buscar na tabela carriers por e-mail ou dono?
                 // Assumindo que o usuário DEVE ter transportadora_id setado.
 
                 if (foundId) {
                     // Buscar dados da transportadora
-                    const { data: transportadoraData } = await (supabase as any)
-                        .from('transportadoras')
+                    const { data: transportadoraData } = await supabase
+                        .from('carriers')
                         .select('id, name, logo_url')
                         .eq('id', foundId)
                         .single()
@@ -58,9 +62,10 @@ export function TransportadoraTenantProvider({ children }: { children: ReactNode
                     // setError('Usuário não vinculado a uma transportadora')
                 }
 
-            } catch (err: any) {
+            } catch (err: unknown) {
                 console.error('Erro ao carregar transportadora:', err)
-                setError(err.message)
+                const error = err as Error
+                setError(error.message || 'Erro desconhecido')
             } finally {
                 setLoading(false)
             }

@@ -3,8 +3,31 @@
 import { motion } from "framer-motion"
 import { ReactNode } from "react"
 
+// Interfaces para props dos componentes de animação
+export interface PageTransitionProps {
+    children: ReactNode
+}
+
+export interface StaggerContainerProps {
+    children: ReactNode
+    delay?: number
+}
+
+export interface StaggerItemProps {
+    children: ReactNode
+}
+
+export interface HoverScaleProps {
+    children: ReactNode
+    scale?: number
+}
+
+export interface FadeInViewProps {
+    children: ReactNode
+}
+
 // Page transition wrapper
-export const PageTransition = ({ children }: { children: ReactNode }) => (
+export const PageTransition = ({ children }: PageTransitionProps) => (
     <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -16,7 +39,7 @@ export const PageTransition = ({ children }: { children: ReactNode }) => (
 )
 
 // Staggered list container
-export const StaggerContainer = ({ children, delay = 0.05 }: { children: ReactNode, delay?: number }) => (
+export const StaggerContainer = ({ children, delay = 0.05 }: StaggerContainerProps) => (
     <motion.div
         initial="hidden"
         animate="visible"
@@ -35,7 +58,7 @@ export const StaggerContainer = ({ children, delay = 0.05 }: { children: ReactNo
 )
 
 // Staggered list item
-export const StaggerItem = ({ children }: { children: ReactNode }) => (
+export const StaggerItem = ({ children }: StaggerItemProps) => (
     <motion.div
         variants={{
             hidden: { opacity: 0, y: 20 },
@@ -48,7 +71,7 @@ export const StaggerItem = ({ children }: { children: ReactNode }) => (
 )
 
 // Hover scale effect
-export const HoverScale = ({ children, scale = 1.02 }: { children: ReactNode, scale?: number }) => (
+export const HoverScale = ({ children, scale = 1.02 }: HoverScaleProps) => (
     <motion.div
         whileHover={{ scale }}
         whileTap={{ scale: 0.98 }}
@@ -59,7 +82,7 @@ export const HoverScale = ({ children, scale = 1.02 }: { children: ReactNode, sc
 )
 
 // Fade in on scroll
-export const FadeInView = ({ children }: { children: ReactNode }) => (
+export const FadeInView = ({ children }: FadeInViewProps) => (
     <motion.div
         initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}

@@ -85,7 +85,7 @@ export function createDocumentsHandler(config: DocumentHandlerConfig) {
             }
 
             return NextResponse.json(documents || [])
-        } catch (error: any) {
+        } catch (error: unknown) {
             const resolvedParams = await params
             logError('Erro na API de documentos', { 
                 error, 
@@ -157,7 +157,7 @@ export function createDocumentsHandler(config: DocumentHandlerConfig) {
 
             if (existing) {
                 // Atualizar documento existente
-                const existingId = (existing as any).id
+                const existingId = (existing as { id: string }).id
                 const { data: updated, error: updateError } = await (supabaseAdmin
                     .from(docConfig.table as any) as any)
                     .update({
@@ -206,7 +206,7 @@ export function createDocumentsHandler(config: DocumentHandlerConfig) {
             }
 
             return NextResponse.json(created, { status: 201 })
-        } catch (error: any) {
+        } catch (error: unknown) {
             const resolvedParams = await params
             logError('Erro na API de documentos', { 
                 error, 
@@ -274,7 +274,7 @@ export function createDocumentsHandler(config: DocumentHandlerConfig) {
             }
 
             return NextResponse.json({ success: true })
-        } catch (error: any) {
+        } catch (error: unknown) {
             const resolvedParams = await params
             logError('Erro na API de documentos', { 
                 error, 

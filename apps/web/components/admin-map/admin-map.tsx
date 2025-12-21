@@ -17,6 +17,7 @@ import {
   isValidCoordinate, 
   normalizeCoordinate 
 } from '@/lib/coordinate-validator'
+import { loadVehicles } from '@/lib/map-services/vehicle-loader'
 import { TrajectoryPanel } from './trajectory-panel'
 import { MapFilters } from './filters'
 import { MapLayers } from './layers'
@@ -43,6 +44,8 @@ import { debug, warn, error as logError } from '@/lib/logger'
 import { formatError, getErrorMeta } from '@/lib/error-utils'
 import { t } from '@/lib/i18n'
 import type { Veiculo, RoutePolyline, MapAlert, MapsBillingStatus, HistoricalTrajectory, RouteStop } from '@/types/map'
+import type { SupabaseRoute, SupabaseStopWithRoute, SupabaseTripWithDates, SupabaseVeiculo } from '@/types/supabase-data'
+import { Database } from '@/types/supabase'
 import { toError } from '@/lib/types/errors'
 
 export interface AdminMapProps {
@@ -303,7 +306,7 @@ export function AdminMap({
             clearTimeout(boundsListenerTimeout)
           }
         }
-      } catch (error: any) {
+      } catch (error: unknown) {
         logError('Erro ao inicializar mapa', { error }, 'AdminMap')
         setMapError(t('common', 'errors.mapLoadFailedListMode'))
         setListMode(true)
@@ -387,7 +390,7 @@ export function AdminMap({
 
         if (!routesError && routesData && routesData.length > 0) {
           // Buscar route_stops para cada rota
-          const routeIds = routesData.map((r: any) => r.id)
+          const routeIds = routesData.map((r: SupabaseRoute) => r.id)
           
           const { data: stopsData, error: stopsError } = await supabase
             .from('route_stops')
@@ -447,260 +450,65 @@ export function AdminMap({
     try {
       debug('Carregando dados iniciais com filtros', { filters }, 'AdminMap')
       
-      // Carregar veículos ativos com todas as informações
-      // Usar LEFT JOIN para não excluir veículos sem company_id
-      let vehiclesQuery = supabase
-        .from('veiculos')
-        .select(`
-          id,
-          plate,
-          model,
-          year,
-          prefix,
-          capacity,
-          is_active,
-          photo_url,
-          company_id,
-          transportadora_id,
-          companies(name)
-        `)
-        .eq('is_active', true)
+      // Carregar veículos usando o serviço extraído
+      const vehicles = await loadVehicles(filters.company || undefined)
       
-      // Aplicar filtro de empresa se selecionado
-      if (filters.company) {
-        vehiclesQuery = vehiclesQuery.eq('company_id', filters.company)
-      }
-      
-      debug(
-        'Carregando veículos ativos com filtros',
-        {
-          filters,
-          query: {
-            table: 'veiculos',
-            filter_is_active: true,
-            filter_company: filters.company || 'nenhum',
-          },
-        },
-        'AdminMap'
-      )
-      
-      const { data: veiculosData, error: vehiclesError } = await vehiclesQuery
-      
-      let finalVeiculosData: SupabaseVeiculo[] = []
-      
-      // Log detalhado para debug
-      if (vehiclesError) {
-        logError('Erro na query de veículos', getErrorMeta(vehiclesError))
-        
-        // Se erro for sobre coluna inexistente, tentar query sem colunas problemáticas
-        if (vehiclesError.message?.includes('column') || vehiclesError.message?.includes('does not exist')) {
-          warn('Tentando query alternativa sem colunas problemáticas', {}, 'AdminMap')
-          try {
-            const { data: fallbackData, error: fallbackError } = await supabase
-              .from('veiculos')
-              .select('id, plate, model, is_active, company_id')
-              .eq('is_active', true)
-            
-            if (!fallbackError && fallbackData) {
-              debug(`Query alternativa retornou ${fallbackData.length} veículos`, { count: fallbackData.length }, 'AdminMap')
-              finalVeiculosData = fallbackData as SupabaseVeiculo[]
-            }
-          } catch (fallbackErr) {
-            logError('Query alternativa também falhou', { error: fallbackErr }, 'AdminMap')
-          }
-        }
-      } else {
-        finalVeiculosData = veiculosData || []
-        debug(`Query retornou ${finalVeiculosData.length} veículos`, { count: finalVeiculosData.length }, 'AdminMap')
-        if (finalVeiculosData.length > 0) {
-          debug('Primeiros veículos', {
-            veiculos: finalVeiculosData.slice(0, 3).map((v: SupabaseVeiculo) => ({
-              id: v.id,
-              plate: v.plate,
-              is_active: v.is_active,
-              company_id: v.company_id,
-              transportadora_id: v.transportadora_id
-            }))
-          }, 'AdminMap')
-        } else {
-          // Se não retornou veículos, verificar se há veículos ativos no banco
-          warn('Nenhum veículo retornado - verificando se há veículos ativos no banco', {}, 'AdminMap')
-          const { data: checkData, error: checkError } = await supabase
-            .from('veiculos')
-            .select('id, plate, is_active')
-            .eq('is_active', true)
-            .limit(5)
-          
-          if (checkError) {
-            logError('Erro ao verificar veículos', { error: checkError }, 'AdminMap')
-          } else if (checkData && checkData.length > 0) {
-            warn(`Encontrados ${checkData.length} veículos ativos, mas não foram retornados pela query principal`, { count: checkData.length, veiculos: checkData }, 'AdminMap')
-            warn('Possível problema: RLS policies podem estar bloqueando o acesso', {}, 'AdminMap')
-          } else {
-            debug('Não há veículos ativos no banco de dados', {}, 'AdminMap')
-          }
-        }
-      }
-      
-      if (finalVeiculosData && finalVeiculosData.length > 0) {
-        debug(`Processando ${finalVeiculosData.length} veículos ativos`, { count: finalVeiculosData.length }, 'AdminMap')
-        
-        // Buscar trips ativas para esses veículos
-        const vehicleIds = finalVeiculosData.map((v: SupabaseVeiculo) => v.id)
-        
-        // Buscar trips ativas (inProgress) para obter informações de rota e motorista
-        const { data: activeTrips } = await supabase
-          .from('trips')
-          .select(`
-            id,
-            veiculo_id,
-            motorista_id,
-            route_id,
-            status,
-            routes(name),
-            users!trips_driver_id_fkey(id, name)
-          `)
-          .in('veiculo_id', vehicleIds)
-          .eq('status', 'inProgress')
-        
-        // Mapear trips por veiculo_id
-        const tripsByVehicle = new Map<string, SupabaseTrip>()
-        if (activeTrips) {
-          activeTrips.forEach((trip: SupabaseTrip) => {
-            if (!tripsByVehicle.has(trip.veiculo_id)) {
-              tripsByVehicle.set(trip.veiculo_id, trip)
-            }
-          })
-        }
-        
-        // Buscar últimas posições conhecidas
-        const tripIds = activeTrips?.map((t: SupabaseTrip) => t.id) || []
-        let lastPositions: SupabasePosition[] = []
-        
-        if (tripIds.length > 0) {
-          // Buscar posições recentes (últimas 5 minutos) primeiro
-          const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString()
-          const { data: recentPositions } = await supabase
-            .from('motorista_positions')
-            .select('trip_id, lat, lng, speed, timestamp')
-            .in('trip_id', tripIds)
-            .gte('timestamp', fiveMinutesAgo)
-            .order('timestamp', { ascending: false })
-          
-          if (recentPositions && recentPositions.length > 0) {
-            // Mapear posições para veiculo_id via trips
-            const tripToVehicle = new Map(activeTrips?.map((t: SupabaseTrip) => [t.id, t.veiculo_id]) || [])
-            lastPositions = (recentPositions || []).map((pos: SupabasePosition) => ({
-              ...pos,
-              veiculo_id: tripToVehicle.get(pos.trip_id)
-            }))
-          } else {
-            // Se não há posições recentes, buscar últimas posições conhecidas
-            const { data: allPositions } = await supabase
-              .from('motorista_positions')
-              .select('trip_id, lat, lng, speed, timestamp')
-              .in('trip_id', tripIds)
-              .order('timestamp', { ascending: false })
-              .limit(tripIds.length * 10)
-            
-            if (allPositions) {
-              const tripToVehicle = new Map(activeTrips?.map((t: SupabaseTrip) => [t.id, t.veiculo_id]) || [])
-              lastPositions = (allPositions || []).map((pos: SupabasePosition) => ({
-                ...pos,
-                veiculo_id: tripToVehicle.get(pos.trip_id)
-              }))
-            }
+      // Normalizar coordenadas dos veículos
+      const normalizedVehicles = vehicles.map((v: Veiculo) => {
+        if (v.lat !== null && v.lng !== null && isValidCoordinate(v.lat, v.lng)) {
+          const normalized = normalizeCoordinate(v.lat, v.lng)
+          if (normalized) {
+            return { ...v, lat: normalized.lat, lng: normalized.lng }
           }
         }
         
-        // Agrupar posições por veiculo_id e pegar a mais recente
-        const positionsByVehicle = new Map<string, SupabasePosition & { veiculo_id?: string }>()
-        lastPositions.forEach((pos: SupabasePosition) => {
-          if (pos.veiculo_id && !positionsByVehicle.has(pos.veiculo_id)) {
-            positionsByVehicle.set(pos.veiculo_id, pos)
-          }
+        return {
+          ...v,
+          speed: v.speed !== null && !isNaN(v.speed) ? v.speed : null,
+          heading: v.heading !== null && !isNaN(v.heading) ? v.heading : null,
+        }
+      })
+      
+      setVeiculos(normalizedVehicles)
+      
+      const withCoords = normalizedVehicles.filter((v: Veiculo) => v.lat !== null && v.lng !== null).length
+      const withoutCoords = normalizedVehicles.length - withCoords
+      
+      debug(`Carregados ${normalizedVehicles.length} veículos ativos`, { 
+        total: normalizedVehicles.length,
+        withCoords,
+        withoutCoords
+      }, 'AdminMap')
+      
+      if (withCoords === 0 && normalizedVehicles.length > 0) {
+        notifySuccess(t('common','success.noRecentGpsPositions', { count: normalizedVehicles.length }), {
+          duration: 5000
         })
-        
-        // Montar dados finais dos veículos - MOSTRAR TODOS OS VEÍCULOS ATIVOS
-        const processedVehicles = finalVeiculosData.map((v: SupabaseVeiculo) => {
-          const trip = tripsByVehicle.get(v.id)
-          const lastPos = positionsByVehicle.get(v.id)
-          
-          // Calcular heading se houver posição
-          let heading = null
-          if (lastPos) {
-            // Tentar calcular heading (simplificado - seria melhor ter histórico)
-            heading = 0 // Por enquanto, sem heading
-          }
-          
-          // Determinar status
-          let vehicleStatus: 'moving' | 'stopped_short' | 'stopped_long' | 'garage' = 'garage'
-          if (lastPos) {
-            const posTime = new Date(lastPos.timestamp)
-            const minutesAgo = (Date.now() - posTime.getTime()) / (1000 * 60)
-            
-            if (lastPos.speed && lastPos.speed > 0.83) { // > 3 km/h
-              vehicleStatus = 'moving'
-            } else if (minutesAgo > 3) {
-              vehicleStatus = 'stopped_long'
-            } else {
-              vehicleStatus = 'stopped_short'
-            }
-          } else {
-            // Sem posição = na garagem ou sem GPS
-            vehicleStatus = 'garage'
-          }
-          
-          // Se não há posição GPS, usar coordenadas padrão (centro do Brasil) ou null
-          // O mapa vai mostrar o veículo como "sem posição" mas ainda vai aparecer na lista
-          const lat = lastPos?.lat || null
-          const lng = lastPos?.lng || null
-          
-          // Se não há coordenadas válidas, ainda assim incluir o veículo
-          // Ele aparecerá na lista de veículos mesmo sem posição no mapa
-          
-          return {
-            veiculo_id: v.id,
-            plate: v.plate,
-            model: v.model || '',
-            company_id: v.company_id,
-            company_name: v.companies?.name || '',
-            trip_id: trip?.id || null,
-            route_id: trip?.route_id || null,
-            route_name: trip?.routes?.name || 'Sem rota ativa',
-            motorista_id: trip?.motorista_id || null,
-            motorista_name: trip?.users?.name || 'Sem motorista',
-            lat: lat,
-            lng: lng,
-            speed: lastPos?.speed || null,
-            heading: heading,
-            vehicle_status: vehicleStatus,
-            passenger_count: 0, // Seria necessário buscar de trip_passageiros
-            last_position_time: lastPos?.timestamp || null,
-          }
-        })
-        
-        const processedVehiclesFinal = processedVehicles as Veiculo[]
-        debug(`Montados ${processedVehiclesFinal.length} veículos com dados completos`, { count: processedVehiclesFinal.length }, 'AdminMap')
-        
-        // Processar TODOS os veículos - não filtrar por coordenadas
-        // Veículos sem coordenadas ainda aparecerão na lista e podem ser visualizados
-        const normalizedVehicles = processedVehiclesFinal
-          .map((v: Veiculo) => {
-            // Normalizar coordenadas se existirem
+      }
+
+      // Carregar rotas (lazy loading será aplicado via loadVisibleRoutes)
+      await loadVisibleRoutes()
+
+      // Carregar alertas - DESABILITADO (serão carregados via realtime polling)
+      debug('Carregamento de alertas inicial desabilitado - serão carregados via polling do realtime-service', {}, 'AdminMap')
+      setAlerts([]) // Inicializar vazio
+      
+      // CÓDIGO REMOVIDO - lógica de carregamento de veículos movida para loadVehicles service
+      /*
+      // Carregar veículos usando o serviço extraído
+      const vehicles = await loadVehicles(filters.company || undefined)
+      
+      // Normalizar coordenadas dos veículos
+      const normalizedVehicles = vehicles.map((v: Veiculo) => {
             if (v.lat !== null && v.lng !== null && isValidCoordinate(v.lat, v.lng)) {
               const normalized = normalizeCoordinate(v.lat, v.lng)
               if (normalized) {
                 return { ...v, lat: normalized.lat, lng: normalized.lng }
               }
-            } else {
-              // Veículo sem coordenadas - ainda assim incluir
-              debug(`Veículo ${v.plate} (${v.veiculo_id}) sem coordenadas GPS - será exibido como "na garagem"`, { vehicleId: v.veiculo_id, plate: v.plate }, 'AdminMap')
             }
             
             return {
               ...v,
-              // Garantir valores padrão
               speed: v.speed !== null && !isNaN(v.speed) ? v.speed : null,
               heading: v.heading !== null && !isNaN(v.heading) ? v.heading : null,
             }
@@ -708,45 +516,19 @@ export function AdminMap({
         
         setVeiculos(normalizedVehicles)
         
-        // Contar veículos com e sem coordenadas
         const withCoords = normalizedVehicles.filter((v: Veiculo) => v.lat !== null && v.lng !== null).length
         const withoutCoords = normalizedVehicles.length - withCoords
         
-        debug(`Carregados ${processedVehicles.length} veículos ativos`, { 
-          total: processedVehicles.length,
+      debug(`Carregados ${normalizedVehicles.length} veículos ativos`, { 
+        total: normalizedVehicles.length,
           withCoords,
           withoutCoords
         }, 'AdminMap')
         
-        if (withCoords === 0 && processedVehicles.length > 0) {
-          notifySuccess(t('common','success.noRecentGpsPositions', { count: processedVehicles.length }), {
+      if (withCoords === 0 && normalizedVehicles.length > 0) {
+        notifySuccess(t('common','success.noRecentGpsPositions', { count: normalizedVehicles.length }), {
             duration: 5000
           })
-        }
-      } else if (vehiclesError) {
-        logError('Erro ao carregar veículos', { error: vehiclesError }, 'AdminMap')
-        notifyError(vehiclesError, t('common','errors.loadVehicles', { message: formatError(vehiclesError) }))
-      } else {
-        // Nenhum dado retornado e nenhum erro - verificar se há veículos ativos sem filtros
-        debug('Nenhum veículo retornado da query (sem erro) - verificando se há veículos ativos sem filtros', {}, 'AdminMap')
-        
-        // Tentar buscar sem filtros para debug
-        const { data: allVehicles, error: allError } = await supabase
-          .from('veiculos')
-          .select('id, plate, is_active, company_id')
-          .eq('is_active', true)
-          .limit(5)
-        
-        if (allError) {
-          logError('Erro ao verificar veículos', { error: allError }, 'AdminMap')
-        } else if (allVehicles && allVehicles.length > 0) {
-          warn(`Encontrados ${allVehicles.length} veículos ativos, mas não foram retornados com os filtros aplicados`, { 
-            count: allVehicles.length,
-            veiculos: allVehicles.map((v: any) => ({ plate: v.plate, company_id: v.company_id }))
-          }, 'AdminMap')
-        } else {
-          debug('Não há veículos ativos no banco de dados', {}, 'AdminMap')
-        }
       }
 
       // Carregar rotas (lazy loading será aplicado via loadVisibleRoutes)
@@ -881,7 +663,7 @@ export function AdminMap({
           combinedAlerts = [...mappedIncidents, ...mappedAssistance]
 
           // Validar alertas com coordenadas quando presentes
-          const validAlerts = combinedAlerts.filter((a: any) => {
+          const validAlerts = combinedAlerts.filter((a: MapAlert) => {
             if (a.lat !== undefined && a.lng !== undefined && a.lat !== null && a.lng !== null) {
               if (!isValidCoordinate(a.lat, a.lng)) {
                 warn(`Alerta ${a.alert_id} tem coordenadas inválidas`, { lat: a.lat, lng: a.lng }, 'AdminMap')
@@ -897,9 +679,9 @@ export function AdminMap({
             return true
           })
 
-          setAlerts(validAlerts as any)
+          setAlerts(validAlerts)
         }
-      } catch (alertsError: any) {
+      } catch (alertsError: unknown) {
         alertsErrorMsg = alertsError?.message ?? (() => { try { return JSON.stringify(alertsError) } catch { return String(alertsError) } })()
       }
 
@@ -909,7 +691,7 @@ export function AdminMap({
       */
 
       // Carregar paradas das rotas
-      const routeIds = routes?.map((r: any) => r.route_id) || []
+      const routeIds = routes?.map((r: RoutePolyline) => r.route_id) || []
       if (routeIds.length > 0) {
         const { data: stopsData, error: stopsError } = await supabase
           .from('route_stops')
@@ -928,7 +710,7 @@ export function AdminMap({
           .order('seq', { ascending: true })
 
         if (!stopsError && stopsData) {
-          setRouteStops(stopsData.map((stop: any) => ({
+          setRouteStops(stopsData.map((stop: SupabaseStopWithRoute) => ({
             id: stop.id,
             route_id: stop.route_id,
             route_name: stop.routes?.name || '',
@@ -1214,8 +996,9 @@ export function AdminMap({
         return
       }
 
-      const from = (tripData as any).started_at ? new Date((tripData as any).started_at) : new Date(Date.now() - 2 * 60 * 60 * 1000)
-      const to = (tripData as any).completed_at ? new Date((tripData as any).completed_at) : new Date()
+      const tripDataTyped = tripData as SupabaseTripWithDates
+      const from = tripDataTyped.started_at ? new Date(tripDataTyped.started_at) : new Date(Date.now() - 2 * 60 * 60 * 1000)
+      const to = tripDataTyped.completed_at ? new Date(tripDataTyped.completed_at) : new Date()
 
       // Carregar posições históricas
       if (!playbackServiceRef.current) {
@@ -1270,7 +1053,7 @@ export function AdminMap({
       setShowTrajectories(true)
 
       notifySuccess(t('common','success.trajectoryAnalysisLoaded'))
-    } catch (error: any) {
+    } catch (error: unknown) {
       logError('Erro ao carregar histórico', { error }, 'AdminMap')
       notifyError(formatError(error, t('common','errors.loadHistory')))
     }
@@ -1296,8 +1079,9 @@ export function AdminMap({
         return
       }
 
-      const from = (tripData as any).started_at ? new Date((tripData as any).started_at) : new Date(Date.now() - 2 * 60 * 60 * 1000)
-      const to = (tripData as any).completed_at ? new Date((tripData as any).completed_at) : new Date()
+      const tripDataTyped = tripData as SupabaseTripWithDates
+      const from = tripDataTyped.started_at ? new Date(tripDataTyped.started_at) : new Date(Date.now() - 2 * 60 * 60 * 1000)
+      const to = tripDataTyped.completed_at ? new Date(tripDataTyped.completed_at) : new Date()
 
       if (!playbackServiceRef.current) {
         playbackServiceRef.current = new PlaybackService()
@@ -1432,7 +1216,7 @@ export function AdminMap({
   const handleDispatchAssistance = useCallback(async (veiculo: veiculo) => {
     try {
       // Criar requisição de socorro
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from('gf_service_requests')
         .insert({
           empresa_id: veiculo.company_id,
@@ -1457,7 +1241,7 @@ export function AdminMap({
       // Recarregar alertas chamando loadInitialData novamente
       // Isso vai recarregar todos os alertas incluindo o novo socorro
       loadInitialData()
-    } catch (error: any) {
+    } catch (error: unknown) {
       logError('Erro ao despachar socorro', { error }, 'AdminMap')
     notifyError(formatError(error, t('common','errors.dispatchAssistance')))
     }
@@ -1504,7 +1288,7 @@ export function AdminMap({
         URL.revokeObjectURL(url)
         notifySuccess(t('common','success.exportCsv'))
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       logError('Erro ao exportar', { error }, 'AdminMap')
     notifyError(formatError(error, t('common','errors.export')))
     }

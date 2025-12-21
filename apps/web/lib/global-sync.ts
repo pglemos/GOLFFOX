@@ -30,11 +30,11 @@ type SyncEventType =
   | 'cost.updated'
   | 'assistance_request.updated'
 
-type SyncCallback = (event: { type: SyncEventType; data: any }) => void
+type SyncCallback = (event: { type: SyncEventType; data: unknown }) => void
 
 class GlobalSyncManager {
   private listeners: Set<SyncCallback> = new Set()
-  private channels: Map<string, any> = new Map()
+  private channels: Map<string, unknown> = new Map()
   private isInitialized = false
 
   init() {
@@ -79,7 +79,7 @@ class GlobalSyncManager {
     */
   }
 
-  private handleChange(table: string, payload: any) {
+  private handleChange(table: string, payload: { eventType: string; new?: unknown; old?: unknown }) {
     const eventType = this.mapTableToEventType(table, payload.eventType)
     if (!eventType) return
 
@@ -148,7 +148,7 @@ class GlobalSyncManager {
   }
 
   // Método para forçar sincronização manual (útil após criar/atualizar dados)
-  triggerSync(eventType: SyncEventType, data: any) {
+  triggerSync(eventType: SyncEventType, data: unknown) {
     const event = { type: eventType, data }
     this.listeners.forEach(callback => {
       try {
@@ -164,7 +164,9 @@ class GlobalSyncManager {
 
     import('@/lib/supabase').then(({ supabase }) => {
       this.channels.forEach((channel) => {
-        (supabase as any).removeChannel(channel)
+        if (supabase && typeof supabase.removeChannel === 'function') {
+          supabase.removeChannel(channel as Parameters<typeof supabase.removeChannel>[0])
+        }
       })
     })
     this.channels.clear()

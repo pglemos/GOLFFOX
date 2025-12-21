@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState, useCallback, useRef, memo } from "react"
+import { useEffect, useState, useCallback, useRef, memo, useTransition } from "react"
 import { setOptions, importLibrary } from "@googlemaps/js-api-loader"
 import { Card } from "./ui/card"
 import { Button } from "./ui/button"
@@ -17,41 +17,21 @@ import { AccessibilityControls, useAccessibilityControls } from './accessibility
 import { useResponsive, useReducedMotion } from '@/hooks/use-responsive'
 import { usePerformance } from '@/hooks/use-performance'
 import { useAccessibility } from '@/hooks/use-accessibility'
+import { useMapCache } from '@/hooks/use-map-cache'
+import { createMarkerIcon } from '@/lib/map-utils/marker-icon-factory'
+import { createRoutePolyline } from '@/lib/map-utils/polyline-renderer'
+import { loadRouteData as loadRouteDataService, type RouteData, type RouteStop, type PassageiroInfo } from '@/lib/map-utils/route-data-loader'
+import { RouteHeader } from './route-map/route-header'
+import { ConnectivityIndicator } from './route-map/connectivity-indicator'
+import { formatDuration, formatDistance } from '@/lib/kpi-utils'
 
-interface PassageiroInfo {
-  id: string
-  name: string
-  phone?: string
-  email?: string
-  photo?: string
-  type: 'student' | 'employee' | 'visitor'
-  observations?: string
-}
+// Tipos importados de route-data-loader
+// RouteData, RouteStop já importados acima
 
-interface RouteStop {
-  id: string
-  route_id: string
-  stop_order: number
-  lat: number
-  lng: number
-  address: string
-  stop_name: string
-  passageiro_id?: string
-  passenger_name?: string
-  estimated_arrival?: string
-  stop_type: 'pickup' | 'dropoff'
-  passenger_photo?: string
-  observations?: string
-  passageiro?: PassageiroInfo
-}
-
-interface RouteData {
-  id: string
-  name: string
-  description?: string
-  totalDistance?: number
-  estimatedDuration?: number
-  stops: RouteStop[]
+// Tipo estendido para RouteStop com propriedades de estado
+type RouteStopWithState = RouteStop & {
+  isCurrent?: boolean
+  isCompleted?: boolean
 }
 
 interface AdvancedRouteMapProps {
@@ -80,6 +60,7 @@ export const AdvancedRouteMap = memo(function AdvancedRouteMap({
   const { metrics, isPerformanceGood, measureOperation } = usePerformance()
   const { state: accessibilityState, announce, focusElement } = useAccessibility()
   const accessibilityControls = useAccessibilityControls()
+  const [isPending, startTransition] = useTransition()
   
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -100,40 +81,14 @@ export const AdvancedRouteMap = memo(function AdvancedRouteMap({
   const [isMuted, setIsMuted] = useState(false)
   const [volume, setVolume] = useState(80)
   const [isOnline, setIsOnline] = useState(navigator.onLine)
-  const [cacheExpiry, setCacheExpiry] = useState<number | null>(null)
   
   // Estados para navegação por teclado
   const [focusedMarkerIndex, setFocusedMarkerIndex] = useState<number>(-1)
   const [keyboardNavigationActive, setKeyboardNavigationActive] = useState(false)
   const mapContainerRef = useRef<HTMLDivElement>(null)
 
-  // Funções de cache e performance
-  const getCachedData = useCallback((key: string) => {
-    try {
-      const cached = localStorage.getItem(`route_cache_${key}`)
-      if (cached) {
-        const { data, expiry } = JSON.parse(cached)
-        if (Date.now() < expiry) {
-          return data
-        } else {
-          localStorage.removeItem(`route_cache_${key}`)
-        }
-      }
-    } catch (error) {
-      console.warn('Erro ao acessar cache:', error)
-    }
-    return null
-  }, [])
-
-  const setCachedData = useCallback((key: string, data: any) => {
-    try {
-      const expiry = Date.now() + (5 * 60 * 1000) // 5 minutos
-      localStorage.setItem(`route_cache_${key}`, JSON.stringify({ data, expiry }))
-      setCacheExpiry(expiry)
-    } catch (error) {
-      console.warn('Erro ao salvar cache:', error)
-    }
-  }, [])
+  // Hook de cache
+  const { getCachedData, setCachedData, cacheExpiry } = useMapCache()
 
   // Funções de navegação por teclado
   const focusMarker = useCallback((index: number) => {
@@ -256,7 +211,7 @@ export const AdvancedRouteMap = memo(function AdvancedRouteMap({
 
       // Verificar cache primeiro
       const cacheKey = `route_${routeId}`
-      const cachedData = getCachedData(cacheKey)
+      const cachedData = getCachedData<RouteData>(cacheKey)
       
       if (cachedData && isOnline) {
         setRouteData(cachedData)
@@ -272,60 +227,7 @@ export const AdvancedRouteMap = memo(function AdvancedRouteMap({
       
       // Buscar dados da rota usando measureOperation
       const routeDataFormatted = await measureOperation('load_supabase', async () => {
-        // Buscar dados da rota
-        const { data: route, error: routeError } = await supabase
-          .from('routes')
-          .select('*')
-          .eq('id', routeId)
-          .single()
-
-        if (routeError) throw routeError
-
-        // Buscar pontos de parada com informações dos passageiros
-        const { data: stops, error: stopsError } = await supabase
-          .from('gf_route_plan')
-          .select(`
-            *,
-            gf_employee_company!inner(name, photo_url, phone, email, type, observations)
-          `)
-          .eq('route_id', routeId)
-          .order('stop_order')
-
-        if (stopsError) throw stopsError
-
-        const processedStops: RouteStop[] = stops?.map((stop: any, index: number) => ({
-          id: stop.id,
-          route_id: stop.route_id,
-          stop_order: stop.stop_order,
-          lat: stop.latitude,
-          lng: stop.longitude,
-          address: stop.address || '',
-          stop_name: stop.stop_name || `Parada ${index + 1}`,
-          passageiro_id: stop.passageiro_id,
-          passenger_name: stop.gf_employee_company?.name || '',
-          estimated_arrival: stop.estimated_arrival_time,
-          stop_type: index === 0 ? 'pickup' : 'dropoff',
-          passenger_photo: stop.gf_employee_company?.photo_url,
-          observations: stop.observations,
-          passageiro: {
-            id: stop.passageiro_id || '',
-            name: stop.gf_employee_company?.name || 'Passageiro não identificado',
-            phone: stop.gf_employee_company?.phone,
-            email: stop.gf_employee_company?.email,
-            photo: stop.gf_employee_company?.photo_url,
-            type: stop.gf_employee_company?.type || 'visitor',
-            observations: stop.gf_employee_company?.observations
-          }
-        })) || []
-
-        return {
-          id: route.id,
-          name: route.name,
-          description: (route as any).description || '',
-          totalDistance: (route as any).distance || 0,
-          estimatedDuration: (route as any).estimated_duration || 0,
-          stops: processedStops
-        }
+        return await loadRouteDataService(routeId)
       })
 
       startTransition(() => {
@@ -416,42 +318,11 @@ export const AdvancedRouteMap = memo(function AdvancedRouteMap({
         // Ajustar zoom com margem de 20%
         map.fitBounds(bounds, { top: 50, right: 50, bottom: 50, left: 50 })
 
-        // Criar polyline do trajeto
+        // Criar polyline do trajeto usando utilitário
         if (routeData.stops.length > 1) {
-          const path = routeData.stops.map(stop => ({ lat: stop.lat, lng: stop.lng }))
-          
-          const polyline = new google.maps.Polyline({
-            path,
-            geodesic: true,
-            strokeColor: '#2E7D32', // Cor primária especificada
-            strokeOpacity: 1.0,
-            strokeWeight: 4, // 4px conforme especificação
-            icons: prefersReducedMotion ? [] : [{
-              icon: {
-                path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
-                scale: 3,
-                strokeColor: '#2E7D32'
-              },
-              offset: '100%',
-              repeat: '50px'
-            }]
-          })
-
-          polyline.setMap(map)
+          const stops = routeData.stops.map(stop => ({ lat: stop.lat, lng: stop.lng }))
+          const polyline = createRoutePolyline(map, stops, prefersReducedMotion)
           polylineRef.current = polyline
-
-          // Adicionar sombra sutil ao polyline apenas se não for movimento reduzido
-          if (!prefersReducedMotion) {
-            const shadowPolyline = new google.maps.Polyline({
-              path,
-              geodesic: true,
-              strokeColor: '#000000',
-              strokeOpacity: 0.2,
-              strokeWeight: 6,
-              zIndex: 1
-            })
-            shadowPolyline.setMap(map)
-          }
         }
 
         // Criar marcadores para as paradas
@@ -493,58 +364,10 @@ export const AdvancedRouteMap = memo(function AdvancedRouteMap({
     }
   }, [routeData, initialZoom, showControls, measureOperation, announce, accessibilityState.isKeyboardUser, prefersReducedMotion])
 
-  // Criar polyline do trajeto
-  const createRoutePolyline = useCallback(async (google: typeof window.google, map: google.maps.Map) => {
-    if (!routeData?.stops.length || routeData.stops.length < 2) return
-
-    // Limpar polyline anterior
-    if (polylineRef.current) {
-      polylineRef.current.setMap(null)
-    }
-
-    // Criar caminho com todas as paradas
-    const path = routeData.stops.map(stop => ({
-      lat: stop.lat,
-      lng: stop.lng
-    }))
-
-    // Criar polyline com estilo customizado
-    const polyline = new google.maps.Polyline({
-      path,
-      geodesic: true,
-      strokeColor: '#2E7D32',
-      strokeOpacity: 1.0,
-      strokeWeight: 4,
-      icons: [
-        {
-          icon: {
-            path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
-            scale: 3,
-            strokeColor: '#2E7D32',
-            fillColor: '#2E7D32',
-            fillOpacity: 1
-          },
-          offset: '100%',
-          repeat: '200px'
-        }
-      ]
-    })
-
-    polyline.setMap(map)
-    polylineRef.current = polyline
-
-    // Adicionar sombra à polyline
-    const shadowPolyline = new google.maps.Polyline({
-      path,
-      geodesic: true,
-      strokeColor: '#000000',
-      strokeOpacity: 0.2,
-      strokeWeight: 6,
-      zIndex: 1
-    })
-
-    shadowPolyline.setMap(map)
-  }, [routeData])
+  // Função helper para criar ícone usando o factory
+  const createCustomMarkerIcon = useCallback((type: 'pickup' | 'dropoff', number: number, isFocused: boolean = false): google.maps.Icon => {
+    return createMarkerIcon(type, number, isFocused, isMobile)
+  }, [isMobile])
 
   // Criar marcadores customizados com lazy loading e otimizações
   const createStopMarkers = useCallback(async (google: typeof window.google, map: google.maps.Map) => {
@@ -638,71 +461,7 @@ export const AdvancedRouteMap = memo(function AdvancedRouteMap({
         markersRef.current.push(marker)
       })
     }
-  }, [routeData, focusedMarkerIndex, keyboardNavigationActive, announce, prefersReducedMotion])
-
-  // Cache para ícones de marcadores para melhorar performance
-  const iconCache = useRef<Map<string, google.maps.Icon>>(new Map())
-  
-  // Criar ícone SVG customizado para marcadores com cache e otimizações
-  const createCustomMarkerIcon = useCallback((type: 'pickup' | 'dropoff', number: number, isFocused: boolean = false): google.maps.Icon => {
-    const size = isMobile ? 24 : 32
-    const cacheKey = `${type}-${number}-${size}-${isFocused}`
-    
-    // Verificar cache primeiro
-    if (iconCache.current.has(cacheKey)) {
-      return iconCache.current.get(cacheKey)!
-    }
-    
-    const color = type === 'pickup' ? '#2E7D32' : '#1976D2'
-    const shape = type === 'pickup' ? 'circle' : 'square'
-    const focusRing = isFocused ? `<circle cx="16" cy="16" r="14" fill="none" stroke="#FFD700" stroke-width="2" opacity="0.8"/>` : ''
-    
-    // Otimizar SVG removendo elementos desnecessários em dispositivos móveis
-    const shadowFilter = !isMobile ? `
-      <defs>
-        <filter id="shadow-${cacheKey}" x="-50%" y="-50%" width="200%" height="200%">
-          <feDropShadow dx="0" dy="2" stdDeviation="2" flood-opacity="0.3"/>
-        </filter>
-      </defs>` : ''
-    
-    const filterAttr = !isMobile ? `filter="url(#shadow-${cacheKey})"` : ''
-    
-    const svg = `
-      <svg width="${size}" height="${size}" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-        ${shadowFilter}
-        <g ${filterAttr}>
-          ${focusRing}
-          ${shape === 'circle' 
-            ? `<circle cx="16" cy="16" r="12" fill="${color}" stroke="#FFFFFF" stroke-width="3"/>`
-            : `<rect x="4" y="4" width="24" height="24" rx="2" fill="${color}" stroke="#FFFFFF" stroke-width="3"/>`
-          }
-          <circle cx="16" cy="16" r="8" fill="#FFFFFF" opacity="0.9"/>
-          <text x="16" y="20" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="${color}">
-            ${number}
-          </text>
-        </g>
-      </svg>
-    `
-
-    const icon = {
-      url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`,
-      size: new google.maps.Size(size, size),
-      scaledSize: new google.maps.Size(size, size),
-      anchor: new google.maps.Point(size / 2, size / 2)
-    }
-    
-    // Armazenar no cache com limite de tamanho
-    if (iconCache.current.size > 50) {
-      // Limpar cache quando muito grande
-      const firstKey = iconCache.current.keys().next().value
-      if (firstKey) {
-        iconCache.current.delete(firstKey)
-      }
-    }
-    iconCache.current.set(cacheKey, icon)
-    
-    return icon
-  }, [isMobile])
+  }, [routeData, focusedMarkerIndex, keyboardNavigationActive, announce, prefersReducedMotion, createCustomMarkerIcon])
 
   // Effects
   useEffect(() => {
@@ -715,7 +474,7 @@ export const AdvancedRouteMap = memo(function AdvancedRouteMap({
     }
   }, [routeData, mapLoaded, initializeMap])
 
-  // Atualizar ícones dos marcadores quando o foco muda
+      // Atualizar ícones dos marcadores quando o foco muda
   useEffect(() => {
     if (routeData && markersRef.current.length > 0) {
       markersRef.current.forEach((marker, index) => {
@@ -728,7 +487,7 @@ export const AdvancedRouteMap = memo(function AdvancedRouteMap({
         }
       })
     }
-  }, [focusedMarkerIndex, routeData])
+  }, [focusedMarkerIndex, routeData, createCustomMarkerIcon])
 
   // Simulação de tempo real (para demonstração)
   useEffect(() => {
@@ -764,9 +523,9 @@ export const AdvancedRouteMap = memo(function AdvancedRouteMap({
   const handlePreviousStop = useCallback(() => {
     if (!routeData?.stops || routeData.stops.length === 0) return
     
-    const currentIndex = routeData.stops.findIndex((stop: any) => stop.isCurrent)
+    const currentIndex = routeData.stops.findIndex((stop: RouteStopWithState) => stop.isCurrent)
     if (currentIndex > 0) {
-      const newStops = routeData.stops.map((stop: any, index: number) => ({
+      const newStops = routeData.stops.map((stop: RouteStop, index: number) => ({
         ...stop,
         isCurrent: index === currentIndex - 1,
         isCompleted: index < currentIndex - 1
@@ -786,9 +545,9 @@ export const AdvancedRouteMap = memo(function AdvancedRouteMap({
   const handleNextStop = useCallback(() => {
     if (!routeData?.stops || routeData.stops.length === 0) return
     
-    const currentIndex = routeData.stops.findIndex((stop: any) => stop.isCurrent)
+    const currentIndex = routeData.stops.findIndex((stop: RouteStop) => (stop as RouteStop & { isCurrent?: boolean }).isCurrent)
     if (currentIndex < routeData.stops.length - 1) {
-      const newStops = routeData.stops.map((stop: any, index: number) => ({
+      const newStops = routeData.stops.map((stop: RouteStop, index: number) => ({
         ...stop,
         isCurrent: index === currentIndex + 1,
         isCompleted: index <= currentIndex
@@ -804,12 +563,12 @@ export const AdvancedRouteMap = memo(function AdvancedRouteMap({
     }
   }, [routeData])
 
-  const handleMarkerClick = useCallback((stop: RouteStop, event: any) => {
+  const handleMarkerClick = useCallback((stop: RouteStop, event: google.maps.MapMouseEvent) => {
     // Calcular posição do hotspot
     const rect = mapContainerRef.current?.getBoundingClientRect()
-    if (rect) {
-      const x = event.pixel.x + rect.left
-      const y = event.pixel.y + rect.top
+    if (rect && event.domEvent && 'pageX' in event.domEvent && 'pageY' in event.domEvent) {
+      const x = event.domEvent.pageX
+      const y = event.domEvent.pageY
       
       setSelectedStop(stop)
       setHotspotPosition({ x, y })
@@ -818,12 +577,12 @@ export const AdvancedRouteMap = memo(function AdvancedRouteMap({
     }
   }, [])
 
-  const handleMarkerHover = useCallback((stop: RouteStop, event: any) => {
+  const handleMarkerHover = useCallback((stop: RouteStop, event: google.maps.MapMouseEvent) => {
     // Calcular posição do tooltip
     const rect = mapContainerRef.current?.getBoundingClientRect()
-    if (rect) {
-      const x = event.pixel.x + rect.left
-      const y = event.pixel.y + rect.top
+    if (rect && event.domEvent && 'pageX' in event.domEvent && 'pageY' in event.domEvent) {
+      const x = event.domEvent.pageX
+      const y = event.domEvent.pageY
       
       setSelectedStop(stop)
       setTooltipPosition({ x, y })
@@ -877,18 +636,17 @@ export const AdvancedRouteMap = memo(function AdvancedRouteMap({
     setIsFullscreen(!isFullscreen)
   }
 
-  const formatDuration = (minutes: number) => {
-    const hours = Math.floor(minutes / 60)
-    const mins = minutes % 60
-    return hours > 0 ? `${hours}h ${mins}min` : `${mins}min`
-  }
+  // Funções de formatação usando utilitários do kpi-utils
+  const formatDurationHelper = useCallback((minutes: number) => {
+    return formatDuration(minutes, 'minutes')
+  }, [])
 
-  const formatDistance = (meters: number) => {
+  const formatDistanceHelper = useCallback((meters: number) => {
     if (meters >= 1000) {
       return `${(meters / 1000).toFixed(1)} km`
     }
     return `${meters} m`
-  }
+  }, [])
 
   // Render principal
   if (isLoading) {
@@ -939,28 +697,11 @@ export const AdvancedRouteMap = memo(function AdvancedRouteMap({
       <div className={`flex items-center justify-between mb-4 ${
         isMobile ? 'flex-col gap-2' : 'flex-row'
       }`}>
-        <div className={`flex items-center gap-2 ${
-          isMobile ? 'flex-wrap justify-center' : ''
-        }`} role="status" aria-label="Status da conexão">
-          <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs ${
-            isOnline ? 'bg-success-light text-success' : 'bg-error-light text-error'
-          }`} aria-live="polite">
-            {isOnline ? (
-              <Wifi className="w-3 h-3" aria-hidden="true" />
-            ) : (
-              <WifiOff className="w-3 h-3" aria-hidden="true" />
-            )}
-            {isOnline ? 'Online' : 'Offline'}
-          </div>
-          
-          {cacheExpiry && (
-            <div className={`text-xs text-ink-muted ${
-              isMobile ? 'text-center' : ''
-            }`} aria-label={`Cache válido até ${new Date(cacheExpiry).toLocaleTimeString()}`}>
-              Cache válido até {new Date(cacheExpiry).toLocaleTimeString()}
-            </div>
-          )}
-        </div>
+        <ConnectivityIndicator 
+          isOnline={isOnline}
+          cacheExpiry={cacheExpiry || null}
+          isMobile={isMobile}
+        />
 
         <div className={`flex items-center gap-2 text-xs text-ink-muted ${
           isMobile ? 'justify-center' : ''
@@ -971,85 +712,19 @@ export const AdvancedRouteMap = memo(function AdvancedRouteMap({
       </div>
 
       {/* Cabeçalho com informações da rota */}
-      <Card className="mb-4 p-4 bg-white shadow-sm" role="banner" aria-labelledby="route-title">
-        <div className={`flex items-center justify-between ${
-          isMobile ? 'flex-col gap-4' : 'flex-row'
-        }`}>
-          <div className={`flex items-center gap-4 ${
-            isMobile ? 'flex-col text-center' : 'flex-row'
-          }`}>
-            <div className="flex items-center gap-2">
-              <RouteIcon className="h-5 w-5 text-info" aria-hidden="true" />
-              <span id="route-title" className="text-lg font-semibold">
-                {routeData?.name || 'Rota'}
-              </span>
-            </div>
-            <div className={`flex items-center gap-4 ${
-              isMobile ? 'flex-wrap justify-center' : ''
-            }`} role="list" aria-label="Informações da rota">
-              <div className="flex items-center gap-2" role="listitem">
-                <Clock className="h-4 w-4 text-ink-muted" aria-hidden="true" />
-                <span className="text-sm text-ink-muted" aria-label={`Duração estimada: ${formatDuration(routeData?.estimatedDuration || 0)}`}>
-                  {formatDuration(routeData?.estimatedDuration || 0)}
-                </span>
-              </div>
-              <div className="flex items-center gap-2" role="listitem">
-                <Navigation className="h-4 w-4 text-ink-muted" aria-hidden="true" />
-                <span className="text-sm text-ink-muted" aria-label={`Distância total: ${formatDistance(routeData?.totalDistance || 0)}`}>
-                  {formatDistance(routeData?.totalDistance || 0)}
-                </span>
-              </div>
-              <div className="flex items-center gap-2" role="listitem">
-                <Users className="h-4 w-4 text-ink-muted" aria-hidden="true" />
-                <span className="text-sm text-ink-muted" aria-label={`Número de paradas: ${routeData?.stops.length || 0}`}>
-                  {routeData?.stops.length || 0} paradas
-                </span>
-              </div>
-            </div>
-          </div>
-          
-          <div className={`flex items-center gap-2 ${
-            isMobile ? 'w-full justify-center' : ''
-          }`} role="toolbar" aria-label="Controles do mapa">
-            {showControls && (
-              <>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleReset}
-                  aria-label="Reiniciar visualização do mapa"
-                  title="Reiniciar mapa"
-                >
-                  <RefreshCw className="h-4 w-4" />
-                  {isMobile && <span className="ml-2">Reiniciar</span>}
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={toggleFullscreen}
-                  aria-label={isFullscreen ? "Sair do modo tela cheia" : "Entrar no modo tela cheia"}
-                  title={isFullscreen ? "Sair da tela cheia" : "Tela cheia"}
-                >
-                  {isFullscreen ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
-                  {isMobile && <span className="ml-2">{isFullscreen ? "Sair" : "Tela Cheia"}</span>}
-                </Button>
-              </>
-            )}
-            {onClose && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={onClose}
-                aria-label="Fechar mapa"
-                title="Fechar"
-              >
-                <X className="h-4 w-4" />
-                {isMobile && <span className="ml-2">Fechar</span>}
-              </Button>
-            )}
-          </div>
-        </div>
-      </Card>
+      {routeData && (
+        <RouteHeader
+          routeData={routeData}
+          isMobile={isMobile}
+          formatDuration={formatDurationHelper}
+          formatDistance={formatDistanceHelper}
+          onReset={handleReset}
+          onToggleFullscreen={toggleFullscreen}
+          isFullscreen={isFullscreen}
+          onClose={onClose}
+          showControls={showControls}
+        />
+      )}
 
       {/* Mapa */}
       <Card className="overflow-hidden shadow-lg">
@@ -1170,7 +845,7 @@ export const AdvancedRouteMap = memo(function AdvancedRouteMap({
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              onClick={(e: any) => e.stopPropagation()}
+              onClick={(e: React.MouseEvent) => e.stopPropagation()}
             >
               <div className="flex items-start justify-between mb-4">
                 <h3 className="text-lg font-bold text-ink-strong">

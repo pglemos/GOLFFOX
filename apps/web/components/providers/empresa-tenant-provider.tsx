@@ -293,7 +293,11 @@ function OperatorTenantProviderInner({ children }: { children: ReactNode }) {
   )
 }
 
-export function OperatorTenantProvider({ children }: { children: ReactNode }) {
+export interface OperatorTenantProviderProps {
+  children: ReactNode
+}
+
+export function OperatorTenantProvider({ children }: OperatorTenantProviderProps) {
   return <OperatorTenantProviderInner>{children}</OperatorTenantProviderInner>
 }
 

@@ -7,10 +7,14 @@ import { useOperatorTenant } from "@/components/providers/empresa-tenant-provide
 import { showCriticalAlert } from "@/components/alerts/alert-toast"
 import { notifySuccess } from "@/lib/toast"
 
-export function RealtimeProvider({ children }: { children: React.ReactNode }) {
+export interface RealtimeProviderProps {
+    children: React.ReactNode
+}
+
+export function RealtimeProvider({ children }: RealtimeProviderProps) {
     const { tenantCompanyId } = useOperatorTenant()
     const queryClient = useQueryClient()
-    const channelRef = useRef<any>(null)
+    const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null)
 
     useEffect(() => {
         if (!tenantCompanyId) return
@@ -40,7 +44,7 @@ export function RealtimeProvider({ children }: { children: React.ReactNode }) {
                     queryClient.invalidateQueries({ queryKey: ["control-tower"] })
                     queryClient.invalidateQueries({ queryKey: ["empresa-kpis"] })
 
-                    const newAlert = payload.new as any
+                    const newAlert = payload.new as { severity?: string; alert_type?: string; message?: string }
 
                     // Show toast for critical/warning alerts
                     if (newAlert.severity === 'critical' || newAlert.severity === 'error') {

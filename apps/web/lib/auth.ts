@@ -213,13 +213,14 @@ export class AuthManager {
                     new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 100))
                   ])
                   isReady = true
-                } catch (initCheckErr: any) {
+                } catch (initCheckErr: unknown) {
                   // Se getSession falhar ou timeout, o Supabase ainda não está pronto
-                  if (initCheckErr?.message?.includes('initializePromise') || 
+                  const err = initCheckErr as Error
+                  if (err?.message?.includes('initializePromise') || 
                       initCheckErr?.message?.includes('undefined') ||
                       initCheckErr?.message === 'timeout') {
                     debug('Supabase ainda inicializando, pulando setSession', {
-                      error: initCheckErr?.message
+                      error: err?.message
                     }, 'AuthManager')
                     // Sair do bloco try sem chamar setSession
                     return
@@ -251,23 +252,25 @@ export class AuthManager {
                 } else {
                   debug('Sessão Supabase sincronizada', {}, 'AuthManager')
                 }
-              } catch (setSessionErr: any) {
+              } catch (setSessionErr: unknown) {
                 // Capturar erros específicos do setSession
-                if (setSessionErr?.message?.includes('initializePromise') || 
+                const err = setSessionErr as Error
+                if (err?.message?.includes('initializePromise') || 
                     setSessionErr?.message?.includes('Cannot read properties of undefined')) {
                   debug('Supabase ainda inicializando durante setSession', { 
-                    error: setSessionErr?.message 
+                    error: err?.message 
                   }, 'AuthManager')
                 } else {
                   warn('Erro ao chamar setSession', { error: setSessionErr }, 'AuthManager')
                 }
               }
-            } catch (sessionErr: any) {
+            } catch (sessionErr: unknown) {
               // Ignorar erros de inicialização do Supabase - não crítico
-              if (sessionErr?.message?.includes('initializePromise') || 
+              const err = sessionErr as Error
+              if (err?.message?.includes('initializePromise') || 
                   sessionErr?.message?.includes('Cannot read properties of undefined')) {
                 debug('Supabase ainda inicializando, pulando setSession', { 
-                  error: sessionErr?.message 
+                  error: err?.message 
                 }, 'AuthManager')
               } else {
                 warn('Erro ao chamar setSession', { error: sessionErr }, 'AuthManager')
@@ -371,12 +374,13 @@ export class AuthManager {
 
       debug('persistSession concluído com sucesso', {}, 'AuthManager')
       return Promise.resolve()
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const errorObj = err as Error
       error('persistSession - Erro inesperado', {
         error: err,
-        message: err?.message,
-        stack: err?.stack?.substring(0, 500),
-        name: err?.name
+        message: errorObj?.message,
+        stack: errorObj?.stack?.substring(0, 500),
+        name: errorObj?.name
       }, 'AuthManager')
       // Retornar Promise resolvida mesmo em caso de erro para não quebrar o fluxo
       return Promise.resolve()
