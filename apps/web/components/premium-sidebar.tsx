@@ -1,9 +1,8 @@
 "use client"
 
 import React, { useEffect, useMemo } from "react"
+import Link from "next/link"
 import { usePathname, useRouter } from "@/lib/next-navigation"
-// Usar âncoras nativas para compatibilidade com Next.js canary
-import { useViewTransition } from "@/hooks/use-view-transition"
 import {
   Sidebar,
   SidebarHeader,
@@ -457,7 +456,6 @@ export function PremiumSidebar({
 }: PremiumSidebarProps) {
   const router = useRouter()
   const pathname = usePathname()
-  const { navigateWithTransition } = useViewTransition()
 
   const menuGroups = useMemo(() => {
     switch (panel) {
@@ -472,14 +470,6 @@ export function PremiumSidebar({
     }
   }, [panel])
 
-  // Prefetch de rotas
-  useEffect(() => {
-    menuGroups.forEach(group => {
-      group.items.forEach(item => {
-        router.prefetch(item.href)
-      })
-    })
-  }, [menuGroups, router])
 
   // Verificar se um item está ativo
   const isItemActive = (href: string) => {
@@ -519,16 +509,13 @@ export function PremiumSidebar({
                           isActive={isActive}
                           tooltip={item.label}
                         >
-                          <a
+                          <Link
                             href={item.href}
-                            onClick={(e) => {
-                              e.preventDefault()
-                              navigateWithTransition(item.href)
-                            }}
+                            prefetch={true}
                           >
                             <Icon className="size-4" />
                             <span>{item.label}</span>
-                          </a>
+                          </Link>
                         </SidebarMenuButton>
                         {/* Badge */}
                         {item.badge && (
@@ -563,16 +550,13 @@ export function PremiumSidebar({
                                     isCollapsed && "justify-center px-2"
                                   )}
                                 >
-                                  <a
+                                  <Link
                                     href={child.href}
-                                    onClick={(e) => {
-                                      e.preventDefault()
-                                      navigateWithTransition(child.href)
-                                    }}
+                                    prefetch={true}
                                   >
                                     <ChildIcon className="size-4" />
                                     {!isCollapsed && <span>{child.label}</span>}
-                                  </a>
+                                  </Link>
                                 </SidebarMenuButton>
                               </SidebarMenuItem>
                             )
