@@ -32,11 +32,8 @@ import {
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 
-// Lazy load modal
-const VeiculoModal = dynamic(
-    () => import("@/components/modals/veiculo-modal").then(m => ({ default: m.VeiculoModal })),
-    { ssr: false, loading: () => null }
-)
+// Lazy load modal - usar import direto para evitar problema de redefinição
+import { VeiculoModal } from "@/components/modals/veiculo-modal"
 
 interface veiculo {
     id: string

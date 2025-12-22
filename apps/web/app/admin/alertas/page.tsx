@@ -3,9 +3,14 @@ import { type Metadata } from "next"
 import { Suspense } from "react"
 import { AppShell } from "@/components/app-shell"
 import { getServerUser, hasServerRole } from "@/lib/server-auth"
-import { AlertasPageClient } from "@/components/admin/alertas/alertas-page-client"
 import { getSupabaseAdmin } from "@/lib/supabase-client"
 import { SkeletonList } from "@/components/ui/skeleton"
+import dynamic from "next/dynamic"
+
+const AlertasPageClient = dynamic(
+  () => import("@/components/admin/alertas/alertas-page-client").then(m => ({ default: m.AlertasPageClient })),
+  { ssr: true }
+)
 
 interface Alerta {
   id: string
@@ -73,14 +78,16 @@ export default async function AlertasPage() {
   // Obter usuário do servidor
   const user = await getServerUser()
 
-  // Verificar autenticação
+  // Verificar autenticação - usar throw redirect para evitar problema de redefinição
   if (!user) {
-    redirect('/?next=/admin/alertas')
+    const { redirect: redirectFn } = await import("next/navigation")
+    redirectFn('/?next=/admin/alertas')
   }
 
   // Verificar role
   if (!hasServerRole(user, 'admin')) {
-    redirect('/unauthorized')
+    const { redirect: redirectFn } = await import("next/navigation")
+    redirectFn('/unauthorized')
   }
 
   return (
