@@ -94,27 +94,44 @@ export function Topbar({
   // Listener para atualização de avatar (disparado após upload)
   useEffect(() => {
     const handleAuthUpdate = async () => {
+      debug('Topbar - auth:update event received', {}, 'Topbar')
       // Aguardar um pouco para garantir que o banco foi atualizado
       setTimeout(async () => {
         try {
+          debug('Topbar - Fetching updated user data', {}, 'Topbar')
           const res = await fetch('/api/auth/me', {
             credentials: 'include',
-            cache: 'no-store'
+            cache: 'no-store',
+            headers: {
+              'Cache-Control': 'no-cache',
+              'Pragma': 'no-cache'
+            }
           })
           if (res.ok) {
             const data = await res.json()
             const updatedUser = data?.user
+            debug('Topbar - Updated user data received', {
+              hasAvatarUrl: !!updatedUser?.avatar_url,
+              avatarUrl: updatedUser?.avatar_url
+            }, 'Topbar')
             if (updatedUser?.avatar_url) {
               const urlWithCache = updatedUser.avatar_url.includes('?')
-                ? updatedUser.avatar_url
+                ? `${updatedUser.avatar_url.split('?')[0]}?t=${Date.now()}`
                 : `${updatedUser.avatar_url}?t=${Date.now()}`
+              debug('Topbar - Setting avatar URL with cache', { urlWithCache }, 'Topbar')
               setAvatarUrl(urlWithCache)
+            } else {
+              debug('Topbar - No avatar_url in updated user', {}, 'Topbar')
+              setAvatarUrl(undefined)
             }
+          } else {
+            debug('Topbar - Failed to fetch updated user', { status: res.status }, 'Topbar')
           }
         } catch (error) {
+          debug('Topbar - Error updating avatar', { error }, 'Topbar')
           console.error('Erro ao atualizar avatar:', error)
         }
-      }, 500)
+      }, 800) // Aumentar delay para garantir propagação
     }
 
     window.addEventListener('auth:update', handleAuthUpdate)
@@ -368,6 +385,17 @@ export function Topbar({
                       src={avatarUrl}
                       alt={user?.name || "User"}
                       className="object-cover"
+                      onError={(e) => {
+                        debug('Topbar - Avatar image failed to load', { 
+                          avatarUrl,
+                          error: e 
+                        }, 'Topbar')
+                        // Forçar fallback removendo a URL
+                        setAvatarUrl(undefined)
+                      }}
+                      onLoad={() => {
+                        debug('Topbar - Avatar image loaded successfully', { avatarUrl }, 'Topbar')
+                      }}
                     />
                   )}
                   <AvatarFallback className="rounded-md text-xs font-medium">

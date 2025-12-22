@@ -71,6 +71,14 @@ export async function POST(req: NextRequest) {
       .from('avatares')
       .getPublicUrl(filePath)
 
+    // Log para debug
+    logError('Avatar upload - URL gerada', { 
+      publicUrl, 
+      filePath, 
+      userId,
+      bucket: 'avatares'
+    }, 'UploadAvatarAPI')
+
     // Adicionar timestamp à URL para evitar cache do navegador
     const publicUrlWithCache = `${publicUrl}?t=${Date.now()}`
 
@@ -93,6 +101,15 @@ export async function POST(req: NextRequest) {
 
     // Verificar se o avatar_url foi realmente atualizado
     const updatedUser = updateData[0]
+    
+    // Log para debug
+    logError('Avatar upload - Dados atualizados', {
+      expected: publicUrl,
+      actual: updatedUser.avatar_url,
+      userId,
+      matches: updatedUser.avatar_url === publicUrl
+    }, 'UploadAvatarAPI')
+
     if (updatedUser.avatar_url !== publicUrl) {
       logError('Avatar URL não corresponde ao esperado', {
         expected: publicUrl,
@@ -103,7 +120,15 @@ export async function POST(req: NextRequest) {
     }
 
     // Aguardar um pouco para garantir que a atualização foi propagada
-    await new Promise(resolve => setTimeout(resolve, 100))
+    await new Promise(resolve => setTimeout(resolve, 200))
+
+    // Log final
+    logError('Avatar upload - SUCESSO', {
+      userId,
+      publicUrl,
+      publicUrlWithCache,
+      savedUrl: updatedUser.avatar_url
+    }, 'UploadAvatarAPI')
 
     return NextResponse.json({
       success: true,
