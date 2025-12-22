@@ -51,7 +51,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      veiculos: availableVehicles
+      vehicles: availableVehicles
     })
   } catch (error: any) {
     logError('Erro ao buscar veículos disponíveis', { error }, 'AvailableVehiclesAPI')

@@ -97,7 +97,7 @@ export default function TransportadoraMotoristasPage() {
     const loadDrivers = useCallback(async () => {
         try {
             setDataLoading(true)
-            const response = await fetch('/api/admin/motoristas-list')
+            const response = await fetch('/api/admin/drivers-list')
             if (!response.ok) throw new Error('Erro ao carregar motoristas')
             const data = await response.json()
             setMotoristas(Array.isArray(data) ? data : data.motoristas || [])
@@ -147,7 +147,7 @@ export default function TransportadoraMotoristasPage() {
         if (!confirm(`Excluir motorista "${driverName}"?`)) return
 
         try {
-            const response = await fetch(`/api/admin/motoristas/delete?id=${driverId}`, { method: 'DELETE' })
+            const response = await fetch(`/api/admin/drivers/delete?id=${driverId}`, { method: 'DELETE' })
             if (!response.ok) throw new Error('Erro ao excluir')
             notifySuccess('Motorista excluído')
             loadDrivers()

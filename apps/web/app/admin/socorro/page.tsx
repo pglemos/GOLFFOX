@@ -16,7 +16,7 @@ import { notifySuccess, notifyError } from "@/lib/toast"
 import { useAuthFast } from "@/hooks/use-auth-fast"
 import { EditAssistanceModal } from "@/components/modals/edit-assistance-modal"
 import { Edit } from "lucide-react"
-import { 
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -64,7 +64,7 @@ export default function SocorroPage() {
   const loadEmergencyResources = async () => {
     try {
       dispatchFormDispatch({ type: 'SET_LOADING_RESOURCES', payload: true })
-      
+
       // Carregar rotas com problemas
       const routesResponse = await fetch('/api/admin/emergency/routes-with-problems')
       const routesResult = await routesResponse.json()
@@ -73,17 +73,17 @@ export default function SocorroPage() {
       }
 
       // Carregar motoristas disponíveis
-      const driversResponse = await fetch('/api/admin/emergency/available-motoristas')
+      const driversResponse = await fetch('/api/admin/emergency/available-drivers')
       const driversResult = await driversResponse.json()
       if (driversResult.success) {
-        dispatchFormDispatch({ type: 'SET_DRIVERS', payload: driversResult.motoristas || [] })
+        dispatchFormDispatch({ type: 'SET_DRIVERS', payload: driversResult.drivers || [] })
       }
 
       // Carregar veículos disponíveis
-      const vehiclesResponse = await fetch('/api/admin/emergency/available-veiculos')
+      const vehiclesResponse = await fetch('/api/admin/emergency/available-vehicles')
       const vehiclesResult = await vehiclesResponse.json()
       if (vehiclesResult.success) {
-        dispatchFormDispatch({ type: 'SET_VEHICLES', payload: vehiclesResult.veiculos || [] })
+        dispatchFormDispatch({ type: 'SET_VEHICLES', payload: vehiclesResult.vehicles || [] })
       }
     } catch (error) {
       console.error('Erro ao carregar recursos de emergência:', error)
@@ -119,10 +119,10 @@ export default function SocorroPage() {
       }
 
       notifySuccess('Socorro despachado com sucesso!')
-      
+
       // Limpar formulário
       dispatchFormDispatch({ type: 'RESET_SELECTIONS' })
-      
+
       // Recarregar recursos e ocorrências
       await loadEmergencyResources()
       await loadOcorrencias()
@@ -142,7 +142,7 @@ export default function SocorroPage() {
       if (filterStatus !== "all") {
         params.append('status', filterStatus)
       }
-      
+
       const response = await fetch(`/api/admin/assistance-requests-list?${params.toString()}`)
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
@@ -170,9 +170,9 @@ export default function SocorroPage() {
       const response = await fetch(`/api/admin/assistance-requests/delete?id=${ocorrenciaId}`, {
         method: 'DELETE'
       })
-      
+
       const result = await response.json()
-      
+
       if (!response.ok) {
         const errorMessage = result.message || result.error || 'Erro ao excluir solicitação de socorro'
         const errorDetails = result.details ? ` (${result.details})` : ''
@@ -227,8 +227,8 @@ export default function SocorroPage() {
                   <span className="bg-text-brand text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold">1</span>
                   Selecione a Rota com Problema
                 </Label>
-                <Select 
-                  value={dispatchFormState.selections.routeId} 
+                <Select
+                  value={dispatchFormState.selections.routeId}
                   onValueChange={(value) => dispatchFormDispatch({ type: 'SET_ROUTE_ID', payload: value })}
                   disabled={dispatchFormState.loading.loadingResources}
                 >
@@ -257,8 +257,8 @@ export default function SocorroPage() {
                   <span className="bg-text-brand text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold">2</span>
                   Escolha o Motorista de Socorro
                 </Label>
-                <Select 
-                  value={dispatchFormState.selections.driverId} 
+                <Select
+                  value={dispatchFormState.selections.driverId}
                   onValueChange={(value) => dispatchFormDispatch({ type: 'SET_DRIVER_ID', payload: value })}
                   disabled={dispatchFormState.loading.loadingResources}
                 >
@@ -287,8 +287,8 @@ export default function SocorroPage() {
                   <span className="bg-text-brand text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold">3</span>
                   Escolha o Veículo de Socorro
                 </Label>
-                <Select 
-                  value={dispatchFormState.selections.vehicleId} 
+                <Select
+                  value={dispatchFormState.selections.vehicleId}
                   onValueChange={(value) => dispatchFormDispatch({ type: 'SET_VEHICLE_ID', payload: value })}
                   disabled={dispatchFormState.loading.loadingResources}
                 >
@@ -409,157 +409,157 @@ export default function SocorroPage() {
 
         <div className="grid gap-4">
           {ocorrencias
-            .filter(occ => 
-              searchQuery === "" || 
+            .filter(occ =>
+              searchQuery === "" ||
               occ.request_type?.toLowerCase().includes(searchQuery.toLowerCase()) ||
               occ.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
               occ.address?.toLowerCase().includes(searchQuery.toLowerCase())
             )
             .map((ocorrencia, index) => (
-            <motion.div
-              key={ocorrencia.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.05 }}
-              whileHover={{ y: -4 }}
-              className="group"
-            >
-              <Card className="p-4 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-border hover:border-text-error/30">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      <div className="p-1.5 rounded-lg bg-error-light">
-                        <LifeBuoy className="h-4 w-4 text-text-error" />
-                      </div>
-                      <h3 className="font-bold text-lg capitalize group-hover:text-text-error transition-colors">{ocorrencia.request_type}</h3>
-                      <Badge 
-                        variant={
-                          ocorrencia.status === 'open' ? 'destructive' :
-                          ocorrencia.status === 'dispatched' ? 'default' :
-                          ocorrencia.status === 'resolved' ? 'secondary' : 'outline'
-                        }
-                      >
-                        {ocorrencia.status === 'open' ? 'Aberta' :
-                         ocorrencia.status === 'dispatched' ? 'Despachada' :
-                         ocorrencia.status === 'resolved' ? 'Resolvida' : 'Cancelada'}
-                      </Badge>
-                    </div>
-                    {ocorrencia.description && (
-                      <p className="text-sm text-ink-muted mb-2">{ocorrencia.description}</p>
-                    )}
-                    <div className="space-y-1 text-xs text-ink-muted">
-                      {ocorrencia.address && (
-                        <p>📍 {ocorrencia.address}</p>
-                      )}
-                      {ocorrencia.routes && (
-                        <p>🚌 Rota: {ocorrencia.routes.name || ocorrencia.route_id}</p>
-                      )}
-                      {ocorrencia.motoristas && (
-                        <p>
-                          👤 Motorista: {(
-                            ocorrencia.motoristas.email?.split("@")[0] || ocorrencia.dispatched_driver_id
-                          )}
-                        </p>
-                      )}
-                      {ocorrencia.veiculos && (
-                        <p>🚛 Veículo: {ocorrencia.veiculos.plate}</p>
-                      )}
-                      <p>🕐 {new Date(ocorrencia.created_at).toLocaleString('pt-BR')}</p>
-                      {ocorrencia.status === 'open' && ocorrencia.created_at && (
-                        <div className="flex items-center gap-1 mt-2">
-                          <Clock className="h-3 w-3 text-brand" />
-                          <span className="text-xs text-brand font-medium">
-                            Tempo de resposta: {(() => {
-                              const minutes = Math.floor((Date.now() - new Date(ocorrencia.created_at).getTime()) / (1000 * 60))
-                              return `${minutes}min`
-                            })()}
-                          </span>
+              <motion.div
+                key={ocorrencia.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.05 }}
+                whileHover={{ y: -4 }}
+                className="group"
+              >
+                <Card className="p-4 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-border hover:border-text-error/30">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="p-1.5 rounded-lg bg-error-light">
+                          <LifeBuoy className="h-4 w-4 text-text-error" />
                         </div>
+                        <h3 className="font-bold text-lg capitalize group-hover:text-text-error transition-colors">{ocorrencia.request_type}</h3>
+                        <Badge
+                          variant={
+                            ocorrencia.status === 'open' ? 'destructive' :
+                              ocorrencia.status === 'dispatched' ? 'default' :
+                                ocorrencia.status === 'resolved' ? 'secondary' : 'outline'
+                          }
+                        >
+                          {ocorrencia.status === 'open' ? 'Aberta' :
+                            ocorrencia.status === 'dispatched' ? 'Despachada' :
+                              ocorrencia.status === 'resolved' ? 'Resolvida' : 'Cancelada'}
+                        </Badge>
+                      </div>
+                      {ocorrencia.description && (
+                        <p className="text-sm text-ink-muted mb-2">{ocorrencia.description}</p>
+                      )}
+                      <div className="space-y-1 text-xs text-ink-muted">
+                        {ocorrencia.address && (
+                          <p>📍 {ocorrencia.address}</p>
+                        )}
+                        {ocorrencia.routes && (
+                          <p>🚌 Rota: {ocorrencia.routes.name || ocorrencia.route_id}</p>
+                        )}
+                        {ocorrencia.motoristas && (
+                          <p>
+                            👤 Motorista: {(
+                              ocorrencia.motoristas.email?.split("@")[0] || ocorrencia.dispatched_driver_id
+                            )}
+                          </p>
+                        )}
+                        {ocorrencia.veiculos && (
+                          <p>🚛 Veículo: {ocorrencia.veiculos.plate}</p>
+                        )}
+                        <p>🕐 {new Date(ocorrencia.created_at).toLocaleString('pt-BR')}</p>
+                        {ocorrencia.status === 'open' && ocorrencia.created_at && (
+                          <div className="flex items-center gap-1 mt-2">
+                            <Clock className="h-3 w-3 text-brand" />
+                            <span className="text-xs text-brand font-medium">
+                              Tempo de resposta: {(() => {
+                                const minutes = Math.floor((Date.now() - new Date(ocorrencia.created_at).getTime()) / (1000 * 60))
+                                return `${minutes}min`
+                              })()}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex flex-col gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setSelectedRequestForEdit(ocorrencia)
+                          setIsEditModalOpen(true)
+                        }}
+                      >
+                        <Edit className="h-4 w-4 mr-2" />
+                        Editar
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => handleDeleteOcorrencia(ocorrencia.id)}
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Excluir
+                      </Button>
+                      {ocorrencia.status === 'open' && (
+                        <Button
+                          variant="destructive"
+                          onClick={async () => {
+                            setSelectedRequest(ocorrencia)
+                            setIsModalOpen(true)
+
+                            // Criar alerta crítico
+                            try {
+                              const { data: { session } } = await supabase.auth.getSession()
+                              if (session) {
+                                await supabase.from('gf_incidents').insert({
+                                  company_id: ocorrencia.company_id || null,
+                                  route_id: ocorrencia.route_id || null,
+                                  veiculo_id: ocorrencia.veiculo_id || null,
+                                  motorista_id: ocorrencia.motorista_id || null,
+                                  severity: 'critical',
+                                  status: 'open',
+                                  description: `Ocorrência de socorro: ${ocorrencia.request_type} - ${ocorrencia.description || ''}`
+                                } as any)
+                              }
+                            } catch (error) {
+                              console.error('Erro ao criar alerta:', error)
+                            }
+                          }}
+                        >
+                          <Send className="h-4 w-4 mr-2" />
+                          Despachar
+                        </Button>
+                      )}
+                      {ocorrencia.status === 'dispatched' && (
+                        <Button
+                          variant="outline"
+                          onClick={async () => {
+                            try {
+                              const { error } = await supabase
+                                .from('gf_assistance_requests')
+                                .update({ status: 'resolved', resolved_at: new Date().toISOString() } as any)
+                                .eq('id', ocorrencia.id)
+
+                              if (error) throw error
+
+                              // Calcular SLA
+                              const responseTime = new Date(ocorrencia.dispatched_at || Date.now()).getTime() - new Date(ocorrencia.created_at).getTime()
+                              const resolutionTime = Date.now() - new Date(ocorrencia.created_at).getTime()
+
+                              notifySuccess('', { i18n: { ns: 'common', key: 'success.assistanceResolvedSLA', params: { response: Math.floor(responseTime / 60000), total: Math.floor(resolutionTime / 60000) } } })
+                              loadOcorrencias()
+                            } catch (error: any) {
+                              notifyError(error, `Erro: ${error.message}`, { i18n: { ns: 'common', key: 'errors.assistanceResolve', params: { message: error.message } } })
+                            }
+                          }}
+                        >
+                          <LifeBuoy className="h-4 w-4 mr-2" />
+                          Resolver
+                        </Button>
                       )}
                     </div>
                   </div>
-                  <div className="flex flex-col gap-2">
-                    <Button 
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        setSelectedRequestForEdit(ocorrencia)
-                        setIsEditModalOpen(true)
-                      }}
-                    >
-                      <Edit className="h-4 w-4 mr-2" />
-                      Editar
-                    </Button>
-                    <Button 
-                      variant="destructive"
-                      size="sm"
-                      onClick={() => handleDeleteOcorrencia(ocorrencia.id)}
-                    >
-                      <Trash2 className="h-4 w-4 mr-2" />
-                      Excluir
-                    </Button>
-                    {ocorrencia.status === 'open' && (
-                      <Button 
-                        variant="destructive"
-                        onClick={async () => {
-                          setSelectedRequest(ocorrencia)
-                          setIsModalOpen(true)
-                          
-                          // Criar alerta crítico
-                          try {
-                            const { data: { session } } = await supabase.auth.getSession()
-                            if (session) {
-                              await supabase.from('gf_incidents').insert({
-                                company_id: ocorrencia.company_id || null,
-                                route_id: ocorrencia.route_id || null,
-                                veiculo_id: ocorrencia.veiculo_id || null,
-                                motorista_id: ocorrencia.motorista_id || null,
-                                severity: 'critical',
-                                status: 'open',
-                                description: `Ocorrência de socorro: ${ocorrencia.request_type} - ${ocorrencia.description || ''}`
-                              } as any)
-                            }
-                          } catch (error) {
-                            console.error('Erro ao criar alerta:', error)
-                          }
-                        }}
-                      >
-                        <Send className="h-4 w-4 mr-2" />
-                        Despachar
-                      </Button>
-                    )}
-                    {ocorrencia.status === 'dispatched' && (
-                      <Button 
-                        variant="outline"
-                        onClick={async () => {
-                          try {
-                            const { error } = await supabase
-                              .from('gf_assistance_requests')
-                              .update({ status: 'resolved', resolved_at: new Date().toISOString() } as any)
-                              .eq('id', ocorrencia.id)
-                            
-                            if (error) throw error
-                            
-                            // Calcular SLA
-                            const responseTime = new Date(ocorrencia.dispatched_at || Date.now()).getTime() - new Date(ocorrencia.created_at).getTime()
-                            const resolutionTime = Date.now() - new Date(ocorrencia.created_at).getTime()
-                            
-                            notifySuccess('', { i18n: { ns: 'common', key: 'success.assistanceResolvedSLA', params: { response: Math.floor(responseTime / 60000), total: Math.floor(resolutionTime / 60000) } } })
-                            loadOcorrencias()
-                          } catch (error: any) {
-                            notifyError(error, `Erro: ${error.message}`, { i18n: { ns: 'common', key: 'errors.assistanceResolve', params: { message: error.message } } })
-                          }
-                        }}
-                      >
-                        <LifeBuoy className="h-4 w-4 mr-2" />
-                        Resolver
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              </Card>
-            </motion.div>
-          ))}
+                </Card>
+              </motion.div>
+            ))}
           {ocorrencias.length === 0 && (
             <Card className="p-12 text-center">
               <LifeBuoy className="h-12 w-12 text-ink-light mx-auto mb-4" />

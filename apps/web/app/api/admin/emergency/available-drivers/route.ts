@@ -52,7 +52,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      motoristas: availableDrivers
+      drivers: availableDrivers
     })
   } catch (error: any) {
     logError('Erro ao buscar motoristas disponíveis', { error }, 'AvailableDriversAPI')
