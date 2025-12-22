@@ -1,0 +1,183 @@
+/**
+ * Wrapper para páginas com lazy loading
+ * 
+ * Fornece:
+ * - Loading skeleton enquanto carrega
+ * - Error boundary para erros de carregamento
+ * - Fallback para navegação durante loading
+ */
+
+'use client'
+
+import React, { Suspense, ComponentType } from 'react'
+import { ErrorBoundary, FallbackProps } from 'react-error-boundary'
+import { Skeleton } from '@/components/ui/skeleton'
+import { Button } from '@/components/ui/button'
+import { AlertCircle, RefreshCw } from 'lucide-react'
+
+interface LazyPageWrapperProps {
+  children: React.ReactNode
+  fallback?: React.ReactNode
+}
+
+// Skeleton padrão para páginas
+function PageSkeleton() {
+  return (
+    <div className="p-6 space-y-6 animate-pulse">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <Skeleton className="h-8 w-64" />
+        <div className="flex gap-2">
+          <Skeleton className="h-10 w-24" />
+          <Skeleton className="h-10 w-24" />
+        </div>
+      </div>
+
+      {/* Stats cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <Skeleton key={i} className="h-24 rounded-lg" />
+        ))}
+      </div>
+
+      {/* Main content */}
+      <Skeleton className="h-64 rounded-lg" />
+
+      {/* Table skeleton */}
+      <div className="space-y-2">
+        <Skeleton className="h-10 w-full" />
+        {Array.from({ length: 5 }).map((_, i) => (
+          <Skeleton key={i} className="h-12 w-full" />
+        ))}
+      </div>
+    </div>
+  )
+}
+
+// Fallback de erro
+function ErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
+  return (
+    <div className="flex flex-col items-center justify-center min-h-[400px] p-6">
+      <AlertCircle className="h-12 w-12 text-destructive mb-4" />
+      <h2 className="text-lg font-semibold mb-2">Erro ao carregar página</h2>
+      <p className="text-muted-foreground mb-4 text-center max-w-md">
+        {error.message || 'Ocorreu um erro ao carregar esta página.'}
+      </p>
+      <Button onClick={resetErrorBoundary} variant="outline">
+        <RefreshCw className="h-4 w-4 mr-2" />
+        Tentar novamente
+      </Button>
+    </div>
+  )
+}
+
+/**
+ * Wrapper para páginas com lazy loading
+ */
+export function LazyPageWrapper({
+  children,
+  fallback = <PageSkeleton />,
+}: LazyPageWrapperProps) {
+  return (
+    <ErrorBoundary FallbackComponent={ErrorFallback}>
+      <Suspense fallback={fallback}>{children}</Suspense>
+    </ErrorBoundary>
+  )
+}
+
+/**
+ * HOC para criar componentes de página lazy-loaded
+ */
+export function withLazyLoading<P extends object>(
+  importFn: () => Promise<{ default: ComponentType<P> }>,
+  LoadingComponent: ComponentType = PageSkeleton
+) {
+  const LazyComponent = React.lazy(importFn)
+
+  return function LazyPage(props: P) {
+    return (
+      <ErrorBoundary FallbackComponent={ErrorFallback}>
+        <Suspense fallback={<LoadingComponent />}>
+          <LazyComponent {...props} />
+        </Suspense>
+      </ErrorBoundary>
+    )
+  }
+}
+
+/**
+ * Skeletons especializados para diferentes tipos de página
+ */
+export function TablePageSkeleton() {
+  return (
+    <div className="p-6 space-y-4">
+      <div className="flex items-center justify-between">
+        <Skeleton className="h-8 w-48" />
+        <Skeleton className="h-10 w-32" />
+      </div>
+      <Skeleton className="h-10 w-full" />
+      {Array.from({ length: 10 }).map((_, i) => (
+        <Skeleton key={i} className="h-14 w-full" />
+      ))}
+    </div>
+  )
+}
+
+export function DashboardPageSkeleton() {
+  return (
+    <div className="p-6 space-y-6">
+      {/* KPI Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <Skeleton key={i} className="h-28 rounded-xl" />
+        ))}
+      </div>
+
+      {/* Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Skeleton className="h-80 rounded-xl" />
+        <Skeleton className="h-80 rounded-xl" />
+      </div>
+
+      {/* Table */}
+      <Skeleton className="h-64 rounded-xl" />
+    </div>
+  )
+}
+
+export function MapPageSkeleton() {
+  return (
+    <div className="relative h-[calc(100vh-4rem)]">
+      <Skeleton className="absolute inset-0" />
+      <div className="absolute top-4 left-4 z-10 space-y-2">
+        <Skeleton className="h-10 w-64 rounded-lg" />
+        <Skeleton className="h-8 w-48 rounded-lg" />
+      </div>
+      <div className="absolute top-4 right-4 z-10 space-y-2">
+        <Skeleton className="h-10 w-10 rounded-lg" />
+        <Skeleton className="h-10 w-10 rounded-lg" />
+      </div>
+    </div>
+  )
+}
+
+export function FormPageSkeleton() {
+  return (
+    <div className="p-6 max-w-2xl mx-auto space-y-6">
+      <Skeleton className="h-8 w-48" />
+      <div className="space-y-4">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <div key={i} className="space-y-2">
+            <Skeleton className="h-4 w-24" />
+            <Skeleton className="h-10 w-full" />
+          </div>
+        ))}
+      </div>
+      <div className="flex gap-4 justify-end">
+        <Skeleton className="h-10 w-24" />
+        <Skeleton className="h-10 w-24" />
+      </div>
+    </div>
+  )
+}
+

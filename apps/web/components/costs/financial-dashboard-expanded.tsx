@@ -182,6 +182,24 @@ export function FinancialDashboardExpanded({
                 })
             } catch (error) {
                 console.error('Erro ao carregar dados financeiros:', error)
+                // Feedback ao usuário
+                const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido'
+                setKpis({
+                    totalCosts30d: 0,
+                    totalRevenues30d: 0,
+                    margin30d: 0,
+                    costEntries30d: 0,
+                    revenueEntries30d: 0,
+                    criticalAlerts: 0,
+                    warningAlerts: 0,
+                    recurringCostsCount: 0,
+                })
+                // Toast de erro se disponível
+                if (typeof window !== 'undefined') {
+                    import('@/lib/toast').then(({ notifyError }) => {
+                        notifyError(`Erro ao carregar dados financeiros: ${errorMessage}`)
+                    }).catch(() => {})
+                }
             } finally {
                 setLoading(false)
             }

@@ -10,6 +10,14 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -111,14 +119,12 @@ export function FilterDrawer({
         >
           Limpar
         </Button>
-        {isMobile && (
-          <Button
-            onClick={() => setOpen(false)}
-            className="flex-1 min-h-[44px] touch-manipulation"
-          >
-            Aplicar
-          </Button>
-        )}
+        <Button
+          onClick={() => setOpen(false)}
+          className="flex-1 min-h-[44px] touch-manipulation"
+        >
+          Aplicar
+        </Button>
       </div>
     </div>
   )
@@ -165,29 +171,37 @@ export function FilterDrawer({
     )
   }
 
-  // Desktop: renderizar inline
+  // Desktop: usar Dialog (modal)
   return (
-    <div className="space-y-4 p-4 border rounded-lg bg-card">
-      <div className="flex items-center justify-between">
-        <div>
-          <h3 className="text-sm font-semibold">{title}</h3>
-          {description && (
-            <p className="text-xs text-muted-foreground mt-1">{description}</p>
-          )}
-        </div>
-        {hasActiveFilters && (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        {trigger || (
           <Button
-            variant="ghost"
-            size="sm"
-            onClick={onReset}
-            className="h-8"
+            variant="outline"
+            className={cn(
+              "min-h-[44px] touch-manipulation",
+              hasActiveFilters && "border-primary bg-primary/5"
+            )}
           >
-            <X className="h-4 w-4 mr-1" />
-            Limpar
+            <Filter className="h-4 w-4 mr-2" />
+            Filtros
+            {hasActiveFilters && (
+              <span className="ml-2 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground">
+                {Object.values(values).filter(v => v && v !== "" && v !== "all").length}
+              </span>
+            )}
           </Button>
         )}
-      </div>
-      {content}
-    </div>
+      </DialogTrigger>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle>{title}</DialogTitle>
+          <DialogDescription>{description}</DialogDescription>
+        </DialogHeader>
+        <div className="mt-4">
+          {content}
+        </div>
+      </DialogContent>
+    </Dialog>
   )
 }

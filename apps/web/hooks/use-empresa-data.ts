@@ -3,6 +3,28 @@
 import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from "@tanstack/react-query"
 import { supabase } from "@/lib/supabase"
 
+/**
+ * Interface para dados do dashboard KPIs
+ */
+interface DashboardKPIs {
+  trips_today?: number
+  trips_in_progress?: number
+  trips_completed?: number
+  delays_over_5min?: number
+  avg_occupancy?: number
+  daily_cost?: number
+  sla_d0?: number
+  company_id?: string
+}
+
+/**
+ * Interface para dados de alertas resolvidos
+ */
+interface AlertResolveData {
+  is_resolved: boolean
+  resolved_at: string | null
+}
+
 // Hook para KPIs da Empresa (antigo useOperatorKPIs)
 export function useOperatorKPIs(companyId: string | null) {
   return useQuery({
@@ -20,14 +42,16 @@ export function useOperatorKPIs(companyId: string | null) {
 
       if (kpiError) throw kpiError
 
+      const kpiData = data as DashboardKPIs | null
+
       return {
-        trips_today: Number((data as any)?.trips_today || 0),
-        trips_in_progress: Number((data as any)?.trips_in_progress || 0),
-        trips_completed: Number((data as any)?.trips_completed || 0),
-        delays_over_5min: Number((data as any)?.delays_over_5min || 0),
-        avg_occupancy: Number((data as any)?.avg_occupancy || 0),
-        daily_cost: Number((data as any)?.daily_cost || 0),
-        sla_d0: Number((data as any)?.sla_d0 || 0),
+        trips_today: Number(kpiData?.trips_today || 0),
+        trips_in_progress: Number(kpiData?.trips_in_progress || 0),
+        trips_completed: Number(kpiData?.trips_completed || 0),
+        delays_over_5min: Number(kpiData?.delays_over_5min || 0),
+        avg_occupancy: Number(kpiData?.avg_occupancy || 0),
+        daily_cost: Number(kpiData?.daily_cost || 0),
+        sla_d0: Number(kpiData?.sla_d0 || 0),
       }
     },
     enabled: !!companyId,
@@ -215,9 +239,14 @@ export function useResolveAlert() {
 
   return useMutation({
     mutationFn: async ({ alertId, resolved }: { alertId: string; resolved: boolean }) => {
+      const updateData: AlertResolveData = {
+        is_resolved: resolved,
+        resolved_at: resolved ? new Date().toISOString() : null
+      }
+
       const { error } = await supabase
         .from("gf_alerts")
-        .update({ is_resolved: resolved, resolved_at: resolved ? new Date().toISOString() : null } as any)
+        .update(updateData)
         .eq("id", alertId)
 
       if (error) throw error
