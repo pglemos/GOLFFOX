@@ -16,7 +16,9 @@ import { PlaybackService } from '@/lib/playback-service'
 jest.mock('@/lib/google-maps-loader')
 jest.mock('@/lib/realtime-service')
 jest.mock('@/lib/playback-service')
-jest.mock('@/lib/map-services/vehicle-loader')
+jest.mock('@/lib/services/map/map-services/vehicle-loader', () => ({
+  loadVehicles: jest.fn().mockResolvedValue([]),
+}))
 jest.mock('@/lib/route-deviation-detector')
 jest.mock('@/lib/operational-alerts')
 jest.mock('@/lib/maps-billing-monitor')
@@ -26,10 +28,11 @@ jest.mock('@/lib/toast', () => ({
   notifySuccess: jest.fn(),
   notifyError: jest.fn(),
 }))
-jest.mock('@/lib/logger', () => ({
+jest.mock('@/lib/core/logger', () => ({
   debug: jest.fn(),
   warn: jest.fn(),
   error: jest.fn(),
+  info: jest.fn(),
 }))
 jest.mock('@/lib/error-utils', () => ({
   formatError: jest.fn((err) => err?.message || 'Erro'),

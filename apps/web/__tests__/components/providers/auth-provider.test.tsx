@@ -165,6 +165,11 @@ describe('AuthProvider', () => {
   })
 
   describe('Estratégia 2: API /api/auth/me', () => {
+    beforeEach(() => {
+      // Reset fetch mock antes de cada teste
+      jest.spyOn(global, 'fetch').mockClear()
+    })
+
     it('deve usar API quando cookie não está disponível', async () => {
       const mockUser = {
         id: 'user-1',
@@ -173,10 +178,10 @@ describe('AuthProvider', () => {
         name: 'Test User',
       }
 
-      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
+      jest.spyOn(global, 'fetch').mockResolvedValueOnce({
         ok: true,
         json: async () => ({ user: mockUser }),
-      })
+      } as Response)
 
       render(
         <AuthProvider>
