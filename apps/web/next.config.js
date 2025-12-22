@@ -153,6 +153,20 @@ let nextConfig = {
         port: '',
         pathname: '/**',
       },
+      {
+        // Supabase Storage - fotos de veículos, motoristas, etc
+        protocol: 'https',
+        hostname: '*.supabase.co',
+        port: '',
+        pathname: '/storage/v1/object/public/**',
+      },
+      {
+        // Supabase Storage - hostname específico do projeto
+        protocol: 'https',
+        hostname: 'vmoxzesvjcfmrebagcwo.supabase.co',
+        port: '',
+        pathname: '/**',
+      },
     ],
   },
 }
