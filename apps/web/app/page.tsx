@@ -847,8 +847,8 @@ function LoginContent() {
         // O navegador processa o Set-Cookie header automaticamente
         if (typeof window !== "undefined") {
           // Definir flag para evitar interferência do useEffect
-          (window as any).__golffox_redirecting = true
-            (window as any).__golffox_just_logged_in = true
+          (window as any).__golffox_redirecting = true;
+          (window as any).__golffox_just_logged_in = true;
 
           // ✅ CORREÇÃO: Usar window.location.replace para garantir redirecionamento completo
           // window.location.replace não adiciona ao histórico, evitando loops
