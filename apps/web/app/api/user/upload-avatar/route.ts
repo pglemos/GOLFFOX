@@ -48,7 +48,8 @@ export async function POST(req: NextRequest) {
     // Upload para storage
     const fileExt = file.name.split('.').pop()
     const fileName = `${userId}-${Date.now()}.${fileExt}`
-    const filePath = `avatares/${fileName}`
+    // Caminho sem duplicação - apenas o nome do arquivo, não precisa da pasta "avatares" pois já estamos no bucket "avatares"
+    const filePath = fileName
 
     // Criar bucket se não existir (via SQL se necessário)
     const { error: uploadError } = await supabase.storage
