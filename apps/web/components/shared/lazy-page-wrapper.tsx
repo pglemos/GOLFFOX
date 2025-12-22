@@ -9,8 +9,7 @@
 
 'use client'
 
-import React, { Suspense, ComponentType } from 'react'
-import { ErrorBoundary, FallbackProps } from 'react-error-boundary'
+import React, { Suspense, ComponentType, Component, ReactNode, ErrorInfo } from 'react'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Button } from '@/components/ui/button'
 import { AlertCircle, RefreshCw } from 'lucide-react'
@@ -18,6 +17,16 @@ import { AlertCircle, RefreshCw } from 'lucide-react'
 interface LazyPageWrapperProps {
   children: React.ReactNode
   fallback?: React.ReactNode
+}
+
+interface ErrorBoundaryState {
+  hasError: boolean
+  error: Error | null
+}
+
+interface ErrorFallbackProps {
+  error: Error | null
+  resetError: () => void
 }
 
 // Skeleton padrão para páginas
@@ -55,20 +64,54 @@ function PageSkeleton() {
 }
 
 // Fallback de erro
-function ErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
+function ErrorFallback({ error, resetError }: ErrorFallbackProps) {
   return (
     <div className="flex flex-col items-center justify-center min-h-[400px] p-6">
       <AlertCircle className="h-12 w-12 text-destructive mb-4" />
       <h2 className="text-lg font-semibold mb-2">Erro ao carregar página</h2>
       <p className="text-muted-foreground mb-4 text-center max-w-md">
-        {error.message || 'Ocorreu um erro ao carregar esta página.'}
+        {error?.message || 'Ocorreu um erro ao carregar esta página.'}
       </p>
-      <Button onClick={resetErrorBoundary} variant="outline">
+      <Button onClick={resetError} variant="outline">
         <RefreshCw className="h-4 w-4 mr-2" />
         Tentar novamente
       </Button>
     </div>
   )
+}
+
+// Error Boundary nativo do React
+class ErrorBoundary extends Component<
+  { children: ReactNode; fallback?: (props: ErrorFallbackProps) => ReactNode },
+  ErrorBoundaryState
+> {
+  constructor(props: { children: ReactNode; fallback?: (props: ErrorFallbackProps) => ReactNode }) {
+    super(props)
+    this.state = { hasError: false, error: null }
+  }
+
+  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
+    return { hasError: true, error }
+  }
+
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    console.error('ErrorBoundary caught an error:', error, errorInfo)
+  }
+
+  resetError = () => {
+    this.setState({ hasError: false, error: null })
+  }
+
+  render() {
+    if (this.state.hasError) {
+      if (this.props.fallback) {
+        return this.props.fallback({ error: this.state.error, resetError: this.resetError })
+      }
+      return <ErrorFallback error={this.state.error} resetError={this.resetError} />
+    }
+
+    return this.props.children
+  }
 }
 
 /**
@@ -79,7 +122,7 @@ export function LazyPageWrapper({
   fallback = <PageSkeleton />,
 }: LazyPageWrapperProps) {
   return (
-    <ErrorBoundary FallbackComponent={ErrorFallback}>
+    <ErrorBoundary>
       <Suspense fallback={fallback}>{children}</Suspense>
     </ErrorBoundary>
   )
@@ -96,7 +139,7 @@ export function withLazyLoading<P extends object>(
 
   return function LazyPage(props: P) {
     return (
-      <ErrorBoundary FallbackComponent={ErrorFallback}>
+      <ErrorBoundary>
         <Suspense fallback={<LoadingComponent />}>
           <LazyComponent {...props} />
         </Suspense>

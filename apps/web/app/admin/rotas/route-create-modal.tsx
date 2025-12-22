@@ -442,7 +442,7 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
         title="Selecionar Motorista"
         items={motoristas}
         isLoading={loadingMotoristas}
-        onSelect={(item) => {
+        onSelect={(item: PickerItem) => {
           setSelectedMotorista({
             id: item.id,
             name: item.name as string,
@@ -456,12 +456,12 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
           { key: 'name', label: 'Nome', isPrimary: true },
           { key: 'cpf', label: 'CPF' }
         ]}
-        renderItem={(item) => (
+        renderItem={(item: PickerItem): React.ReactNode => (
           <div className="flex items-center justify-between p-3 border rounded-lg hover:bg-bg-soft cursor-pointer transition-colors">
             <div className="flex-1">
-              <div className="font-medium">{item.name}</div>
+              <div className="font-medium">{String(item.name || '')}</div>
               {item.cpf && (
-                <div className="text-sm text-ink-muted">CPF: {item.cpf}</div>
+                <div className="text-sm text-ink-muted">CPF: {String(item.cpf)}</div>
               )}
             </div>
             {item.documents_valid ? (
@@ -480,7 +480,7 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
         title="Selecionar Veículo"
         items={veiculos}
         isLoading={loadingVeiculos}
-        onSelect={(item) => {
+        onSelect={(item: PickerItem) => {
           setSelectedVeiculo({
             id: item.id,
             plate: item.plate as string,
@@ -495,16 +495,16 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
           { key: 'model', label: 'Modelo' },
           { key: 'capacity', label: 'Capacidade' }
         ]}
-        renderItem={(item) => (
+        renderItem={(item: PickerItem): React.ReactNode => (
           <div className="flex items-center justify-between p-3 border rounded-lg hover:bg-bg-soft cursor-pointer transition-colors">
             <div className="flex-1">
-              <div className="font-medium">{item.name}</div>
+              <div className="font-medium">{String(item.name || '')}</div>
               {item.model && (
-                <div className="text-sm text-ink-muted">{item.model}</div>
+                <div className="text-sm text-ink-muted">{String(item.model)}</div>
               )}
             </div>
             {item.capacity && (
-              <Badge variant="outline">Capacidade: {item.capacity}</Badge>
+              <Badge variant="outline">Capacidade: {Number(item.capacity)}</Badge>
             )}
           </div>
         )}

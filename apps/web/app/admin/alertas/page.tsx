@@ -91,18 +91,16 @@ export default async function AlertasPage() {
   }
 
   // TypeScript: user não pode ser null após verificações acima
-  if (!user) {
-    const { redirect: redirectFn } = await import("next/navigation")
-    redirectFn('/?next=/admin/alertas')
-  }
+  // Usar non-null assertion já que verificamos acima
+  const validUser = user!
 
   return (
     <AppShell user={{
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      avatar_url: user.avatar_url || undefined,
+      id: validUser.id,
+      name: validUser.name,
+      email: validUser.email,
+      role: validUser.role,
+      avatar_url: validUser.avatar_url || undefined,
     }}>
       <Suspense fallback={<SkeletonList count={5} />}>
         <AlertasWrapper />

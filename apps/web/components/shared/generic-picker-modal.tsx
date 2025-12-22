@@ -76,7 +76,9 @@ export interface StatusBadge<T extends PickerItem> {
  */
 export interface GenericPickerModalProps<T extends PickerItem> {
   /** Se o modal está aberto */
-  isOpen: boolean
+  open?: boolean
+  /** @deprecated Use 'open' instead */
+  isOpen?: boolean
   /** Callback ao fechar */
   onClose: () => void
   /** Callback ao selecionar item */
@@ -89,10 +91,18 @@ export interface GenericPickerModalProps<T extends PickerItem> {
   searchPlaceholder?: string
   /** Mensagem quando não há resultados */
   emptyMessage?: string
-  /** Função para buscar itens */
-  fetchItems: () => Promise<T[]>
+  /** Itens para exibir (se fornecido, não usa fetchItems) */
+  items?: T[]
+  /** Estado de loading (quando usando items diretamente) */
+  isLoading?: boolean
+  /** Erro (quando usando items diretamente) */
+  error?: string | null
+  /** Função para buscar itens (usado se items não for fornecido) */
+  fetchItems?: () => Promise<T[]>
   /** Colunas para renderização */
-  columns: PickerColumn<T>[]
+  columns?: PickerColumn<T>[]
+  /** Função para renderizar item customizado */
+  renderItem?: (item: T) => ReactNode
   /** Função para filtrar itens por texto */
   filterFn?: (item: T, query: string) => boolean
   /** Opções de filtro adicional */
@@ -109,6 +119,8 @@ export interface GenericPickerModalProps<T extends PickerItem> {
   warningMessage?: string
   /** Dependências que trigam reload */
   deps?: unknown[]
+  /** ID do item pré-selecionado */
+  selectedId?: string
 }
 
 // ============================================================================
@@ -116,6 +128,7 @@ export interface GenericPickerModalProps<T extends PickerItem> {
 // ============================================================================
 
 export function GenericPickerModal<T extends PickerItem>({
+  open,
   isOpen,
   onClose,
   onSelect,
@@ -123,8 +136,12 @@ export function GenericPickerModal<T extends PickerItem>({
   description,
   searchPlaceholder = "Buscar...",
   emptyMessage = "Nenhum item encontrado",
+  items: itemsProp,
+  isLoading: isLoadingProp,
+  error: errorProp,
   fetchItems,
-  columns,
+  columns = [],
+  renderItem,
   filterFn,
   filterOptions,
   applyFilter,
@@ -134,14 +151,38 @@ export function GenericPickerModal<T extends PickerItem>({
   warningMessage,
   deps = [],
 }: GenericPickerModalProps<T>) {
-  const [items, setItems] = useState<T[]>([])
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const modalOpen = open ?? isOpen ?? false
+  const [items, setItems] = useState<T[]>(itemsProp || [])
+  const [loading, setLoading] = useState(isLoadingProp || false)
+  const [error, setError] = useState<string | null>(errorProp || null)
   const [searchQuery, setSearchQuery] = useState("")
   const [filterValue, setFilterValue] = useState<string>("all")
 
-  // Carregar itens
+  // Atualizar items quando prop mudar
+  useEffect(() => {
+    if (itemsProp) {
+      setItems(itemsProp)
+    }
+  }, [itemsProp])
+
+  // Atualizar loading quando prop mudar
+  useEffect(() => {
+    if (isLoadingProp !== undefined) {
+      setLoading(isLoadingProp)
+    }
+  }, [isLoadingProp])
+
+  // Atualizar error quando prop mudar
+  useEffect(() => {
+    if (errorProp !== undefined) {
+      setError(errorProp)
+    }
+  }, [errorProp])
+
+  // Carregar itens via fetchItems
   const loadItems = useCallback(async () => {
+    if (!fetchItems) return
+    
     setLoading(true)
     setError(null)
     try {
@@ -156,21 +197,31 @@ export function GenericPickerModal<T extends PickerItem>({
     }
   }, [fetchItems])
 
-  // Carregar quando abre ou deps mudam
+  // Carregar quando abre ou deps mudam (apenas se usar fetchItems)
   useEffect(() => {
-    if (isOpen) {
+    if (modalOpen && fetchItems && !itemsProp) {
       loadItems()
     }
-  }, [isOpen, loadItems, ...deps])
+  }, [modalOpen, loadItems, fetchItems, itemsProp, ...deps])
 
   // Filtrar itens
   const filteredItems = useMemo(() => {
     let result = items
 
     // Filtro por texto
-    if (searchQuery && filterFn) {
+    if (searchQuery) {
       const query = searchQuery.toLowerCase().trim()
-      result = result.filter((item) => filterFn(item, query))
+      if (filterFn) {
+        result = result.filter((item) => filterFn(item, query))
+      } else {
+        // Filtro padrão: busca em todos os valores do item
+        result = result.filter((item) => {
+          const searchableText = Object.values(item)
+            .map(v => String(v ?? '').toLowerCase())
+            .join(' ')
+          return searchableText.includes(query)
+        })
+      }
     }
 
     // Filtro adicional
@@ -203,7 +254,7 @@ export function GenericPickerModal<T extends PickerItem>({
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={modalOpen} onOpenChange={onClose}>
       <DialogContent className="w-[95vw] sm:w-[90vw] max-w-2xl max-h-[90vh] overflow-y-auto p-4 sm:p-6 mx-auto">
         <DialogHeader className="pb-4 sm:pb-6">
           <DialogTitle className="text-xl sm:text-2xl font-bold break-words">
@@ -277,6 +328,29 @@ export function GenericPickerModal<T extends PickerItem>({
                 ) : (
                   filteredItems.map((item) => {
                     const isSelectable = !canSelect || canSelect(item)
+
+                    // Se renderItem foi fornecido, usar ele
+                    if (renderItem) {
+                      return (
+                        <div
+                          key={item.id}
+                          onClick={() => isSelectable && handleSelect(item)}
+                          role="button"
+                          tabIndex={0}
+                          onKeyDown={(e) => {
+                            if ((e.key === "Enter" || e.key === " ") && isSelectable) {
+                              e.preventDefault()
+                              handleSelect(item)
+                            }
+                          }}
+                          aria-disabled={!isSelectable}
+                        >
+                          {renderItem(item)}
+                        </div>
+                      )
+                    }
+
+                    // Renderização padrão com colunas
                     const primaryColumn = columns.find((c) => c.isPrimary)
                     const secondaryColumn = columns.find((c) => c.isSecondary)
                     const otherColumns = columns.filter((c) => !c.isPrimary && !c.isSecondary)
