@@ -20,21 +20,35 @@ export function useAuthSimple() {
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
-        // Função para carregar usuário do cookie
-        const loadUserFromCookie = () => {
+        // Função para carregar usuário do cookie ou storage
+        const loadUserFromStorage = () => {
             try {
-                // Pegar cookie golffox-session
+                // 1. Tentar pegar do cookie golffox-session
                 const cookieMatch = document.cookie.match(/golffox-session=([^;]+)/)
+                let userData: any = null
 
-                if (!cookieMatch) {
-                    setUser(null)
-                    setLoading(false)
-                    return
+                if (cookieMatch) {
+                    try {
+                        const decoded = atob(cookieMatch[1])
+                        userData = JSON.parse(decoded)
+                        console.log('[useAuthSimple] Usuário carregado do cookie')
+                    } catch (e) {
+                        console.warn('[useAuthSimple] Erro ao decodificar cookie')
+                    }
                 }
 
-                // Decodificar Base64  
-                const decoded = atob(cookieMatch[1])
-                const userData = JSON.parse(decoded)
+                // 2. Fallback: Tentar pegar do localStorage (golffox-auth)
+                if (!userData) {
+                    const stored = localStorage.getItem('golffox-auth')
+                    if (stored) {
+                        try {
+                            userData = JSON.parse(stored)
+                            console.log('[useAuthSimple] Usuário carregado do localStorage')
+                        } catch (e) {
+                            console.warn('[useAuthSimple] Erro ao decodificar localStorage')
+                        }
+                    }
+                }
 
                 if (userData?.id && userData?.email) {
                     setUser({
@@ -49,15 +63,15 @@ export function useAuthSimple() {
                     setUser(null)
                 }
             } catch (err) {
-                console.error('Erro ao decodificar cookie de sessão:', err)
+                console.error('Erro ao carregar sessão:', err)
                 setUser(null)
             }
 
             setLoading(false)
         }
 
-        // Carregar imediatamente (não depende de server)
-        loadUserFromCookie()
+        // Carregar imediatamente
+        loadUserFromStorage()
     }, [])
 
     return { user, loading }

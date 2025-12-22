@@ -9,6 +9,7 @@ import { Mail, Lock, Eye, EyeOff, ArrowRight, Sparkles, Shield, Zap } from "luci
 import { motion, AnimatePresence } from "framer-motion"
 import { AuthManager } from "@/lib/auth"
 import { getUserRoleByEmail } from "@/lib/user-role"
+import { normalizeRole } from "@/lib/role-mapper"
 import { debug, error as logError, warn as logWarn } from "@/lib/logger"
 import { LoginErrorBoundary } from "./login-error-boundary"
 
@@ -170,49 +171,60 @@ function LoginContent() {
         // Tentar decodificar o cookie para obter o role
         try {
           const cookieMatch = document.cookie.match(/golffox-session=([^;]+)/)
-          if (!cookieMatch) {
-            // Cookie malformado, limpar e continuar na página de login
-            document.cookie = 'golffox-session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT'
-            return
+          let userData: any = null
+
+          if (cookieMatch) {
+            try {
+              const decoded = atob(cookieMatch[1])
+              userData = JSON.parse(decoded)
+            } catch {
+              // Cookie malformado, limpar
+              document.cookie = 'golffox-session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT'
+            }
           }
 
-          const decoded = atob(cookieMatch[1])
-          const userData = JSON.parse(decoded)
+          // Tentar localStorage se o cookie for HttpOnly (não visível em document.cookie)
+          if (!userData) {
+            const stored = localStorage.getItem('golffox-auth')
+            if (stored) {
+              try {
+                userData = JSON.parse(stored)
+              } catch { }
+            }
+          }
 
           if (!userData || !userData.role) {
-            // Dados inválidos, limpar cookie
-            document.cookie = 'golffox-session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT'
             return
           }
 
           const userRole = userData.role || getUserRoleByEmail(userData.email || '')
 
-          const safeNext = sanitizePath(rawNext)
+          // ✅ Usar normalização centralizada para garantir consistência
+          const normalizedRole = normalizeRole(userRole)
 
-          // Normalizar roles para PT-BR
-          const normalizedRole =
-            userRole === 'operador' ? 'empresa' :  // antigo operador → empresa
-              userRole === 'transportadora' ? 'operador' :  // antigo transportadora → operador
-                userRole === 'motorista' ? 'motorista' :
-                  userRole === 'passageiro' ? 'passageiro' : userRole
+          debug('Sessão detectada no cookie', { userRole, normalizedRole, email: userData.email }, 'LoginPage')
+
+          const safeNext = sanitizePath(rawNext)
 
           // Redirect baseado na role normalizada
           let redirectUrl =
             normalizedRole === 'admin' ? '/admin' :
               normalizedRole === 'empresa' ? '/empresa' :  // Empresa Contratante
-                normalizedRole === 'operador' || normalizedRole === 'transportadora' ? '/transportadora' :  // Operador da Transportadora
+                normalizedRole === 'operador' ? '/transportadora' :  // Operador da Transportadora
                   '/empresa' // Default para empresa
 
           // Usar função auxiliar local para verificar permissão
           const checkPermission = (role: string, path: string): boolean => {
-            if (path.startsWith('/admin')) return role === 'admin'
-            if (path.startsWith('/empresa')) return ['admin', 'empresa', 'operador'].includes(role)
-            if (path.startsWith('/transportadora')) return ['admin', 'operador', 'transportadora'].includes(role)
+            const norm = normalizeRole(role)
+            if (path.startsWith('/admin')) return norm === 'admin'
+            if (path.startsWith('/empresa')) return ['admin', 'empresa'].includes(norm)
+            if (path.startsWith('/transportadora')) return ['admin', 'operador'].includes(norm)
             return true
           }
-          
-          if (safeNext && checkPermission(userRole, safeNext)) {
+
+          if (safeNext && checkPermission(normalizedRole, safeNext)) {
             redirectUrl = safeNext
+            debug('Usando safeNext para redirecionamento', { safeNext }, 'LoginPage')
           }
 
           // Verificar se já estamos na URL de destino para evitar loops
@@ -379,7 +391,7 @@ function LoginContent() {
       // O state do React pode estar desatualizado devido ao closure do useCallback
       const inputEmail = emailInputRef.current?.value || ''
       const inputPassword = passwordInputRef.current?.value || ''
-      
+
       const rawEmail = demoEmail ?? (inputEmail || email)
       const rawPassword = demoPassword ?? (inputPassword || password)
 
@@ -529,7 +541,7 @@ function LoginContent() {
             signal: controller.signal,
             credentials: "include",
           })
-          
+
           debug('LOGIN - Resposta recebida', {
             status: response.status,
             ok: response.ok,
@@ -736,7 +748,7 @@ function LoginContent() {
             if (path.startsWith('/transportadora')) return ['admin', 'operador', 'transportadora'].includes(role)
             return true
           }
-          
+
           try {
             const isAllowed = checkRolePermission(userRoleFromDatabase, safeNext)
             debug('LOGIN - Resultado de checkRolePermission', {

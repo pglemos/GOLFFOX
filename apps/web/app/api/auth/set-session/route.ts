@@ -57,8 +57,8 @@ async function setSessionHandler(req: NextRequest) {
         return NextResponse.json({ error: 'csrf_failed' }, { status: 403 })
       }
       // Se há sessão válida (Supabase ou golffox-session), permitir (login já foi validado)
-      debug('Bypassing CSRF check - valid session present', { 
-        supabaseCookieName, 
+      debug('Bypassing CSRF check - valid session present', {
+        supabaseCookieName,
         hasSupabaseSession: !!hasSupabaseSession,
         hasGolffoxSession: !!hasGolffoxSession
       }, 'set-session')
@@ -72,16 +72,14 @@ async function setSessionHandler(req: NextRequest) {
       return NextResponse.json({ error: "invalid_user_payload" }, { status: 400 })
     }
 
-    // Payload no cookie (NÃO inclui access_token por segurança)
+    // Payload no cookie (INCLUI access_token para validateAuth)
     // Cookie é HttpOnly, então não é acessível via JavaScript (proteção XSS)
-    // O access_token deve ser obtido do cookie do Supabase ou header Authorization
     const sessionPayload = {
       id: user.id,
       email: user.email,
       role: user.role,
-      companyId: user.companyId ?? null
-      // ✅ REMOVIDO: access_token não deve estar no cookie customizado
-      // O token será obtido do cookie do Supabase (sb-{project}-auth-token) ou header Authorization
+      companyId: user.companyId ?? null,
+      accessToken: accessToken || null
     }
 
     // Serializa como Base64 (padrão do sistema)
