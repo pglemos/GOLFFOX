@@ -266,9 +266,11 @@ export function Topbar({
   return (
     <header
       className={cn(
-        "before:bg-background/40 sticky top-0 z-50 before:absolute before:inset-0 before:mask-[linear-gradient(var(--card),var(--card)_18%,transparent_100%)] before:backdrop-blur-xl",
-        // Mobile: header compacto sem backdrop blur
-        isMobile && "before:hidden bg-white/5 backdrop-blur-xl border-b border-white/10 shadow-sm"
+        "sticky top-0 z-50",
+        // Desktop: padding-top para alinhar com sidebar container (p-6 = 24px)
+        !isMobile && "pt-6",
+        // Mobile: header transparente
+        isMobile && "pb-0"
       )}
     >
       <div className={cn(
@@ -276,11 +278,11 @@ export function Topbar({
         "bg-white/5 backdrop-blur-xl relative z-51 mx-auto flex items-center justify-between px-6 py-2",
         // Border translúcida estilo Apple
         "border border-white/10 shadow-sm",
-        // Desktop: mt-6 para alinhar com sidebar (mesma altura do p-6 da sidebar), rounded-2xl, largura com margem
-        !isMobile && "mt-6 rounded-2xl w-[calc(100%-2rem)] sm:w-[calc(100%-3rem)]",
+        // Desktop: rounded-2xl, largura com margem (sem margin-top, pois o header já tem pt-6)
+        !isMobile && "rounded-2xl w-[calc(100%-2rem)] sm:w-[calc(100%-3rem)] my-3",
         // Hover effect
         "hover:bg-white/10 hover:border-white/20 hover:shadow-2xl hover:shadow-black/5 transition-all duration-500",
-        // Mobile: full width, sem margin-top, sem border-radius
+        // Mobile: full width, sem border-radius
         isMobile && "w-full h-14 rounded-none border-x-0 border-t-0 hover:bg-white/5 hover:border-white/10"
       )}>
         {/* Left Section - Exatamente como Application Shell 08 */}

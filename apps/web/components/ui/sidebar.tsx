@@ -123,7 +123,7 @@ function SidebarProvider({
             } as React.CSSProperties
           }
           className={cn(
-            "group/sidebar-wrapper has-data-[variant=inset]:bg-sidebar flex min-h-svh w-full",
+            "group/sidebar-wrapper has-data-[variant=inset]:bg-sidebar bg-transparent flex min-h-svh w-full",
             className
           )}
           {...props}
@@ -219,8 +219,8 @@ function Sidebar({
             ? "left-0 group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)]"
             : "right-0 group-data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width)*-1)]",
           variant === "floating" || variant === "inset"
-            ? "p-6 pr-0 group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+(--spacing(4))+2px)] group-data-[side=right]:pl-0 group-data-[side=right]:pr-6 [&>[data-slot=sidebar-inner]]:group-data-[variant=floating]:rounded-lg"
-            : "group-data-[collapsible=icon]:w-(--sidebar-width-icon)",
+            ? "p-6 pr-0 group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+(--spacing(4))+2px)] group-data-[side=right]:pl-0 group-data-[side=right]:pr-6 bg-transparent"
+            : "group-data-[collapsible=icon]:w-(--sidebar-width-icon) bg-transparent",
           className
         )}
       >
