@@ -28,8 +28,9 @@ let nextConfig = {
   // Transpile pacotes ESM problemáticos para CommonJS
   transpilePackages: ['@supabase/supabase-js'],
 
-  // ✅ React Compiler: Otimização automática de componentes React
-  reactCompiler: true,
+  // ❌ React Compiler desabilitado temporariamente
+  // Pode causar problemas de otimização onde funções são substituídas por true
+  // reactCompiler: true,
 
   // ✅ Code splitting avançado
   experimental: {
