@@ -189,9 +189,6 @@ function LoginContent() {
 
           const safeNext = sanitizePath(rawNext)
 
-          // Usar a função isAllowedForRole do useCallback (definida abaixo)
-          // Não redefinir aqui para evitar conflitos
-
           // Normalizar roles para PT-BR
           const normalizedRole =
             userRole === 'operador' ? 'empresa' :  // antigo operador → empresa
@@ -375,20 +372,6 @@ function LoginContent() {
       return null
     }
   }
-
-  // ✅ Função para verificar se role tem permissão para acessar um path
-  // ✅ CRÍTICO: Esta função deve sempre retornar um booleano, nunca ser sobrescrita
-  const isAllowedForRole = useCallback((role: string, path: string): boolean => {
-    if (!role || !path || typeof role !== 'string' || typeof path !== 'string') {
-      return false
-    }
-    if (path.startsWith('/admin')) return role === 'admin'
-    // empresa = empresa contratante (antigo operador)
-    if (path.startsWith('/empresa')) return ['admin', 'empresa', 'operador'].includes(role)
-    // operador = gestor da transportadora
-    if (path.startsWith('/transportadora')) return ['admin', 'operador', 'transportadora'].includes(role)
-    return true
-  }, [])
 
   const handleLogin = useCallback(
     async (demoEmail?: string, demoPassword?: string) => {
