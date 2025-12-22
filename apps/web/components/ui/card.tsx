@@ -9,9 +9,9 @@ const cardVariants = cva(
     variants: {
       variant: {
         default: "border bg-card",
-        glass: "bg-card/50 backdrop-blur-sm border-border",
+        glass: "bg-white/5 backdrop-blur-xl border-white/10 hover:bg-white/10 hover:border-white/20",
         gradient: "bg-gradient-to-br from-brand/10 to-accent-custom/10 border-border",
-        premium: "bg-card/50 backdrop-blur-sm border-border hover:shadow-xl hover:border-brand/50",
+        premium: "bg-white/5 backdrop-blur-xl border-white/10 hover:bg-white/10 hover:border-white/20 hover:shadow-2xl hover:shadow-black/5 rounded-2xl",
       },
       hover: {
         true: "lg:hover:shadow-lg lg:hover:scale-[1.02] cursor-pointer active:scale-[0.98]",

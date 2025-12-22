@@ -1,12 +1,19 @@
 "use client"
 
 import { useState, useTransition } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Filter, ChevronDown, ChevronUp, Save, X, Calendar } from "lucide-react"
+import { Badge } from "@/components/ui/badge"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
+import { Filter, Save, Calendar, SlidersHorizontal } from "lucide-react"
 import { useMobile } from "@/hooks/use-mobile"
 import { FilterDrawer } from "@/components/shared/filter-drawer"
+import { cn } from "@/lib/utils"
+import { Separator } from "@/components/ui/separator"
 
 interface AdminFiltersProps {
   initialFilters?: {
@@ -86,64 +93,81 @@ export function AdminFilters({ initialFilters, onFiltersChange }: AdminFiltersPr
     )
   }
 
+  const hasActiveFilters = tempFilters.empresa || tempFilters.turno || (tempFilters.data && tempFilters.data !== new Date().toISOString().split('T')[0])
+  const activeFiltersCount = [tempFilters.empresa, tempFilters.turno].filter(Boolean).length + (tempFilters.data && tempFilters.data !== new Date().toISOString().split('T')[0] ? 1 : 0)
+
   return (
-    <Card className="bg-card/50 backdrop-blur-sm border-border hover:shadow-xl transition-all duration-300">
-      <CardHeader className="pb-4 px-3 sm:px-6">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
-          <div className="flex items-center gap-2">
-            <Filter className="h-5 w-5 text-brand flex-shrink-0" />
-            <CardTitle className="text-base sm:text-lg font-semibold">Filtros</CardTitle>
-          </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setFiltersExpanded(!filtersExpanded)}
-            className="gap-2 w-full sm:w-auto min-h-[44px] touch-manipulation"
-          >
-            {filtersExpanded ? (
-              <>
-                <ChevronUp className="h-4 w-4" />
-                <span className="hidden sm:inline">Minimizar</span>
-                <span className="sm:hidden">Fechar</span>
-              </>
-            ) : (
-              <>
-                <ChevronDown className="h-4 w-4" />
-                <span className="hidden sm:inline">Expandir</span>
-                <span className="sm:hidden">Abrir</span>
-              </>
+    <Popover open={filtersExpanded} onOpenChange={setFiltersExpanded}>
+      <PopoverTrigger asChild>
+        <Button
+          variant="outline"
+          size="sm"
+          className={cn(
+            "h-9 px-3 gap-2 relative",
+            hasActiveFilters && "border-primary bg-primary/5 hover:bg-primary/10"
+          )}
+        >
+          <SlidersHorizontal className="h-4 w-4" />
+          <span className="hidden sm:inline">Filtros</span>
+          {hasActiveFilters && (
+            <Badge 
+              variant="default" 
+              className="ml-1 h-5 min-w-5 px-1.5 flex items-center justify-center text-[10px] font-semibold"
+            >
+              {activeFiltersCount}
+            </Badge>
+          )}
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-80 sm:w-96 p-0" align="start">
+        <div className="p-4 space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Filter className="h-4 w-4 text-muted-foreground" />
+              <h4 className="font-semibold text-sm">Filtros</h4>
+            </div>
+            {hasActiveFilters && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleResetFilters}
+                className="h-7 px-2 text-xs text-muted-foreground hover:text-foreground"
+              >
+                Limpar
+              </Button>
             )}
-          </Button>
-        </div>
-      </CardHeader>
-      {filtersExpanded && (
-        <CardContent className="pt-0 px-3 sm:px-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 mb-4">
+          </div>
+          
+          <Separator />
+          
+          <div className="space-y-4">
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-ink-strong">Empresa</label>
+              <label className="text-xs font-medium text-muted-foreground">Empresa</label>
               <Input
                 placeholder="Todas as empresas"
                 value={tempFilters.empresa}
                 onChange={(e) => setTempFilters({ ...tempFilters, empresa: e.target.value })}
-                className="w-full min-h-[44px]"
+                className="h-9"
               />
             </div>
+            
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-ink-strong">Data</label>
+              <label className="text-xs font-medium text-muted-foreground">Data</label>
               <div className="relative">
-                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-ink-muted pointer-events-none z-10" />
+                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none z-10" />
                 <Input
                   type="date"
                   value={tempFilters.data}
                   onChange={(e) => setTempFilters({ ...tempFilters, data: e.target.value })}
-                  className="pl-10 w-full min-h-[44px]"
+                  className="pl-10 h-9"
                 />
               </div>
             </div>
+            
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-ink-strong">Turno</label>
+              <label className="text-xs font-medium text-muted-foreground">Turno</label>
               <select
-                className="w-full min-h-[44px] px-3 py-2 rounded-lg border border-border bg-bg-soft text-sm focus:outline-none focus:ring-2 focus:ring-brand focus:ring-opacity-20 transition-all touch-manipulation"
+                className="w-full h-9 px-3 py-2 rounded-md border border-input bg-background text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                 value={tempFilters.turno}
                 onChange={(e) => setTempFilters({ ...tempFilters, turno: e.target.value })}
               >
@@ -154,28 +178,30 @@ export function AdminFilters({ initialFilters, onFiltersChange }: AdminFiltersPr
               </select>
             </div>
           </div>
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-2 sm:gap-2 pt-4 border-t border-border">
+          
+          <Separator />
+          
+          <div className="flex gap-2">
             <Button
               variant="outline"
               size="sm"
-              onClick={handleResetFilters}
-              className="gap-2 w-full sm:w-auto min-h-[44px] touch-manipulation"
+              onClick={() => setFiltersExpanded(false)}
+              className="flex-1 h-9"
             >
-              <X className="h-4 w-4" />
-              Limpar
+              Cancelar
             </Button>
             <Button
               size="sm"
               onClick={handleSaveFilters}
-              className="gap-2 w-full sm:w-auto min-h-[44px] touch-manipulation"
+              className="flex-1 h-9"
             >
-              <Save className="h-4 w-4" />
-              Salvar Filtros
+              <Save className="h-3.5 w-3.5 mr-1.5" />
+              Aplicar
             </Button>
           </div>
-        </CardContent>
-      )}
-    </Card>
+        </div>
+      </PopoverContent>
+    </Popover>
   )
 }
 

@@ -57,7 +57,7 @@ export function ActivityTimeline({ activities, loading, onViewAll }: ActivityTim
   }
 
   return (
-    <Card className="bg-card/50 backdrop-blur-sm border-border hover:shadow-xl transition-all duration-300">
+    <Card className="bg-white/5 backdrop-blur-xl border-white/10 hover:bg-white/10 hover:border-white/20 hover:shadow-2xl hover:shadow-black/5 transition-all duration-500 rounded-2xl">
       <CardHeader className="pb-4">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <div className="flex-1">
@@ -127,7 +127,7 @@ export function ActivityTimeline({ activities, loading, onViewAll }: ActivityTim
 
                     {/* Content Card */}
                     <motion.div
-                      className="bg-card/50 backdrop-blur-sm rounded-xl p-4 border border-border hover:border-brand/50 hover:shadow-lg transition-all duration-300 group-hover:bg-card/80"
+                      className="bg-white/5 backdrop-blur-md rounded-xl p-4 border border-white/10 hover:border-white/20 hover:shadow-lg transition-all duration-300 group-hover:bg-white/10"
                       whileHover={{ x: 4, scale: 1.01 }}
                     >
                       <div className="flex items-start gap-4">

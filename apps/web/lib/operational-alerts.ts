@@ -3,8 +3,19 @@
  * Monitora erros de API, falhas de cron, e outros eventos críticos
  */
 
-import { supabase } from './supabase'
 import { error as logError } from './logger'
+
+// Importação condicional do Supabase - apenas no servidor
+let supabase: any = null
+if (typeof window === 'undefined') {
+  // Apenas no servidor, importar Supabase
+  try {
+    const supabaseModule = require('./supabase')
+    supabase = supabaseModule.supabase
+  } catch (e) {
+    // Ignorar erro se não conseguir importar (pode estar no cliente)
+  }
+}
 
 function formatSupabaseError(error: any): string {
   if (!error) return 'Erro desconhecido'
@@ -34,10 +45,54 @@ export interface OperationalAlert {
 
 /**
  * Registra um alerta operacional
+ * Funciona tanto no servidor quanto no cliente (via API route ou fallback silencioso)
  */
 export async function createAlert(alert: OperationalAlert): Promise<void> {
   try {
-  await (supabase as any).from('gf_alerts').insert({
+    // Se estiver no cliente, tentar usar API route (mas não quebrar se falhar)
+    if (typeof window !== 'undefined') {
+      try {
+        const response = await fetch('/api/alerts/create', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          body: JSON.stringify(alert),
+        })
+        if (response.ok) {
+          return
+        }
+      } catch (apiError) {
+        // Se API route não existir ou falhar, apenas logar no console (não quebrar aplicação)
+        if (process.env.NODE_ENV === 'development') {
+          console.warn('[OperationalAlerts] Não foi possível criar alerta no cliente:', alert.title, apiError)
+        }
+        return
+      }
+      return
+    }
+
+    // Se estiver no servidor, usar Supabase diretamente
+    if (!supabase) {
+      // No servidor, tentar importar dinamicamente
+      try {
+        const supabaseModule = require('./supabase')
+        supabase = supabaseModule.supabase
+      } catch (e) {
+        // Se não conseguir importar, apenas logar (não quebrar)
+        if (process.env.NODE_ENV === 'development') {
+          console.warn('[OperationalAlerts] Supabase não disponível para criar alerta')
+        }
+        return
+      }
+    }
+
+    if (!supabase) {
+      return
+    }
+
+    await (supabase as any).from('gf_alerts').insert({
       type: alert.type,
       severity: alert.severity,
       title: alert.title,
@@ -50,8 +105,11 @@ export async function createAlert(alert: OperationalAlert): Promise<void> {
       is_resolved: false,
     })
   } catch (err) {
+    // Não quebrar aplicação - apenas logar erro
+    if (process.env.NODE_ENV === 'development') {
+      console.warn('[OperationalAlerts] Erro ao criar alerta:', formatSupabaseError(err))
+    }
     logError('Erro ao criar alerta operacional', { error: formatSupabaseError(err) }, 'OperationalAlerts')
-    // Não falhar silenciosamente - logar erro
   }
 }
 
@@ -135,6 +193,30 @@ export async function getUnresolvedAlerts(
   limit: number = 50
 ): Promise<any[]> {
   try {
+    // Se estiver no cliente, usar API route
+    if (typeof window !== 'undefined') {
+      try {
+        const params = new URLSearchParams({ limit: limit.toString() })
+        if (severity) params.set('severity', severity)
+        const response = await fetch(`/api/alerts/unresolved?${params}`, {
+          credentials: 'include',
+        })
+        if (response.ok) {
+          const data = await response.json()
+          return data.alerts || []
+        }
+      } catch (apiError) {
+        logError('Erro ao buscar alertas via API route', { error: apiError }, 'OperationalAlerts')
+      }
+      return []
+    }
+
+    // Se estiver no servidor, usar Supabase diretamente
+    if (!supabase) {
+      logError('Supabase não disponível para buscar alertas', {}, 'OperationalAlerts')
+      return []
+    }
+
     // Priorizar view segura por operador se existir, com fallback para tabela base
     let query = supabase
       .from('v_operador_alerts_secure')
@@ -198,14 +280,41 @@ export async function getUnresolvedAlerts(
  */
 export async function resolveAlert(alertId: string, notes?: string): Promise<void> {
   try {
-  await (supabase as any)
-    .from('gf_alerts')
-    .update({
-        is_resolved: true,
-        resolved_at: new Date().toISOString(),
-        resolution_notes: notes,
-      })
-      .eq('id', alertId)
+    // Se estiver no cliente, usar API route
+    if (typeof window !== 'undefined') {
+      try {
+        const response = await fetch('/api/alerts/resolve', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          body: JSON.stringify({ alertId, notes }),
+        })
+        if (!response.ok) {
+          throw new Error(`API route retornou status ${response.status}`)
+        }
+        return
+      } catch (apiError) {
+        logError('Erro ao resolver alerta via API route', { error: apiError }, 'OperationalAlerts')
+        return
+      }
+    }
+
+    // Se estiver no servidor, usar Supabase diretamente
+    if (!supabase) {
+      logError('Supabase não disponível para resolver alerta', {}, 'OperationalAlerts')
+      return
+    }
+
+    await (supabase as any)
+      .from('gf_alerts')
+      .update({
+          is_resolved: true,
+          resolved_at: new Date().toISOString(),
+          resolution_notes: notes,
+        })
+        .eq('id', alertId)
   } catch (error) {
     logError('Erro ao resolver alerta', { error: formatSupabaseError(error) }, 'OperationalAlerts')
   }
@@ -216,6 +325,28 @@ export async function resolveAlert(alertId: string, notes?: string): Promise<voi
  */
 export async function hasCriticalAlerts(): Promise<boolean> {
   try {
+    // Se estiver no cliente, usar API route
+    if (typeof window !== 'undefined') {
+      try {
+        const response = await fetch('/api/alerts/has-critical', {
+          credentials: 'include',
+        })
+        if (response.ok) {
+          const data = await response.json()
+          return data.hasCritical || false
+        }
+      } catch (apiError) {
+        logError('Erro ao verificar alertas críticos via API route', { error: apiError }, 'OperationalAlerts')
+      }
+      return false
+    }
+
+    // Se estiver no servidor, usar Supabase diretamente
+    if (!supabase) {
+      logError('Supabase não disponível para verificar alertas críticos', {}, 'OperationalAlerts')
+      return false
+    }
+
     // Tentar pela view segura primeiro
     let { data, error } = await supabase
       .from('v_operador_alerts_secure')

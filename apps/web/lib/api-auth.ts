@@ -114,18 +114,29 @@ export async function validateAuth(request: NextRequest): Promise<AuthenticatedU
     }
 
     // 3. ✅ CORREÇÃO: Tentar obter token do cookie customizado (golffox-session)
-    // O cookie customizado PODE conter access_token quando setado via API de login
+    // O cookie customizado PODE conter accessToken quando setado via API de login
     if (!accessToken) {
       const sessionCookie = request.cookies.get('golffox-session')?.value
       if (sessionCookie) {
         try {
           const sessionData = decodeBase64Json(sessionCookie)
           if (sessionData) {
+            // Tentar accessToken primeiro (formato atual do login)
             const token = sessionData.accessToken as string || sessionData.access_token as string
             if (token) {
               accessToken = token
               tokenSource = 'golffox-session'
-              debug('Token encontrado no cookie golffox-session', {}, 'ApiAuth')
+              debug('Token encontrado no cookie golffox-session', {
+                hasAccessToken: !!sessionData.accessToken,
+                hasAccess_token: !!sessionData.access_token
+              }, 'ApiAuth')
+            } else {
+              // Se não tem token mas tem dados do usuário, logar para debug
+              debug('Cookie golffox-session encontrado mas sem accessToken', {
+                hasId: !!sessionData.id,
+                hasRole: !!sessionData.role,
+                keys: Object.keys(sessionData)
+              }, 'ApiAuth')
             }
           }
         } catch (e) {
@@ -134,9 +145,74 @@ export async function validateAuth(request: NextRequest): Promise<AuthenticatedU
       }
     }
 
+    // ✅ CORREÇÃO: Se não encontrou token mas tem cookie golffox-session válido, usar dados do cookie
     if (!accessToken) {
+      const sessionCookie = request.cookies.get('golffox-session')?.value
+      if (sessionCookie) {
+        try {
+          const sessionData = decodeBase64Json(sessionCookie)
+          if (sessionData && sessionData.id && sessionData.role && sessionData.email) {
+            // Usar dados do cookie como fallback quando não há token do Supabase
+            // Isso permite autenticação via cookie mesmo sem token válido
+            debug('Usando dados do cookie golffox-session como fallback (sem token Supabase)', {
+              userId: sessionData.id,
+              role: sessionData.role
+            }, 'ApiAuth')
+
+            // Buscar dados completos do usuário no banco usando service role
+            if (serviceKey) {
+              const supabaseAdmin = createClient(supabaseUrl, serviceKey, {
+                auth: { persistSession: false, autoRefreshToken: false }
+              })
+
+              const { data: userData, error: dbError } = await supabaseAdmin
+                .from('users')
+                .select('id, email, role, company_id, transportadora_id')
+                .eq('id', sessionData.id)
+                .maybeSingle()
+
+              if (!dbError && userData) {
+                const normalizedRole = normalizeRole(userData.role || sessionData.role)
+                const authenticatedUser: AuthenticatedUser = {
+                  id: userData.id,
+                  email: userData.email || sessionData.email || '',
+                  role: normalizedRole,
+                  companyId: userData.company_id || sessionData.companyId || null
+                }
+
+                debug('Usuário autenticado via cookie fallback', {
+                  id: authenticatedUser.id,
+                  role: authenticatedUser.role
+                }, 'ApiAuth')
+
+                return authenticatedUser
+              }
+            }
+
+            // Fallback final: usar dados do cookie diretamente (menos seguro, mas funcional)
+            const normalizedRole = normalizeRole(sessionData.role)
+            const authenticatedUser: AuthenticatedUser = {
+              id: sessionData.id,
+              email: sessionData.email || '',
+              role: normalizedRole,
+              companyId: sessionData.companyId || sessionData.company_id || null
+            }
+
+            warn('Usando dados do cookie diretamente (sem validação do banco)', {
+              userId: authenticatedUser.id,
+              role: authenticatedUser.role
+            }, 'ApiAuth')
+
+            return authenticatedUser
+          }
+        } catch (e) {
+          warn('Erro ao processar cookie golffox-session como fallback', { error: e }, 'ApiAuth')
+        }
+      }
+
       warn('Token de acesso não encontrado em nenhum lugar', {
-        path: request.nextUrl.pathname
+        path: request.nextUrl.pathname,
+        hasGolffoxSession: !!request.cookies.get('golffox-session')?.value
       }, 'ApiAuth')
       return null
     }

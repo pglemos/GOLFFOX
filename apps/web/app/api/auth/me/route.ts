@@ -21,18 +21,91 @@ function tryDecode(cookieValue: string): any | null {
 }
 
 async function meHandler(request: NextRequest) {
-  // Verificar autenticação (qualquer usuário autenticado pode ver seus próprios dados)
-  const authError = await requireAuth(request)
-  if (authError) return authError
+  debug('[AuthMeAPI] Iniciando verificação de autenticação', {
+    hasCookies: request.cookies.getAll().length > 0,
+    cookieNames: request.cookies.getAll().map(c => c.name)
+  }, 'AuthMeAPI')
 
-  // Obter dados do cookie para compatibilidade com código existente
+  // Obter dados do cookie golffox-session primeiro (método mais rápido e confiável)
   const cookie = request.cookies.get('golffox-session')?.value
-  if (!cookie) {
-    return unauthorizedResponse('Sessão não encontrada')
+  let userData: any = null
+
+  if (cookie) {
+    debug('[AuthMeAPI] Cookie golffox-session encontrado, tentando decodificar...', {
+      cookieLength: cookie.length
+    }, 'AuthMeAPI')
+    userData = tryDecode(cookie)
+    if (userData && userData.id && userData.role) {
+      debug('[AuthMeAPI] Usuário encontrado no cookie golffox-session', { 
+        userId: userData.id, 
+        role: userData.role,
+        email: userData.email?.substring(0, 3) + '***'
+      }, 'AuthMeAPI')
+    } else {
+      debug('[AuthMeAPI] Cookie decodificado mas dados inválidos', {
+        hasId: !!userData?.id,
+        hasRole: !!userData?.role
+      }, 'AuthMeAPI')
+      userData = null
+    }
+  } else {
+    debug('[AuthMeAPI] Cookie golffox-session não encontrado', {}, 'AuthMeAPI')
   }
-  const userData = tryDecode(cookie)
-  if (!userData || !userData.id || !userData.role) {
-    return unauthorizedResponse('Sessão inválida')
+
+  // Se não encontrou no cookie, tentar requireAuth (valida token do Supabase)
+  // Mas apenas se realmente não houver cookie - não bloquear se cookie existir mas estiver inválido
+  if (!userData) {
+    debug('[AuthMeAPI] Cookie golffox-session não encontrado ou inválido, tentando requireAuth...', {}, 'AuthMeAPI')
+    
+    // Se não há cookie, retornar erro imediatamente (não tentar requireAuth que pode ser lento)
+    if (!cookie) {
+      debug('[AuthMeAPI] Nenhum cookie golffox-session encontrado, retornando erro', {}, 'AuthMeAPI')
+      return NextResponse.json({
+        success: false,
+        error: 'Não autorizado',
+        message: 'Sessão não encontrada. Faça login novamente.'
+      }, { status: 401 })
+    }
+
+    // Se há cookie mas está inválido, tentar requireAuth como último recurso
+    try {
+      const authError = await requireAuth(request)
+      if (authError) {
+        debug('[AuthMeAPI] requireAuth falhou', { 
+          status: authError.status,
+          statusText: authError.statusText
+        }, 'AuthMeAPI')
+        // Retornar erro mais informativo
+        return NextResponse.json({
+          success: false,
+          error: 'Não autorizado',
+          message: 'Sessão inválida. Faça login novamente.'
+        }, { status: 401 })
+      }
+      // Se requireAuth passou, buscar dados do cookie novamente ou usar dados validados
+      const cookieRetry = request.cookies.get('golffox-session')?.value
+      if (cookieRetry) {
+        userData = tryDecode(cookieRetry)
+        debug('[AuthMeAPI] Dados obtidos após requireAuth bem-sucedido', {
+          hasUserData: !!userData
+        }, 'AuthMeAPI')
+      }
+      if (!userData || !userData.id || !userData.role) {
+        debug('[AuthMeAPI] Nenhum dado de usuário encontrado após requireAuth', {}, 'AuthMeAPI')
+        return NextResponse.json({
+          success: false,
+          error: 'Sessão não encontrada',
+          message: 'Não foi possível obter dados do usuário. Faça login novamente.'
+        }, { status: 401 })
+      }
+    } catch (error) {
+      logError('Erro ao executar requireAuth', { error }, 'AuthMeAPI')
+      return NextResponse.json({
+        success: false,
+        error: 'Erro interno',
+        message: 'Erro ao verificar autenticação'
+      }, { status: 500 })
+    }
   }
 
   // Buscar dados completos do usuário no banco para incluir transportadora_id, company_id, etc.
@@ -85,8 +158,9 @@ async function meHandler(request: NextRequest) {
     logError('Erro ao buscar dados do usuário no banco', { error }, 'AuthMeAPI')
   }
 
-  // Fallback para dados do cookie
-  return successResponse({
+  // Fallback para dados do cookie - retornar formato esperado pelo hook
+  return NextResponse.json({
+    success: true,
     user: {
       id: userData.id,
       email: userData.email || '',

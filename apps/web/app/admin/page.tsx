@@ -13,6 +13,10 @@ export default function AdminDashboard() {
   const [isRedirecting, setIsRedirecting] = useState(false)
 
   useEffect(() => {
+    console.log('[AdminDashboard] Estado atual:', { loading, hasUser: !!user, role: user?.role })
+  }, [user, loading])
+
+  useEffect(() => {
     // Debug para identificar problemas de permissão
     if (!loading) {
       console.log('[AdminDashboard] Estado de autenticação:', {
@@ -25,11 +29,15 @@ export default function AdminDashboard() {
       if (!user) {
         console.warn('[AdminDashboard] Usuário não encontrado, redirecionando para login')
         setIsRedirecting(true)
-        router.replace('/?next=/admin')
+        setTimeout(() => {
+          router.replace('/?next=/admin')
+        }, 100)
       } else if (user.role !== 'admin') {
         console.warn('[AdminDashboard] Usuário não tem role admin:', user.role)
         setIsRedirecting(true)
-        router.replace('/unauthorized')
+        setTimeout(() => {
+          router.replace('/unauthorized')
+        }, 100)
       }
     }
   }, [user, loading, router])

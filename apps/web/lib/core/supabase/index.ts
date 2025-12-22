@@ -7,8 +7,14 @@
 export { supabase } from './client'
 export type { SupabaseClientUnion, RealtimeChannelUnion } from './client'
 
-// Cliente server-side
-export { getSupabaseAdmin, supabaseServiceRole } from './server'
+// ✅ CORREÇÃO: Não exportar server-side diretamente
+// Em vez disso, criar um arquivo separado que só é importado quando necessário
+// Isso evita executar código do servidor no cliente durante o build
+
+// Para usar no servidor, importe diretamente:
+// import { getSupabaseAdmin, supabaseServiceRole } from '@/lib/core/supabase/server'
+//
+// Não importe do index.ts no cliente!
 
 // Session helpers
 export { ensureSupabaseSession, getAccessTokenFromGolffoxCookie } from './session'

@@ -31,7 +31,7 @@ export function QuickActionsGrid({ actions }: QuickActionsGridProps) {
             transition={{ delay: index * 0.1, duration: 0.5 }}
           >
             <a href={action.href} className="block h-full group">
-              <Card className="relative h-full overflow-hidden bg-card/50 backdrop-blur-sm border-border hover:shadow-2xl hover:shadow-text-brand/10 transition-all duration-500 hover:border-text-brand/50 cursor-pointer">
+              <Card variant="premium" className="relative h-full overflow-hidden cursor-pointer">
                 {/* Gradient Background */}
                 <motion.div
                   className={`absolute inset-0 bg-gradient-to-br ${action.bgGradient} opacity-0 group-hover:opacity-100 transition-opacity duration-500`}

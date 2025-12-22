@@ -84,7 +84,7 @@ export function DashboardKPIs({ kpis }: DashboardKPIsProps) {
                 const Icon = kpi.icon
                 return (
                     <motion.div key={index} variants={listItem}>
-                        <Card className="group hover:shadow-lg transition-all duration-300 cursor-pointer">
+                        <Card variant="premium" className="group cursor-pointer">
                             <CardHeader>
                                 <CardDescription className="flex items-center gap-2">
                                     <div className="p-2 rounded-lg bg-gradient-to-br from-bg-brand-light to-bg-brand-soft group-hover:from-text-brand group-hover:to-brand-hover transition-all duration-300">

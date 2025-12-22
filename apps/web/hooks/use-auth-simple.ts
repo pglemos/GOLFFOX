@@ -21,22 +21,38 @@ export function useAuthSimple() {
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
+        let mounted = true
+        let timeoutId: NodeJS.Timeout | null = null
+
         // Função para carregar usuário do storage ou API
         const loadUser = async () => {
             try {
                 let userData: any = null
 
                 // 1. Tentar localStorage/sessionStorage primeiro (mais rápido)
-                const storedLocal = localStorage.getItem('golffox-auth')
-                const storedSession = sessionStorage.getItem('golffox-auth')
+                let storedLocal: string | null = null
+                let storedSession: string | null = null
+                try {
+                    storedLocal = typeof window !== 'undefined' ? localStorage.getItem('golffox-auth') : null
+                    storedSession = typeof window !== 'undefined' ? sessionStorage.getItem('golffox-auth') : null
+                } catch (e) {
+                    console.warn('[useAuthSimple] Erro ao acessar storage:', e)
+                }
                 const stored = storedLocal || storedSession
 
                 if (stored) {
                     try {
                         userData = JSON.parse(stored)
-                        console.log(`[useAuthSimple] Usuário carregado do ${storedLocal ? 'localStorage' : 'sessionStorage'}`)
+                        // Validar se os dados são válidos
+                        if (userData?.id && userData?.email) {
+                            console.log(`[useAuthSimple] Usuário carregado do ${storedLocal ? 'localStorage' : 'sessionStorage'}`)
+                        } else {
+                            console.warn('[useAuthSimple] Dados no storage inválidos, ignorando')
+                            userData = null
+                        }
                     } catch (e) {
-                        console.warn('[useAuthSimple] Erro ao decodificar storage')
+                        console.warn('[useAuthSimple] Erro ao decodificar storage:', e)
+                        userData = null
                     }
                 }
 
@@ -45,19 +61,39 @@ export function useAuthSimple() {
                 if (!userData?.id || !userData?.email) {
                     console.log('[useAuthSimple] Dados não encontrados no storage, chamando API /api/auth/me...')
                     try {
+                        // Timeout de 10 segundos para evitar loading infinito
+                        const controller = new AbortController()
+                        timeoutId = setTimeout(() => {
+                            controller.abort()
+                        }, 10000)
+
                         const response = await fetch('/api/auth/me', {
                             method: 'GET',
                             credentials: 'include', // Importante: enviar cookies
                             headers: {
                                 'Accept': 'application/json',
                             },
+                            signal: controller.signal,
                         })
+
+                        if (timeoutId) {
+                            clearTimeout(timeoutId)
+                            timeoutId = null
+                        }
+
+                        if (!mounted) return
 
                         if (response.ok) {
                             const data = await response.json()
+                            console.log('[useAuthSimple] Resposta da API:', {
+                                success: data.success,
+                                hasUser: !!data.user,
+                                userId: data.user?.id,
+                                role: data.user?.role
+                            })
                             if (data.success && data.user) {
                                 userData = data.user
-                                console.log('[useAuthSimple] Usuário carregado via API /api/auth/me')
+                                console.log('[useAuthSimple] ✅ Usuário carregado via API /api/auth/me')
 
                                 // Salvar no storage para próximas cargas serem mais rápidas
                                 const safeData = JSON.stringify({
@@ -69,18 +105,48 @@ export function useAuthSimple() {
                                     companyId: userData.companyId,
                                 })
                                 try {
-                                    sessionStorage.setItem('golffox-auth', safeData)
+                                    if (typeof window !== 'undefined') {
+                                        sessionStorage.setItem('golffox-auth', safeData)
+                                    }
                                 } catch (e) {
-                                    console.warn('[useAuthSimple] Erro ao salvar no sessionStorage')
+                                    console.warn('[useAuthSimple] Erro ao salvar no sessionStorage:', e)
                                 }
+                            } else {
+                                console.warn('[useAuthSimple] ⚠️ Resposta da API não contém dados válidos:', {
+                                    success: data.success,
+                                    hasUser: !!data.user,
+                                    error: data.error,
+                                    message: data.message
+                                })
                             }
                         } else {
-                            console.log('[useAuthSimple] API /api/auth/me retornou status:', response.status)
+                            const errorText = await response.text().catch(() => 'Erro desconhecido')
+                            let errorJson = null
+                            try {
+                                errorJson = JSON.parse(errorText)
+                            } catch (e) {
+                                // Não é JSON, usar texto
+                            }
+                            console.error('[useAuthSimple] ❌ API /api/auth/me retornou erro:', {
+                                status: response.status,
+                                statusText: response.statusText,
+                                error: errorJson || errorText
+                            })
                         }
-                    } catch (apiError) {
-                        console.warn('[useAuthSimple] Erro ao chamar API /api/auth/me:', apiError)
+                    } catch (apiError: any) {
+                        if (timeoutId) {
+                            clearTimeout(timeoutId)
+                            timeoutId = null
+                        }
+                        if (apiError.name === 'AbortError') {
+                            console.error('[useAuthSimple] Timeout ao chamar API /api/auth/me (10s)')
+                        } else {
+                            console.warn('[useAuthSimple] Erro ao chamar API /api/auth/me:', apiError)
+                        }
                     }
                 }
+
+                if (!mounted) return
 
                 // 3. Definir estado do usuário
                 if (userData?.id && userData?.email) {
@@ -98,14 +164,26 @@ export function useAuthSimple() {
                 }
             } catch (err) {
                 console.error('[useAuthSimple] Erro ao carregar sessão:', err)
-                setUser(null)
+                if (mounted) {
+                    setUser(null)
+                }
+            } finally {
+                if (mounted) {
+                    setLoading(false)
+                }
             }
-
-            setLoading(false)
         }
 
         // Carregar imediatamente
         loadUser()
+
+        // Cleanup
+        return () => {
+            mounted = false
+            if (timeoutId) {
+                clearTimeout(timeoutId)
+            }
+        }
     }, [])
 
     return { user, loading }
