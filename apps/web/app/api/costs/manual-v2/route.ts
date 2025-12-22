@@ -186,10 +186,14 @@ export async function GET(request: NextRequest) {
             pageSize,
             totalPages,
         })
-    } catch (error) {
+    } catch (error: any) {
         logError('[API] Erro interno', { error }, 'CostsManualV2API')
         return NextResponse.json(
-            { success: false, error: 'Erro interno do servidor' },
+            {
+                success: false,
+                error: 'Erro interno do servidor',
+                details: error.message || error
+            },
             { status: 500 }
         )
     }

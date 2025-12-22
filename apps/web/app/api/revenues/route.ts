@@ -171,10 +171,14 @@ export async function GET(request: NextRequest) {
             pageSize,
             totalPages,
         })
-    } catch (error) {
+    } catch (error: any) {
         logError('Erro interno ao processar receitas', { error }, 'RevenuesAPI')
         return NextResponse.json(
-            { success: false, error: 'Erro interno do servidor' },
+            {
+                success: false,
+                error: 'Erro interno do servidor',
+                details: error.message || error
+            },
             { status: 500 }
         )
     }
@@ -219,18 +223,18 @@ export async function POST(request: NextRequest) {
             notes: body.notes,
             ...body
         })
-        
+
         if (!validation.success) {
             return NextResponse.json(
-                { 
-                    success: false, 
-                    error: 'Dados inválidos', 
-                    details: validation.error.errors 
+                {
+                    success: false,
+                    error: 'Dados inválidos',
+                    details: validation.error.errors
                 },
                 { status: 400 }
             )
         }
-        
+
         const validated = validation.data
 
         // Definir tenant baseado no papel
