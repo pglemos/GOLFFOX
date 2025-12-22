@@ -375,11 +375,16 @@ function LoginContent() {
 
   const handleLogin = useCallback(
     async (demoEmail?: string, demoPassword?: string) => {
-      const rawEmail = demoEmail ?? email
-      const rawPassword = demoPassword ?? password
+      // ✅ CORREÇÃO: Obter valores diretamente dos refs dos inputs para garantir valores atualizados
+      // O state do React pode estar desatualizado devido ao closure do useCallback
+      const inputEmail = emailInputRef.current?.value || ''
+      const inputPassword = passwordInputRef.current?.value || ''
+      
+      const rawEmail = demoEmail ?? (inputEmail || email)
+      const rawPassword = demoPassword ?? (inputPassword || password)
 
       const sanitizedEmail = sanitizeInput(rawEmail)
-      const sanitizedPassword = (demoPassword ?? password).trim()
+      const sanitizedPassword = (demoPassword ?? (inputPassword || password)).trim()
 
       setFieldErrors({})
       setSuccess(false)
