@@ -81,12 +81,17 @@ export function Topbar({
   // Atualizar avatar URL quando user mudar
   useEffect(() => {
     if (user?.avatar_url) {
-      // Adicionar timestamp para evitar cache
-      const urlWithCache = user.avatar_url.includes('?') 
-        ? user.avatar_url 
-        : `${user.avatar_url}?t=${Date.now()}`
+      // Remover timestamp existente e adicionar novo para forçar atualização
+      const cleanUrl = user.avatar_url.split('?')[0]
+      const urlWithCache = `${cleanUrl}?t=${Date.now()}`
+      debug('Topbar - Setting avatar URL from user prop', { 
+        original: user.avatar_url,
+        cleanUrl,
+        urlWithCache 
+      }, 'Topbar')
       setAvatarUrl(urlWithCache)
     } else {
+      debug('Topbar - No avatar_url in user prop', {}, 'Topbar')
       setAvatarUrl(undefined)
     }
   }, [user?.avatar_url])
