@@ -114,11 +114,25 @@ export function useAuthFast() {
 
     checkAuth()
 
+    let isHandlingUpdate = false
+    let updateTimeoutId: NodeJS.Timeout | null = null
+
     const handleAuthUpdate = async (event?: Event) => {
+      // Debounce para evitar múltiplas chamadas simultâneas
+      if (isHandlingUpdate) {
+        return
+      }
+
+      isHandlingUpdate = true
       setLoading(true)
 
+      // Limpar timeout anterior se existir
+      if (updateTimeoutId) {
+        clearTimeout(updateTimeoutId)
+      }
+
       // Adicionar delay para garantir que o banco foi atualizado
-      setTimeout(async () => {
+      updateTimeoutId = setTimeout(async () => {
         try {
           // Forçar busca no servidor (ignorar cookie desatualizado)
           const res = await fetch('/api/auth/me', {
@@ -131,7 +145,10 @@ export function useAuthFast() {
             }
           })
           
-          if (!mounted) return
+          if (!mounted) {
+            isHandlingUpdate = false
+            return
+          }
           
           if (res.ok) {
             try {
@@ -148,6 +165,7 @@ export function useAuthFast() {
                 }
                 setUser(newUser)
                 setLoading(false)
+                isHandlingUpdate = false
                 return
               }
             } catch (parseError) {
@@ -157,18 +175,26 @@ export function useAuthFast() {
           
           // Fallback para cookie se servidor falhar
           await checkAuth()
+          isHandlingUpdate = false
         } catch (err: unknown) {
           logError('Erro ao buscar autenticação após update', { error: err }, 'useAuthFast')
-          if (!mounted) return
+          if (!mounted) {
+            isHandlingUpdate = false
+            return
+          }
           await checkAuth()
+          isHandlingUpdate = false
         }
-      }, 200) // Pequeno delay para garantir propagação no banco
+      }, 500) // Debounce de 500ms para evitar loops
     }
 
     window.addEventListener('auth:update', handleAuthUpdate)
 
     return () => {
       mounted = false
+      if (updateTimeoutId) {
+        clearTimeout(updateTimeoutId)
+      }
       window.removeEventListener('auth:update', handleAuthUpdate)
     }
   }, [])

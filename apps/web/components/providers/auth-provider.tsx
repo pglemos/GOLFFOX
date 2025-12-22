@@ -196,44 +196,112 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null)
   }, [])
 
-  // Carregar usuário na montagem
+  // Carregar usuário na montagem (apenas uma vez)
   useEffect(() => {
-    loadUser()
-  }, [loadUser])
+    let mounted = true
+    let hasLoaded = false
+
+    const initialLoad = async () => {
+      if (hasLoaded) return
+      hasLoaded = true
+      
+      if (mounted) {
+        await loadUser()
+      }
+    }
+
+    initialLoad()
+
+    return () => {
+      mounted = false
+    }
+  }, []) // Executar apenas uma vez na montagem
 
   // Escutar mudanças de sessão do Supabase
   useEffect(() => {
+    let isHandling = false
+    let timeoutId: NodeJS.Timeout | null = null
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log('🔄 Auth state changed:', event)
       
-      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-        // Recarregar usuário quando há mudança de sessão
-        await loadUser(true)
-      } else if (event === 'SIGNED_OUT') {
-        // Limpar usuário ao fazer logout
-        clearCache()
-        setUser(null)
+      // Ignorar INITIAL_SESSION para evitar loops
+      if (event === 'INITIAL_SESSION') {
+        return
       }
+
+      // Debounce para evitar múltiplas chamadas simultâneas
+      if (isHandling) {
+        return
+      }
+
+      isHandling = true
+      
+      // Limpar timeout anterior se existir
+      if (timeoutId) {
+        clearTimeout(timeoutId)
+      }
+
+      timeoutId = setTimeout(async () => {
+        try {
+          if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+            // Recarregar usuário quando há mudança de sessão
+            await loadUser(true)
+          } else if (event === 'SIGNED_OUT') {
+            // Limpar usuário ao fazer logout
+            clearCache()
+            setUser(null)
+          }
+        } finally {
+          isHandling = false
+        }
+      }, 300) // Debounce de 300ms
     })
 
     return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId)
+      }
       subscription.unsubscribe()
     }
   }, [loadUser, clearCache])
 
   // Escutar eventos customizados auth:update (disparados quando há atualizações de perfil)
   useEffect(() => {
+    let isHandling = false
+    let timeoutId: NodeJS.Timeout | null = null
+
     const handleAuthUpdate = async () => {
       console.log('🔄 auth:update event received')
+      
+      // Debounce para evitar múltiplas chamadas simultâneas
+      if (isHandling) {
+        return
+      }
+
+      isHandling = true
+
+      // Limpar timeout anterior se existir
+      if (timeoutId) {
+        clearTimeout(timeoutId)
+      }
+
       // Forçar recarregamento após pequeno delay para garantir que banco foi atualizado
-      setTimeout(() => {
-        loadUser(true)
-      }, 200)
+      timeoutId = setTimeout(async () => {
+        try {
+          await loadUser(true)
+        } finally {
+          isHandling = false
+        }
+      }, 500) // Debounce de 500ms
     }
 
     window.addEventListener('auth:update', handleAuthUpdate)
 
     return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId)
+      }
       window.removeEventListener('auth:update', handleAuthUpdate)
     }
   }, [loadUser])

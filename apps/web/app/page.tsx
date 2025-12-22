@@ -189,14 +189,8 @@ function LoginContent() {
 
           const safeNext = sanitizePath(rawNext)
 
-          const isAllowedForRole = (role: string, path: string): boolean => {
-            if (path.startsWith('/admin')) return role === 'admin'
-            // empresa = empresa contratante (antigo operador)
-            if (path.startsWith('/empresa')) return ['admin', 'empresa', 'operador'].includes(role)
-            // operador = transportadora
-            if (path.startsWith('/transportadora')) return ['admin', 'operador', 'transportadora', 'transportadora'].includes(role)
-            return true
-          }
+          // Usar a função isAllowedForRole do useCallback (definida abaixo)
+          // Não redefinir aqui para evitar conflitos
 
           // Normalizar roles para PT-BR
           const normalizedRole =
@@ -212,7 +206,15 @@ function LoginContent() {
                 normalizedRole === 'operador' || normalizedRole === 'transportadora' ? '/transportadora' :  // Operador da Transportadora
                   '/empresa' // Default para empresa
 
-          if (safeNext && isAllowedForRole(userRole, safeNext)) {
+          // Usar função auxiliar local para verificar permissão
+          const checkPermission = (role: string, path: string): boolean => {
+            if (path.startsWith('/admin')) return role === 'admin'
+            if (path.startsWith('/empresa')) return ['admin', 'empresa', 'operador'].includes(role)
+            if (path.startsWith('/transportadora')) return ['admin', 'operador', 'transportadora'].includes(role)
+            return true
+          }
+          
+          if (safeNext && checkPermission(userRole, safeNext)) {
             redirectUrl = safeNext
           }
 
