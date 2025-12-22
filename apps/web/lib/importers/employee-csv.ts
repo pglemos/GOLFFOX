@@ -145,20 +145,20 @@ export async function geocodeBatch(
   const results = new Map<string, { lat: number; lng: number } | null>()
   const cache = new Map<string, { lat: number; lng: number } | null>()
   const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
-  
+
   // Remover duplicatas mantendo ordem
   const uniqueAddresses = Array.from(new Set(addresses))
-  
+
   for (let i = 0; i < uniqueAddresses.length; i++) {
     const address = uniqueAddresses[i]
-    
+
     // Verificar cache primeiro
     if (cache.has(address)) {
       results.set(address, cache.get(address)!)
       onProgress?.(i + 1, uniqueAddresses.length)
       continue
     }
-    
+
     let attempts = 0
     let coords: { lat: number; lng: number } | null = null
     const maxAttempts = 3
@@ -167,7 +167,7 @@ export async function geocodeBatch(
     while (attempts < maxAttempts && !coords) {
       try {
         coords = await geocodeAddress(address)
-        
+
         if (!coords && attempts < maxAttempts - 1) {
           // Aguardar antes de tentar novamente (exponential backoff)
           await delay(Math.pow(2, attempts) * 1000) // 1s, 2s, 4s
@@ -176,11 +176,11 @@ export async function geocodeBatch(
           break
         }
       } catch (error: any) {
-        warn(`Erro ao geocodificar endereço (tentativa ${attempts + 1}/${maxAttempts})`, { 
-          address, 
-          error: error.message || error 
+        warn(`Erro ao geocodificar endereço (tentativa ${attempts + 1}/${maxAttempts})`, {
+          address,
+          error: error.message || error
         }, 'EmployeeCSVImporter')
-        
+
         if (attempts < maxAttempts - 1) {
           await delay(Math.pow(2, attempts) * 1000)
           attempts++
@@ -234,7 +234,7 @@ export async function importEmployees(
 
   for (let i = 0; i < employees.length; i++) {
     const emp = employees[i]
-    
+
     try {
       // Validação de duplicatas no mesmo lote
       if (processedEmails.has(emp.email)) {
@@ -257,7 +257,7 @@ export async function importEmployees(
       if ((existingEmployee as any)?.employee_id) {
         // Funcionário já existe, usar employee_id existente
         userId = (existingEmployee as any).employee_id
-        
+
         // Atualizar dados do usuário se necessário
         try {
           await supabase
@@ -273,7 +273,7 @@ export async function importEmployees(
         }
       } else {
         // Criar novo usuário via API
-        const userRes = await fetch('/api/operador/create-employee', {
+        const userRes = await fetch('/api/empresa/create-employee', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
