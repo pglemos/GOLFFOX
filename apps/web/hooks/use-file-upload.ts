@@ -12,7 +12,7 @@ import { logError } from '@/lib/logger'
  */
 export interface UseFileUploadOptions {
     /** Nome do bucket no Supabase Storage */
-    bucket: 'veiculo-documents' | 'motorista-documents' | 'transportadora-documents' | 'company-documents' | 'veiculo-photos' | 'avatars'
+    bucket: 'vehicle-documents' | 'driver-documents' | 'carrier-documents' | 'company-documents' | 'vehicle-photos' | 'avatars' | 'costs'
     /** Tamanho máximo em MB (padrão: 10) */
     maxSize?: number
     /** Tipos de arquivo permitidos (padrão: PDF e imagens) */
@@ -159,7 +159,7 @@ export function useFileUpload(options: UseFileUploadOptions): UseFileUploadRetur
                     } catch {
                         // Se não conseguir fazer parse, usar mensagem padrão
                     }
-                    
+
                     const error = new Error(errorData.error || errorData.details || 'Erro ao enviar arquivo')
                     error.name = `HTTP${response.status}`
                     throw error
@@ -193,9 +193,9 @@ export function useFileUpload(options: UseFileUploadOptions): UseFileUploadRetur
         if (!result.success) {
             const errorMsg = formatUserErrorMessage(result.error)
             const suggestion = getErrorActionSuggestion(result.error)
-            
+
             setError(suggestion ? `${errorMsg}\n\n${suggestion}` : errorMsg)
-            
+
             logError('Erro ao fazer upload de arquivo', {
                 error: result.error?.message,
                 stack: result.error?.stack,
@@ -203,7 +203,7 @@ export function useFileUpload(options: UseFileUploadOptions): UseFileUploadRetur
                 bucket,
                 fileName: file.name,
             }, 'useFileUpload')
-            
+
             notifyError(result.error, errorMsg)
             return null
         }

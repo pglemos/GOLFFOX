@@ -75,7 +75,7 @@ export interface DocumentConfig {
 
 export const DOCUMENTS_CONFIG: Record<EntityType, DocumentConfig> = {
     transportadora: {
-        bucket: "transportadora-documents",
+        bucket: "carrier-documents",
         endpoint: "/api/admin/carriers",
         table: "gf_transportadora_documents",
         foreignKey: "transportadora_id",
@@ -90,8 +90,8 @@ export const DOCUMENTS_CONFIG: Record<EntityType, DocumentConfig> = {
         entityNameSingular: "transportadora",
     },
     motorista: {
-        bucket: "motorista-documents",
-        endpoint: "/api/admin/motoristas",
+        bucket: "driver-documents",
+        endpoint: "/api/admin/drivers",
         table: "gf_motorista_documents",
         foreignKey: "motorista_id",
         paramName: "driverId",
@@ -105,8 +105,8 @@ export const DOCUMENTS_CONFIG: Record<EntityType, DocumentConfig> = {
         entityNameSingular: "motorista",
     },
     veiculo: {
-        bucket: "veiculo-documents",
-        endpoint: "/api/admin/veiculos",
+        bucket: "vehicle-documents",
+        endpoint: "/api/admin/vehicles",
         table: "gf_veiculo_documents",
         foreignKey: "veiculo_id",
         paramName: "vehicleId",
@@ -148,12 +148,12 @@ export function getDocumentsConfig(entityType: EntityType): DocumentConfig {
  */
 export function getFilteredDocumentTypes(entityType: EntityType): string[] {
     const config = getDocumentsConfig(entityType)
-    
+
     // Para transportadora, excluir legal_rep_cnh (gerenciado separadamente)
     if (entityType === "transportadora") {
         return config.documentTypes.filter(t => t !== 'legal_rep_cnh')
     }
-    
+
     return config.documentTypes
 }
 

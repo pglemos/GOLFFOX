@@ -10,7 +10,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 interface DocumentUploadProps {
   driverId?: string
   vehicleId?: string
-  folder: 'motorista-documents' | 'veiculo-documents' | 'medical-exams'
+  folder: 'driver-documents' | 'vehicle-documents' | 'medical-exams'
   documentType?: string
   onSuccess?: () => void
   onError?: (error: string) => void
@@ -30,13 +30,13 @@ interface DocumentData {
   policy_number?: string
 }
 
-export function DocumentUpload({ 
-  driverId, 
-  vehicleId, 
-  folder, 
+export function DocumentUpload({
+  driverId,
+  vehicleId,
+  folder,
   documentType,
   onSuccess,
-  onError 
+  onError
 }: DocumentUploadProps) {
   const [file, setFile] = useState<File | null>(null)
   const [uploading, setUploading] = useState(false)
@@ -73,7 +73,7 @@ export function DocumentUpload({
 
   const handleUpload = async () => {
     if (!file) return
-    
+
     setUploading(true)
     setError(null)
     setSuccess(false)
@@ -102,7 +102,7 @@ export function DocumentUpload({
       const uploadData = await uploadRes.json()
 
       // Se for documento de motorista, salvar no banco
-      if (driverId && folder === 'motorista-documents' && documentType) {
+      if (driverId && folder === 'driver-documents' && documentType) {
         const docData: DocumentData = {
           document_type: documentType,
           file_url: uploadData.file_url,
@@ -143,7 +143,7 @@ export function DocumentUpload({
       }
 
       // Se for documento de veículo, salvar no banco
-      if (vehicleId && folder === 'veiculo-documents' && documentType) {
+      if (vehicleId && folder === 'vehicle-documents' && documentType) {
         const docData: DocumentData = {
           document_type: documentType,
           file_url: uploadData.file_url,
@@ -165,7 +165,7 @@ export function DocumentUpload({
       setSuccess(true)
       setFile(null)
       onSuccess?.()
-      
+
       // Resetar sucesso após 3 segundos
       setTimeout(() => setSuccess(false), 3000)
     } catch (err: any) {
@@ -201,9 +201,9 @@ export function DocumentUpload({
           <span className="text-xs text-ink-muted">
             {(file.size / 1024 / 1024).toFixed(2)} MB
           </span>
-          <Button 
-            size="sm" 
-            variant="ghost" 
+          <Button
+            size="sm"
+            variant="ghost"
             onClick={() => setFile(null)}
             disabled={uploading}
             className="h-8 w-8 p-0"
@@ -229,8 +229,8 @@ export function DocumentUpload({
         </Alert>
       )}
 
-      <Button 
-        onClick={handleUpload} 
+      <Button
+        onClick={handleUpload}
         disabled={!file || uploading}
         className="w-full"
       >

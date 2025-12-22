@@ -6,14 +6,15 @@ import { logError } from '@/lib/logger'
 
 export const runtime = 'nodejs'
 
-// Buckets permitidos
+// Buckets permitidos (devem corresponder aos buckets criados no Supabase Storage)
 const ALLOWED_BUCKETS = [
-    'veiculo-documents',
-    'motorista-documents',
-    'transportadora-documents',
+    'vehicle-documents',
+    'driver-documents',
+    'carrier-documents',
     'company-documents',
-    'veiculo-photos',
-    'avatars'
+    'vehicle-photos',
+    'avatars',
+    'costs'
 ]
 
 export async function POST(request: NextRequest) {
