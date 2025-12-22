@@ -74,15 +74,17 @@ const VehicleCard = React.memo(function VehicleCard({
                 <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
                     <div className="flex-1 flex gap-3 sm:gap-4 min-w-0">
                         {veiculo.photo_url && (
-                            <Image
-                                src={veiculo.photo_url}
-                                alt={veiculo.plate}
-                                width={80}
-                                height={80}
-                                className="w-16 h-16 sm:w-20 sm:h-20 rounded-lg object-cover border-2 border-border flex-shrink-0"
-                                loading="lazy"
-                                quality={80}
-                            />
+                            <div className="relative w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0 rounded-lg overflow-hidden border-2 border-border bg-muted">
+                                <Image
+                                    src={veiculo.photo_url}
+                                    alt={veiculo.plate}
+                                    fill
+                                    className="object-cover"
+                                    sizes="(max-width: 640px) 64px, 80px"
+                                    loading="lazy"
+                                    quality={80}
+                                />
+                            </div>
                         )}
                         <div className="flex-1 min-w-0">
                             <div className="flex flex-wrap items-center gap-2 mb-2">
