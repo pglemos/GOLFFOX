@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState, useCallback } from "react"
+import { useEffect, useState, useCallback, useMemo } from "react"
 import { useTransportadoraRealtime } from "@/hooks/use-transportadora-realtime"
 import { AppShell } from "@/components/app-shell"
 import { Button } from "@/components/ui/button"
@@ -311,7 +311,7 @@ export default function TransportadoraDashboard() {
       const hours = Array.from({ length: 24 }, (_, i) => i)
       const lineChartData = hours.map((hour) => ({
         hora: `${hour.toString().padStart(2, '0')}:00`,
-        emRota: hour >= 6 && hour <= 22 ? Math.floor(onRouteCount * (0.7 + Math.random() * 0.3)) : Math.floor(onRouteCount * 0.2)
+        emRota: hour >= 6 && hour <= 22 ? Math.floor(onRouteCount * 0.85) : Math.floor(onRouteCount * 0.2)
       }))
       setChartData(lineChartData)
 
@@ -372,6 +372,89 @@ export default function TransportadoraDashboard() {
     enablePolling: true,
     pollingInterval: 60000,
   })
+
+  // Calcular trends memoizadas
+  const kpiTrends = useMemo(() => ({
+    totalFleet: previousKpis.totalFleet > 0 
+      ? Math.round(((kpis.totalFleet - previousKpis.totalFleet) / previousKpis.totalFleet) * 100) 
+      : 0,
+    onRoute: previousKpis.onRoute > 0 
+      ? Math.round(((kpis.onRoute - previousKpis.onRoute) / previousKpis.onRoute) * 100) 
+      : 0,
+    activeDrivers: previousKpis.activeDrivers > 0 
+      ? Math.round(((kpis.activeDrivers - previousKpis.activeDrivers) / previousKpis.activeDrivers) * 100) 
+      : 0,
+    criticalAlerts: previousKpis.criticalAlerts > 0 
+      ? Math.round(((kpis.criticalAlerts - previousKpis.criticalAlerts) / previousKpis.criticalAlerts) * 100) 
+      : 0,
+    totalCostsThisMonth: previousKpis.totalCostsThisMonth > 0 
+      ? Math.round(((kpis.totalCostsThisMonth - previousKpis.totalCostsThisMonth) / previousKpis.totalCostsThisMonth) * 100) 
+      : 0,
+    totalTrips: previousKpis.totalTrips > 0 
+      ? Math.round(((kpis.totalTrips - previousKpis.totalTrips) / previousKpis.totalTrips) * 100) 
+      : 0,
+    delayed: previousKpis.delayed > 0 
+      ? Math.round(((kpis.delayed - previousKpis.delayed) / previousKpis.delayed) * 100) 
+      : 0,
+  }), [kpis, previousKpis])
+
+  // Handlers memoizados para navegação
+  const handleNavigateVeiculos = useCallback(() => {
+    router.push('/transportadora/veiculos')
+  }, [router])
+
+  const handleNavigateMotoristas = useCallback(() => {
+    try {
+      router.push('/transportadora/motoristas')
+    } catch (err) {
+      console.error('❌ Router.push failed, using window.location:', err)
+      window.location.href = '/transportadora/motoristas'
+    }
+  }, [router])
+
+  const handleNavigateAlertas = useCallback(() => {
+    try {
+      router.push('/transportadora/alertas')
+    } catch (err) {
+      console.error('❌ Router.push failed, using window.location:', err)
+      window.location.href = '/transportadora/alertas'
+    }
+  }, [router])
+
+  const handleNavigateCustos = useCallback(() => {
+    try {
+      router.push('/transportadora/custos')
+    } catch (err) {
+      console.error('❌ Router.push failed, using window.location:', err)
+      window.location.href = '/transportadora/custos'
+    }
+  }, [router])
+
+  // Memoizar dados de gráficos
+  const memoizedChartData = useMemo(() => {
+    if (chartData.length === 0) return []
+    return chartData
+  }, [chartData])
+
+  const memoizedFleetStatusData = useMemo(() => {
+    if (fleetStatusData.length === 0) return []
+    return fleetStatusData
+  }, [fleetStatusData])
+
+  const memoizedTopDrivers = useMemo(() => {
+    if (topDrivers.length === 0) return []
+    return topDrivers
+  }, [topDrivers])
+
+  const memoizedRecentActivities = useMemo(() => {
+    if (recentActivities.length === 0) return []
+    return recentActivities
+  }, [recentActivities])
+
+  // Formatar valor de custos mensais
+  const formattedMonthlyCosts = useMemo(() => {
+    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 0 }).format(kpis.totalCostsThisMonth)
+  }, [kpis.totalCostsThisMonth])
 
   if (loading) {
     return (
@@ -434,42 +517,28 @@ export default function TransportadoraDashboard() {
             icon={Truck}
             label={t('transportadora', 'kpi_total_fleet')}
             value={kpis.totalFleet.toString()}
-            trend={previousKpis.totalFleet > 0 ? Math.round(((kpis.totalFleet - previousKpis.totalFleet) / previousKpis.totalFleet) * 100) : 0}
-            onClick={() => router.push('/transportadora/veiculos')}
+            trend={kpiTrends.totalFleet}
+            onClick={handleNavigateVeiculos}
           />
           <KpiCard
             icon={Navigation}
             label={t('transportadora', 'kpi_on_route')}
             value={kpis.onRoute.toString()}
-            trend={previousKpis.onRoute > 0 ? Math.round(((kpis.onRoute - previousKpis.onRoute) / previousKpis.onRoute) * 100) : 0}
+            trend={kpiTrends.onRoute}
           />
           <KpiCard
             icon={Users}
             label={t('transportadora', 'kpi_active_drivers')}
             value={kpis.activeDrivers.toString()}
-            trend={previousKpis.activeDrivers > 0 ? Math.round(((kpis.activeDrivers - previousKpis.activeDrivers) / previousKpis.activeDrivers) * 100) : 0}
-            onClick={() => {
-              try {
-                router.push('/transportadora/motoristas')
-              } catch (err) {
-                console.error('❌ Router.push failed, using window.location:', err)
-                window.location.href = '/transportadora/motoristas'
-              }
-            }}
+            trend={kpiTrends.activeDrivers}
+            onClick={handleNavigateMotoristas}
           />
           <KpiCard
             icon={AlertCircle}
             label={t('transportadora', 'kpi_critical_alerts')}
             value={kpis.criticalAlerts.toString()}
-            trend={previousKpis.criticalAlerts > 0 ? Math.round(((kpis.criticalAlerts - previousKpis.criticalAlerts) / previousKpis.criticalAlerts) * 100) : 0}
-            onClick={() => {
-              try {
-                router.push('/transportadora/alertas')
-              } catch (err) {
-                console.error('❌ Router.push failed, using window.location:', err)
-                window.location.href = '/transportadora/alertas'
-              }
-            }}
+            trend={kpiTrends.criticalAlerts}
+            onClick={handleNavigateAlertas}
           />
         </div>
 
@@ -481,37 +550,23 @@ export default function TransportadoraDashboard() {
           <KpiCard
             icon={DollarSign}
             label={t('transportadora', 'kpi_monthly_costs')}
-            value={new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 0 }).format(kpis.totalCostsThisMonth)}
-            trend={previousKpis.totalCostsThisMonth > 0 ? Math.round(((kpis.totalCostsThisMonth - previousKpis.totalCostsThisMonth) / previousKpis.totalCostsThisMonth) * 100) : 0}
-            onClick={() => {
-              try {
-                router.push('/transportadora/custos')
-              } catch (err) {
-                console.error('❌ Router.push failed, using window.location:', err)
-                window.location.href = '/transportadora/custos'
-              }
-            }}
+            value={formattedMonthlyCosts}
+            trend={kpiTrends.totalCostsThisMonth}
+            onClick={handleNavigateCustos}
           />
           <KpiCard
             icon={Navigation}
             label={t('transportadora', 'kpi_monthly_trips')}
             value={kpis.totalTrips.toString()}
-            trend={previousKpis.totalTrips > 0 ? Math.round(((kpis.totalTrips - previousKpis.totalTrips) / previousKpis.totalTrips) * 100) : 0}
+            trend={kpiTrends.totalTrips}
           />
           <KpiCard
             icon={AlertCircle}
             label={t('transportadora', 'kpi_expiring_documents')}
             value={kpis.delayed.toString()}
-            trend={previousKpis.delayed > 0 ? Math.round(((kpis.delayed - previousKpis.delayed) / previousKpis.delayed) * 100) : 0}
+            trend={kpiTrends.delayed}
             hint={t('transportadora', 'hint_click_details')}
-            onClick={() => {
-              try {
-                router.push('/transportadora/alertas')
-              } catch (err) {
-                console.error('❌ Router.push failed, using window.location:', err)
-                window.location.href = '/transportadora/alertas'
-              }
-            }}
+            onClick={handleNavigateAlertas}
           />
         </div>
 
@@ -528,7 +583,7 @@ export default function TransportadoraDashboard() {
             mobileHeight={250}
             className={cn(isMobile ? "w-full" : "lg:col-span-2")}
           >
-            <LineChart data={chartData}>
+            <LineChart data={memoizedChartData}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
               <XAxis
                 dataKey="hora"
@@ -575,7 +630,7 @@ export default function TransportadoraDashboard() {
           >
             <PieChart>
               <Pie
-                data={fleetStatusData}
+                data={memoizedFleetStatusData}
                 cx="50%"
                 cy="50%"
                 labelLine={false}
@@ -584,7 +639,7 @@ export default function TransportadoraDashboard() {
                 fill="#8884d8"
                 dataKey="value"
               >
-                {fleetStatusData.map((entry, index) => {
+                {memoizedFleetStatusData.map((entry, index) => {
                   const colors = ['#3B82F6', '#10B981', '#6B7280']
                   return <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
                 })}
@@ -600,7 +655,7 @@ export default function TransportadoraDashboard() {
             height={300}
             mobileHeight={250}
           >
-            <BarChart data={topDrivers}>
+            <BarChart data={memoizedTopDrivers}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
               <XAxis
                 dataKey="name"
@@ -830,7 +885,7 @@ export default function TransportadoraDashboard() {
           </div>
 
           {/* Atividades Recentes */}
-          <RecentActivities activities={recentActivities} maxItems={5} />
+          <RecentActivities activities={memoizedRecentActivities} maxItems={5} />
         </div>
       </div>
     </AppShell>

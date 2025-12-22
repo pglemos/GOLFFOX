@@ -215,6 +215,14 @@ export function FileUpload({
         }
     }, [preview])
 
+    const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLDivElement>) => {
+        if (disabled || uploading) return
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault()
+            handleClick()
+        }
+    }, [disabled, uploading, handleClick])
+
     const renderPreview = () => {
         if (!preview && !fileName) return null
 
@@ -223,7 +231,7 @@ export function FileUpload({
                 <div className="relative">
                     <img
                         src={preview}
-                        alt="Preview"
+                        alt={fileName ? `Preview da imagem ${fileName}` : 'Preview da imagem enviada'}
                         className="max-h-32 max-w-full mx-auto rounded-lg object-contain"
                     />
                 </div>
@@ -258,8 +266,13 @@ export function FileUpload({
                 onDrop={handleDrop}
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
+                onKeyDown={handleKeyDown}
+                role="button"
+                tabIndex={disabled ? -1 : 0}
+                aria-label={label || "Arraste ou clique para enviar arquivo"}
+                aria-disabled={disabled}
                 className={cn(
-                    "relative border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-all duration-200",
+                    "relative border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
                     isDragActive && "border-primary bg-primary/5 scale-[1.02]",
                     disabled && "opacity-50 cursor-not-allowed",
                     error && "border-destructive bg-destructive/5",
@@ -284,7 +297,7 @@ export function FileUpload({
                                     variant="secondary"
                                     className="h-7 w-7 rounded-full shadow-md"
                                     onClick={handleDownload}
-                                    title="Visualizar"
+                                    aria-label={fileName ? `Visualizar arquivo ${fileName}` : "Visualizar arquivo"}
                                 >
                                     <Eye className="h-3.5 w-3.5" />
                                 </Button>
@@ -295,7 +308,7 @@ export function FileUpload({
                                     variant="destructive"
                                     className="h-7 w-7 rounded-full shadow-md"
                                     onClick={handleRemove}
-                                    title="Remover"
+                                    aria-label={fileName ? `Remover arquivo ${fileName}` : "Remover arquivo"}
                                 >
                                     <X className="h-3.5 w-3.5" />
                                 </Button>

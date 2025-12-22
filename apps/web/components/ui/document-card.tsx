@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import Image from "next/image"
 import {
     FileText,
     Image as ImageIcon,
@@ -166,7 +167,13 @@ export function DocumentCard({
                 <div className="flex items-center gap-1">
                     {hasFile && (
                         <>
-                            <Button size="icon" variant="ghost" className="h-8 w-8" onClick={handleView}>
+                            <Button 
+                                size="icon" 
+                                variant="ghost" 
+                                className="h-8 w-8" 
+                                onClick={handleView}
+                                aria-label={`Visualizar documento ${documentLabel}`}
+                            >
                                 <Eye className="h-4 w-4" />
                             </Button>
                             {onDelete && (
@@ -176,6 +183,7 @@ export function DocumentCard({
                                     className="h-8 w-8 text-destructive"
                                     onClick={handleDelete}
                                     disabled={deleting}
+                                    aria-label={`Excluir documento ${documentLabel}`}
                                 >
                                     <Trash2 className="h-4 w-4" />
                                 </Button>
@@ -234,14 +242,23 @@ export function DocumentCard({
                     <>
                         {/* Preview para imagens */}
                         {fileUrl && isImageFile(fileUrl) && (
-                            <div className="relative aspect-video rounded-lg overflow-hidden bg-muted">
-                                {/* eslint-disable-next-line @next/next/no-img-element */}
-                                <img
-                                    src={fileUrl}
-                                    alt={documentLabel}
-                                    className="w-full h-full object-cover cursor-pointer hover:opacity-90 transition-opacity"
+                            <div className="relative aspect-video rounded-lg overflow-hidden bg-muted w-full">
+                                <button
+                                    type="button"
                                     onClick={handleView}
-                                />
+                                    className="absolute inset-0 w-full h-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                                    aria-label={`Visualizar imagem do documento ${documentLabel}${fileName ? `: ${fileName}` : ''}`}
+                                >
+                                    <Image
+                                        src={fileUrl}
+                                        alt={fileName ? `Preview do documento ${documentLabel}: ${fileName}` : `Preview do documento ${documentLabel}`}
+                                        fill
+                                        className="object-cover hover:opacity-90 transition-opacity pointer-events-none"
+                                        sizes="(max-width: 768px) 100vw, 50vw"
+                                        loading="lazy"
+                                        quality={85}
+                                    />
+                                </button>
                             </div>
                         )}
 
@@ -314,6 +331,7 @@ export function DocumentCard({
                             className="text-destructive border-destructive/30 hover:bg-destructive/10"
                             disabled={disabled || deleting}
                             onClick={handleDelete}
+                            aria-label={`Excluir documento ${documentLabel}`}
                         >
                             <Trash2 className="h-4 w-4" />
                         </Button>

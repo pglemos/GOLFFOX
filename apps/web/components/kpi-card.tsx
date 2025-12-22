@@ -1,5 +1,6 @@
 "use client"
 
+import React from "react"
 import { motion } from "framer-motion"
 import { type LucideIcon, ArrowUpRight, ArrowDownRight, Minus } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -18,7 +19,7 @@ interface KpiCardProps {
   onClick?: () => void
 }
 
-export function KpiCard({
+function KpiCardComponent({
   icon: Icon,
   label,
   value,
@@ -103,3 +104,10 @@ export function KpiCard({
     </motion.div>
   )
 }
+
+export const KpiCard = React.memo(KpiCardComponent, (prev, next) => 
+  prev.value === next.value &&
+  prev.trend === next.trend &&
+  prev.label === next.label &&
+  prev.onClick === next.onClick
+)

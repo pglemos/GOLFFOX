@@ -479,7 +479,7 @@ export default function TransportadoraVeiculosPage() {
                           {veiculo.photo_url ? (
                             <img
                               src={veiculo.photo_url}
-                              alt={veiculo.plate}
+                              alt={`Foto do veículo ${veiculo.plate}${veiculo.model ? ` - ${veiculo.model}` : ''}`}
                               className="w-20 h-20 rounded-lg object-cover border border-border"
                             />
                           ) : (
@@ -650,15 +650,21 @@ export default function TransportadoraVeiculosPage() {
                                         <div className="mb-3">
                                           {doc.file_url.match(/\.(jpg|jpeg|png|gif|webp)$/i) ? (
                                             <div className="relative w-full max-w-xs">
-                                              <img
-                                                src={doc.file_url}
-                                                alt={doc.document_type}
-                                                className="w-full h-32 object-cover rounded-lg border border-border cursor-pointer hover:opacity-80 transition-opacity"
+                                              <button
+                                                type="button"
                                                 onClick={() => window.open(doc.file_url, '_blank')}
-                                              />
-                                              <div className="absolute inset-0 bg-black/0 hover:bg-black/10 rounded-lg transition-colors flex items-center justify-center">
-                                                <ExternalLink className="h-6 w-6 text-white opacity-0 hover:opacity-100 transition-opacity" />
-                                              </div>
+                                                className="relative w-full h-32 rounded-lg border border-border cursor-pointer hover:opacity-80 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 overflow-hidden"
+                                                aria-label={`Abrir imagem do documento ${doc.document_type} em nova aba`}
+                                              >
+                                                <img
+                                                  src={doc.file_url}
+                                                  alt={`Imagem do documento ${doc.document_type}${doc.document_number ? ` número ${doc.document_number}` : ''}`}
+                                                  className="w-full h-full object-cover pointer-events-none"
+                                                />
+                                                <div className="absolute inset-0 bg-black/0 hover:bg-black/10 rounded-lg transition-colors flex items-center justify-center pointer-events-none">
+                                                  <ExternalLink className="h-6 w-6 text-white opacity-0 hover:opacity-100 transition-opacity" />
+                                                </div>
+                                              </button>
                                             </div>
                                           ) : (
                                             <div className="w-full max-w-xs p-8 bg-bg-hover rounded-lg border border-border flex items-center justify-center">

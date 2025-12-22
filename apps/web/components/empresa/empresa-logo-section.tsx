@@ -2,6 +2,7 @@
 
 import { usePathname } from "@/lib/next-navigation"
 import { useState } from "react"
+import Image from "next/image"
 import { useOperatorTenant, useEmpresaTenant } from "@/components/providers/empresa-tenant-provider"
 
 interface EmpresaLogoSectionProps {
@@ -25,13 +26,13 @@ export function EmpresaLogoSection({ panelHomeUrl, panelBranding }: EmpresaLogoS
         if (logoUrl && !imgFailed) {
             return (
                 <a href={panelHomeUrl} className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
-                    <img
+                    <Image
                         src={logoUrl}
                         alt={companyName || 'Empresa'}
+                        width={40}
+                        height={40}
                         className="h-8 sm:h-10 w-auto object-contain"
                         loading="lazy"
-                        decoding="async"
-                        referrerPolicy="no-referrer"
                         onError={() => setImgFailed(true)}
                     />
                     <span className="font-bold text-lg sm:text-2xl tracking-tight text-ink-strong hidden xs:block">

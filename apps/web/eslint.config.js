@@ -36,6 +36,42 @@ module.exports = [
       "no-console": ["warn", {
         allow: ["warn", "error"] // Permitir apenas console.warn e console.error em casos excepcionais
       }],
+      // Ordenação de imports
+      "import/order": ["warn", {
+        "groups": [
+          "builtin",      // Node.js built-in modules
+          "external",     // External libraries
+          "internal",     // Internal modules (aliases @/)
+          ["parent", "sibling"], // Relative imports
+          "index",        // Index imports
+          "type"          // Type imports
+        ],
+        "pathGroups": [
+          {
+            "pattern": "react",
+            "group": "external",
+            "position": "before"
+          },
+          {
+            "pattern": "next/**",
+            "group": "external",
+            "position": "before"
+          },
+          {
+            "pattern": "@/**",
+            "group": "internal"
+          }
+        ],
+        "pathGroupsExcludedImportTypes": ["react", "next"],
+        "newlines-between": "always",
+        "alphabetize": {
+          "order": "asc",
+          "caseInsensitive": true
+        }
+      }],
+      "import/no-relative-parent-imports": ["warn", {
+        "allow": ["../..", "../../.."] // Permitir até 3 níveis para compatibilidade durante transição
+      }],
     },
   },
   // Permitir console.* apenas em arquivos de teste e scripts

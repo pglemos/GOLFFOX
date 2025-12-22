@@ -744,7 +744,13 @@ export const FleetMap = memo(function FleetMap({ companyId, transportadoraId, ro
                   <h3 className="font-bold text-lg sm:text-xl truncate">{selectedBus.vehicle_plate}</h3>
                   <p className="text-sm text-ink-muted truncate">{selectedBus.vehicle_model}</p>
                 </div>
-                <Button size="icon" variant="ghost" onClick={() => setSelectedBus(null)} className="hover:bg-bg-hover">
+                <Button 
+                  size="icon" 
+                  variant="ghost" 
+                  onClick={() => setSelectedBus(null)} 
+                  className="hover:bg-bg-hover"
+                  aria-label="Fechar detalhes do veículo"
+                >
                   <X className="h-4 w-4" />
                 </Button>
               </div>

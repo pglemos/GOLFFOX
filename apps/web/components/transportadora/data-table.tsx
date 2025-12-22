@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useMemo, useEffect } from "react"
+import React, { useState, useMemo, useEffect, useCallback } from "react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -52,7 +52,7 @@ interface DataTableProps<T> {
   onAction?: (action: string, row: T) => void
 }
 
-export function DataTable<T extends Record<string, any>>({
+function DataTableComponent<T extends Record<string, any>>({
   data,
   columns,
   searchable = true,
@@ -146,16 +146,16 @@ export function DataTable<T extends Record<string, any>>({
 
   const totalPages = Math.ceil(sortedData.length / pageSize)
 
-  const handleSort = (columnKey: string) => {
+  const handleSort = useCallback((columnKey: string) => {
     if (sortColumn === columnKey) {
       setSortDirection(sortDirection === "asc" ? "desc" : "asc")
     } else {
       setSortColumn(columnKey)
       setSortDirection("asc")
     }
-  }
+  }, [sortColumn, sortDirection])
 
-  const getSortIcon = (columnKey: string) => {
+  const getSortIcon = useCallback((columnKey: string) => {
     if (sortColumn !== columnKey) {
       return <ArrowUpDown className="w-4 h-4 ml-1 opacity-50" />
     }
@@ -164,9 +164,9 @@ export function DataTable<T extends Record<string, any>>({
     ) : (
       <ArrowDown className="w-4 h-4 ml-1" />
     )
-  }
+  }, [sortColumn, sortDirection])
 
-  const getUserInitials = (name?: string) => {
+  const getUserInitials = useCallback((name?: string) => {
     if (!name) return 'U'
     return name
       .split(' ')
@@ -174,9 +174,9 @@ export function DataTable<T extends Record<string, any>>({
       .map(n => n[0])
       .join('')
       .toUpperCase()
-  }
+  }, [])
 
-  const getStatusBadge = (status: string) => {
+  const getStatusBadge = useCallback((status: string) => {
     const statusLower = status?.toLowerCase() || ''
     if (statusLower.includes('active') || statusLower.includes('ativo')) {
       return <Badge className="bg-success-light0 hover:bg-success text-white">{status}</Badge>
@@ -188,43 +188,49 @@ export function DataTable<T extends Record<string, any>>({
       return <Badge variant="secondary">{status}</Badge>
     }
     return <Badge variant="outline">{status}</Badge>
-  }
+  }, [])
 
   // Handle checkbox selection
-  const handleSelectAll = (checked: boolean) => {
+  const handleSelectAll = useCallback((checked: boolean) => {
     if (checked) {
       // Selecionar todos os itens da página atual
       const pageStart = (currentPage - 1) * pageSize
       const pageEnd = Math.min(pageStart + pageSize, sortedData.length)
-      const newSelected = new Set(selectedRows)
-      for (let i = pageStart; i < pageEnd; i++) {
-        newSelected.add(i)
-      }
-      setSelectedRows(newSelected)
-      setSelectAll(newSelected.size === sortedData.length && sortedData.length > 0)
+      setSelectedRows(prev => {
+        const newSelected = new Set(prev)
+        for (let i = pageStart; i < pageEnd; i++) {
+          newSelected.add(i)
+        }
+        setSelectAll(newSelected.size === sortedData.length && sortedData.length > 0)
+        return newSelected
+      })
     } else {
       // Desselecionar todos os itens da página atual
       const pageStart = (currentPage - 1) * pageSize
       const pageEnd = Math.min(pageStart + pageSize, sortedData.length)
-      const newSelected = new Set(selectedRows)
-      for (let i = pageStart; i < pageEnd; i++) {
-        newSelected.delete(i)
-      }
-      setSelectedRows(newSelected)
-      setSelectAll(false)
+      setSelectedRows(prev => {
+        const newSelected = new Set(prev)
+        for (let i = pageStart; i < pageEnd; i++) {
+          newSelected.delete(i)
+        }
+        setSelectAll(false)
+        return newSelected
+      })
     }
-  }
+  }, [currentPage, pageSize, sortedData.length])
 
-  const handleSelectRow = (index: number, checked: boolean) => {
-    const newSelected = new Set(selectedRows)
-    if (checked) {
-      newSelected.add(index)
-    } else {
-      newSelected.delete(index)
-    }
-    setSelectedRows(newSelected)
-    setSelectAll(newSelected.size === sortedData.length && sortedData.length > 0)
-  }
+  const handleSelectRow = useCallback((index: number, checked: boolean) => {
+    setSelectedRows(prev => {
+      const newSelected = new Set(prev)
+      if (checked) {
+        newSelected.add(index)
+      } else {
+        newSelected.delete(index)
+      }
+      setSelectAll(newSelected.size === sortedData.length && sortedData.length > 0)
+      return newSelected
+    })
+  }, [sortedData.length])
 
   // Check if all items on current page are selected
   useEffect(() => {
@@ -501,9 +507,19 @@ export function DataTable<T extends Record<string, any>>({
                         className={cn(
                           onRowClick ? "cursor-pointer touch-manipulation" : "",
                           "hover:bg-muted/50 transition-colors",
-                          isSelected && "bg-muted/30"
+                          isSelected && "bg-muted/30",
+                          onRowClick && "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                         )}
                         onClick={() => onRowClick?.(row)}
+                        onKeyDown={(e) => {
+                          if (onRowClick && (e.key === 'Enter' || e.key === ' ')) {
+                            e.preventDefault()
+                            onRowClick(row)
+                          }
+                        }}
+                        role={onRowClick ? "button" : undefined}
+                        tabIndex={onRowClick ? 0 : undefined}
+                        aria-label={onRowClick ? `Ver detalhes da linha ${actualIndex + 1}` : undefined}
                       >
                         {/* Checkbox cell */}
                         {columns.some(col => col.showCheckbox) && (
@@ -512,7 +528,7 @@ export function DataTable<T extends Record<string, any>>({
                               checked={isSelected}
                               onCheckedChange={(checked) => handleSelectRow(actualIndex, checked as boolean)}
                               onClick={(e) => e.stopPropagation()}
-                              aria-label={`Select row ${actualIndex + 1}`}
+                              aria-label={`Selecionar linha ${actualIndex + 1}`}
                             />
                           </TableCell>
                         )}
@@ -566,7 +582,7 @@ export function DataTable<T extends Record<string, any>>({
                                         e.stopPropagation()
                                         onView(row)
                                       }}
-                                      aria-label="View"
+                                      aria-label={`Visualizar linha ${globalIndex + 1}`}
                                     >
                                       <Eye className="h-4 w-4" />
                                     </Button>
@@ -580,7 +596,7 @@ export function DataTable<T extends Record<string, any>>({
                                         e.stopPropagation()
                                         onDelete(row)
                                       }}
-                                      aria-label="Delete"
+                                      aria-label={`Excluir linha ${globalIndex + 1}`}
                                     >
                                       <Trash2 className="h-4 w-4" />
                                     </Button>
@@ -715,4 +731,6 @@ export function DataTable<T extends Record<string, any>>({
     </Card>
   )
 }
+
+export const DataTable = React.memo(DataTableComponent) as typeof DataTableComponent
 

@@ -32,6 +32,15 @@
       "@/lib/*": [
         "./lib/*"
       ],
+      "@/lib/core/*": [
+        "./lib/core/*"
+      ],
+      "@/lib/services/*": [
+        "./lib/services/*"
+      ],
+      "@/lib/api/*": [
+        "./lib/api/*"
+      ],
       "@/server/*": [
         "./server/*"
       ],

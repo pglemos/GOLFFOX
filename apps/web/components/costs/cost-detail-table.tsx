@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import React, { useState, useMemo, useCallback } from "react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -39,7 +39,63 @@ interface CostDetailTableProps {
 
 type GroupingLevel = 'group' | 'category' | 'none'
 
-export function CostDetailTable({ costs, onReconcile, loading }: CostDetailTableProps) {
+// Componente memoizado para card mobile
+const CostCard = React.memo(function CostCard({
+  cost,
+  onReconcile
+}: {
+  cost: CostDetail
+  onReconcile?: (cost: CostDetail) => void
+}) {
+  return (
+    <Card key={cost.id} className="mobile-table-card p-4">
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <span className="text-xs font-medium text-muted-foreground uppercase">Data</span>
+          <span className="text-sm font-semibold">{new Date(cost.date).toLocaleDateString('pt-BR')}</span>
+        </div>
+        <div className="flex items-center justify-between">
+          <span className="text-xs font-medium text-muted-foreground uppercase">Grupo/Categoria</span>
+          <span className="text-sm text-right flex-1 ml-2">{cost.group_name} {cost.category}{cost.subcategory ? ` - ${cost.subcategory}` : ''}</span>
+        </div>
+        <div className="flex items-center justify-between">
+          <span className="text-xs font-medium text-muted-foreground uppercase">Rota</span>
+          <span className="text-sm">{cost.route_name || '-'}</span>
+        </div>
+        <div className="flex items-center justify-between">
+          <span className="text-xs font-medium text-muted-foreground uppercase">Veículo</span>
+          <span className="text-sm">{cost.vehicle_plate || '-'}</span>
+        </div>
+        <div className="flex items-center justify-between pt-2 border-t">
+          <span className="text-xs font-medium text-muted-foreground uppercase">Valor</span>
+          <span className="text-base font-bold text-primary">{formatCurrency(cost.amount)}</span>
+        </div>
+        <div className="flex items-center justify-between">
+          <span className="text-xs font-medium text-muted-foreground uppercase">Origem</span>
+          <Badge variant="outline" className="text-xs">{cost.source}</Badge>
+        </div>
+        {onReconcile && cost.invoice_id && (
+          <div className="pt-2 border-t">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => onReconcile(cost)}
+              className="w-full min-h-[44px] touch-manipulation"
+            >
+              Conciliar
+            </Button>
+          </div>
+        )}
+      </div>
+    </Card>
+  )
+}, (prev, next) => 
+  prev.cost.id === next.cost.id && 
+  prev.cost.amount === next.cost.amount && 
+  prev.cost.date === next.cost.date
+)
+
+function CostDetailTableComponent({ costs, onReconcile, loading }: CostDetailTableProps) {
   const isMobile = useMobile() // Hook mobile-first
   const [grouping, setGrouping] = useState<GroupingLevel>('group')
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set())
@@ -48,24 +104,26 @@ export function CostDetailTable({ costs, onReconcile, loading }: CostDetailTable
   const [page, setPage] = useState(0)
   const [pageSize, setPageSize] = useState(isMobile ? 20 : 50) // Menos itens por página em mobile
 
-  const toggleGroup = (group: string) => {
-    const newExpanded = new Set(expandedGroups)
-    if (newExpanded.has(group)) {
-      newExpanded.delete(group)
-    } else {
-      newExpanded.add(group)
-    }
-    setExpandedGroups(newExpanded)
-  }
+  const toggleGroup = useCallback((group: string) => {
+    setExpandedGroups(prev => {
+      const newExpanded = new Set(prev)
+      if (newExpanded.has(group)) {
+        newExpanded.delete(group)
+      } else {
+        newExpanded.add(group)
+      }
+      return newExpanded
+    })
+  }, [])
 
-  const handleSort = (column: keyof CostDetail) => {
+  const handleSort = useCallback((column: keyof CostDetail) => {
     if (sortColumn === column) {
       setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')
     } else {
       setSortColumn(column)
       setSortDirection('desc')
     }
-  }
+  }, [sortColumn, sortDirection])
 
   const sortedCosts = useMemo(() => {
     if (!sortColumn) return costs
@@ -131,7 +189,7 @@ export function CostDetailTable({ costs, onReconcile, loading }: CostDetailTable
     return { groups }
   }, [sortedCosts, grouping])
 
-  const handleExport = (format: 'csv' | 'excel' | 'pdf') => {
+  const handleExport = useCallback((format: 'csv' | 'excel' | 'pdf') => {
     const reportData = {
       title: 'Detalhamento de Custos',
       description: `Total de ${costs.length} registros`,
@@ -172,7 +230,7 @@ export function CostDetailTable({ costs, onReconcile, loading }: CostDetailTable
     } else {
       exportToPDF(reportData, `custos_${new Date().toISOString().split('T')[0]}.pdf`)
     }
-  }
+  }, [costs])
 
   if (loading) {
     return (
@@ -507,3 +565,5 @@ export function CostDetailTable({ costs, onReconcile, loading }: CostDetailTable
     </Card>
   )
 }
+
+export const CostDetailTable = React.memo(CostDetailTableComponent)

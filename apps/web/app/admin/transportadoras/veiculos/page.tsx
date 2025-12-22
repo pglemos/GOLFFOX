@@ -1,7 +1,9 @@
 "use client"
 
-import { useEffect, useState, useMemo, useCallback } from "react"
+import React, { useEffect, useState, useMemo, useCallback, useRef } from "react"
+import Image from "next/image"
 import dynamic from "next/dynamic"
+import { useVirtualizer } from "@tanstack/react-virtual"
 import { AppShell } from "@/components/app-shell"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
@@ -54,6 +56,152 @@ interface Transportadora {
     name: string
 }
 
+// Componente memoizado para card de veículo
+const VehicleCard = React.memo(function VehicleCard({
+    veiculo,
+    onEdit,
+    onDelete
+}: {
+    veiculo: veiculo
+    onEdit: () => void
+    onDelete: () => void
+}) {
+    return (
+        <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+            whileHover={{ y: -4 }}
+        >
+            <Card className="p-3 sm:p-4 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-border hover:border-text-brand/30 group">
+                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
+                    <div className="flex-1 flex gap-3 sm:gap-4 min-w-0">
+                        {veiculo.photo_url && (
+                            <Image
+                                src={veiculo.photo_url}
+                                alt={veiculo.plate}
+                                width={80}
+                                height={80}
+                                className="w-16 h-16 sm:w-20 sm:h-20 rounded-lg object-cover border-2 border-border flex-shrink-0"
+                                loading="lazy"
+                                quality={80}
+                            />
+                        )}
+                        <div className="flex-1 min-w-0">
+                            <div className="flex flex-wrap items-center gap-2 mb-2">
+                                <div className="p-1 rounded-lg bg-gradient-to-br from-bg-brand-light to-bg-brand-soft">
+                                    <Truck className="h-4 w-4 text-brand" />
+                                </div>
+                                <h3 className="font-bold text-base sm:text-lg group-hover:text-brand transition-colors">{veiculo.plate}</h3>
+                                {veiculo.prefix && (
+                                    <Badge variant="outline">Prefixo: {veiculo.prefix}</Badge>
+                                )}
+                                <Badge variant={veiculo.is_active !== false ? "default" : "secondary"}>
+                                    {veiculo.is_active !== false ? "Ativo" : "Inativo"}
+                                </Badge>
+                            </div>
+                            <p className="font-medium mb-1 text-sm sm:text-base">{veiculo.model || "Sem modelo"}</p>
+                            <div className="flex flex-wrap gap-2 sm:gap-4 text-xs sm:text-sm text-ink-muted">
+                                {veiculo.year && (
+                                    <span className="flex items-center gap-1">
+                                        <Calendar className="h-3 w-3" />
+                                        {veiculo.year}
+                                    </span>
+                                )}
+                                {veiculo.capacity && <span>Capacidade: {veiculo.capacity}</span>}
+                                {veiculo.carrier_name && (
+                                    <span className="flex items-center gap-1">
+                                        <Building2 className="h-3 w-3" />
+                                        {veiculo.carrier_name}
+                                    </span>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                    <div className="flex gap-2">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={onEdit}
+                            className="min-h-[44px] touch-manipulation"
+                        >
+                            <Edit className="h-4 w-4 mr-1" />
+                            Editar
+                        </Button>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={onDelete}
+                            className="min-h-[44px] touch-manipulation text-destructive hover:bg-destructive/10"
+                        >
+                            <Trash2 className="h-4 w-4" />
+                        </Button>
+                    </div>
+                </div>
+            </Card>
+        </motion.div>
+    )
+}, (prev, next) => prev.veiculo.id === next.veiculo.id)
+
+// Componente virtualizado para listas grandes
+function VirtualizedVehicleList({
+    vehicles,
+    onEdit,
+    onDelete
+}: {
+    vehicles: veiculo[]
+    onEdit: (veiculo: veiculo) => void
+    onDelete: (vehicleId: string, vehiclePlate: string) => void
+}) {
+    const parentRef = useRef<HTMLDivElement>(null)
+
+    const virtualizer = useVirtualizer({
+        count: vehicles.length,
+        getScrollElement: () => parentRef.current,
+        estimateSize: () => 150, // altura estimada de cada card
+        overscan: 5,
+    })
+
+    return (
+        <div
+            ref={parentRef}
+            className="h-[600px] overflow-auto"
+        >
+            <div
+                style={{
+                    height: `${virtualizer.getTotalSize()}px`,
+                    width: '100%',
+                    position: 'relative',
+                }}
+            >
+                {virtualizer.getVirtualItems().map((virtualRow) => {
+                    const veiculo = vehicles[virtualRow.index]
+                    return (
+                        <div
+                            key={virtualRow.key}
+                            style={{
+                                position: 'absolute',
+                                top: 0,
+                                left: 0,
+                                width: '100%',
+                                height: `${virtualRow.size}px`,
+                                transform: `translateY(${virtualRow.start}px)`,
+                            }}
+                            className="px-0 pb-3"
+                        >
+                            <VehicleCard
+                                veiculo={veiculo}
+                                onEdit={() => onEdit(veiculo)}
+                                onDelete={() => onDelete(veiculo.id, veiculo.plate)}
+                            />
+                        </div>
+                    )
+                })}
+            </div>
+        </div>
+    )
+}
+
 export default function TransportadoraVeiculosPage() {
     const { user, loading: authLoading } = useAuthFast()
     const [veiculos, setVeiculos] = useState<veiculo[]>([])
@@ -68,13 +216,13 @@ export default function TransportadoraVeiculosPage() {
     const debouncedSearchQuery = useDebounce(searchQuery, 300)
 
     // Abre dialog de seleção de transportadora para novo veículo
-    const handleNewVehicle = () => {
+    const handleNewVehicle = useCallback(() => {
         setNewVehicleCarrierId("")
         setIsSelectCarrierOpen(true)
-    }
+    }, [])
 
     // Após selecionar transportadora, abre modal de cadastro
-    const handleCarrierSelected = () => {
+    const handleCarrierSelected = useCallback(() => {
         if (!newVehicleCarrierId) return
         const selectedCarrier = transportadoras.find(t => t.id === newVehicleCarrierId)
         setSelectedVeiculo({
@@ -86,7 +234,7 @@ export default function TransportadoraVeiculosPage() {
         })
         setIsSelectCarrierOpen(false)
         setIsModalOpen(true)
-    }
+    }, [newVehicleCarrierId, transportadoras])
 
     useEffect(() => {
         if (user && !authLoading) {
@@ -144,7 +292,7 @@ export default function TransportadoraVeiculosPage() {
         return result
     }, [veiculos, debouncedSearchQuery, filterTransportadora])
 
-    const handleDelete = async (vehicleId: string, vehiclePlate: string) => {
+    const handleDelete = useCallback(async (vehicleId: string, vehiclePlate: string) => {
         if (!confirm(`Excluir veículo "${vehiclePlate}"?`)) return
 
         try {
@@ -155,7 +303,7 @@ export default function TransportadoraVeiculosPage() {
         } catch (error) {
             notifyError(error, "Erro ao excluir veículo")
         }
-    }
+    }, [loadVehicles])
 
     if (authLoading || !user) {
         return <div className="min-h-screen flex items-center justify-center"><div className="w-16 h-16 border-4 border-text-brand border-t-transparent rounded-full animate-spin" /></div>
@@ -209,88 +357,29 @@ export default function TransportadoraVeiculosPage() {
                 {dataLoading && veiculos.length === 0 ? (
                     <SkeletonList count={5} />
                 ) : (
-                    <div className="grid gap-3 sm:gap-4 w-full">
-                        {filteredVehicles.length === 0 ? (
-                            <Card className="p-8 text-center">
-                                <Truck className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                                <p className="text-muted-foreground">Nenhum veículo encontrado</p>
-                            </Card>
-                        ) : (
-                            filteredVehicles.map((veiculo) => (
-                                <motion.div
+                    filteredVehicles.length === 0 ? (
+                        <Card className="p-8 text-center">
+                            <Truck className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+                            <p className="text-muted-foreground">Nenhum veículo encontrado</p>
+                        </Card>
+                    ) : filteredVehicles.length > 50 ? (
+                        <VirtualizedVehicleList
+                            vehicles={filteredVehicles}
+                            onEdit={(veiculo) => { setSelectedVeiculo(veiculo); setIsModalOpen(true) }}
+                            onDelete={handleDelete}
+                        />
+                    ) : (
+                        <div className="grid gap-3 sm:gap-4 w-full">
+                            {filteredVehicles.map((veiculo) => (
+                                <VehicleCard
                                     key={veiculo.id}
-                                    initial={{ opacity: 0, y: 20 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ duration: 0.3 }}
-                                    whileHover={{ y: -4 }}
-                                >
-                                    <Card className="p-3 sm:p-4 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-border hover:border-text-brand/30 group">
-                                        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
-                                            <div className="flex-1 flex gap-3 sm:gap-4 min-w-0">
-                                                {veiculo.photo_url && (
-                                                    /* eslint-disable-next-line @next/next/no-img-element */
-                                                    <img
-                                                        src={veiculo.photo_url}
-                                                        alt={veiculo.plate}
-                                                        className="w-16 h-16 sm:w-20 sm:h-20 rounded-lg object-cover border-2 border-border flex-shrink-0"
-                                                    />
-                                                )}
-                                                <div className="flex-1 min-w-0">
-                                                    <div className="flex flex-wrap items-center gap-2 mb-2">
-                                                        <div className="p-1 rounded-lg bg-gradient-to-br from-bg-brand-light to-bg-brand-soft">
-                                                            <Truck className="h-4 w-4 text-brand" />
-                                                        </div>
-                                                        <h3 className="font-bold text-base sm:text-lg group-hover:text-brand transition-colors">{veiculo.plate}</h3>
-                                                        {veiculo.prefix && (
-                                                            <Badge variant="outline">Prefixo: {veiculo.prefix}</Badge>
-                                                        )}
-                                                        <Badge variant={veiculo.is_active !== false ? "default" : "secondary"}>
-                                                            {veiculo.is_active !== false ? "Ativo" : "Inativo"}
-                                                        </Badge>
-                                                    </div>
-                                                    <p className="font-medium mb-1 text-sm sm:text-base">{veiculo.model || "Sem modelo"}</p>
-                                                    <div className="flex flex-wrap gap-2 sm:gap-4 text-xs sm:text-sm text-ink-muted">
-                                                        {veiculo.year && (
-                                                            <span className="flex items-center gap-1">
-                                                                <Calendar className="h-3 w-3" />
-                                                                {veiculo.year}
-                                                            </span>
-                                                        )}
-                                                        {veiculo.capacity && <span>Capacidade: {veiculo.capacity}</span>}
-                                                        {veiculo.carrier_name && (
-                                                            <span className="flex items-center gap-1">
-                                                                <Building2 className="h-3 w-3" />
-                                                                {veiculo.carrier_name}
-                                                            </span>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div className="flex gap-2">
-                                                <Button
-                                                    variant="outline"
-                                                    size="sm"
-                                                    onClick={() => { setSelectedVeiculo(veiculo); setIsModalOpen(true) }}
-                                                    className="min-h-[44px] touch-manipulation"
-                                                >
-                                                    <Edit className="h-4 w-4 mr-1" />
-                                                    Editar
-                                                </Button>
-                                                <Button
-                                                    variant="outline"
-                                                    size="sm"
-                                                    onClick={() => handleDelete(veiculo.id, veiculo.plate)}
-                                                    className="min-h-[44px] touch-manipulation text-destructive hover:bg-destructive/10"
-                                                >
-                                                    <Trash2 className="h-4 w-4" />
-                                                </Button>
-                                            </div>
-                                        </div>
-                                    </Card>
-                                </motion.div>
-                            ))
-                        )}
-                    </div>
+                                    veiculo={veiculo}
+                                    onEdit={() => { setSelectedVeiculo(veiculo); setIsModalOpen(true) }}
+                                    onDelete={() => handleDelete(veiculo.id, veiculo.plate)}
+                                />
+                            ))}
+                        </div>
+                    )
                 )}
             </div>
 

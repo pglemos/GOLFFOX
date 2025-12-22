@@ -111,6 +111,44 @@ export function AdvancedPlaybackControls({
     onProgressChange(newTime)
   }
 
+  const handleProgressKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    let newTime = playbackState.currentTime
+    const step = playbackState.totalDuration * 0.01 // 1% do total
+
+    switch (event.key) {
+      case 'ArrowRight':
+      case 'ArrowUp':
+        event.preventDefault()
+        newTime = Math.min(playbackState.currentTime + step, playbackState.totalDuration)
+        onProgressChange(newTime)
+        break
+      case 'ArrowLeft':
+      case 'ArrowDown':
+        event.preventDefault()
+        newTime = Math.max(playbackState.currentTime - step, 0)
+        onProgressChange(newTime)
+        break
+      case 'Home':
+        event.preventDefault()
+        onProgressChange(0)
+        break
+      case 'End':
+        event.preventDefault()
+        onProgressChange(playbackState.totalDuration)
+        break
+      case 'PageUp':
+        event.preventDefault()
+        newTime = Math.min(playbackState.currentTime + (playbackState.totalDuration * 0.1), playbackState.totalDuration)
+        onProgressChange(newTime)
+        break
+      case 'PageDown':
+        event.preventDefault()
+        newTime = Math.max(playbackState.currentTime - (playbackState.totalDuration * 0.1), 0)
+        onProgressChange(newTime)
+        break
+    }
+  }
+
   return (
     <Card className={`${className}`}>
       <CardContent className="p-4 space-y-4">
@@ -289,8 +327,16 @@ export function AdvancedPlaybackControls({
 
           {/* Barra de progresso clicável */}
           <div 
-            className="relative h-2 bg-muted rounded-full cursor-pointer group"
+            className="relative h-2 bg-muted rounded-full cursor-pointer group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             onClick={handleProgressClick}
+            onKeyDown={handleProgressKeyDown}
+            role="slider"
+            tabIndex={0}
+            aria-label="Progresso da reprodução"
+            aria-valuenow={playbackState.currentTime}
+            aria-valuemin={0}
+            aria-valuemax={playbackState.totalDuration}
+            aria-valuetext={`${formatTime(playbackState.currentTime)} de ${formatTime(playbackState.totalDuration)}`}
           >
             <motion.div
               className="absolute top-0 left-0 h-full bg-gradient-to-r from-info-light0 to-info rounded-full"
