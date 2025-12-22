@@ -541,6 +541,7 @@ function LoginContent() {
             signal: controller.signal,
             credentials: "include",
           })
+          
           debug('LOGIN - Resposta recebida', {
             status: response.status,
             ok: response.ok,
