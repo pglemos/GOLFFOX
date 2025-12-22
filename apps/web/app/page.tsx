@@ -905,22 +905,18 @@ function LoginContent() {
           }
         } else {
           // ✅ VALIDAÇÃO: Garantir que finalRedirectUrl é uma string válida antes de usar router.replace
+          // Nota: Este bloco é executado em ambiente server-side onde window não existe
           if (typeof finalRedirectUrl === 'string' && finalRedirectUrl.trim() !== '') {
             try {
               if (typeof router.replace === 'function') {
                 router.replace(finalRedirectUrl)
               } else {
-                logError('LOGIN - router.replace não é uma função', { type: typeof router.replace }, 'LoginPage')
-                if (typeof window !== 'undefined' && typeof window.location !== 'undefined') {
-                  window.location.href = finalRedirectUrl
-                }
+                logError('LOGIN - router.replace não é uma função (server-side)', { type: typeof router.replace }, 'LoginPage')
+                // Em ambiente server-side, não há fallback para window.location
               }
             } catch (routerError: any) {
-              logError('LOGIN - Erro ao usar router.replace', { error: routerError }, 'LoginPage')
-              // Fallback para window.location.href
-              if (typeof window !== 'undefined' && typeof window.location !== 'undefined') {
-                window.location.href = finalRedirectUrl
-              }
+              logError('LOGIN - Erro ao usar router.replace (server-side)', { error: routerError }, 'LoginPage')
+              // Em ambiente server-side, não há fallback para window.location
             }
           } else {
             logError('LOGIN - finalRedirectUrl inválido antes de router.replace', {
@@ -989,7 +985,7 @@ function LoginContent() {
   const StatItem = memo(({ value, label }: { value: string, label: string }) => {
     return (
       <div className="text-center">
-        <div className="text-4xl md:text-5xl font-bold bg-gradient-to-br from-white via-white to-white/70 bg-clip-text text-transparent mb-2">
+        <div className="text-4xl md:text-5xl font-bold bg-linear-to-br from-white via-white to-white/70 bg-clip-text text-transparent mb-2">
           {value}
         </div>
         <div className="text-sm md:text-base text-white/60 font-light tracking-wide">
@@ -1010,7 +1006,7 @@ function LoginContent() {
       <div className="absolute inset-0 hidden lg:block" aria-hidden="true">
         <FloatingOrbs />
         <div
-          className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_at_center,black_20%,transparent_80%)]"
+          className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-size-[64px_64px] mask-[radial-gradient(ellipse_at_center,black_20%,transparent_80%)]"
           style={{ willChange: 'auto' }}
         />
       </div>
@@ -1056,12 +1052,12 @@ function LoginContent() {
               )}
 
               {/* Border gradient animado */}
-              <div className="relative w-32 h-32 rounded-[40px] bg-gradient-to-br from-[#F97316] via-[#FB923C] to-[#EA580C] p-[3px] shadow-2xl shadow-brand/50">
+              <div className="relative w-32 h-32 rounded-[40px] bg-linear-to-br from-[#F97316] via-[#FB923C] to-[#EA580C] p-[3px] shadow-2xl shadow-brand/50">
                 <div className="w-full h-full rounded-[37px] bg-black flex items-center justify-center relative overflow-hidden">
                   {/* Shine effect otimizado */}
                   {!shouldReduceMotion && (
                     <motion.div
-                      className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent will-change-transform"
+                      className="absolute inset-0 bg-linear-to-r from-transparent via-white/20 to-transparent will-change-transform"
                       animate={{
                         x: ['-200%', '200%'],
                       }}
@@ -1124,7 +1120,7 @@ function LoginContent() {
           >
             <span className="text-white">O futuro do</span>
             <br />
-            <span className={`bg-gradient-to-r from-[#F97316] via-[#FB923C] to-[#FDBA74] bg-clip-text text-transparent ${!shouldReduceMotion ? 'bg-[length:200%_100%] animate-[gradient-shift_3s_ease_infinite]' : ''}`}>
+            <span className={`bg-linear-to-r from-[#F97316] via-[#FB923C] to-[#FDBA74] bg-clip-text text-transparent ${!shouldReduceMotion ? 'bg-size-[200%_100%] animate-[gradient-shift_3s_ease_infinite]' : ''}`}>
               transporte corporativo
             </span>
           </motion.h1>
@@ -1174,10 +1170,10 @@ function LoginContent() {
               initial={{ opacity: 1, y: 0 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-              className="lg:hidden bg-gradient-to-br from-white via-white to-bg-soft rounded-3xl shadow-2xl border border-border p-6 sm:p-8 mb-8 relative overflow-hidden"
+              className="lg:hidden bg-linear-to-br from-white via-white to-bg-soft rounded-3xl shadow-2xl border border-border p-6 sm:p-8 mb-8 relative overflow-hidden"
             >
               {/* Background pattern sutil */}
-              <div className="absolute inset-0 opacity-[0.02] bg-[radial-gradient(circle_at_1px_1px,rgb(0,0,0)_1px,transparent_0)] bg-[length:24px_24px]" />
+              <div className="absolute inset-0 opacity-[0.02] bg-[radial-gradient(circle_at_1px_1px,rgb(0,0,0)_1px,transparent_0)] bg-size-[24px_24px]" />
 
               <div className="relative w-full min-w-0 z-10">
                 {/* Logo mobile Premium */}
@@ -1191,7 +1187,7 @@ function LoginContent() {
                     whileHover={{ scale: 1.05 }}
                     className="inline-flex items-center justify-center gap-3 mb-4"
                   >
-                    <h2 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-ink-strong to-brand bg-clip-text text-transparent">
+                    <h2 className="text-2xl sm:text-3xl font-bold bg-linear-to-r from-ink-strong to-brand bg-clip-text text-transparent">
                       GOLF FOX
                     </h2>
                   </motion.div>
@@ -1257,11 +1253,11 @@ function LoginContent() {
                         initial={{ opacity: 0, y: -10, scale: 0.95 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                        className="p-4 bg-gradient-to-r from-error-light to-error-light/80 border-2 border-error/20 rounded-2xl text-sm text-error shadow-sm backdrop-blur-sm"
+                        className="p-4 bg-linear-to-r from-error-light to-error-light/80 border-2 border-error/20 rounded-2xl text-sm text-error shadow-sm backdrop-blur-sm"
                         role="alert"
                       >
                         <div className="flex items-start gap-3">
-                          <div className="w-5 h-5 rounded-full bg-error flex items-center justify-center flex-shrink-0 mt-0.5">
+                          <div className="w-5 h-5 rounded-full bg-error flex items-center justify-center shrink-0 mt-0.5">
                             <span className="text-white text-xs font-bold">!</span>
                           </div>
                           <p className="flex-1 font-medium">{error}</p>
@@ -1274,9 +1270,9 @@ function LoginContent() {
                         initial={{ opacity: 0, y: -10, scale: 0.95 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                        className="p-4 bg-gradient-to-r from-success-light to-success-light/80 border-2 border-success/20 rounded-2xl text-sm text-success shadow-sm backdrop-blur-sm flex items-center gap-3"
+                        className="p-4 bg-linear-to-r from-success-light to-success-light/80 border-2 border-success/20 rounded-2xl text-sm text-success shadow-sm backdrop-blur-sm flex items-center gap-3"
                       >
-                        <Sparkles className="w-5 h-5 flex-shrink-0" />
+                        <Sparkles className="w-5 h-5 shrink-0" />
                         <span className="font-medium">Login realizado com sucesso!</span>
                       </motion.div>
                     )}
@@ -1322,7 +1318,7 @@ function LoginContent() {
                           }
                         }}
                         autoComplete="email"
-                        className={`w-full h-14 pl-12 pr-4 bg-gradient-to-br from-bg-soft to-bg border-2 ${fieldErrors.email
+                        className={`w-full h-14 pl-12 pr-4 bg-linear-to-br from-bg-soft to-bg border-2 ${fieldErrors.email
                           ? "border-error focus:border-error focus:ring-2 focus:ring-error/20 shadow-[0_0_0_4px_rgba(239,68,68,0.1)]"
                           : "border-border focus:border-brand focus:ring-2 focus:ring-brand/20 hover:border-strong"
                           } rounded-2xl text-base focus:bg-white placeholder:text-ink-muted font-medium`}
@@ -1367,7 +1363,7 @@ function LoginContent() {
                         }}
                         ref={passwordInputRef}
                         autoComplete="current-password"
-                        className={`w-full h-14 pl-12 pr-14 bg-gradient-to-br from-bg-soft to-bg border-2 ${fieldErrors.password
+                        className={`w-full h-14 pl-12 pr-14 bg-linear-to-br from-bg-soft to-bg border-2 ${fieldErrors.password
                           ? "border-error focus:border-error focus:ring-2 focus:ring-error/20 shadow-[0_0_0_4px_rgba(239,68,68,0.1)]"
                           : "border-border focus:border-brand focus:ring-2 focus:ring-brand/20 hover:border-strong"
                           } rounded-2xl text-base focus:bg-white placeholder:text-ink-muted font-medium`}
@@ -1438,12 +1434,12 @@ function LoginContent() {
                     <Button
                       type="submit"
                       disabled={!canSubmit}
-                      className="w-full h-14 bg-gradient-to-r from-brand via-brand-hover to-brand bg-[length:200%_100%] hover:bg-[position:100%_0] text-white font-bold text-base shadow-brand-lg hover:shadow-brand-lg transition-all duration-500 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none rounded-2xl relative overflow-hidden group touch-manipulation will-change-transform"
+                      className="w-full h-14 bg-linear-to-r from-brand via-brand-hover to-brand bg-size-[200%_100%] hover:bg-position-[100%_0] text-white font-bold text-base shadow-brand-lg hover:shadow-brand-lg transition-all duration-500 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none rounded-2xl relative overflow-hidden group touch-manipulation will-change-transform"
                     >
                       {/* Shimmer effect otimizado */}
                       {!shouldReduceMotion && !loading && !transitioning && (
                         <motion.div
-                          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent will-change-transform"
+                          className="absolute inset-0 bg-linear-to-r from-transparent via-white/20 to-transparent will-change-transform"
                           animate={{
                             x: ['-200%', '200%'],
                           }}
@@ -1517,7 +1513,7 @@ function LoginContent() {
                     className="p-4 bg-error-light/10 border border-error/20 rounded-xl text-sm text-error shadow-sm flex items-start gap-3"
                     role="alert"
                   >
-                    <div className="w-5 h-5 rounded-full bg-error flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <div className="w-5 h-5 rounded-full bg-error flex items-center justify-center shrink-0 mt-0.5">
                       <span className="text-white text-xs font-bold">!</span>
                     </div>
                     <p className="flex-1 font-medium">{error}</p>
@@ -1531,7 +1527,7 @@ function LoginContent() {
                     exit={{ opacity: 0, y: -10, scale: 0.95 }}
                     className="p-4 bg-success-light/10 border border-success/20 rounded-xl text-sm text-success shadow-sm flex items-center gap-3"
                   >
-                    <Sparkles className="w-5 h-5 flex-shrink-0" />
+                    <Sparkles className="w-5 h-5 shrink-0" />
                     <span className="font-medium">Login realizado com sucesso!</span>
                   </motion.div>
                 )}
