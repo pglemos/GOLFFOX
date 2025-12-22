@@ -44,7 +44,7 @@ export default function HistoricoRotasPage() {
     const loadExecutions = async () => {
         try {
             setLoading(true)
-            const response = await fetch('/api/operador/historico-rotas')
+            const response = await fetch('/api/empresa/historico-rotas')
             const data = await response.json()
 
             // Convert strings to Date objects
@@ -167,96 +167,96 @@ export default function HistoricoRotasPage() {
                         <div className="grid gap-4">
                             {filteredExecutions.map((exec, index) => (
                                 <motion.div
-                                  key={exec.id}
-                                  initial={{ opacity: 0, y: 20 }}
-                                  animate={{ opacity: 1, y: 0 }}
-                                  transition={{ delay: index * 0.05 }}
-                                  whileHover={{ y: -4 }}
-                                  className="group"
+                                    key={exec.id}
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: index * 0.05 }}
+                                    whileHover={{ y: -4 }}
+                                    className="group"
                                 >
-                                <Card key={exec.id} className="p-4 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-border hover:border-text-brand/30">
-                                    <div className="flex flex-col lg:flex-row gap-4 lg:items-center">
-                                        {/* Main Info */}
-                                        <div className="flex-1 space-y-2">
-                                            <div className="flex items-start justify-between">
-                                                <div>
-                                                    <h3 className="font-semibold text-lg">{exec.route}</h3>
-                                                    <div className="flex items-center gap-2 text-sm text-ink-muted">
-                                                        <MapPin className="h-3 w-3" />
-                                                        {exec.municipality}
+                                    <Card key={exec.id} className="p-4 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-border hover:border-text-brand/30">
+                                        <div className="flex flex-col lg:flex-row gap-4 lg:items-center">
+                                            {/* Main Info */}
+                                            <div className="flex-1 space-y-2">
+                                                <div className="flex items-start justify-between">
+                                                    <div>
+                                                        <h3 className="font-semibold text-lg">{exec.route}</h3>
+                                                        <div className="flex items-center gap-2 text-sm text-ink-muted">
+                                                            <MapPin className="h-3 w-3" />
+                                                            {exec.municipality}
+                                                        </div>
+                                                    </div>
+                                                    <div className="lg:hidden">
+                                                        {getStatusBadge(exec.status)}
                                                     </div>
                                                 </div>
-                                                <div className="lg:hidden">
-                                                    {getStatusBadge(exec.status)}
+
+                                                <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm">
+                                                    <div className="flex items-center gap-2">
+                                                        <Calendar className="h-4 w-4 text-ink-light" />
+                                                        {exec.date.toLocaleDateString('pt-BR')}
+                                                    </div>
+                                                    <div className="flex items-center gap-2">
+                                                        <Clock className="h-4 w-4 text-ink-light" />
+                                                        {exec.date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                                                    </div>
+                                                    <div className="flex items-center gap-2">
+                                                        <Navigation className="h-4 w-4 text-ink-light" />
+                                                        {exec.motorista}
+                                                    </div>
                                                 </div>
                                             </div>
 
-                                            <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm">
-                                                <div className="flex items-center gap-2">
-                                                    <Calendar className="h-4 w-4 text-ink-light" />
-                                                    {exec.date.toLocaleDateString('pt-BR')}
+                                            {/* Metrics */}
+                                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 lg:w-auto lg:flex-shrink-0 bg-bg-soft p-3 rounded-lg">
+                                                <div className="text-center">
+                                                    <p className="text-xs text-ink-muted">Duração</p>
+                                                    <p className="font-medium">{exec.duration}</p>
                                                 </div>
-                                                <div className="flex items-center gap-2">
-                                                    <Clock className="h-4 w-4 text-ink-light" />
-                                                    {exec.date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                                                <div className="text-center">
+                                                    <p className="text-xs text-ink-muted">Distância</p>
+                                                    <p className="font-medium">{exec.distance} km</p>
                                                 </div>
-                                                <div className="flex items-center gap-2">
-                                                    <Navigation className="h-4 w-4 text-ink-light" />
-                                                    {exec.motorista}
+                                                <div className="text-center">
+                                                    <p className="text-xs text-ink-muted">Passageiros</p>
+                                                    <p className="font-medium">{exec.passengers}</p>
+                                                </div>
+                                                <div className="text-center">
+                                                    <p className="text-xs text-ink-muted">Custo</p>
+                                                    <p className="font-medium text-success">R$ {exec.cost.toFixed(2)}</p>
                                                 </div>
                                             </div>
-                                        </div>
 
-                                        {/* Metrics */}
-                                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 lg:w-auto lg:flex-shrink-0 bg-bg-soft p-3 rounded-lg">
-                                            <div className="text-center">
-                                                <p className="text-xs text-ink-muted">Duração</p>
-                                                <p className="font-medium">{exec.duration}</p>
-                                            </div>
-                                            <div className="text-center">
-                                                <p className="text-xs text-ink-muted">Distância</p>
-                                                <p className="font-medium">{exec.distance} km</p>
-                                            </div>
-                                            <div className="text-center">
-                                                <p className="text-xs text-ink-muted">Passageiros</p>
-                                                <p className="font-medium">{exec.passengers}</p>
-                                            </div>
-                                            <div className="text-center">
-                                                <p className="text-xs text-ink-muted">Custo</p>
-                                                <p className="font-medium text-success">R$ {exec.cost.toFixed(2)}</p>
-                                            </div>
-                                        </div>
-
-                                        {/* Scores */}
-                                        <div className="flex gap-4 lg:w-48 lg:flex-shrink-0 justify-center lg:justify-end">
-                                            <div className="text-center">
-                                                <div className="relative inline-flex items-center justify-center">
-                                                    <svg className="w-10 h-10 transform -rotate-90">
-                                                        <circle cx="20" cy="20" r="16" stroke="currentColor" strokeWidth="3" fill="transparent" className="text-ink-light" />
-                                                        <circle cx="20" cy="20" r="16" stroke="currentColor" strokeWidth="3" fill="transparent" className="text-info" strokeDasharray={100} strokeDashoffset={100 - exec.punctuality} />
-                                                    </svg>
-                                                    <span className="absolute text-xs font-medium">{exec.punctuality}%</span>
+                                            {/* Scores */}
+                                            <div className="flex gap-4 lg:w-48 lg:flex-shrink-0 justify-center lg:justify-end">
+                                                <div className="text-center">
+                                                    <div className="relative inline-flex items-center justify-center">
+                                                        <svg className="w-10 h-10 transform -rotate-90">
+                                                            <circle cx="20" cy="20" r="16" stroke="currentColor" strokeWidth="3" fill="transparent" className="text-ink-light" />
+                                                            <circle cx="20" cy="20" r="16" stroke="currentColor" strokeWidth="3" fill="transparent" className="text-info" strokeDasharray={100} strokeDashoffset={100 - exec.punctuality} />
+                                                        </svg>
+                                                        <span className="absolute text-xs font-medium">{exec.punctuality}%</span>
+                                                    </div>
+                                                    <p className="text-[10px] text-ink-muted mt-1">Pontualidade</p>
                                                 </div>
-                                                <p className="text-[10px] text-ink-muted mt-1">Pontualidade</p>
-                                            </div>
-                                            <div className="text-center">
-                                                <div className="relative inline-flex items-center justify-center">
-                                                    <svg className="w-10 h-10 transform -rotate-90">
-                                                        <circle cx="20" cy="20" r="16" stroke="currentColor" strokeWidth="3" fill="transparent" className="text-ink-light" />
-                                                        <circle cx="20" cy="20" r="16" stroke="currentColor" strokeWidth="3" fill="transparent" className="text-success" strokeDasharray={100} strokeDashoffset={100 - exec.optimization} />
-                                                    </svg>
-                                                    <span className="absolute text-xs font-medium">{exec.optimization}%</span>
+                                                <div className="text-center">
+                                                    <div className="relative inline-flex items-center justify-center">
+                                                        <svg className="w-10 h-10 transform -rotate-90">
+                                                            <circle cx="20" cy="20" r="16" stroke="currentColor" strokeWidth="3" fill="transparent" className="text-ink-light" />
+                                                            <circle cx="20" cy="20" r="16" stroke="currentColor" strokeWidth="3" fill="transparent" className="text-success" strokeDasharray={100} strokeDashoffset={100 - exec.optimization} />
+                                                        </svg>
+                                                        <span className="absolute text-xs font-medium">{exec.optimization}%</span>
+                                                    </div>
+                                                    <p className="text-[10px] text-ink-muted mt-1">Otimização</p>
                                                 </div>
-                                                <p className="text-[10px] text-ink-muted mt-1">Otimização</p>
+                                            </div>
+
+                                            {/* Status Badge (Desktop) */}
+                                            <div className="hidden lg:block w-32 text-right">
+                                                {getStatusBadge(exec.status)}
                                             </div>
                                         </div>
-
-                                        {/* Status Badge (Desktop) */}
-                                        <div className="hidden lg:block w-32 text-right">
-                                            {getStatusBadge(exec.status)}
-                                        </div>
-                                    </div>
-                                </Card>
+                                    </Card>
                                 </motion.div>
                             ))}
                         </div>

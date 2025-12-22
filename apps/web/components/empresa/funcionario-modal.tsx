@@ -92,7 +92,7 @@ export function FuncionarioModal({ funcionario, isOpen, onClose, onSave, empresa
 
   const geocodeAddress = async (address: string) => {
     if (!address || !process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY) return null
-    
+
     try {
       const response = await fetch(
         `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`
@@ -164,7 +164,7 @@ export function FuncionarioModal({ funcionario, isOpen, onClose, onSave, empresa
         })
       } else {
         // Create new employee user via API route (includes gf_employee_company insertion)
-        const res = await fetch('/api/operador/create-employee', {
+        const res = await fetch('/api/empresa/create-employee', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -304,17 +304,17 @@ export function FuncionarioModal({ funcionario, isOpen, onClose, onSave, empresa
           </div>
 
           <DialogFooter className="flex-col sm:flex-row gap-3 pt-6 border-t mt-4">
-            <Button 
-              type="button" 
-              variant="outline" 
+            <Button
+              type="button"
+              variant="outline"
               onClick={onClose}
               className="w-full sm:w-auto order-2 sm:order-1 h-11 sm:h-12 text-base font-medium"
             >
               Cancelar
             </Button>
-            <Button 
-              type="submit" 
-              disabled={loading} 
+            <Button
+              type="submit"
+              disabled={loading}
               className="bg-brand hover:bg-brand-hover w-full sm:w-auto order-1 sm:order-2 h-11 sm:h-12 text-base font-medium"
             >
               {loading ? "Salvando..." : "Salvar"}
