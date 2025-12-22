@@ -239,27 +239,45 @@ export function RotasPageContent() {
             </div>
           </div>
 
-          {/* Search and Filters */}
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="flex-1">
-              <SearchBarPremium
-                value={searchQuery}
-                onChange={setSearchQuery}
-                placeholder="Buscar rotas por nome, descrição ou empresa..."
-              />
-            </div>
-            <FilterDrawer
-              filters={filterFields}
-              values={filterValues}
-              onFilterChange={(key, value) => {
-                setFilterValues(prev => ({ ...prev, [key]: value }))
-              }}
-              onReset={() => setFilterValues({ company: "", status: "", date: "" })}
+          {/* Search Bar */}
+          <div className="w-full">
+            <SearchBarPremium
+              value={searchQuery}
+              onChange={setSearchQuery}
+              placeholder="Buscar rotas por nome, descrição ou empresa..."
             />
           </div>
 
-          {/* Routes Grid */}
-          {filteredRotas.length === 0 ? (
+          {/* Main Content Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Filters Sidebar - Desktop */}
+            <div className="hidden lg:block lg:col-span-1">
+              <FilterDrawer
+                filters={filterFields}
+                values={filterValues}
+                onFilterChange={(key, value) => {
+                  setFilterValues(prev => ({ ...prev, [key]: value }))
+                }}
+                onReset={() => setFilterValues({ company: "", status: "", date: "" })}
+              />
+            </div>
+
+            {/* Routes Content */}
+            <div className="lg:col-span-2">
+              {/* Mobile Filters */}
+              <div className="lg:hidden mb-4">
+                <FilterDrawer
+                  filters={filterFields}
+                  values={filterValues}
+                  onFilterChange={(key, value) => {
+                    setFilterValues(prev => ({ ...prev, [key]: value }))
+                  }}
+                  onReset={() => setFilterValues({ company: "", status: "", date: "" })}
+                />
+              </div>
+
+              {/* Routes Grid */}
+              {filteredRotas.length === 0 ? (
             <EmptyState
               icon={Route}
               title="Nenhuma rota encontrada"
@@ -385,7 +403,9 @@ export function RotasPageContent() {
                 </motion.div>
               ))}
             </div>
-          )}
+              )}
+            </div>
+          </div>
         </div>
 
         {/* Modal de Rota */}

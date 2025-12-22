@@ -174,20 +174,26 @@ export default function TransportadoraDashboard() {
 
       if (driversData?.length) {
         // Buscar dados de ranking/gamificação
-        const driverIds = driversData.map((d: any) => d.id)
-        // @ts-ignore - Supabase type inference issue
-        const { data: rankings } = await ((supabase
-          .from('gf_gamification_scores' as any)
+        const driverIds = driversData.map((d: { id: string }) => d.id)
+        
+        interface GamificationScore {
+          motorista_id: string
+          trips_completed?: number
+          total_points?: number
+        }
+        
+        const { data: rankings } = await supabase
+          .from('gf_gamification_scores')
           .select('*')
-          .in('motorista_id', driverIds)) as any)
+          .in('motorista_id', driverIds) as { data: GamificationScore[] | null }
 
-        driversWithStats = (driversData || []).map((motorista: any) => {
-          const ranking = rankings?.find((r: any) => r.motorista_id === motorista.id)
+        driversWithStats = (driversData || []).map((motorista: { id: string; name: string }) => {
+          const ranking = rankings?.find((r) => r.motorista_id === motorista.id)
           return {
             id: motorista.id,
             name: motorista.name,
-            trips: (ranking as any)?.trips_completed || 0,
-            rating: (ranking as any)?.total_points ? ((ranking as any).total_points / 100).toFixed(1) : '0.0',
+            trips: ranking?.trips_completed || 0,
+            rating: ranking?.total_points ? (ranking.total_points / 100).toFixed(1) : '0.0',
             status: 'active'
           }
         })

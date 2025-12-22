@@ -151,7 +151,7 @@ export async function getUnresolvedAlerts(
 
     // Se view segura não estiver disponível ou der erro, usar tabela base
     if (error) {
-      const fallback = supabase
+      let fallbackQuery = supabase
         .from('gf_alerts')
         .select('*')
         .eq('is_resolved', false)
@@ -159,23 +159,33 @@ export async function getUnresolvedAlerts(
         .limit(limit)
 
       if (severity) {
-        fallback.eq('severity', severity)
+        fallbackQuery = fallbackQuery.eq('severity', severity)
       }
-      const res = await fallback
-      // @ts-ignore - Type mismatch between database schema and expected type
-      data = res.data
+      const res = await fallbackQuery
+      data = res.data as typeof data
       error = res.error
     }
 
     if (error) throw error
     
     // Mapear dados do banco para formato esperado (alert_type -> type)
-    const mappedData = (data || []).map((alert: any) => ({
+    interface AlertRecord {
+      id: string
+      type?: string
+      alert_type?: string
+      severity: AlertSeverity
+      title: string
+      message: string
+      is_resolved: boolean
+      created_at: string
+      [key: string]: unknown
+    }
+    
+    const mappedData = (data || []).map((alert: AlertRecord) => ({
       ...alert,
       type: alert.type || alert.alert_type || 'other'
     }))
     
-    // @ts-ignore - Type mismatch between database schema and expected return type
     return mappedData
   } catch (error) {
     logError('Erro ao buscar alertas', { error: formatSupabaseError(error) }, 'OperationalAlerts')
@@ -221,8 +231,7 @@ export async function hasCriticalAlerts(): Promise<boolean> {
         .eq('is_resolved', false)
         .eq('severity', 'critical')
         .limit(1)
-      // @ts-ignore - Type mismatch between database schema and expected type
-      data = res.data
+      data = res.data as typeof data
       error = res.error
     }
 

@@ -9,8 +9,6 @@ import {
   Bell,
   LogOut,
   Loader2,
-  Share2,
-  Activity,
   PanelLeft
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -38,6 +36,7 @@ import { useMobile } from "@/hooks/use-mobile"
 import { cn } from "@/lib/utils"
 import { useSidebar } from "@/components/ui/sidebar"
 import { UserNotifications } from "@/components/user-notifications"
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 
 interface TopbarProps {
   user?: {
@@ -67,6 +66,7 @@ export function Topbar({
   const [isLoggingOut, setIsLoggingOut] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false)
+  const [avatarUrl, setAvatarUrl] = useState<string | undefined>(user?.avatar_url)
 
   // Tentar usar useSidebar se disponível (desktop), caso contrário usar onToggleSidebar (mobile)
   let sidebarControl: { toggle: () => void } | null = null
@@ -77,6 +77,49 @@ export function Topbar({
     // useSidebar não disponível (fora do provider), usar onToggleSidebar como fallback
     sidebarControl = null
   }
+
+  // Atualizar avatar URL quando user mudar
+  useEffect(() => {
+    if (user?.avatar_url) {
+      // Adicionar timestamp para evitar cache
+      const urlWithCache = user.avatar_url.includes('?') 
+        ? user.avatar_url 
+        : `${user.avatar_url}?t=${Date.now()}`
+      setAvatarUrl(urlWithCache)
+    } else {
+      setAvatarUrl(undefined)
+    }
+  }, [user?.avatar_url])
+
+  // Listener para atualização de avatar (disparado após upload)
+  useEffect(() => {
+    const handleAuthUpdate = async () => {
+      // Aguardar um pouco para garantir que o banco foi atualizado
+      setTimeout(async () => {
+        try {
+          const res = await fetch('/api/auth/me', {
+            credentials: 'include',
+            cache: 'no-store'
+          })
+          if (res.ok) {
+            const data = await res.json()
+            const updatedUser = data?.user
+            if (updatedUser?.avatar_url) {
+              const urlWithCache = updatedUser.avatar_url.includes('?')
+                ? updatedUser.avatar_url
+                : `${updatedUser.avatar_url}?t=${Date.now()}`
+              setAvatarUrl(urlWithCache)
+            }
+          }
+        } catch (error) {
+          console.error('Erro ao atualizar avatar:', error)
+        }
+      }, 500)
+    }
+
+    window.addEventListener('auth:update', handleAuthUpdate)
+    return () => window.removeEventListener('auth:update', handleAuthUpdate)
+  }, [])
 
   // Debug logging (apenas em desenvolvimento)
   useEffect(() => {
@@ -300,29 +343,6 @@ export function Topbar({
 
         {/* Right Actions - Mobile: Menu compacto */}
         <div className="flex items-center gap-1 sm:gap-1.5">
-          {/* Desktop: Ações completas - EXATAMENTE como Application Shell 08 */}
-          {!isMobile && (
-            <>
-              <button
-                data-slot="button"
-                type="button"
-                className="focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive inline-flex shrink-0 items-center justify-center gap-2 rounded-md text-sm font-medium whitespace-nowrap transition-all outline-none focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50 size-9"
-                aria-label="Compartilhar"
-              >
-                <Share2 className="h-4 w-4" />
-              </button>
-              <button
-                data-slot="button"
-                type="button"
-                aria-haspopup="dialog"
-                className="focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive inline-flex shrink-0 items-center justify-center gap-2 rounded-md text-sm font-medium whitespace-nowrap transition-all outline-none focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50 size-9"
-                aria-label="Atividades"
-              >
-                <Activity className="h-4 w-4" />
-              </button>
-            </>
-          )}
-
           {/* Operational Alerts - Sempre visível */}
           <OperationalAlertsNotification />
 
@@ -342,14 +362,25 @@ export function Topbar({
                 )}
                 aria-label="User menu"
               >
-                <span data-slot="avatar" className={cn("relative flex shrink-0 overflow-hidden rounded-md", isMobile ? "size-8" : "size-8")}>
-                  <img
-                    data-slot="avatar-image"
-                    className="aspect-square size-full"
-                    src={user?.avatar_url || "https://cdn.shadcnstudio.com/ss-assets/avatar/avatar-1.png"}
-                    alt={user?.name || "User"}
-                  />
-                </span>
+                <Avatar className={cn("size-8 rounded-md", isMobile ? "size-8" : "size-8")}>
+                  {avatarUrl && (
+                    <AvatarImage
+                      src={avatarUrl}
+                      alt={user?.name || "User"}
+                      className="object-cover"
+                    />
+                  )}
+                  <AvatarFallback className="rounded-md text-xs font-medium">
+                    {user?.name
+                      ? user.name
+                          .split(' ')
+                          .map(n => n[0])
+                          .join('')
+                          .toUpperCase()
+                          .slice(0, 2)
+                      : 'U'}
+                  </AvatarFallback>
+                </Avatar>
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent

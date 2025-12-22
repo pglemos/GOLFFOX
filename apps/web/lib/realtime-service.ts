@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * Serviço de Realtime para o Mapa Admin
  * Gerencia conexões Supabase Realtime com fallback para polling
@@ -59,6 +58,59 @@ export interface RealtimeServiceOptions {
   pollingInterval?: number // ms
 }
 
+/**
+ * Tipos internos para dados do realtime
+ */
+interface TripData {
+  id: string
+  veiculo_id: string
+  route_id: string
+  motorista_id: string
+  status: 'scheduled' | 'inProgress' | 'completed' | 'cancelled'
+  started_at?: string
+  completed_at?: string
+}
+
+interface PositionData {
+  trip_id: string
+  lat: number
+  lng: number
+  speed: number | null
+  heading: number | null
+  timestamp: string
+  motorista_id?: string
+}
+
+interface IncidentData {
+  id: string
+  company_id: string
+  route_id?: string
+  veiculo_id?: string
+  severity?: 'low' | 'medium' | 'high' | 'critical'
+  description: string
+  created_at: string
+  status: string
+}
+
+interface ServiceRequestData {
+  id: string
+  empresa_id: string
+  route_id?: string
+  tipo: string
+  status: string
+  priority?: string
+  notes?: string
+  payload?: {
+    latitude?: string
+    longitude?: string
+  }
+  created_at: string
+}
+
+interface PositionWithTrip extends PositionData {
+  trips: TripData
+}
+
 export class RealtimeService {
   private channels: Map<string, RealtimeChannel> = new Map()
   private pollingIntervals: Map<string, NodeJS.Timeout> = new Map()
@@ -67,7 +119,7 @@ export class RealtimeService {
   private updateQueue: RealtimeUpdateType[] = []
   private debounceTimer: NodeJS.Timeout | null = null
   private readonly DEBOUNCE_MS = 300
-  private tripCache: Map<string, any> = new Map()
+  private tripCache: Map<string, TripData> = new Map()
 
   constructor(options: RealtimeServiceOptions = {}) {
     this.options = {
@@ -147,10 +199,10 @@ export class RealtimeService {
           schema: 'public',
           table: 'motorista_positions',
         },
-        async (payload: RealtimePostgresChangesPayload<any>) => {
+        async (payload: RealtimePostgresChangesPayload<PositionData>) => {
           try {
             // Buscar dados completos diretamente das tabelas (view v_live_vehicles não existe)
-            const position = payload.new as any
+            const position = payload.new as PositionData
 
             // motorista_positions tem trip_id, não veiculo_id diretamente
             // Buscar trip no cache ou no banco
@@ -224,8 +276,8 @@ export class RealtimeService {
           schema: 'public',
           table: 'trips',
         },
-        (payload: RealtimePostgresChangesPayload<any>) => {
-          const trip = payload.new as any
+        (payload: RealtimePostgresChangesPayload<TripData>) => {
+          const trip = payload.new as TripData
 
           // Atualizar cache
           this.tripCache.set(trip.id, trip)
@@ -272,8 +324,8 @@ export class RealtimeService {
           table: 'gf_incidents',
           filter: 'status=eq.open',
         },
-        (payload: RealtimePostgresChangesPayload<any>) => {
-          const incident = payload.new as any
+        (payload: RealtimePostgresChangesPayload<IncidentData>) => {
+          const incident = payload.new as IncidentData
           this.queueUpdate({
             type: 'alert',
             data: {
@@ -305,8 +357,8 @@ export class RealtimeService {
           table: 'gf_service_requests',
           filter: 'tipo=eq.socorro',
         },
-        (payload: RealtimePostgresChangesPayload<any>) => {
-          const request = payload.new as any
+        (payload: RealtimePostgresChangesPayload<ServiceRequestData>) => {
+          const request = payload.new as ServiceRequestData
           const lat = request.payload?.latitude
           const lng = request.payload?.longitude
 
@@ -363,7 +415,7 @@ export class RealtimeService {
         }
 
         if (positionsData && positionsData.length > 0) {
-          positionsData.forEach((pos: any) => {
+          positionsData.forEach((pos: PositionWithTrip) => {
             const trip = pos.trips
             if (trip && pos.lat && pos.lng) {
               this.queueUpdate({

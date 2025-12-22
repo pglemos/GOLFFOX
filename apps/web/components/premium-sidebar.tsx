@@ -5,7 +5,6 @@ import Link from "next/link"
 import { usePathname, useRouter } from "@/lib/next-navigation"
 import {
   Sidebar,
-  SidebarHeader,
   SidebarContent,
   SidebarGroup,
   SidebarGroupLabel,
@@ -42,7 +41,6 @@ import {
   UsersRound
 } from "lucide-react"
 import { OperationalAlertsBadge } from "@/components/operational-alerts-badge"
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { cn } from "@/lib/utils"
 
 // Tipos para itens de menu
@@ -402,50 +400,6 @@ const empresaMenuGroups: MenuGroup[] = [
   }
 ]
 
-// Avatar no header do sidebar - 32x32
-const SidebarLogo = ({ panel, user }: { panel: 'admin' | 'operador' | 'transportadora' | 'empresa', user?: { name: string, email: string, avatar_url?: string } }) => {
-  const { state } = useSidebar()
-  const isCollapsed = state === "collapsed"
-
-  // Iniciais do nome para fallback
-  const getInitials = (name: string) => {
-    return name
-      .split(' ')
-      .map(n => n[0])
-      .join('')
-      .toUpperCase()
-      .slice(0, 2)
-  }
-
-  return (
-    <SidebarHeader>
-      <SidebarMenu>
-        <SidebarMenuItem>
-          <button
-            type="button"
-            data-slot="button"
-            className={cn(
-              "focus-visible:border-ring focus-visible:ring-ring/50 inline-flex shrink-0 items-center justify-center gap-2 rounded-md text-sm font-medium whitespace-nowrap transition-all outline-none focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50",
-              "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
-              "size-9",
-              isCollapsed ? "mx-auto" : "ml-1"
-            )}
-            aria-label="User menu"
-          >
-            <Avatar className="size-8 rounded-md">
-              {user?.avatar_url ? (
-                <AvatarImage src={user.avatar_url} alt={user?.name || 'User'} />
-              ) : null}
-              <AvatarFallback className="rounded-md text-xs">
-                {user?.name ? getInitials(user.name) : 'U'}
-              </AvatarFallback>
-            </Avatar>
-          </button>
-        </SidebarMenuItem>
-      </SidebarMenu>
-    </SidebarHeader>
-  )
-}
 
 // Componente principal PremiumSidebar
 export function PremiumSidebar({
@@ -485,9 +439,6 @@ export function PremiumSidebar({
 
   return (
     <Sidebar variant="floating" collapsible="icon">
-      {/* Avatar/Header */}
-      <SidebarLogo panel={panel} user={user} />
-
       {/* Content */}
       <SidebarContent>
         {menuGroups.map((group, groupIndex) => (

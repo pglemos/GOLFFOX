@@ -1,24 +1,23 @@
 ﻿"use client"
 
 import { useMemo } from "react"
-import dynamic from "next/dynamic"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { TrendingUp, Users, DollarSign } from "lucide-react"
-
-// Lazy load dos gráficos
-const LineChart = dynamic(() => import("recharts").then((mod) => mod.LineChart) as any, { ssr: false })
-const Line = dynamic(() => import("recharts").then((mod) => mod.Line) as any, { ssr: false })
-const XAxis = dynamic(() => import("recharts").then((mod) => mod.XAxis) as any, { ssr: false })
-const YAxis = dynamic(() => import("recharts").then((mod) => mod.YAxis) as any, { ssr: false })
-const CartesianGrid = dynamic(() => import("recharts").then((mod) => mod.CartesianGrid) as any, { ssr: false })
-const Tooltip = dynamic(() => import("recharts").then((mod) => mod.Tooltip) as any, { ssr: false })
-const Legend = dynamic(() => import("recharts").then((mod) => mod.Legend) as any, { ssr: false })
-const ResponsiveContainer = dynamic(() => import("recharts").then((mod) => mod.ResponsiveContainer), { ssr: false })
-const BarChart = dynamic(() => import("recharts").then((mod) => mod.BarChart) as any, { ssr: false })
-const Bar = dynamic(() => import("recharts").then((mod) => mod.Bar) as any, { ssr: false })
-const PieChart = dynamic(() => import("recharts").then((mod) => mod.PieChart) as any, { ssr: false })
-const Pie = dynamic(() => import("recharts").then((mod) => mod.Pie) as any, { ssr: false })
-const Cell = dynamic(() => import("recharts").then((mod) => mod.Cell), { ssr: false })
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  PieChart,
+  Pie,
+  Cell,
+} from "recharts"
 
 interface DashboardChartsProps {
   kpis: {
@@ -81,23 +80,14 @@ export function DashboardCharts({ kpis, period = "today" }: DashboardChartsProps
         </CardHeader>
         <CardContent>
           <div className="h-[300px]">
-            {/* @ts-ignore - Recharts type incompatibility */}
             <ResponsiveContainer width="100%" height="100%">
-              {/* @ts-ignore - Recharts type incompatibility */}
-              <LineChart data={tripsData as any}>
-                {/* @ts-ignore - Recharts type incompatibility */}
+              <LineChart data={tripsData}>
                 <CartesianGrid strokeDasharray="3 3" />
-                {/* @ts-ignore - Recharts type incompatibility */}
                 <XAxis dataKey="name" />
-                {/* @ts-ignore - Recharts type incompatibility */}
                 <YAxis />
-                {/* @ts-ignore - Recharts type incompatibility */}
                 <Tooltip />
-                {/* @ts-ignore - Recharts type incompatibility */}
                 <Legend />
-                {/* @ts-ignore - Recharts type incompatibility */}
                 <Line type="monotone" dataKey="viagens" stroke="#3b82f6" strokeWidth={2} />
-                {/* @ts-ignore - Recharts type incompatibility */}
                 <Line type="monotone" dataKey="concluidas" stroke="#10b981" strokeWidth={2} />
               </LineChart>
             </ResponsiveContainer>
@@ -115,19 +105,12 @@ export function DashboardCharts({ kpis, period = "today" }: DashboardChartsProps
         </CardHeader>
         <CardContent>
           <div className="h-[300px]">
-            {/* @ts-ignore - Recharts type incompatibility */}
             <ResponsiveContainer width="100%" height="100%">
-              {/* @ts-ignore - Recharts type incompatibility */}
-              <BarChart data={occupancyData as any}>
-                {/* @ts-ignore - Recharts type incompatibility */}
+              <BarChart data={occupancyData}>
                 <CartesianGrid strokeDasharray="3 3" />
-                {/* @ts-ignore - Recharts type incompatibility */}
                 <XAxis dataKey="hora" />
-                {/* @ts-ignore - Recharts type incompatibility */}
                 <YAxis />
-                {/* @ts-ignore - Recharts type incompatibility */}
                 <Tooltip />
-                {/* @ts-ignore - Recharts type incompatibility */}
                 <Bar dataKey="ocupacao" fill="#8b5cf6" />
               </BarChart>
             </ResponsiveContainer>
@@ -145,24 +128,17 @@ export function DashboardCharts({ kpis, period = "today" }: DashboardChartsProps
         </CardHeader>
         <CardContent>
           <div className="h-[300px]">
-            {/* @ts-ignore - Recharts type incompatibility */}
             <ResponsiveContainer width="100%" height="100%">
-              {/* @ts-ignore - Recharts type incompatibility */}
-              <BarChart data={costComparison as any}>
-                {/* @ts-ignore - Recharts type incompatibility */}
+              <BarChart data={costComparison}>
                 <CartesianGrid strokeDasharray="3 3" />
-                {/* @ts-ignore - Recharts type incompatibility */}
                 <XAxis dataKey="name" />
-                {/* @ts-ignore - Recharts type incompatibility */}
                 <YAxis />
-                {/* @ts-ignore - Recharts type incompatibility */}
-                <Tooltip formatter={(value: unknown, name: unknown) => {
+                <Tooltip formatter={(value: number | string) => {
                   if (typeof value === 'number') {
                     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value)
                   }
                   return value
                 }} />
-                {/* @ts-ignore - Recharts type incompatibility */}
                 <Bar dataKey="valor" fill="#10b981" />
               </BarChart>
             </ResponsiveContainer>
@@ -177,13 +153,10 @@ export function DashboardCharts({ kpis, period = "today" }: DashboardChartsProps
         </CardHeader>
         <CardContent>
           <div className="h-[300px]">
-            {/* @ts-ignore - Recharts type incompatibility */}
             <ResponsiveContainer width="100%" height="100%">
-              {/* @ts-ignore - Recharts type incompatibility */}
               <PieChart>
-                {/* @ts-ignore - Recharts type incompatibility */}
                 <Pie
-                  data={tripsStatusData as any}
+                  data={tripsStatusData}
                   cx="50%"
                   cy="50%"
                   labelLine={false}
@@ -196,7 +169,6 @@ export function DashboardCharts({ kpis, period = "today" }: DashboardChartsProps
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
-                {/* @ts-ignore - Recharts type incompatibility */}
                 <Tooltip />
               </PieChart>
             </ResponsiveContainer>

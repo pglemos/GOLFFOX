@@ -598,15 +598,15 @@ export default function TransportadoraConfiguracoesPage() {
                     </div>
                     <button
                       onClick={() => handleNotificationChange(key, !formData.notifications[key as keyof typeof formData.notifications])}
-                      className={`relative w-12 h-6 rounded-full transition-colors ml-4 ${formData.notifications[key as keyof typeof formData.notifications]
-                        ? 'bg-brand'
-                        : 'bg-muted'
+                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ml-4 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 ${formData.notifications[key as keyof typeof formData.notifications]
+                        ? 'bg-primary'
+                        : 'bg-input'
                         }`}
                     >
                       <span
-                        className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform shadow-sm ${formData.notifications[key as keyof typeof formData.notifications]
-                          ? 'translate-x-6'
-                          : 'translate-x-0'
+                        className={`inline-block h-5 w-5 rounded-full bg-background shadow-lg ring-0 transition-transform ${formData.notifications[key as keyof typeof formData.notifications]
+                          ? 'translate-x-5'
+                          : 'translate-x-0.5'
                           }`}
                       />
                     </button>
