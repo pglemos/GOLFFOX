@@ -12,47 +12,77 @@ interface AuthUser {
 }
 
 /**
- * Hook de autenticação simplificado - usa apenas cookie golffox-session
- * para evitar chamadas de rede que podem travar
+ * Hook de autenticação simplificado
+ * Tenta carregar dados do localStorage/sessionStorage primeiro (rápido)
+ * Se não encontrar, faz chamada à API /api/auth/me (o cookie HttpOnly é enviado automaticamente)
  */
 export function useAuthSimple() {
     const [user, setUser] = useState<AuthUser | null>(null)
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
-        // Função para carregar usuário do cookie ou storage
-        const loadUserFromStorage = () => {
+        // Função para carregar usuário do storage ou API
+        const loadUser = async () => {
             try {
-                // 1. Tentar pegar do cookie golffox-session
-                const cookieMatch = document.cookie.match(/golffox-session=([^;]+)/)
                 let userData: any = null
 
-                if (cookieMatch) {
+                // 1. Tentar localStorage/sessionStorage primeiro (mais rápido)
+                const storedLocal = localStorage.getItem('golffox-auth')
+                const storedSession = sessionStorage.getItem('golffox-auth')
+                const stored = storedLocal || storedSession
+
+                if (stored) {
                     try {
-                        const decoded = atob(cookieMatch[1])
-                        userData = JSON.parse(decoded)
-                        console.log('[useAuthSimple] Usuário carregado do cookie')
+                        userData = JSON.parse(stored)
+                        console.log(`[useAuthSimple] Usuário carregado do ${storedLocal ? 'localStorage' : 'sessionStorage'}`)
                     } catch (e) {
-                        console.warn('[useAuthSimple] Erro ao decodificar cookie')
+                        console.warn('[useAuthSimple] Erro ao decodificar storage')
                     }
                 }
 
-                // 2. Fallback: Tentar pegar do localStorage ou sessionStorage (golffox-auth)
-                if (!userData) {
-                    const storedLocal = typeof window !== 'undefined' ? localStorage.getItem('golffox-auth') : null
-                    const storedSession = typeof window !== 'undefined' ? sessionStorage.getItem('golffox-auth') : null
-                    const stored = storedLocal || storedSession
+                // 2. Se não encontrou no storage, chamar API /api/auth/me
+                // O cookie HttpOnly golffox-session é enviado automaticamente pelo navegador
+                if (!userData?.id || !userData?.email) {
+                    console.log('[useAuthSimple] Dados não encontrados no storage, chamando API /api/auth/me...')
+                    try {
+                        const response = await fetch('/api/auth/me', {
+                            method: 'GET',
+                            credentials: 'include', // Importante: enviar cookies
+                            headers: {
+                                'Accept': 'application/json',
+                            },
+                        })
 
-                    if (stored) {
-                        try {
-                            userData = JSON.parse(stored)
-                            console.log(`[useAuthSimple] Usuário carregado do ${storedLocal ? 'localStorage' : 'sessionStorage'}`)
-                        } catch (e) {
-                            console.warn('[useAuthSimple] Erro ao decodificar storage')
+                        if (response.ok) {
+                            const data = await response.json()
+                            if (data.success && data.user) {
+                                userData = data.user
+                                console.log('[useAuthSimple] Usuário carregado via API /api/auth/me')
+
+                                // Salvar no storage para próximas cargas serem mais rápidas
+                                const safeData = JSON.stringify({
+                                    id: userData.id,
+                                    email: userData.email,
+                                    name: userData.name,
+                                    role: userData.role,
+                                    avatar_url: userData.avatar_url,
+                                    companyId: userData.companyId,
+                                })
+                                try {
+                                    sessionStorage.setItem('golffox-auth', safeData)
+                                } catch (e) {
+                                    console.warn('[useAuthSimple] Erro ao salvar no sessionStorage')
+                                }
+                            }
+                        } else {
+                            console.log('[useAuthSimple] API /api/auth/me retornou status:', response.status)
                         }
+                    } catch (apiError) {
+                        console.warn('[useAuthSimple] Erro ao chamar API /api/auth/me:', apiError)
                     }
                 }
 
+                // 3. Definir estado do usuário
                 if (userData?.id && userData?.email) {
                     setUser({
                         id: userData.id,
@@ -63,10 +93,11 @@ export function useAuthSimple() {
                         companyId: userData.companyId || userData.company_id,
                     })
                 } else {
+                    console.log('[useAuthSimple] Nenhum usuário encontrado')
                     setUser(null)
                 }
             } catch (err) {
-                console.error('Erro ao carregar sessão:', err)
+                console.error('[useAuthSimple] Erro ao carregar sessão:', err)
                 setUser(null)
             }
 
@@ -74,7 +105,7 @@ export function useAuthSimple() {
         }
 
         // Carregar imediatamente
-        loadUserFromStorage()
+        loadUser()
     }, [])
 
     return { user, loading }
