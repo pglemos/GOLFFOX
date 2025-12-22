@@ -49,6 +49,15 @@ process.env.NEXT_PUBLIC_SUPABASE_URL = 'http://localhost:54321'
 process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = 'test-anon-key'
 process.env.SUPABASE_SERVICE_ROLE_KEY = 'test-service-role-key'
 
+// Mock supabase-session - mockar ambos os caminhos possíveis
+const mockEnsureSupabaseSession = jest.fn().mockResolvedValue(undefined)
+jest.mock('@/lib/supabase-session', () => ({
+  ensureSupabaseSession: mockEnsureSupabaseSession,
+}), { virtual: true })
+jest.mock('@/lib/core/supabase/session', () => ({
+  ensureSupabaseSession: mockEnsureSupabaseSession,
+}), { virtual: true })
+
 // Mock Supabase client to avoid "Supabase não configurado" errors
 jest.mock('@/lib/supabase', () => ({
   supabase: {

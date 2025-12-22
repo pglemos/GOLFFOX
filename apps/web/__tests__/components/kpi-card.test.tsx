@@ -2,7 +2,7 @@ import React from 'react'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { KpiCard } from '@/components/kpi-card'
-import { renderWithProviders } from '../../helpers/component-helpers'
+import { renderWithProviders } from '../helpers/component-helpers'
 import { TrendingUp, TrendingDown } from 'lucide-react'
 
 // Mock framer-motion
@@ -141,7 +141,7 @@ describe('KpiCard Component', () => {
     })
 
     it('não deve exibir badge de trend quando trend não é fornecido', () => {
-      const { container } = renderWithProviders(
+      renderWithProviders(
         <KpiCard
           icon={TrendingUp}
           label="Viagens"
@@ -149,9 +149,8 @@ describe('KpiCard Component', () => {
         />
       )
 
-      // Não deve ter badge de trend
-      const trendBadge = container.querySelector('[class*="trend"]')
-      expect(trendBadge).not.toBeInTheDocument()
+      // Não deve ter badge de trend (verificado pela ausência do texto de porcentagem)
+      expect(screen.queryByText(/%/)).not.toBeInTheDocument()
     })
   })
 

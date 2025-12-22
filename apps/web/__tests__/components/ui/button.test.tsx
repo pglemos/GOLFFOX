@@ -2,7 +2,7 @@ import React from 'react'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { Button } from '@/components/ui/button'
-import { renderWithProviders } from '../../../helpers/component-helpers'
+import { renderWithProviders } from '../../helpers/component-helpers'
 
 describe('Button Component', () => {
   describe('Renderização', () => {

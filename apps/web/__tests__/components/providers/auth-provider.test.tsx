@@ -7,8 +7,6 @@ import React from 'react'
 import { render, screen, waitFor } from '@testing-library/react'
 import { AuthProvider, useAuth } from '@/components/providers/auth-provider'
 import { supabase } from '@/lib/supabase'
-import { ensureSupabaseSession } from '@/lib/supabase-session'
-
 // Mock dependencies
 jest.mock('@/lib/supabase', () => ({
   supabase: {
@@ -18,12 +16,17 @@ jest.mock('@/lib/supabase', () => ({
         data: { subscription: { unsubscribe: jest.fn() } },
       })),
     },
+    from: jest.fn(() => ({
+      select: jest.fn(() => ({
+        eq: jest.fn(() => ({
+          maybeSingle: jest.fn().mockResolvedValue({ data: null, error: null }),
+        })),
+      })),
+    })),
   },
 }))
 
-jest.mock('@/lib/supabase-session', () => ({
-  ensureSupabaseSession: jest.fn(),
-}))
+// Mock já está no jest.setup.js
 
 // Helper component para testar o hook
 function TestComponent() {

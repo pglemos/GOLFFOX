@@ -21,6 +21,55 @@ jest.mock('@/lib/route-deviation-detector')
 jest.mock('@/lib/operational-alerts')
 jest.mock('@/lib/maps-billing-monitor')
 jest.mock('@/lib/trajectory-analyzer')
+jest.mock('@/lib/coordinate-validator')
+jest.mock('@/lib/toast', () => ({
+  notifySuccess: jest.fn(),
+  notifyError: jest.fn(),
+}))
+jest.mock('@/lib/logger', () => ({
+  debug: jest.fn(),
+  warn: jest.fn(),
+  error: jest.fn(),
+}))
+jest.mock('@/lib/error-utils', () => ({
+  formatError: jest.fn((err) => err?.message || 'Erro'),
+  getErrorMeta: jest.fn(() => ({})),
+}))
+jest.mock('@/lib/i18n', () => ({
+  t: jest.fn((key) => key),
+}))
+jest.mock('@/stores/map-filters', () => ({
+  useMapFilters: jest.fn((selector) => {
+    const state = {
+      company: null,
+      route: null,
+      veiculo: null,
+      motorista: null,
+      setCompany: jest.fn(),
+      setRoute: jest.fn(),
+      setVeiculo: jest.fn(),
+    }
+    return typeof selector === 'function' ? selector(state) : state
+  }),
+}))
+jest.mock('@/stores/map-selection', () => ({
+  useMapSelection: jest.fn(() => ({
+    selectedVeiculo: null,
+    selectedRoute: null,
+    setSelectedVeiculo: jest.fn(),
+    setSelectedRoute: jest.fn(),
+    clearSelection: jest.fn(),
+  })),
+}))
+jest.mock('@/stores/map-playback', () => ({
+  useMapPlayback: jest.fn(() => ({
+    isPlaying: false,
+    currentTime: null,
+    start: jest.fn(),
+    stop: jest.fn(),
+    pause: jest.fn(),
+  })),
+}))
 jest.mock('@/lib/supabase', () => ({
   supabase: {
     from: jest.fn(() => ({

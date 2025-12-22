@@ -12,6 +12,22 @@ import { renderWithProviders } from '../../helpers/component-helpers'
 
 // Mock dependencies
 jest.mock('@/hooks/use-reconciliation')
+jest.mock('@/lib/supabase', () => ({
+  supabase: {
+    from: jest.fn(() => ({
+      select: jest.fn(() => ({
+        eq: jest.fn(() => ({
+          data: [],
+          error: null,
+        })),
+      })),
+    })),
+  },
+}))
+jest.mock('@/lib/toast', () => ({
+  notifyError: jest.fn(),
+  notifySuccess: jest.fn(),
+}))
 
 const mockUseReconciliation = useReconciliation as jest.MockedFunction<typeof useReconciliation>
 
