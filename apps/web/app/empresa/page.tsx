@@ -91,7 +91,7 @@ export default function EmpresaDashboard() {
         <div className="min-h-screen flex items-center justify-center p-4">
           <Card className="p-8 max-w-md w-full text-center">
             <h2 className="text-xl font-bold mb-2 text-error">Erro ao carregar</h2>
-            <p className="text-ink-muted mb-4">{tenantError || error}</p>
+            <p className="text-ink-muted mb-4">{tenantError || 'Erro desconhecido'}</p>
             <Button onClick={() => window.location.reload()} variant="default">
               Tentar Novamente
             </Button>

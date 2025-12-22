@@ -90,6 +90,12 @@ export default async function AlertasPage() {
     redirectFn('/unauthorized')
   }
 
+  // TypeScript: user não pode ser null após verificações acima
+  if (!user) {
+    const { redirect: redirectFn } = await import("next/navigation")
+    redirectFn('/?next=/admin/alertas')
+  }
+
   return (
     <AppShell user={{
       id: user.id,

@@ -9,7 +9,8 @@
  * - Gráficos Orçado vs Real
  */
 
-import { useState, useEffect, useMemo } from "react"
+import { useState, useEffect, useMemo, Suspense } from "react"
+import { LazyPageWrapper, DashboardPageSkeleton } from "@/components/shared/lazy-page-wrapper"
 import { motion, AnimatePresence } from "framer-motion"
 import {
   DollarSign,
@@ -99,7 +100,7 @@ function CountUp({ value, duration = 1500, prefix = "" }: { value: number; durat
   return <span>{prefix}{formatCurrency(displayValue)}</span>
 }
 
-export default function CustosPage() {
+function CustosPageContent() {
   const { user } = useAuth()
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState("overview")
@@ -693,5 +694,13 @@ export default function CustosPage() {
         </Tabs>
       </div>
     </AppShell>
+  )
+}
+
+export default function CustosPage() {
+  return (
+    <LazyPageWrapper fallback={<DashboardPageSkeleton />}>
+      <CustosPageContent />
+    </LazyPageWrapper>
   )
 }

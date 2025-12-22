@@ -11,7 +11,7 @@
 import React from 'react'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { VirtualizedTable, VirtualizedTableColumn } from '@/components/shared/virtualized-table'
+import { VirtualizedTable, VirtualizedColumn } from '@/components/shared/virtualized-table'
 
 interface TestData {
   id: string
@@ -33,7 +33,7 @@ function generateTestData(count: number): TestData[] {
 }
 
 describe('VirtualizedTable - Integração', () => {
-  const columns: VirtualizedTableColumn<TestData>[] = [
+  const columns: VirtualizedColumn<TestData>[] = [
     { key: 'id', header: 'ID', width: 100 },
     { key: 'name', header: 'Nome', width: 200 },
     { key: 'email', header: 'Email', width: 250 },
@@ -249,7 +249,7 @@ describe('VirtualizedTable - Integração', () => {
   describe('Renderização Customizada', () => {
     it('deve usar renderCell customizado quando fornecido', () => {
       const data = generateTestData(10)
-      const columnsWithCustomRender: VirtualizedTableColumn<TestData>[] = [
+      const columnsWithCustomRender: VirtualizedColumn<TestData>[] = [
         ...columns.slice(0, 3),
         {
           key: 'status',
@@ -278,7 +278,7 @@ describe('VirtualizedTable - Integração', () => {
       }
 
       const data = generateTestData(1000)
-      const columnsWithTracking: VirtualizedTableColumn<TestData>[] = [
+      const columnsWithTracking: VirtualizedColumn<TestData>[] = [
         {
           key: 'name',
           header: 'Nome',

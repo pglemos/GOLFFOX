@@ -1,7 +1,8 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, Suspense } from "react"
 import { AppShell } from "@/components/app-shell"
+import { LazyPageWrapper, FormPageSkeleton } from "@/components/shared/lazy-page-wrapper"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -27,7 +28,7 @@ import { supabase } from "@/lib/supabase"
 import { notifySuccess, notifyError } from "@/lib/toast"
 import { ThemeToggle } from "@/components/theme-toggle"
 
-export default function AdminConfiguracoesPage() {
+function AdminConfiguracoesPageContent() {
   const { user, loading } = useAuthFast()
   const [savingPersonal, setSavingPersonal] = useState(false)
   
@@ -703,5 +704,13 @@ export default function AdminConfiguracoesPage() {
         </div>
       </div>
     </AppShell>
+  )
+}
+
+export default function AdminConfiguracoesPage() {
+  return (
+    <LazyPageWrapper fallback={<FormPageSkeleton />}>
+      <AdminConfiguracoesPageContent />
+    </LazyPageWrapper>
   )
 }

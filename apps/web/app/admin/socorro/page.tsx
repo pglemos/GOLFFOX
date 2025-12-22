@@ -232,7 +232,7 @@ export default function SocorroPage() {
                   onValueChange={(value) => dispatchFormDispatch({ type: 'SET_ROUTE_ID', payload: value })}
                   disabled={dispatchFormState.loading.loadingResources}
                 >
-                  <SelectTrigger className={`h-12 text-base ${!selectedRouteId ? 'border-error-light' : ''}`}>
+                  <SelectTrigger className={`h-12 text-base ${!dispatchFormState.selections.routeId ? 'border-error-light' : ''}`}>
                     <SelectValue placeholder="Selecione uma rota com problema" />
                   </SelectTrigger>
                   <SelectContent>

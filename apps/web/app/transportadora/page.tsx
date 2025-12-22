@@ -182,6 +182,7 @@ export default function TransportadoraDashboard() {
           total_points?: number
         }
         
+        // @ts-expect-error - gf_gamification_scores não está no tipo do Supabase ainda
         const { data: rankings } = await supabase
           .from('gf_gamification_scores')
           .select('*')

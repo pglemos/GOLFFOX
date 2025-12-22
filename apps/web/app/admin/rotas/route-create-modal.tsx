@@ -1,6 +1,6 @@
 ﻿"use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import {
   Dialog,
   DialogContent,
@@ -17,8 +17,7 @@ import { supabase } from "@/lib/supabase"
 import { notifySuccess, notifyError } from "@/lib/toast"
 import { optimizeRoute } from "@/lib/route-optimization"
 import { geocodeAddress } from "@/lib/geocoding"
-import { MotoristaPickerModal } from "@/components/admin/motorista-picker-modal"
-import { VeiculoPickerModal } from "@/components/admin/veiculo-picker-modal"
+import { GenericPickerModal, type PickerItem } from "@/components/shared/generic-picker-modal"
 import { z } from "zod"
 import React from "react"
 import { useRouteCreate } from "./use-route-create"
@@ -59,6 +58,10 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
 
   const [isMotoristaModalOpen, setIsMotoristaModalOpen] = useState(false)
   const [isVeiculoModalOpen, setIsVeiculoModalOpen] = useState(false)
+  const [motoristas, setMotoristas] = useState<PickerItem[]>([])
+  const [veiculos, setVeiculos] = useState<PickerItem[]>([])
+  const [loadingMotoristas, setLoadingMotoristas] = useState(false)
+  const [loadingVeiculos, setLoadingVeiculos] = useState(false)
 
   // Use the new hook for Google Maps loading
   const { isLoaded: mapLoaded, error: mapError } = useGoogleMapsLoader(isOpen)
@@ -66,6 +69,50 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
   const selectedEmployeesData = useMemo(() => {
     return employees.filter((e) => formData.selected_employees?.includes(e.employee_id))
   }, [employees, formData.selected_employees])
+
+  // Carregar motoristas quando modal abrir
+  useEffect(() => {
+    if (isMotoristaModalOpen && formData.company_id) {
+      setLoadingMotoristas(true)
+      fetch(`/api/admin/motoristas-list?company_id=${formData.company_id}`)
+        .then(res => res.json())
+        .then(result => {
+          if (result.success) {
+            setMotoristas((result.motoristas || []).map((d: any) => ({
+              id: d.id,
+              name: d.name || "Sem nome",
+              cpf: d.cpf || "",
+              documents_valid: !!d.cpf,
+              rating: undefined
+            })))
+          }
+        })
+        .catch(err => console.error("Erro ao carregar motoristas:", err))
+        .finally(() => setLoadingMotoristas(false))
+    }
+  }, [isMotoristaModalOpen, formData.company_id])
+
+  // Carregar veículos quando modal abrir
+  useEffect(() => {
+    if (isVeiculoModalOpen && formData.company_id) {
+      setLoadingVeiculos(true)
+      fetch(`/api/admin/vehicles-list?company_id=${formData.company_id}${formData.selected_employees?.length ? `&required_capacity=${formData.selected_employees.length}` : ''}`)
+        .then(res => res.json())
+        .then(result => {
+          if (result.success) {
+            setVeiculos((result.vehicles || []).map((d: any) => ({
+              id: d.id,
+              name: d.plate || "Sem placa",
+              plate: d.plate,
+              capacity: d.capacity || 0,
+              model: d.model || ""
+            })))
+          }
+        })
+        .catch(err => console.error("Erro ao carregar veículos:", err))
+        .finally(() => setLoadingVeiculos(false))
+    }
+  }, [isVeiculoModalOpen, formData.company_id, formData.selected_employees?.length])
 
   const handleOptimize = async () => {
     if (!formData.company_id || !formData.selected_employees || formData.selected_employees.length === 0) {
@@ -390,25 +437,77 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
         </DialogContent>
       </Dialog>
 
-      <MotoristaPickerModal
-        isOpen={isMotoristaModalOpen}
+      <GenericPickerModal
+        open={isMotoristaModalOpen}
+        title="Selecionar Motorista"
+        items={motoristas}
+        isLoading={loadingMotoristas}
+        onSelect={(item) => {
+          setSelectedMotorista({
+            id: item.id,
+            name: item.name as string,
+            documents_valid: item.documents_valid as boolean
+          })
+          setIsMotoristaModalOpen(false)
+        }}
         onClose={() => setIsMotoristaModalOpen(false)}
-        onSelect={(motorista) => setSelectedMotorista({
-          id: motorista.id,
-          name: motorista.name,
-          documents_valid: motorista.documents_valid
-        })}
-        companyId={formData.company_id}
+        searchPlaceholder="Buscar por nome ou CPF..."
+        columns={[
+          { key: 'name', label: 'Nome', isPrimary: true },
+          { key: 'cpf', label: 'CPF' }
+        ]}
+        renderItem={(item) => (
+          <div className="flex items-center justify-between p-3 border rounded-lg hover:bg-bg-soft cursor-pointer transition-colors">
+            <div className="flex-1">
+              <div className="font-medium">{item.name}</div>
+              {item.cpf && (
+                <div className="text-sm text-ink-muted">CPF: {item.cpf}</div>
+              )}
+            </div>
+            {item.documents_valid ? (
+              <Badge variant="default" className="bg-success-light text-success">
+                Docs OK
+              </Badge>
+            ) : (
+              <Badge variant="destructive">Pendente</Badge>
+            )}
+          </div>
+        )}
       />
 
-      <VeiculoPickerModal
-        isOpen={isVeiculoModalOpen}
+      <GenericPickerModal
+        open={isVeiculoModalOpen}
+        title="Selecionar Veículo"
+        items={veiculos}
+        isLoading={loadingVeiculos}
+        onSelect={(item) => {
+          setSelectedVeiculo({
+            id: item.id,
+            plate: item.plate as string,
+            capacity: item.capacity as number
+          })
+          setIsVeiculoModalOpen(false)
+        }}
         onClose={() => setIsVeiculoModalOpen(false)}
-        onSelect={(veiculo) =>
-          setSelectedVeiculo({ id: veiculo.id, plate: veiculo.plate, capacity: veiculo.capacity })
-        }
-        companyId={formData.company_id}
-        requiredCapacity={formData.selected_employees?.length}
+        searchPlaceholder="Buscar por placa ou modelo..."
+        columns={[
+          { key: 'name', label: 'Placa', isPrimary: true },
+          { key: 'model', label: 'Modelo' },
+          { key: 'capacity', label: 'Capacidade' }
+        ]}
+        renderItem={(item) => (
+          <div className="flex items-center justify-between p-3 border rounded-lg hover:bg-bg-soft cursor-pointer transition-colors">
+            <div className="flex-1">
+              <div className="font-medium">{item.name}</div>
+              {item.model && (
+                <div className="text-sm text-ink-muted">{item.model}</div>
+              )}
+            </div>
+            {item.capacity && (
+              <Badge variant="outline">Capacidade: {item.capacity}</Badge>
+            )}
+          </div>
+        )}
       />
     </>
   )

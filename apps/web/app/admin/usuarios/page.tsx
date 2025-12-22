@@ -1,7 +1,8 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, Suspense } from "react"
 import { AppShell } from "@/components/app-shell"
+import { LazyPageWrapper, TablePageSkeleton } from "@/components/shared/lazy-page-wrapper"
 import { Button } from "@/components/ui/button"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -25,7 +26,7 @@ import { useMobile } from "@/hooks/use-mobile"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { FilterDrawer } from "@/components/shared/filter-drawer"
 
-export default function UsuariosPage() {
+function UsuariosPageContent() {
     const router = useRouter()
     const isMobile = useMobile() // Hook mobile-first
     const { user, loading: authLoading } = useAuthFast()
@@ -500,5 +501,13 @@ export default function UsuariosPage() {
                 />
             </div>
         </AppShell>
+    )
+}
+
+export default function UsuariosPage() {
+    return (
+        <LazyPageWrapper fallback={<TablePageSkeleton />}>
+            <UsuariosPageContent />
+        </LazyPageWrapper>
     )
 }
