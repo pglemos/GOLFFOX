@@ -62,6 +62,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           company_id: userData.companyId || userData.company_id,
         }
       }
+
+      // ⚠️ FALLBACK: Se o cookie é HttpOnly, não estará em document.cookie
+      // Tentar recuperar do storage (síncrono e seguro para UI)
+      if (typeof window !== 'undefined') {
+        const stored = localStorage.getItem('golffox-auth') || sessionStorage.getItem('golffox-auth')
+        if (stored) {
+          try {
+            const u = JSON.parse(stored)
+            if (u && u.id && u.email) {
+              return {
+                id: u.id,
+                email: u.email,
+                name: u.name || u.email.split('@')[0],
+                role: u.role || 'user',
+                avatar_url: u.avatar_url,
+                companyId: u.companyId || u.company_id,
+                company_id: u.companyId || u.company_id,
+              }
+            }
+          } catch { }
+        }
+      }
     } catch (err) {
       // Cookie inválido ou malformado
       console.warn('⚠️ Erro ao decodificar cookie de sessão:', err)
@@ -204,7 +226,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const initialLoad = async () => {
       if (hasLoaded) return
       hasLoaded = true
-      
+
       if (mounted) {
         await loadUser()
       }
@@ -224,7 +246,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log('🔄 Auth state changed:', event)
-      
+
       // Ignorar INITIAL_SESSION para evitar loops
       if (event === 'INITIAL_SESSION') {
         return
@@ -236,7 +258,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       isHandling = true
-      
+
       // Limpar timeout anterior se existir
       if (timeoutId) {
         clearTimeout(timeoutId)
@@ -273,7 +295,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const handleAuthUpdate = async () => {
       console.log('🔄 auth:update event received')
-      
+
       // Debounce para evitar múltiplas chamadas simultâneas
       if (isHandling) {
         return

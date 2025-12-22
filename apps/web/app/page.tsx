@@ -183,9 +183,9 @@ function LoginContent() {
             }
           }
 
-          // Tentar localStorage se o cookie for HttpOnly (não visível em document.cookie)
+          // Tentar localStorage/sessionStorage se o cookie for HttpOnly (não visível em document.cookie)
           if (!userData) {
-            const stored = localStorage.getItem('golffox-auth')
+            const stored = localStorage.getItem('golffox-auth') || sessionStorage.getItem('golffox-auth')
             if (stored) {
               try {
                 userData = JSON.parse(stored)

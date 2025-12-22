@@ -37,15 +37,18 @@ export function useAuthSimple() {
                     }
                 }
 
-                // 2. Fallback: Tentar pegar do localStorage (golffox-auth)
+                // 2. Fallback: Tentar pegar do localStorage ou sessionStorage (golffox-auth)
                 if (!userData) {
-                    const stored = localStorage.getItem('golffox-auth')
+                    const storedLocal = typeof window !== 'undefined' ? localStorage.getItem('golffox-auth') : null
+                    const storedSession = typeof window !== 'undefined' ? sessionStorage.getItem('golffox-auth') : null
+                    const stored = storedLocal || storedSession
+
                     if (stored) {
                         try {
                             userData = JSON.parse(stored)
-                            console.log('[useAuthSimple] Usuário carregado do localStorage')
+                            console.log(`[useAuthSimple] Usuário carregado do ${storedLocal ? 'localStorage' : 'sessionStorage'}`)
                         } catch (e) {
-                            console.warn('[useAuthSimple] Erro ao decodificar localStorage')
+                            console.warn('[useAuthSimple] Erro ao decodificar storage')
                         }
                     }
                 }

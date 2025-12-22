@@ -50,7 +50,7 @@ export function getStoredUser(): UserData | null {
   if (typeof window === 'undefined') return null
 
   try {
-    const stored = localStorage.getItem(STORAGE_KEY)
+    const stored = localStorage.getItem(STORAGE_KEY) || sessionStorage.getItem(STORAGE_KEY)
     return stored ? JSON.parse(stored) : null
   } catch {
     return null
