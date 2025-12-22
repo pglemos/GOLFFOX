@@ -736,45 +736,40 @@ function LoginContent() {
         let redirectUrl: string | null = null
 
         // ✅ VALIDAÇÃO: Garantir que safeNext é uma string válida antes de usar
-        // Verificar se safeNext é string E se isAllowedForRole retorna true
+        // Verificar se safeNext é string E se o role tem permissão
         if (safeNext && typeof safeNext === 'string' && safeNext.trim() !== '') {
-          // ✅ VALIDAÇÃO: Garantir que isAllowedForRole é uma função antes de chamar
-          if (typeof isAllowedForRole === 'function') {
-            try {
-              const isAllowed = isAllowedForRole(userRoleFromDatabase, safeNext)
-              debug('LOGIN - Resultado de isAllowedForRole', {
-                isAllowed,
-                type: typeof isAllowed,
-                isBoolean: typeof isAllowed === 'boolean'
-              })
+          // ✅ CORREÇÃO: Verificação de permissão inline para evitar problemas de closure
+          const checkRolePermission = (role: string, path: string): boolean => {
+            if (!role || !path || typeof role !== 'string' || typeof path !== 'string') {
+              return false
+            }
+            if (path.startsWith('/admin')) return role === 'admin'
+            if (path.startsWith('/empresa')) return ['admin', 'empresa', 'operador'].includes(role)
+            if (path.startsWith('/transportadora')) return ['admin', 'operador', 'transportadora'].includes(role)
+            return true
+          }
+          
+          try {
+            const isAllowed = checkRolePermission(userRoleFromDatabase, safeNext)
+            debug('LOGIN - Resultado de checkRolePermission', {
+              isAllowed,
+              role: userRoleFromDatabase,
+              path: safeNext
+            })
 
-              // ✅ VALIDAÇÃO: Garantir que isAllowed é um booleano, não uma função
-              if (isAllowed === true) {
-                redirectUrl = safeNext
-              } else if (isAllowed === false) {
-                // Se não for permitido, usar o role do banco para determinar o painel
-                redirectUrl = AuthManager.getRedirectUrl(userRoleFromDatabase)
-              } else {
-                // Se retornar algo inesperado, usar o role do banco
-                logWarn('LOGIN - isAllowedForRole retornou valor inesperado', { isAllowed }, 'LoginPage')
-                redirectUrl = AuthManager.getRedirectUrl(userRoleFromDatabase)
-              }
-            } catch (roleCheckError: any) {
-              logError('LOGIN - Erro ao verificar permissão de role', {
-                error: roleCheckError,
-                message: roleCheckError?.message,
-                stack: roleCheckError?.stack?.substring(0, 500),
-                role: userRoleFromDatabase,
-                path: safeNext
-              })
-              // Em caso de erro, usar o role do banco para determinar o painel
+            if (isAllowed === true) {
+              redirectUrl = safeNext
+            } else {
+              // Se não for permitido, usar o role do banco para determinar o painel
               redirectUrl = AuthManager.getRedirectUrl(userRoleFromDatabase)
             }
-          } else {
-            logError('LOGIN - isAllowedForRole não é uma função', {
-              type: typeof isAllowedForRole,
-              value: isAllowedForRole
-            }, 'LoginPage')
+          } catch (roleCheckError: any) {
+            logError('LOGIN - Erro ao verificar permissão de role', {
+              error: roleCheckError,
+              message: roleCheckError?.message,
+              role: userRoleFromDatabase,
+              path: safeNext
+            })
             // Em caso de erro, usar o role do banco para determinar o painel
             redirectUrl = AuthManager.getRedirectUrl(userRoleFromDatabase)
           }
@@ -1004,7 +999,6 @@ function LoginContent() {
       searchParams,
       rememberMe,
       resolvedAuthEndpoint,
-      isAllowedForRole,
     ]
   )
 
