@@ -12,7 +12,7 @@ import { logError } from '@/lib/logger'
  */
 export interface UseFileUploadOptions {
     /** Nome do bucket no Supabase Storage */
-    bucket: 'vehicle-documents' | 'driver-documents' | 'carrier-documents' | 'company-documents' | 'vehicle-photos' | 'avatars' | 'costs'
+    bucket: 'documentos-veiculo' | 'documentos-motorista' | 'documentos-transportadora' | 'documentos-empresa' | 'fotos-veiculo' | 'avatares' | 'custos'
     /** Tamanho máximo em MB (padrão: 10) */
     maxSize?: number
     /** Tipos de arquivo permitidos (padrão: PDF e imagens) */
@@ -76,7 +76,7 @@ const DEFAULT_MAX_SIZE = 10
  * @example
  * ```tsx
  * const { upload, uploading, error } = useFileUpload({
- *   bucket: 'veiculo-documents',
+ *   bucket: 'documentos-veiculo',
  *   folder: 'crlv'
  * })
  * 

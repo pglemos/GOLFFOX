@@ -75,7 +75,7 @@ export interface DocumentConfig {
 
 export const DOCUMENTS_CONFIG: Record<EntityType, DocumentConfig> = {
     transportadora: {
-        bucket: "carrier-documents",
+        bucket: "documentos-transportadora",
         endpoint: "/api/admin/carriers",
         table: "gf_transportadora_documents",
         foreignKey: "transportadora_id",
@@ -90,7 +90,7 @@ export const DOCUMENTS_CONFIG: Record<EntityType, DocumentConfig> = {
         entityNameSingular: "transportadora",
     },
     motorista: {
-        bucket: "driver-documents",
+        bucket: "documentos-motorista",
         endpoint: "/api/admin/drivers",
         table: "gf_motorista_documents",
         foreignKey: "motorista_id",
@@ -105,7 +105,7 @@ export const DOCUMENTS_CONFIG: Record<EntityType, DocumentConfig> = {
         entityNameSingular: "motorista",
     },
     veiculo: {
-        bucket: "vehicle-documents",
+        bucket: "documentos-veiculo",
         endpoint: "/api/admin/vehicles",
         table: "gf_veiculo_documents",
         foreignKey: "veiculo_id",
@@ -120,7 +120,7 @@ export const DOCUMENTS_CONFIG: Record<EntityType, DocumentConfig> = {
         entityNameSingular: "veículo",
     },
     company: {
-        bucket: "company-documents",
+        bucket: "documentos-empresa",
         endpoint: "/api/admin/companies",
         table: "gf_company_documents",
         foreignKey: "company_id",

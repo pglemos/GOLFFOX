@@ -37,7 +37,7 @@ Foi implementada a versão completa (100%) do Painel da Transportadora (transpor
 - ✅ Função `get_trip_passenger_count()` para contar passageiros
 
 #### v54_carrier_storage_setup.sql
-- ✅ Políticas RLS para bucket `transportadora-documents` no Supabase Storage
+- ✅ Políticas RLS para bucket `documentos-transportadora` no Supabase Storage
 - ✅ Acesso restrito por transportadora
 - ✅ Suporte a 3 pastas: `motorista-documents`, `veiculo-documents`, `medical-exams`
 
@@ -258,7 +258,7 @@ Execute as migrations na ordem no Supabase SQL Editor:
 ### 2. Configurar Supabase Storage
 1. Acesse: https://app.supabase.com
 2. Vá em: Storage → Buckets → New Bucket
-3. Nome: `transportadora-documents`
+3. Nome: `documentos-transportadora`
 4. Public: `false`
 5. File size limit: `10 MB`
 6. Allowed MIME types: `image/jpeg, image/png, application/pdf`

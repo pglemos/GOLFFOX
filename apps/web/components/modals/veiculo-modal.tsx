@@ -139,7 +139,7 @@ export function VeiculoModal({ veiculo, isOpen, onClose, onSave, carriers }: Vei
     try {
       const form = new FormData()
       form.append('file', photoFile)
-      form.append('bucket', 'veiculo-photos')
+      form.append('bucket', 'fotos-veiculo')
       form.append('folder', 'veiculos')
       form.append('entityId', vehicleId)
 

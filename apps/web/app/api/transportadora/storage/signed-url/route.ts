@@ -85,7 +85,7 @@ export async function POST(req: NextRequest) {
 
     // Criar URL assinada válida por 1 hora
     const { data, error } = await supabaseServiceRole.storage
-      .from('transportadora-documents')
+      .from('documentos-transportadora')
       .createSignedUrl(file_path, 3600) // 1 hora
 
     if (error) {

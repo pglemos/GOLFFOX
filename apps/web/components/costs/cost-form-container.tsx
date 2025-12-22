@@ -104,7 +104,8 @@ export function CostFormContainer({
         try {
             const formData = new FormData()
             formData.append('file', file)
-            formData.append('folder', 'costs')
+            formData.append('bucket', 'custos')
+            formData.append('folder', 'custos')
 
             const response = await fetch('/api/upload', {
                 method: 'POST',

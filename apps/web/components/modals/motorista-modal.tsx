@@ -230,8 +230,8 @@ export function MotoristaModal({ motorista, isOpen, onClose, onSave, carriers = 
     try {
       const form = new FormData()
       form.append('file', file)
-      form.append('bucket', 'driver-documents')
-      form.append('folder', 'driver-documents')
+      form.append('bucket', 'documentos-motorista')
+      form.append('folder', 'documentos-motorista')
       form.append('entityId', motorista.id)
 
       const response = await fetch('/api/upload', {

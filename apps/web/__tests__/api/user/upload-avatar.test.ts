@@ -24,11 +24,11 @@ describe('POST /api/user/upload-avatar', () => {
     mockSupabaseClient.storage = {
       from: jest.fn(() => ({
         upload: jest.fn().mockResolvedValue({
-          data: { path: 'avatars/user-1-1234567890.jpg' },
+          data: { path: 'avatares/user-1-1234567890.jpg' },
           error: null,
         }),
         getPublicUrl: jest.fn().mockReturnValue({
-          data: { publicUrl: 'https://storage.example.com/avatars/user-1-1234567890.jpg' },
+          data: { publicUrl: 'https://storage.example.com/avatares/user-1-1234567890.jpg' },
         }),
       })),
     }

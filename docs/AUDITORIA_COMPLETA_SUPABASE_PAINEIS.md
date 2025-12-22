@@ -45,11 +45,11 @@ Esta auditoria verificou a estrutura do Supabase (banco de dados, storage, polí
 - ✅ Políticas para `trips` - OK (Service role, role-based access)
 
 **Políticas de Storage:**
-- ✅ `avatars` bucket - 4 políticas criadas:
-  - `Users can upload avatars` (INSERT)
-  - `Users can update avatars` (UPDATE)
-  - `Anyone can read avatars` (SELECT - bucket público)
-  - `Users can delete avatars` (DELETE)
+- ✅ `avatares` bucket - 4 políticas criadas:
+  - `Users can upload avatares` (INSERT)
+  - `Users can update avatares` (UPDATE)
+  - `Anyone can read avatares` (SELECT - bucket público)
+  - `Users can delete avatares` (DELETE)
 
 ### 1.4 Extensões Instaladas
 **Status: ✅ OK**
@@ -87,18 +87,18 @@ Esta auditoria verificou a estrutura do Supabase (banco de dados, storage, polí
 
 **Total de buckets:** 3 buckets
 
-1. ✅ **`avatars`** - **RECENTE**
+1. ✅ **`avatares`** - **RECENTE**
    - Público: `true`
    - Limite: `5MB` (5.242.880 bytes)
    - Tipos MIME: `image/jpeg`, `image/jpg`, `image/png`, `image/webp`
    - Políticas RLS: 4 políticas ativas
 
-2. ✅ **`transportadora-documents`**
+2. ✅ **`documentos-transportadora`**
    - Público: `false`
    - Limite: `10MB` (10.485.760 bytes)
    - Tipos MIME: `image/jpeg`, `image/png`, `application/pdf`
 
-3. ✅ **`veiculo-photos`**
+3. ✅ **`fotos-veiculo`**
    - Público: `true`
    - Limite: `null` (sem limite configurado)
    - Tipos MIME: `null` (sem restrição)
@@ -106,9 +106,9 @@ Esta auditoria verificou a estrutura do Supabase (banco de dados, storage, polí
 ### 2.2 Políticas de Storage
 **Status: ✅ OK**
 
-- ✅ Políticas para `avatars` - 4 políticas criadas e ativas
-- ✅ Políticas para `transportadora-documents` - Políticas existentes
-- ⚠️ **Recomendação:** Verificar políticas para `veiculo-photos` se necessário
+- ✅ Políticas para `avatares` - 4 políticas criadas e ativas
+- ✅ Políticas para `documentos-transportadora` - Políticas existentes
+- ⚠️ **Recomendação:** Verificar políticas para `fotos-veiculo` se necessário
 
 ---
 
@@ -283,7 +283,7 @@ Nenhum problema crítico identificado.
    - **Ação:** Considerar remover completamente ou manter para uso futuro
    - **Prioridade:** Baixa
 
-2. ⚠️ **Bucket `veiculo-photos` sem limite de tamanho**
+2. ⚠️ **Bucket `fotos-veiculo` sem limite de tamanho**
    - **Status:** Limite configurado como `null`
    - **Ação:** Considerar definir limite (ex: 10MB)
    - **Prioridade:** Baixa
@@ -305,11 +305,11 @@ Nenhum problema crítico identificado.
    ]
    ```
 
-2. 💡 **Definir limite para bucket `veiculo-photos`**
+2. 💡 **Definir limite para bucket `fotos-veiculo`**
    ```sql
    UPDATE storage.buckets 
    SET file_size_limit = 10485760 
-   WHERE id = 'veiculo-photos';
+   WHERE id = 'fotos-veiculo';
    ```
 
 3. 💡 **Remover página `/admin/sincronizacao` se não for mais usada**
@@ -328,7 +328,7 @@ Nenhum problema crítico identificado.
 ### 8.1 Upload de Avatar
 **Status: ✅ FUNCIONANDO**
 
-- ✅ Bucket `avatars` criado
+- ✅ Bucket `avatares` criado
 - ✅ Coluna `avatar_url` adicionada
 - ✅ Políticas RLS criadas
 - ✅ API route `/api/user/upload-avatar` funcionando
@@ -355,7 +355,7 @@ Nenhum problema crítico identificado.
 
 ### 9.2 Storage
 - **Buckets:** 3
-- **Políticas de Storage:** 4+ (para avatars)
+- **Políticas de Storage:** 4+ (para avatares)
 
 ### 9.3 Frontend
 - **Páginas Admin:** 19
@@ -391,7 +391,7 @@ Nenhum problema crítico identificado.
 
 **Recomendações:**
 1. Adicionar proteção explícita para `/transportadora` no middleware (opcional)
-2. Definir limite para bucket `veiculo-photos` (opcional)
+2. Definir limite para bucket `fotos-veiculo` (opcional)
 3. Considerar remover página `/admin/sincronizacao` se não for mais usada (opcional)
 
 **Próximos passos sugeridos:**

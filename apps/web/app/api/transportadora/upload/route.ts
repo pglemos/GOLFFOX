@@ -79,7 +79,7 @@ export async function POST(req: NextRequest) {
 
     // Upload para Supabase Storage
     const { data: uploadData, error: uploadError } = await supabaseServiceRole.storage
-      .from('transportadora-documents')
+      .from('documentos-transportadora')
       .upload(filePath, buffer, {
         contentType: file.type,
         cacheControl: '3600',
@@ -96,11 +96,11 @@ export async function POST(req: NextRequest) {
     // Obter URL assinada (bucket é privado)
     // A URL será acessível via Supabase Storage com autenticação
     const baseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
-    const publicUrl = `${baseUrl}/storage/v1/object/transportadora-documents/${filePath}`
+    const publicUrl = `${baseUrl}/storage/v1/object/documentos-transportadora/${filePath}`
 
     // Também criar URL assinada válida por 1 ano para acesso direto
     const { data: signedUrlData } = await supabaseServiceRole.storage
-      .from('transportadora-documents')
+      .from('documentos-transportadora')
       .createSignedUrl(filePath, 31536000) // 1 ano em segundos
 
     return NextResponse.json({

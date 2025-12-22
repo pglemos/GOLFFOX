@@ -54,7 +54,7 @@ ORDER BY viewname;
 3. Vá em: **Storage** → **Buckets**
 4. Clique em **New Bucket**
 5. Configure:
-   - **Name:** `transportadora-documents`
+   - **Name:** `documentos-transportadora`
    - **Public bucket:** ❌ **DESABILITADO** (deixe desmarcado - bucket privado)
    - **File size limit:** `10 MB` (ou maior se necessário)
    - **Allowed MIME types:** `image/jpeg,image/png,application/pdf`

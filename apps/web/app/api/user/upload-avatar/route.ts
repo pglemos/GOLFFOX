@@ -48,11 +48,11 @@ export async function POST(req: NextRequest) {
     // Upload para storage
     const fileExt = file.name.split('.').pop()
     const fileName = `${userId}-${Date.now()}.${fileExt}`
-    const filePath = `avatars/${fileName}`
+    const filePath = `avatares/${fileName}`
 
     // Criar bucket se não existir (via SQL se necessário)
     const { error: uploadError } = await supabase.storage
-      .from('avatars')
+      .from('avatares')
       .upload(filePath, buffer, {
         contentType: file.type,
         upsert: true
@@ -61,14 +61,14 @@ export async function POST(req: NextRequest) {
     if (uploadError) {
       // Se o bucket não existir, informar ao usuário
       if (uploadError.message.includes('Bucket not found') || uploadError.message.includes('not found') || (uploadError as any).statusCode === '404') {
-        throw new Error('Bucket de avatares não encontrado. Por favor, crie o bucket "avatars" no Supabase Storage primeiro.')
+        throw new Error('Bucket de avatares não encontrado. Por favor, crie o bucket "avatares" no Supabase Storage primeiro.')
       }
       throw uploadError
     }
 
     // Obter URL pública com timestamp para evitar cache
     const { data: { publicUrl } } = supabase.storage
-      .from('avatars')
+      .from('avatares')
       .getPublicUrl(filePath)
 
     // Adicionar timestamp à URL para evitar cache do navegador

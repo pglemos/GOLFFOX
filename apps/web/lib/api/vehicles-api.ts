@@ -56,7 +56,7 @@ export async function uploadVehiclePhoto(
   try {
     const form = new FormData()
     form.append('file', file)
-    form.append('bucket', 'veiculo-photos')
+    form.append('bucket', 'fotos-veiculo')
     form.append('folder', 'veiculos')
     form.append('entityId', vehicleId)
 

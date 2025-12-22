@@ -8,13 +8,13 @@ export const runtime = 'nodejs'
 
 // Buckets permitidos (devem corresponder aos buckets criados no Supabase Storage)
 const ALLOWED_BUCKETS = [
-    'vehicle-documents',
-    'driver-documents',
-    'carrier-documents',
-    'company-documents',
-    'vehicle-photos',
-    'avatars',
-    'costs'
+    'documentos-veiculo',
+    'documentos-motorista',
+    'documentos-transportadora',
+    'documentos-empresa',
+    'fotos-veiculo',
+    'avatares',
+    'custos'
 ]
 
 export async function POST(request: NextRequest) {
