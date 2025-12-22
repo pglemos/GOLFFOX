@@ -5,7 +5,7 @@
 
 import { useState, useCallback, useRef } from 'react'
 import { supabase } from '@/lib/supabase'
-import { loadVehicles } from '@/lib/map-services/vehicle-loader'
+import { loadVehicles } from '@/lib/services/map/map-services/vehicle-loader'
 import { isValidCoordinate, normalizeCoordinate } from '@/lib/coordinate-validator'
 import { debug, warn, error as logError } from '@/lib/logger'
 import { notifySuccess } from '@/lib/toast'

@@ -7,9 +7,9 @@
 
 import { NextRequest } from 'next/server'
 import { createClient, SupabaseClient } from '@supabase/supabase-js'
-import { supabaseServiceRole } from './supabase-server'
-import type { AuthenticatedUser } from './api-auth'
-import { validateAuth } from './api-auth'
+import { supabaseServiceRole } from '@/lib/supabase-server'
+import type { AuthenticatedUser } from '@/lib/api-auth'
+import { validateAuth } from '@/lib/api-auth'
 import { getSupabaseUrl, getSupabaseAnonKey, getSupabaseServiceKey } from '@/lib/env'
 import type { Database } from '@/types/supabase'
 

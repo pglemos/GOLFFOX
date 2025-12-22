@@ -17,7 +17,7 @@ import {
   isValidCoordinate, 
   normalizeCoordinate 
 } from '@/lib/coordinate-validator'
-import { loadVehicles } from '@/lib/map-services/vehicle-loader'
+import { loadVehicles } from '@/lib/services/map/map-services/vehicle-loader'
 import { TrajectoryPanel } from './trajectory-panel'
 import { MapFilters } from './filters'
 import { MapLayers } from './layers'

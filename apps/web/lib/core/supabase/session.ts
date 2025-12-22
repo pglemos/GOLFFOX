@@ -5,7 +5,7 @@ import { supabase } from '@/lib/supabase'
 
 let bootstrapPromise: Promise<Session | null> | null = null
 
-function getAccessTokenFromGolffoxCookie(): string | null {
+export function getAccessTokenFromGolffoxCookie(): string | null {
   if (typeof document === 'undefined') return null
 
   const match = document.cookie.match(/(?:^|;\\s*)golffox-session=([^;]+)/)
