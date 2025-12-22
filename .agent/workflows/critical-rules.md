@@ -30,3 +30,12 @@ O sistema do usuário (Windows 10 24H2) tem incompatibilidade com o binário SWC
 - React: 19.x
 - Node.js: 22.x
 - Supabase: @supabase/supabase-js
+
+## 5. PROCESSOS DE CORREÇÃO E DEPLOY
+> [!IMPORTANT]
+> **SEMPRE EXECUTAR APÓS CORREÇÕES**
+> Sempre que realizar uma correção no código:
+> 1. Subir as alterações para o GitHub
+> 2. Realizar o deploy no Vercel
+> 3. Verificar em produção se a correção foi efetiva
+> 4. SOMENTE após a verificação em produção, considerar a tarefa concluída
