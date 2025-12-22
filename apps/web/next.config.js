@@ -8,12 +8,15 @@ let nextConfig = {
   allowedDevOrigins: ['*.replit.dev', '*.replit.app', '*.picard.replit.dev'],
   // Corrigir warning sobre múltiplos lockfiles
   outputFileTracingRoot: path.join(__dirname, '../../'),
-  // Logs detalhados de requisições de dados (fetch)
-  logging: {
+  // Logs detalhados de requisições de dados (fetch) - desabilitado em produção para performance
+  logging: isProd ? undefined : {
     fetches: {
       fullUrl: true,
     },
   },
+  // Otimizações de build
+  swcMinify: true, // Usar SWC para minificação (mais rápido)
+  compress: true, // Habilitar compressão gzip
   typescript: {
     // ⚠️ ATENÇÃO: ignoreBuildErrors está habilitado temporariamente
     // Estado atual: ~154 erros TypeScript restantes (principalmente tipos Supabase e Next.js 16)
@@ -46,14 +49,16 @@ let nextConfig = {
       '@googlemaps/js-api-loader',
       '@react-google-maps/api',
     ],
+    // Otimizações de build
+    optimizeCss: true, // Otimizar CSS durante build
     // instrumentationHook não é mais necessário no Next.js 16.1.0+
     // O arquivo instrumentation.ts é detectado automaticamente
     // Turbopack: Habilitado via flag --turbo nos scripts do package.json
     // Configurações do Turbopack são aplicadas automaticamente quando --turbo é usado
   },
 
-  // Configuração webpack para resolver problema ESM do Supabase
-  webpack: (config) => {
+  // Configuração webpack para resolver problema ESM do Supabase e otimizar build
+  webpack: (config, { dev, isServer }) => {
     // Workaround (Windows + SWC WASM + webpack):
     // Alguns módulos CJS do próprio Next (dist/client/components) são analisados
     // pelo webpack como ESM e acabam sendo empacotados sem `exports`, quebrando
@@ -63,6 +68,48 @@ let nextConfig = {
       ...config.resolve.alias,
       '@supabase/supabase-js': require.resolve('@supabase/supabase-js'),
     }
+    
+    // Otimizações de build em produção
+    if (!dev && !isServer) {
+      // Otimizar cache de módulos
+      config.cache = {
+        type: 'filesystem',
+        buildDependencies: {
+          config: [__filename],
+        },
+      }
+      
+      // Reduzir tamanho do bundle
+      config.optimization = {
+        ...config.optimization,
+        moduleIds: 'deterministic',
+        runtimeChunk: 'single',
+        splitChunks: {
+          chunks: 'all',
+          cacheGroups: {
+            default: false,
+            vendors: false,
+            // Vendor chunk para bibliotecas grandes
+            vendor: {
+              name: 'vendor',
+              chunks: 'all',
+              test: /node_modules/,
+              priority: 20,
+            },
+            // Chunk separado para commons
+            common: {
+              name: 'common',
+              minChunks: 2,
+              chunks: 'all',
+              priority: 10,
+              reuseExistingChunk: true,
+              enforce: true,
+            },
+          },
+        },
+      }
+    }
+    
     return config
   },
 
