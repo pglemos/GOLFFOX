@@ -66,14 +66,10 @@ export async function GET(request: NextRequest) {
 
     const { count } = await countQuery
 
-    return successResponse({
-      data: data || [],
-      pagination: {
-        page,
-        limit,
-        total: count || 0,
-        totalPages: Math.ceil((count || 0) / limit),
-      },
+    return successResponse(data || [], 200, {
+      count: count || 0,
+      limit,
+      offset
     })
   } catch (error) {
     logError('Erro ao listar transportadoras', { error }, 'TransportadorasAPI')

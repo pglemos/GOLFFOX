@@ -35,10 +35,10 @@ function isAllowedForRole(role: string, path: string): boolean {
 
   if (path.startsWith('/admin')) return normalizedRole === 'admin'
   // gestor_empresa = Gestor da Empresa Contratante
-  if (path.startsWith('/empresa')) return ['admin', 'gestor_empresa', 'empresa'].includes(normalizedRole)
+  if (path.startsWith('/empresa')) return ['admin', 'gestor_empresa', 'gestor_empresa'].includes(normalizedRole)
   // gestor_transportadora = Gestor da Transportadora
   // Compatibilidade temporária: operador e transportadora também permitidos
-  if (path.startsWith('/transportadora')) return ['admin', 'gestor_transportadora', 'operador', 'transportadora'].includes(normalizedRole)
+  if (path.startsWith('/transportadora')) return ['admin', 'gestor_transportadora', 'gestor_empresa', 'gestor_transportadora'].includes(normalizedRole)
   return true
 }
 
@@ -54,10 +54,10 @@ function getRedirectPath(role: string): string {
     case 'gestor_transportadora':
       return '/transportadora'
     // Compatibilidade temporária com roles antigas
-    case 'empresa':
+    case 'gestor_empresa':
       return '/empresa'
-    case 'operador':
-    case 'transportadora':
+    case 'gestor_empresa':
+    case 'gestor_transportadora':
       return '/transportadora'
     default:
       return '/'
@@ -462,7 +462,7 @@ async function loginHandler(req: NextRequest) {
 
     let companyId: string | null = finalUser.company_id || null
     // Verificar se é gestor_transportadora (ou operador legado) que precisa de empresa associada
-    if (role === 'gestor_transportadora' || role === 'operador') {
+    if (role === 'gestor_transportadora' || role === 'gestor_empresa') {
       try {
         // ✅ Usar supabaseAdmin para bypassar RLS
         let supabaseAdminForCheck
@@ -510,7 +510,7 @@ async function loginHandler(req: NextRequest) {
       role,
       companyId: companyId || undefined,
       company_id: companyId || undefined, // Adicionar snake_case para compatibilidade com testes
-      transportadoraId: (role === 'gestor_transportadora' || role === 'transportadora') ? transportadoraId : undefined,
+      transportadoraId: (role === 'gestor_transportadora' || role === 'gestor_transportadora') ? transportadoraId : undefined,
       avatar_url: finalUser?.avatar_url || null,
     }
 

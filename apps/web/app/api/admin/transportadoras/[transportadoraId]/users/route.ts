@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseServiceRole } from '@/lib/supabase-server'
 import { requireAuth } from '@/lib/api-auth'
+import { successResponse, errorResponse, validationErrorResponse } from '@/lib/api-response'
 
 export const runtime = 'nodejs'
 
@@ -17,48 +18,33 @@ export async function OPTIONS() {
 
 export async function GET(
   req: NextRequest,
-  context: { params: Promise<{ transportadoraId?: string; carrierId?: string }> }
+  context: { params: Promise<{ transportadoraId: string }> }
 ) {
-  const params = await context.params
-
   try {
+    const { transportadoraId } = await context.params
     const authErrorResponse = await requireAuth(req, 'admin')
     if (authErrorResponse) return authErrorResponse
 
-    const transportadoraId = params.transportadoraId || params.carrierId
     if (!transportadoraId) {
-      return NextResponse.json(
-        { success: false, error: 'ID da transportadora não fornecido' },
-        { status: 400 }
-      )
+      return validationErrorResponse('ID da transportadora não fornecido')
     }
 
-    // Selecionar apenas colunas necessárias para listagem (otimização de performance)
+    // Selecionar apenas colunas necessárias para listagem
     const userColumns = 'id,email,name,role,transportadora_id,is_active,created_at,updated_at'
     const { data, error } = await supabaseServiceRole
       .from('users')
       .select(userColumns)
       .eq('transportadora_id', transportadoraId)
-      .eq('role', 'transportadora')
+      .eq('role', 'gestor_transportadora')
       .order('name', { ascending: true })
 
     if (error) {
-      return NextResponse.json(
-        { success: false, error: 'Erro ao buscar usuários', message: error.message },
-        { status: 500 }
-      )
+      return errorResponse(error, 500, 'Erro ao buscar usuários')
     }
 
-    return NextResponse.json({
-      success: true,
-      users: data || []
-    })
+    return successResponse(data || [])
   } catch (err) {
-    const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'
-    return NextResponse.json(
-      { success: false, error: 'Erro ao processar requisição', message: errorMessage },
-      { status: 500 }
-    )
+    return errorResponse(err, 500, 'Erro ao processar requisição')
   }
 }
 

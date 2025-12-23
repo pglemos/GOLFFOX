@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
 
     // Se é operador, usar o company_id dele se não fornecido
     let finalCompanyId = companyId
-    if (!finalCompanyId && (authenticatedUser.role === 'gestor_transportadora' || authenticatedUser.role === 'operador')) {
+    if (!finalCompanyId && (authenticatedUser.role === 'gestor_transportadora' || authenticatedUser.role === 'gestor_empresa')) {
       finalCompanyId = authenticatedUser.companyId || null
       
       // Se ainda não tem, buscar do banco

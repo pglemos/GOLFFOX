@@ -172,7 +172,7 @@ function distance(a: { lat: number; lng: number }, b: { lat: number; lng: number
 
 export async function POST(request: NextRequest) {
   // Verificar autenticação (admin ou empresa podem otimizar rotas)
-  const authError = await requireAuth(request, ['admin', 'gestor_empresa', 'empresa', 'gestor_transportadora', 'operador'])
+  const authError = await requireAuth(request, ['admin', 'gestor_empresa', 'gestor_empresa', 'gestor_transportadora', 'gestor_empresa'])
   if (authError) return authError
 
   try {

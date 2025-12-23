@@ -1,4 +1,4 @@
-import { GET } from '@/app/api/transportadora/alerts/route'
+import { GET } from '@/app/api/transportadora/alertas/route'
 import { createTransportadoraRequest } from '../../helpers/api-test-helpers'
 import { mockSupabaseClient } from '../../helpers/mock-supabase'
 import { createTestUser, createTestTransportadora } from '../../helpers/test-data'
@@ -28,7 +28,7 @@ jest.mock('@/lib/api-auth', () => ({
   }),
 }))
 
-describe('GET /api/transportadora/alerts', () => {
+describe('GET /api/transportadora/alertas', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockSupabaseClient.clear()
@@ -79,7 +79,7 @@ describe('GET /api/transportadora/alerts', () => {
 
     const req = createTransportadoraRequest({
       method: 'GET',
-      url: 'http://localhost:3000/api/transportadora/alerts?alert_level=critical',
+      url: 'http://localhost:3000/api/transportadora/alertas?alert_level=critical',
     }) as NextRequest
 
     const response = await GET(req)

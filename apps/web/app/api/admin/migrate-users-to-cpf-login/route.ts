@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
         const { data: users, error: usersError } = await supabase
             .from('users')
             .select('id, email, cpf, role, name')
-            .in('role', ['motorista', 'motorista', 'passageiro', 'passageiro', 'funcionario', 'operador'])
+            .in('role', ['motorista', 'motorista', 'passageiro', 'passageiro', 'funcionario', 'gestor_empresa'])
             .not('cpf', 'is', null)
 
         if (usersError) {
@@ -128,7 +128,7 @@ export async function GET(request: NextRequest) {
         const { data: users, error } = await supabase
             .from('users')
             .select('id, email, cpf, role, name')
-            .in('role', ['motorista', 'motorista', 'passageiro', 'passageiro', 'funcionario', 'operador'])
+            .in('role', ['motorista', 'motorista', 'passageiro', 'passageiro', 'funcionario', 'gestor_empresa'])
 
         if (error) {
             return NextResponse.json({ error: error.message }, { status: 500 })

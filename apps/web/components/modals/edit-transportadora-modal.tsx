@@ -81,7 +81,7 @@ export function EditCarrierModal({ transportadora, isOpen, onClose, onSave }: Ed
         return
       }
 
-      const response = await fetch(`/api/admin/transportadora/update?id=${transportadora.id}`, {
+      const response = await fetch(`/api/admin/transportadoras/update?id=${transportadora.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

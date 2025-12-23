@@ -87,7 +87,7 @@ export async function POST(req: NextRequest) {
 
     logger.debug('[CREATE transportadora] Success! transportadora created:', (data as any).id)
 
-    return successResponse({ transportadora: data })
+    return successResponse(data)
   } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return validationErrorResponse('Dados inválidos', { details: error.errors })

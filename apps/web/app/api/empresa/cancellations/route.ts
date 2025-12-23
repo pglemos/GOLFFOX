@@ -6,7 +6,7 @@ import { requireAuth } from '@/lib/api-auth';
 // GET /api/empresa/cancellations - Não-embarques dos funcionários
 export async function GET(request: NextRequest) {
     // Verificar autenticação (empresa ou admin)
-    const authError = await requireAuth(request, ['admin', 'gestor_empresa', 'empresa', 'gestor_transportadora', 'operador'])
+    const authError = await requireAuth(request, ['admin', 'gestor_empresa', 'gestor_empresa', 'gestor_transportadora', 'gestor_empresa'])
     if (authError) return authError
 
     try {

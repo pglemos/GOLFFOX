@@ -6,7 +6,7 @@ import { requireAuth } from '@/lib/api-auth';
 // GET /api/transportadora/messages - Listar mensagens dos motoristas
 export async function GET(request: NextRequest) {
     // Verificar autenticação (transportadora)
-    const authError = await requireAuth(request, ['admin', 'gestor_transportadora', 'operador', 'transportadora'])
+    const authError = await requireAuth(request, ['admin', 'gestor_transportadora', 'gestor_empresa', 'gestor_transportadora'])
     if (authError) return authError
 
     try {
@@ -71,7 +71,7 @@ export async function GET(request: NextRequest) {
 // POST /api/transportadora/messages - Enviar mensagem para motorista
 export async function POST(request: NextRequest) {
     // Verificar autenticação (transportadora)
-    const authError = await requireAuth(request, ['admin', 'gestor_transportadora', 'operador', 'transportadora'])
+    const authError = await requireAuth(request, ['admin', 'gestor_transportadora', 'gestor_empresa', 'gestor_transportadora'])
     if (authError) return authError
 
     try {
@@ -117,7 +117,7 @@ export async function POST(request: NextRequest) {
 // PUT /api/transportadora/messages - Marcar mensagens como lidas
 export async function PUT(request: NextRequest) {
     // Verificar autenticação (transportadora)
-    const authError = await requireAuth(request, ['admin', 'gestor_transportadora', 'operador', 'transportadora'])
+    const authError = await requireAuth(request, ['admin', 'gestor_transportadora', 'gestor_empresa', 'gestor_transportadora'])
     if (authError) return authError
 
     try {

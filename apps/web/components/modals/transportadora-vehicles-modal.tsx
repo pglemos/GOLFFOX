@@ -49,10 +49,10 @@ export function TransportadoraVehiclesModal({ transportadora, isOpen, onClose }:
   const loadVeiculos = async () => {
     try {
       setLoading(true)
-      const response = await fetch(`/api/admin/transportadora/${transportadora.id}/veiculos`)
+      const response = await fetch(`/api/admin/transportadoras/${transportadora.id}/veiculos`)
       if (response.ok) {
         const result = await response.json()
-        setVeiculos(result.veiculos || [])
+        setVeiculos(result.data || [])
       }
     } catch (error) {
       console.error('Erro ao carregar veículos:', error)
@@ -84,7 +84,7 @@ export function TransportadoraVehiclesModal({ transportadora, isOpen, onClose }:
     setLoading(true)
 
     try {
-      const response = await fetch(`/api/admin/transportadora/${transportadora.id}/veiculos`, {
+      const response = await fetch(`/api/admin/transportadoras/${transportadora.id}/veiculos`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -118,7 +118,7 @@ export function TransportadoraVehiclesModal({ transportadora, isOpen, onClose }:
     setLoading(true)
 
     try {
-      const response = await fetch(`/api/admin/transportadora/${transportadora.id}/veiculos/${editingVehicle.id}`, {
+      const response = await fetch(`/api/admin/transportadoras/${transportadora.id}/veiculos/${editingVehicle.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -152,7 +152,7 @@ export function TransportadoraVehiclesModal({ transportadora, isOpen, onClose }:
     setLoading(true)
 
     try {
-      const response = await fetch(`/api/admin/transportadora/${transportadora.id}/veiculos/${vehicleId}`, {
+      const response = await fetch(`/api/admin/transportadoras/${transportadora.id}/veiculos/${vehicleId}`, {
         method: 'DELETE'
       })
 

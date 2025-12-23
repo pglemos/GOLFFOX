@@ -42,7 +42,7 @@ export default function TransportadorasPage() {
       }
       const result = await response.json()
       if (result.success) {
-        setCarriers(result.carriers || [])
+        setCarriers(result.data || [])
       } else {
         throw new Error(result.error || 'Erro ao carregar transportadoras')
       }
@@ -61,7 +61,7 @@ export default function TransportadorasPage() {
     }
 
     try {
-      const response = await fetch(`/api/admin/transportadora/delete?id=${carrierId}`, {
+      const response = await fetch(`/api/admin/transportadoras/delete?id=${carrierId}`, {
         method: 'DELETE'
       })
 

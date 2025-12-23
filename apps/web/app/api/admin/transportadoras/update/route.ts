@@ -4,6 +4,7 @@ import { requireAuth } from '@/lib/api-auth'
 import { z } from 'zod'
 import { CarrierUpdate } from '@/types/carrier'
 import { invalidateEntityCache } from '@/lib/next-cache'
+import { successResponse, errorResponse, validationErrorResponse } from '@/lib/api-response'
 
 export const runtime = 'nodejs'
 
@@ -61,10 +62,7 @@ export async function PUT(req: NextRequest) {
 
     const carrierId = req.nextUrl.searchParams.get('id')
     if (!carrierId) {
-      return NextResponse.json(
-        { success: false, error: 'ID da transportadora não fornecido' },
-        { status: 400 }
-      )
+      return validationErrorResponse('ID da transportadora não fornecido')
     }
 
     const body = await req.json()
@@ -109,30 +107,17 @@ export async function PUT(req: NextRequest) {
       .single())
 
     if (error) {
-      return NextResponse.json(
-        { success: false, error: 'Erro ao atualizar transportadora', message: error.message },
-        { status: 500 }
-      )
+      return errorResponse(error, 500, 'Erro ao atualizar transportadora')
     }
 
     // Invalidar cache após atualização
-    await invalidateEntityCache('transportadora', carrierId)
+    await invalidateEntityCache('gestor_transportadora', carrierId)
 
-    return NextResponse.json({
-      success: true,
-      transportadora: data
-    })
+    return successResponse(data)
   } catch (error: unknown) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json(
-        { success: false, error: 'Dados inválidos', details: error.errors },
-        { status: 400 }
-      )
+      return validationErrorResponse('Dados inválidos', { details: error.errors })
     }
-    const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido ao processar requisição'
-    return NextResponse.json(
-      { success: false, error: 'Erro ao processar requisição', message: errorMessage },
-      { status: 500 }
-    )
+    return errorResponse(error, 500, 'Erro ao processar requisição')
   }
 }

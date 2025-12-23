@@ -3,6 +3,7 @@ import { getSupabaseAdmin } from '@/lib/supabase-client'
 import { requireAuth } from '@/lib/api-auth'
 import { logger, logError } from '@/lib/logger'
 import { invalidateEntityCache } from '@/lib/next-cache'
+import { successResponse, errorResponse, notFoundResponse, validationErrorResponse } from '@/lib/api-response'
 
 export const runtime = 'nodejs'
 
@@ -18,16 +19,14 @@ export async function OPTIONS() {
 }
 
 export async function DELETE(req: NextRequest) {
+  let carrierId: string | null = null
   try {
     const authErrorResponse = await requireAuth(req, 'admin')
     if (authErrorResponse) return authErrorResponse
 
-    const carrierId = req.nextUrl.searchParams.get('id')
+    carrierId = req.nextUrl.searchParams.get('id')
     if (!carrierId) {
-      return NextResponse.json(
-        { success: false, error: 'ID da transportadora não fornecido' },
-        { status: 400 }
-      )
+      return validationErrorResponse('ID da transportadora não fornecido')
     }
 
     const supabase = getSupabaseAdmin()
@@ -40,10 +39,7 @@ export async function DELETE(req: NextRequest) {
       .single())
 
     if (carrierError || !transportadora) {
-      return NextResponse.json(
-        { success: false, error: 'Transportadora não encontrada', message: carrierError?.message },
-        { status: 404 }
-      )
+      return notFoundResponse('Transportadora não encontrada')
     }
 
     // 1. Remover referências de users (setar transportadora_id como NULL)
@@ -54,15 +50,7 @@ export async function DELETE(req: NextRequest) {
 
     if (usersError) {
       logError('Erro ao atualizar users', { error: usersError, carrierId }, 'TransportadorasDeleteAPI')
-      return NextResponse.json(
-        {
-          success: false,
-          error: 'Erro ao remover referências de usuários',
-          message: usersError.message,
-          details: 'Não foi possível atualizar os usuários relacionados à transportadora'
-        },
-        { status: 500 }
-      )
+      return errorResponse(usersError, 500, 'Erro ao remover referências de usuários')
     }
 
     // 2. Remover referências de veiculos (setar transportadora_id como NULL)
@@ -73,18 +61,10 @@ export async function DELETE(req: NextRequest) {
 
     if (vehiclesError) {
       logError('Erro ao atualizar veiculos', { error: vehiclesError, carrierId }, 'TransportadorasDeleteAPI')
-      return NextResponse.json(
-        {
-          success: false,
-          error: 'Erro ao remover referências de veículos',
-          message: vehiclesError.message,
-          details: 'Não foi possível atualizar os veículos relacionados à transportadora'
-        },
-        { status: 500 }
-      )
+      return errorResponse(vehiclesError, 500, 'Erro ao remover referências de veículos')
     }
 
-    // 3. Excluir rotas relacionadas (routes.transportadora_id é NOT NULL, então precisamos excluir)
+    // 3. Excluir rotas relacionadas
     const { error: routesError } = await supabase
       .from('routes')
       .delete()
@@ -92,41 +72,24 @@ export async function DELETE(req: NextRequest) {
 
     if (routesError) {
       logError('Erro ao excluir routes', { error: routesError, carrierId }, 'TransportadorasDeleteAPI')
-      return NextResponse.json(
-        {
-          success: false,
-          error: 'Erro ao excluir rotas relacionadas',
-          message: routesError.message,
-          details: 'Não foi possível excluir as rotas relacionadas à transportadora'
-        },
-        { status: 500 }
-      )
+      return errorResponse(routesError, 500, 'Erro ao excluir rotas relacionadas')
     }
 
-    // 4. Verificar se há outras tabelas com referências (ex: costs, se existir)
+    // 4. Verificar se há outras tabelas com referências
     try {
-      // @ts-ignore - Supabase type inference issue
       const { data: costsData, error: costsCheckError } = await (supabase
         .from('costs' as any)
         .select('id')
         .eq('transportadora_id', carrierId)
         .limit(1) as any)
 
-      // Se a tabela existir e houver registros, remover referências
       if (!costsCheckError && costsData && costsData.length > 0) {
-        // @ts-ignore - Supabase type inference issue
-        const { error: costsError } = await (supabase
+        await supabase
           .from('costs' as any)
           .update({ transportadora_id: null } as any)
-          .eq('transportadora_id', carrierId) as any)
-
-        if (costsError) {
-          logger.warn('Aviso ao atualizar costs (pode não existir):', costsError)
-          // Não falhar se a tabela não existir ou não tiver a coluna
-        }
+          .eq('transportadora_id', carrierId)
       }
     } catch (costsError: any) {
-      // Ignorar erros relacionados à tabela costs (pode não existir)
       logger.warn('Tabela costs não encontrada ou sem coluna transportadora_id, continuando...')
     }
 
@@ -138,30 +101,16 @@ export async function DELETE(req: NextRequest) {
 
     if (deleteError) {
       logError('Erro ao excluir transportadora', { error: deleteError, carrierId }, 'TransportadorasDeleteAPI')
-      return NextResponse.json(
-        {
-          success: false,
-          error: 'Erro ao excluir transportadora',
-          message: deleteError.message,
-          details: 'As referências foram removidas, mas houve erro ao excluir a transportadora'
-        },
-        { status: 500 }
-      )
+      return errorResponse(deleteError, 500, 'Erro ao excluir transportadora')
     }
 
     // Invalidar cache após exclusão
-    await invalidateEntityCache('transportadora', carrierId)
+    await invalidateEntityCache('gestor_transportadora', carrierId)
 
-    return NextResponse.json({
-      success: true,
-      message: 'Transportadora excluída com sucesso'
-    })
+    return successResponse({ message: 'Transportadora excluída com sucesso' })
   } catch (error: any) {
-    logError('Erro ao processar exclusão de transportadora', { error, carrierId: req.nextUrl.searchParams.get('id') }, 'TransportadorasDeleteAPI')
-    return NextResponse.json(
-      { success: false, error: 'Erro ao processar requisição', message: error.message },
-      { status: 500 }
-    )
+    logError('Erro ao processar exclusão de transportadora', { error, carrierId }, 'TransportadorasDeleteAPI')
+    return errorResponse(error, 500, 'Erro ao processar requisição')
   }
 }
 

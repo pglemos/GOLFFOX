@@ -4,7 +4,7 @@ import { getSupabaseAdmin } from '@/lib/supabase-client'
 
 export async function POST(request: NextRequest) {
   // Verificar autenticação (admin ou empresa)
-  const authError = await requireAuth(request, ['admin', 'gestor_empresa', 'empresa', 'gestor_transportadora', 'operador'])
+  const authError = await requireAuth(request, ['admin', 'gestor_empresa', 'gestor_empresa', 'gestor_transportadora', 'gestor_empresa'])
   if (authError) return authError
   try {
     const { email, companyId } = await request.json()

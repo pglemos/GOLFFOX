@@ -55,10 +55,10 @@ export function TransportadoraDriversModal({ transportadora, isOpen, onClose }: 
   const loadMotoristas = async () => {
     try {
       setLoading(true)
-      const response = await fetch(`/api/admin/transportadora/${transportadora.id}/motoristas`)
+      const response = await fetch(`/api/admin/transportadoras/${transportadora.id}/motoristas`)
       if (response.ok) {
         const result = await response.json()
-        setMotoristas(result.motoristas || [])
+        setMotoristas(result.data || [])
       } else {
         throw new Error('Erro ao carregar motoristas')
       }
@@ -116,7 +116,7 @@ export function TransportadoraDriversModal({ transportadora, isOpen, onClose }: 
         throw new Error("Endereço completo é obrigatório")
       }
 
-      const response = await fetch(`/api/admin/transportadora/${transportadora.id}/motoristas`, {
+      const response = await fetch(`/api/admin/transportadoras/${transportadora.id}/motoristas`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -148,7 +148,7 @@ export function TransportadoraDriversModal({ transportadora, isOpen, onClose }: 
     setLoading(true)
 
     try {
-      const response = await fetch(`/api/admin/transportadora/${transportadora.id}/motoristas/${editingDriver.id}`, {
+      const response = await fetch(`/api/admin/transportadoras/${transportadora.id}/motoristas/${editingDriver.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
@@ -178,7 +178,7 @@ export function TransportadoraDriversModal({ transportadora, isOpen, onClose }: 
     setLoading(true)
 
     try {
-      const response = await fetch(`/api/admin/transportadora/${transportadora.id}/motoristas/${driverId}`, {
+      const response = await fetch(`/api/admin/transportadoras/${transportadora.id}/motoristas/${driverId}`, {
         method: 'DELETE'
       })
 

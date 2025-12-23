@@ -33,10 +33,10 @@ export function TransportadoraUsersModal({ transportadora, isOpen, onClose, onSa
   const loadUsers = async () => {
     try {
       setLoading(true)
-      const response = await fetch(`/api/admin/transportadora/${transportadora.id}/users`)
+      const response = await fetch(`/api/admin/transportadoras/${transportadora.id}/users`)
       if (response.ok) {
         const result = await response.json()
-        setUsers(result.users || [])
+        setUsers(result.data || [])
       }
     } catch (error) {
       console.error('Erro ao carregar usuários:', error)

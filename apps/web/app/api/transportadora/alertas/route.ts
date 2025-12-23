@@ -1,43 +1,71 @@
-"use server"
+import { NextRequest, NextResponse } from 'next/server'
+import { supabaseServiceRole } from '@/lib/supabase-server'
+import { requireAuth, validateAuth } from '@/lib/api-auth'
+import { successResponse, errorResponse, unauthorizedResponse, forbiddenResponse } from '@/lib/api-response'
 
-import { NextResponse } from "next/server"
+export const runtime = 'nodejs'
 
-export async function GET() {
-    // Mock alerts data – replace with real Supabase query later
-    const alerts = [
-        {
-            id: "1",
-            type: "veiculo_parado",
-            title: "Veículo parado na rua 5",
-            description: "O veículo 1234 está parado há mais de 30 minutos.",
-            timestamp: new Date().toISOString(),
-            veiculo: "ABC-1234",
-            motorista: "Carlos Silva",
-            location: "Rua 5, Bairro Centro",
-            status: "pending",
+export async function OPTIONS() {
+    return new NextResponse(null, {
+        status: 200,
+        headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'GET, OPTIONS',
+            'Access-Control-Allow-Headers': 'Content-Type, Authorization',
         },
-        {
-            id: "2",
-            type: "critico",
-            title: "Falha no motor",
-            description: "Motorista relatou falha no motor do veículo 5678.",
-            timestamp: new Date().toISOString(),
-            veiculo: "DEF-5678",
-            motorista: "João Nunes",
-            location: "Avenida Principal",
-            status: "pending",
-        },
-        {
-            id: "3",
-            type: "aviso",
-            title: "Manutenção programada",
-            description: "Manutenção programada para o veículo 9012 amanhã.",
-            timestamp: new Date().toISOString(),
-            veiculo: "GHI-9012",
-            motorista: "Roberto Silva",
-            location: "Depósito",
-            status: "pending",
-        },
-    ]
-    return NextResponse.json({ alerts })
+    })
+}
+
+export async function GET(req: NextRequest) {
+    try {
+        const authErrorResponse = await requireAuth(req, 'gestor_transportadora')
+        if (authErrorResponse) return authErrorResponse
+
+        const user = await validateAuth(req)
+        if (!user) {
+            return unauthorizedResponse()
+        }
+
+        // Buscar transportadora_id do usuário
+        const { data: userData } = await supabaseServiceRole
+            .from('users')
+            .select('transportadora_id')
+            .eq('id', user.id)
+            .single()
+
+        if (!userData?.transportadora_id) {
+            return forbiddenResponse('Usuário não está associado a uma transportadora')
+        }
+
+        // Buscar alertas de vencimento
+        const alertLevel = req.nextUrl.searchParams.get('alert_level') || 'critical,warning'
+        const alertLevels = alertLevel.split(',')
+
+        // View materializada - selecionar todas as colunas
+        const { data, error } = await supabaseServiceRole
+            .from('v_carrier_expiring_documents')
+            .select('*')
+            .eq('transportadora_id', userData.transportadora_id)
+            .in('alert_level', alertLevels)
+            .order('days_to_expiry', { ascending: true })
+
+        if (error) {
+            return errorResponse(error, 500, 'Erro ao buscar alertas')
+        }
+
+        // Estatísticas
+        const stats = {
+            totalCount: data?.length || 0,
+            criticalCount: data?.filter(a => a.alert_level === 'critical').length || 0,
+            warningCount: data?.filter(a => a.alert_level === 'warning').length || 0,
+            expiredCount: data?.filter(a => a.alert_level === 'expired').length || 0,
+        }
+
+        return successResponse(data || [], 200, {
+            count: stats.totalCount,
+            ...stats as any
+        })
+    } catch (err) {
+        return errorResponse(err, 500, 'Erro ao processar requisição')
+    }
 }

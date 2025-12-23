@@ -35,16 +35,9 @@ export async function GET(req: NextRequest) {
       )
     }
 
-    return NextResponse.json({
-      success: true,
-      carriers: data || []
-    })
+    return successResponse(data || [])
   } catch (err) {
-    const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'
-    return NextResponse.json(
-      { success: false, error: 'Erro ao processar requisição', message: errorMessage },
-      { status: 500 }
-    )
+    return errorResponse(err, 500, 'Erro ao processar requisição')
   }
 }
 

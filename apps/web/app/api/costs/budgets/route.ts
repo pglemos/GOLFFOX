@@ -23,7 +23,7 @@ async function getBudgetsHandler(request: NextRequest) {
     const categoryId = searchParams.get('category_id')
 
     // ✅ Validar autenticação primeiro (admin pode listar sem company_id)
-    const authError = await requireAuth(request, ['admin', 'gestor_transportadora', 'operador'])
+    const authError = await requireAuth(request, ['admin', 'gestor_transportadora', 'gestor_empresa'])
     if (authError) {
       return authError
     }

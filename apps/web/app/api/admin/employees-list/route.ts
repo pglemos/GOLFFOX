@@ -53,7 +53,7 @@ export async function GET(request: NextRequest) {
       let usersQuery = supabaseAdmin
         .from('users')
         .select('id, name, email, phone, company_id, role, is_active', { count: 'exact' })
-        .in('role', ['operador', 'funcionario'])
+        .in('role', ['gestor_empresa', 'funcionario'])
         .order('name', { ascending: true })
       
       if (companyId) {

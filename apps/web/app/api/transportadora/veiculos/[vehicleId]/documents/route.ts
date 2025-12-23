@@ -6,14 +6,16 @@ import { z } from 'zod'
 export const runtime = 'nodejs'
 
 const documentSchema = z.object({
-  document_type: z.enum(['cnh', 'cpf', 'rg', 'comprovante_residencia', 'foto_3x4', 'certidao_criminal', 'certidao_civil']),
+  document_type: z.enum(['crlv', 'ipva', 'seguro', 'inspecao', 'alvara']),
   document_number: z.string().optional().nullable(),
-  file_url: z.string().url(),
-  file_name: z.string().min(1),
-  file_size_bytes: z.number().int().positive().optional().nullable(),
+  file_url: z.string().url().optional().nullable(),
+  file_name: z.string().optional().nullable(),
   issue_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional().nullable(),
   expiry_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional().nullable(),
-  status: z.enum(['valid', 'expired', 'pending_review', 'rejected']).optional(),
+  value_brl: z.number().min(0).optional().nullable(),
+  insurance_company: z.string().optional().nullable(),
+  policy_number: z.string().optional().nullable(),
+  status: z.enum(['valid', 'expired', 'pending', 'cancelled']).optional(),
   notes: z.string().optional().nullable(),
 })
 
@@ -30,20 +32,20 @@ export async function OPTIONS() {
 
 export async function GET(
   request: NextRequest,
-  context: { params: Promise<{ driverId: string }> }
+  context: { params: Promise<{ vehicleId: string }> }
 ) {
   const params = await context.params
 
   try {
-    const authErrorResponse = await requireAuth(request, 'transportadora')
+    const authErrorResponse = await requireAuth(request, 'gestor_transportadora')
     if (authErrorResponse) return authErrorResponse
 
     // Selecionar apenas colunas necessárias para listagem (otimização de performance)
-    const documentColumns = 'id,motorista_id,document_type,document_number,file_url,file_name,file_size_bytes,issue_date,expiry_date,status,notes,created_at,updated_at'
+    const documentColumns = 'id,veiculo_id,document_type,document_number,file_url,file_name,issue_date,expiry_date,value_brl,insurance_company,policy_number,status,notes,created_at,updated_at'
     const { data, error } = await supabaseServiceRole
-      .from('driver_documents' as any)
+      .from('vehicle_documents')
       .select(documentColumns)
-      .eq('motorista_id', params.driverId)
+      .eq('veiculo_id', params.vehicleId)
       .order('created_at', { ascending: false })
 
     if (error) {
@@ -65,21 +67,21 @@ export async function GET(
 
 export async function POST(
   request: NextRequest,
-  context: { params: Promise<{ driverId: string }> }
+  context: { params: Promise<{ vehicleId: string }> }
 ) {
   const params = await context.params
 
   try {
-    const authErrorResponse = await requireAuth(request, 'transportadora')
+    const authErrorResponse = await requireAuth(request, 'gestor_transportadora')
     if (authErrorResponse) return authErrorResponse
 
     const body = await request.json()
     const validated = documentSchema.parse(body)
 
     const { data, error } = await supabaseServiceRole
-      .from('driver_documents' as any)
+      .from('vehicle_documents')
       .insert({
-        motorista_id: params.driverId,
+        veiculo_id: params.vehicleId,
         ...validated,
         issue_date: validated.issue_date || null,
         expiry_date: validated.expiry_date || null,

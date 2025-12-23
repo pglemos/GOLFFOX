@@ -57,7 +57,7 @@ export async function GET(req: NextRequest) {
         email: testEmail,
         password: testPassword,
         email_confirm: true,
-        user_metadata: { role: 'operador', name: 'Teste Empresa' }
+        user_metadata: { role: 'gestor_empresa', name: 'Teste Empresa' }
       })
       if (createError) throw createError
       existing = created.user
@@ -67,7 +67,7 @@ export async function GET(req: NextRequest) {
       const { data: updated, error: updateError } = await supabaseAdmin.auth.admin.updateUserById(existing.id, {
         password: testPassword,
         email_confirm: true,
-        user_metadata: { ...(existing.user_metadata || {}), role: 'operador', name: 'Teste Empresa' }
+        user_metadata: { ...(existing.user_metadata || {}), role: 'gestor_empresa', name: 'Teste Empresa' }
       })
       if (updateError) throw updateError
       existing = updated.user
@@ -81,7 +81,7 @@ export async function GET(req: NextRequest) {
         id: existing.id,
         email: testEmail,
         name: 'Teste Empresa',
-        role: 'operador',
+        role: 'gestor_empresa',
         is_active: true
       }, { onConflict: 'id' })
 

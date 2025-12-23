@@ -17,7 +17,7 @@ export async function OPTIONS() {
 
 export async function POST(req: NextRequest) {
   try {
-    const authErrorResponse = await requireAuth(req, 'transportadora')
+    const authErrorResponse = await requireAuth(req, 'gestor_transportadora')
     if (authErrorResponse) return authErrorResponse
 
     const formData = await req.formData()

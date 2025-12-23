@@ -22,7 +22,7 @@ export async function GET(req: NextRequest) {
 
   const testUserEmail = 'transportadora@trans.com'
   const testUserPassword = 'senha123'
-  const testUserRole = 'transportadora'
+  const testUserRole = 'gestor_transportadora'
   const testUserName = 'Transportadora Teste'
 
   try {

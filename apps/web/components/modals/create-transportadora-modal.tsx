@@ -48,7 +48,7 @@ export function CreateTransportadoraModal({ isOpen, onClose, onSave }: CreateTra
         return
       }
 
-      const response = await fetch('/api/admin/transportadora/create', {
+      const response = await fetch('/api/admin/transportadoras/create', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

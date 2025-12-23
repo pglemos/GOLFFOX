@@ -79,9 +79,9 @@ export async function GET(request: NextRequest) {
       `, { count: 'exact' })
 
         // Aplicar filtro de tenant baseado no papel
-        if ((profile?.role === 'gestor_empresa' || profile?.role === 'empresa') && profile.company_id) {
+        if ((profile?.role === 'gestor_empresa' || profile?.role === 'gestor_empresa') && profile.company_id) {
             query = query.eq('company_id', profile.company_id)
-        } else if ((profile?.role === 'gestor_transportadora' || profile?.role === 'transportadora' || profile?.role === 'operador') && profile.transportadora_id) {
+        } else if ((profile?.role === 'gestor_transportadora' || profile?.role === 'gestor_transportadora' || profile?.role === 'gestor_empresa') && profile.transportadora_id) {
             query = query.eq('transportadora_id', profile.transportadora_id)
         }
 
@@ -158,7 +158,7 @@ export async function GET(request: NextRequest) {
             createdAt: row.created_at as string,
             updatedAt: row.updated_at as string,
             company: row.company as ManualRevenue['company'],
-            transportadora: row.transportadora as ManualRevenue['transportadora'],
+            transportadora: row.transportadora as ManualRevenue['gestor_transportadora'],
         }))
 
         const totalPages = count ? Math.ceil(count / pageSize) : 0
@@ -241,10 +241,10 @@ export async function POST(request: NextRequest) {
         let companyId = body.companyId
         let carrierId = body.carrierId
 
-        if (profile?.role === 'gestor_empresa' || profile?.role === 'empresa') {
+        if (profile?.role === 'gestor_empresa' || profile?.role === 'gestor_empresa') {
             companyId = profile.company_id
             carrierId = null
-        } else if (profile?.role === 'gestor_transportadora' || profile?.role === 'transportadora' || profile?.role === 'operador') {
+        } else if (profile?.role === 'gestor_transportadora' || profile?.role === 'gestor_transportadora' || profile?.role === 'gestor_empresa') {
             carrierId = profile.transportadora_id
             companyId = null
         }
