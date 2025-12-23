@@ -411,7 +411,7 @@ function CustosPageContent() {
             <TabsTrigger value="budget">Orçamento</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="overview" className="space-y-4">
+          <TabsContent value="overview" className="bg-transparent border-0 p-0 shadow-none space-y-4">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               {/* Gráfico de tendência - usa dados legados se disponíveis */}
               <Card variant="premium">
@@ -529,7 +529,7 @@ function CustosPageContent() {
             </div>
           </TabsContent>
 
-          <TabsContent value="costs" className="space-y-4">
+          <TabsContent value="costs" className="bg-transparent border-0 p-0 shadow-none space-y-4">
             <Card variant="premium">
               <CardHeader>
                 <div className="flex justify-between items-center">
@@ -597,7 +597,7 @@ function CustosPageContent() {
             </Card>
           </TabsContent>
 
-          <TabsContent value="revenues" className="space-y-4">
+          <TabsContent value="revenues" className="bg-transparent border-0 p-0 shadow-none space-y-4">
             <Card variant="premium">
               <CardHeader>
                 <div className="flex justify-between items-center">
@@ -648,7 +648,7 @@ function CustosPageContent() {
             </Card>
           </TabsContent>
 
-          <TabsContent value="budget" className="space-y-4">
+          <TabsContent value="budget" className="bg-transparent border-0 p-0 shadow-none space-y-4">
             <Card variant="premium">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">

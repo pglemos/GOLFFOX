@@ -139,7 +139,7 @@ export function CostCharts({ companyId, period = 'month' }: CostChartProps) {
         <TabsTrigger value="companies">Por Empresa</TabsTrigger>
       </TabsList>
 
-      <TabsContent value="monthly" className="mt-6">
+      <TabsContent value="monthly" className="bg-transparent border-0 p-0 shadow-none mt-6">
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -168,7 +168,7 @@ export function CostCharts({ companyId, period = 'month' }: CostChartProps) {
         </Card>
       </TabsContent>
 
-      <TabsContent value="routes" className="mt-6">
+      <TabsContent value="routes" className="bg-transparent border-0 p-0 shadow-none mt-6">
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -197,7 +197,7 @@ export function CostCharts({ companyId, period = 'month' }: CostChartProps) {
         </Card>
       </TabsContent>
 
-      <TabsContent value="veiculos" className="mt-6">
+      <TabsContent value="veiculos" className="bg-transparent border-0 p-0 shadow-none mt-6">
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -226,7 +226,7 @@ export function CostCharts({ companyId, period = 'month' }: CostChartProps) {
         </Card>
       </TabsContent>
 
-      <TabsContent value="motoristas" className="mt-6">
+      <TabsContent value="motoristas" className="bg-transparent border-0 p-0 shadow-none mt-6">
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -255,7 +255,7 @@ export function CostCharts({ companyId, period = 'month' }: CostChartProps) {
         </Card>
       </TabsContent>
 
-      <TabsContent value="companies" className="mt-6">
+      <TabsContent value="companies" className="bg-transparent border-0 p-0 shadow-none mt-6">
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">

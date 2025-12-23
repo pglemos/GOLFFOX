@@ -277,15 +277,15 @@ export function MotoristaModal({ motorista, isOpen, onClose, onSave, carriers = 
         </DialogHeader>
 
         <Tabs defaultValue="dados" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 gap-1 sm:gap-2">
-            <TabsTrigger value="dados" className="text-xs sm:text-sm min-h-[44px] touch-manipulation">Dados</TabsTrigger>
-            <TabsTrigger value="documentos" className="text-xs sm:text-sm min-h-[44px] touch-manipulation">Documentos</TabsTrigger>
-            <TabsTrigger value="salario" className="text-xs sm:text-sm min-h-[44px] touch-manipulation">
-              <DollarSign className="h-3 w-3 mr-1" />Salário
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="dados">Dados</TabsTrigger>
+            <TabsTrigger value="documentos">Documentos</TabsTrigger>
+            <TabsTrigger value="salario">
+              <DollarSign className="h-4 w-4 mr-2" />Salário
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="dados">
+          <TabsContent value="dados" className="bg-transparent border-0 p-0 shadow-none">
             <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
               {/* Dados Pessoais */}
               <div className="space-y-4">
@@ -542,14 +542,14 @@ export function MotoristaModal({ motorista, isOpen, onClose, onSave, carriers = 
             </form>
           </TabsContent>
 
-          <TabsContent value="documentos">
+          <TabsContent value="documentos" className="bg-transparent border-0 p-0 shadow-none">
             <MotoristaDocumentsSection
               motoristaId={motorista?.id ?? formData.id}
               isEditing={!!motorista?.id || !!formData.id}
             />
           </TabsContent>
 
-          <TabsContent value="salario">
+          <TabsContent value="salario" className="bg-transparent border-0 p-0 shadow-none">
             <MotoristaCompensationSection
               motoristaId={motorista?.id ?? formData.id}
               isEditing={!!motorista?.id || !!formData.id}

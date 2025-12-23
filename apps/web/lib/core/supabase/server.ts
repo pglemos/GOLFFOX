@@ -52,6 +52,7 @@ export const supabaseServiceRole = typeof window === 'undefined'
     })
   : ({} as SupabaseClientType) // No cliente, retornar objeto vazio (não deve ser usado)
 
+// Exportar função de forma que o Next.js/Turbopack possa analisar estaticamente
 export function getSupabaseAdmin(): SupabaseClientType {
   // ✅ CORREÇÃO: Verificar se está no servidor
   if (typeof window !== 'undefined') {

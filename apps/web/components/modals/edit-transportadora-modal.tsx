@@ -184,22 +184,22 @@ export function EditCarrierModal({ transportadora, isOpen, onClose, onSave }: Ed
         </DialogHeader>
 
         <Tabs defaultValue="dados" className="w-full">
-          <TabsList className="grid w-full grid-cols-4 gap-1 mb-4">
-            <TabsTrigger value="dados" className="text-xs sm:text-sm min-h-[44px]">
-              <Building2 className="h-3 w-3 mr-1 hidden sm:inline" />Dados
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="dados">
+              <Building2 className="h-4 w-4 mr-2" />Dados
             </TabsTrigger>
-            <TabsTrigger value="documentos" className="text-xs sm:text-sm min-h-[44px]">
-              <FileText className="h-3 w-3 mr-1 hidden sm:inline" />Docs
+            <TabsTrigger value="documentos">
+              <FileText className="h-4 w-4 mr-2" />Docs
             </TabsTrigger>
-            <TabsTrigger value="bancario" className="text-xs sm:text-sm min-h-[44px]">
-              <CreditCard className="h-3 w-3 mr-1 hidden sm:inline" />Bancário
+            <TabsTrigger value="bancario">
+              <CreditCard className="h-4 w-4 mr-2" />Bancário
             </TabsTrigger>
-            <TabsTrigger value="representante" className="text-xs sm:text-sm min-h-[44px]">
-              <User className="h-3 w-3 mr-1 hidden sm:inline" />Rep.Legal
+            <TabsTrigger value="representante">
+              <User className="h-4 w-4 mr-2" />Rep.Legal
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="dados">
+          <TabsContent value="dados" className="bg-transparent border-0 p-0 shadow-none">
             <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                 <div className="col-span-1 sm:col-span-2">
@@ -316,21 +316,21 @@ export function EditCarrierModal({ transportadora, isOpen, onClose, onSave }: Ed
             </form>
           </TabsContent>
 
-          <TabsContent value="documentos">
+          <TabsContent value="documentos" className="bg-transparent border-0 p-0 shadow-none">
             <TransportadoraDocumentsSection
               transportadoraId={transportadora.id}
               isEditing={true}
             />
           </TabsContent>
 
-          <TabsContent value="bancario">
+          <TabsContent value="bancario" className="bg-transparent border-0 p-0 shadow-none">
             <TransportadoraBankingSection
               transportadoraId={transportadora.id}
               isEditing={true}
             />
           </TabsContent>
 
-          <TabsContent value="representante">
+          <TabsContent value="representante" className="bg-transparent border-0 p-0 shadow-none">
             <TransportadoraLegalRepSection
               transportadoraId={transportadora.id}
               isEditing={true}

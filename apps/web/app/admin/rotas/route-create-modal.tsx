@@ -353,14 +353,14 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
           </DialogHeader>
 
           <Tabs defaultValue="form" className="flex-1 flex flex-col overflow-hidden min-h-0">
-            <TabsList className="grid w-full grid-cols-2 h-12 mb-6">
-              <TabsTrigger value="form" className="text-base font-medium">Formulário</TabsTrigger>
-              <TabsTrigger value="preview" disabled={!optimizationResult} className="text-base font-medium">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="form">Formulário</TabsTrigger>
+              <TabsTrigger value="preview" disabled={!optimizationResult}>
                 Pré-visualização
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="form" className="flex-1 overflow-y-auto">
+            <TabsContent value="form" className="flex-1 overflow-y-auto bg-transparent border-0 p-0 shadow-none">
               <RouteForm
                 formData={formData as RouteFormData}
                 setFormData={setFormData as React.Dispatch<React.SetStateAction<RouteFormData>>}
@@ -387,7 +387,7 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
               </RouteForm>
             </TabsContent>
 
-            <TabsContent value="preview" className="flex-1 overflow-hidden flex flex-col">
+            <TabsContent value="preview" className="flex-1 overflow-hidden flex flex-col bg-transparent border-0 p-0 shadow-none">
               {optimizationResult && mapLoaded ? (
                 <LocalRoutePreviewMap
                   result={optimizationResult}

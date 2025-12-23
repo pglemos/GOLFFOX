@@ -557,7 +557,7 @@ export default function TransportadoraVeiculosPage() {
             )}
           </TabsContent>
 
-          <TabsContent value="documents" className="space-y-6">
+          <TabsContent value="documents" className="bg-transparent border-0 p-0 shadow-none space-y-6">
             <div className="flex items-center justify-between">
               <h2 className="text-2xl font-bold">Documentos dos Veículos</h2>
               {selectedVeiculo && (
@@ -741,7 +741,7 @@ export default function TransportadoraVeiculosPage() {
             )}
           </TabsContent>
 
-          <TabsContent value="maintenances" className="space-y-6">
+          <TabsContent value="maintenances" className="bg-transparent border-0 p-0 shadow-none space-y-6">
             <div className="flex items-center justify-between">
               <h2 className="text-2xl font-bold">Manutenções dos Veículos</h2>
               {selectedVeiculo && (

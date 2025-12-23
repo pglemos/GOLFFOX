@@ -196,14 +196,14 @@ export function TransportadoraVehiclesModal({ transportadora, isOpen, onClose }:
         </DialogHeader>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 overflow-hidden flex flex-col">
-          <TabsList className="w-full grid grid-cols-2 gap-1 sm:gap-2">
-            <TabsTrigger value="list" className="text-xs sm:text-sm min-h-[44px]">Lista ({veiculos.length})</TabsTrigger>
-            <TabsTrigger value="form" className="text-xs sm:text-sm min-h-[44px]">
+          <TabsList className="w-full grid grid-cols-2">
+            <TabsTrigger value="list">Lista ({veiculos.length})</TabsTrigger>
+            <TabsTrigger value="form">
               {editingVehicle ? 'Editar' : 'Novo Veículo'}
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="list" className="flex-1 overflow-y-auto mt-4 space-y-4">
+          <TabsContent value="list" className="flex-1 overflow-y-auto bg-transparent border-0 p-0 shadow-none space-y-4">
             <div className="flex justify-between items-center">
               <h3 className="font-semibold">Total de Veículos: {veiculos.length}</h3>
               <Button size="sm" onClick={() => {
@@ -311,7 +311,7 @@ export function TransportadoraVehiclesModal({ transportadora, isOpen, onClose }:
             )}
           </TabsContent>
 
-          <TabsContent value="form" className="flex-1 overflow-y-auto mt-4">
+          <TabsContent value="form" className="flex-1 overflow-y-auto bg-transparent border-0 p-0 shadow-none">
             <form onSubmit={editingVehicle ? handleUpdateVehicle : handleCreateVehicle} className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                 <div>

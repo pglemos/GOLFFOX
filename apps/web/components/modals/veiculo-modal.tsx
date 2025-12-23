@@ -481,16 +481,16 @@ export function VeiculoModal({ veiculo, isOpen, onClose, onSave, carriers }: Vei
         </DialogHeader>
 
         <Tabs defaultValue="dados" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 gap-1 mb-4">
-            <TabsTrigger value="dados" className="text-sm min-h-[40px]">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="dados">
               <Truck className="h-4 w-4 mr-2" />Dados
             </TabsTrigger>
-            <TabsTrigger value="documentos" className="text-sm min-h-[40px]">
+            <TabsTrigger value="documentos">
               <FileText className="h-4 w-4 mr-2" />Documentos
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="dados">
+          <TabsContent value="dados" className="bg-transparent border-0 p-0 shadow-none">
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Foto do Veículo */}
               <div className="space-y-2">
@@ -658,7 +658,7 @@ export function VeiculoModal({ veiculo, isOpen, onClose, onSave, carriers }: Vei
             </form>
           </TabsContent>
 
-          <TabsContent value="documentos">
+          <TabsContent value="documentos" className="bg-transparent border-0 p-0 shadow-none">
             <VeiculoDocumentsSection
               veiculoId={veiculo?.id ?? formData.id}
               isEditing={!!veiculo?.id || !!formData.id}
