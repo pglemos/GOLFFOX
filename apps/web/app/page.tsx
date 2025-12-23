@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useCallback, Suspense } from "react"
+import { useState, useCallback, Suspense, useEffect } from "react"
 
 import { motion, AnimatePresence } from "framer-motion"
 import { Sparkles, Shield, Zap } from "lucide-react"
@@ -26,6 +26,20 @@ function LoginContent() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  const [csrfToken, setCsrfToken] = useState<string>("")
+
+  useEffect(() => {
+    // Buscar CSRF token ao montar o componente
+    fetch('/api/auth/csrf')
+      .then(res => res.json())
+      .then(data => {
+        if (data?.token) {
+          setCsrfToken(data.token)
+        }
+      })
+      .catch(err => console.error("Erro ao buscar CSRF token:", err))
+  }, [])
+
   const handleLogin = useCallback(async (email: string, pass: string, remember: boolean) => {
     setLoading(true)
     setError(null)
@@ -33,7 +47,10 @@ function LoginContent() {
     try {
       const result = await fetch("/api/auth/login", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "x-csrf-token": csrfToken
+        },
         body: JSON.stringify({ email, password: pass }),
       })
 
@@ -57,7 +74,7 @@ function LoginContent() {
     } finally {
       setLoading(false)
     }
-  }, [router, searchParams])
+  }, [router, searchParams, csrfToken])
 
   return (
     <main className="relative min-h-screen bg-slate-950 flex items-center justify-center p-4 overflow-hidden">
