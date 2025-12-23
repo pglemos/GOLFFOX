@@ -1,6 +1,10 @@
 "use client"
 
 import { useState, useEffect } from "react"
+
+import { LifeBuoy, Send, Truck, Users, Navigation } from "lucide-react"
+
+import { Button } from "@/components/ui/button"
 import { 
   Dialog, 
   DialogContent, 
@@ -8,14 +12,8 @@ import {
   DialogTitle, 
   DialogFooter 
 } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { LifeBuoy, Send, Truck, Users, Navigation } from "lucide-react"
-import { supabase } from "@/lib/supabase"
-import { notifySuccess, notifyError } from "@/lib/toast"
-import { formatError } from "@/lib/error-utils"
-import { useSupabaseSync } from "@/hooks/use-supabase-sync"
 import { 
   Select,
   SelectContent,
@@ -23,6 +21,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { useSupabaseSync } from "@/hooks/use-supabase-sync"
+import { formatError } from "@/lib/error-utils"
+import { supabase } from "@/lib/supabase"
+import { notifySuccess, notifyError } from "@/lib/toast"
 
 interface AssistanceRequest {
   id: string

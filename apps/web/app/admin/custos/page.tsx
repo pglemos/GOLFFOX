@@ -10,7 +10,7 @@
  */
 
 import { useState, useEffect, useMemo, Suspense } from "react"
-import { LazyPageWrapper, DashboardPageSkeleton } from "@/components/shared/lazy-page-wrapper"
+
 import { motion, AnimatePresence } from "framer-motion"
 import {
   DollarSign,
@@ -28,28 +28,27 @@ import {
   Filter,
 } from "lucide-react"
 import {
-  LineChart,
-  Line,
-  BarChart,
-  Bar,
-  PieChart,
-  Pie,
-  Cell,
-  XAxis,
-  YAxis,
-  CartesianGrid,
   Tooltip,
   ResponsiveContainer,
   Legend,
   AreaChart,
   Area,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Cell
 } from 'recharts'
+
 import { AppShell } from "@/components/app-shell"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Button } from "@/components/ui/button"
+import { CostForm } from "@/components/costs/cost-form"
+import { FinancialCharts } from "@/components/costs/financial-charts"
+import { useAuth } from "@/components/providers/auth-provider"
+import { LazyPageWrapper, DashboardPageSkeleton } from "@/components/shared/lazy-page-wrapper"
 import { Badge } from "@/components/ui/badge"
-import { Skeleton } from "@/components/ui/skeleton"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import {
   Select,
   SelectContent,
@@ -65,10 +64,11 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet"
-import { CostForm } from "@/components/costs/cost-form"
-import { useAuth } from "@/hooks/use-auth"
-import { notifyError, notifySuccess } from "@/lib/toast"
+import { Skeleton } from "@/components/ui/skeleton"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { useFinancialData } from "@/hooks/domain/use-financial-data"
 import { formatCurrency } from "@/lib/kpi-utils"
+import { notifyError, notifySuccess } from "@/lib/toast"
 import type { ManualCost, ManualRevenue, Budget } from "@/types/financial"
 
 // Cores para gráficos
@@ -110,66 +110,16 @@ function CustosPageContent() {
     return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
   })
 
-  // Estados de dados
-  const [legacyData, setLegacyData] = useState<any>(null)
-  const [costs, setCosts] = useState<ManualCost[]>([])
-  const [revenues, setRevenues] = useState<ManualRevenue[]>([])
-  const [budgets, setBudgets] = useState<Budget[]>([])
+  const {
+    costs,
+    revenues,
+    budgets,
+    loading: dataLoading,
+    kpis,
+    refresh: loadData
+  } = useFinancialData(period)
 
-  // Carregar dados
-  useEffect(() => {
-    loadData()
-  }, [period])
-
-  const loadData = async () => {
-    try {
-      setLoading(true)
-      const [year, month] = period.split('-')
-
-      // Carregar dados em paralelo - legado e novos
-      const [legacyRes, costsRes, revenuesRes, budgetsRes] = await Promise.all([
-        fetch('/api/admin/custos'),
-        fetch(`/api/costs/manual-v2?page=1&page_size=100&date_from=${year}-${month}-01&date_to=${year}-${month}-31`),
-        fetch(`/api/revenues?page=1&page_size=100&date_from=${year}-${month}-01&date_to=${year}-${month}-31`),
-        fetch(`/api/budgets?year=${year}&month=${month}`),
-      ])
-
-      const [legacyResult, costsData, revenuesData, budgetsData] = await Promise.all([
-        legacyRes.json(),
-        costsRes.json(),
-        revenuesRes.json(),
-        budgetsRes.json(),
-      ])
-
-      setLegacyData(legacyResult)
-      if (costsData.success) setCosts(costsData.data || [])
-      if (revenuesData.success) setRevenues(revenuesData.data || [])
-      if (budgetsData.success) setBudgets(budgetsData.data || [])
-    } catch (error) {
-      notifyError(error, "Erro ao carregar dados financeiros")
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  // KPIs calculados
-  const kpis = useMemo(() => {
-    const totalCosts = costs.reduce((sum, c) => sum + c.amount, 0)
-    const totalRevenues = revenues.reduce((sum, r) => sum + r.amount, 0)
-    const margin = totalRevenues - totalCosts
-    const marginPercent = totalRevenues > 0 ? ((margin / totalRevenues) * 100).toFixed(1) : '0'
-    const recurringCount = costs.filter(c => c.isRecurring).length
-
-    return {
-      totalCosts,
-      totalRevenues,
-      margin,
-      marginPercent,
-      costEntries: costs.length,
-      revenueEntries: revenues.length,
-      recurringCount,
-    }
-  }, [costs, revenues])
+  // Substituído pelo hook useFinancialData
 
   // Dados para gráfico de categoria
   const categoryData = useMemo(() => {
@@ -191,7 +141,7 @@ function CustosPageContent() {
   const budgetVsActualData = useMemo(() => {
     return budgets.map(budget => {
       const actual = costs
-        .filter(c => c.categoryId === budget.categoryId)
+        .filter(c => c.category_id === budget.categoryId)
         .reduce((sum, c) => sum + c.amount, 0)
 
       return {
@@ -215,7 +165,7 @@ function CustosPageContent() {
     role: 'admin'
   }
 
-  if (loading) {
+  if (loading || dataLoading) {
     return (
       <AppShell panel="admin" user={userForShell}>
         <div className="p-4 sm:p-6 lg:p-8 space-y-6">
@@ -355,8 +305,8 @@ function CustosPageContent() {
             transition={{ delay: 0.2 }}
           >
             <Card variant="premium" className={`relative overflow-hidden ${kpis.margin >= 0
-                ? 'bg-gradient-to-br from-info-light to-info-light border-info-light dark:from-info dark:to-info dark:border-info'
-                : 'bg-gradient-to-br from-error-light to-error-light border-error-light dark:from-error dark:to-error dark:border-error'
+              ? 'bg-gradient-to-br from-info-light to-info-light border-info-light dark:from-info dark:to-info dark:border-info'
+              : 'bg-gradient-to-br from-error-light to-error-light border-error-light dark:from-error dark:to-error dark:border-error'
               }`}>
               <div className={`absolute top-0 right-0 w-32 h-32 ${kpis.margin >= 0 ? 'bg-info-light0/10' : 'bg-error-light0/10'} rounded-bl-full`} />
               <CardHeader className="pb-2">
@@ -412,121 +362,11 @@ function CustosPageContent() {
           </TabsList>
 
           <TabsContent value="overview" className="bg-transparent border-0 p-0 shadow-none space-y-4">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              {/* Gráfico de tendência - usa dados legados se disponíveis */}
-              <Card variant="premium">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <BarChart3 className="h-5 w-5" />
-                    Evolução Financeira
-                  </CardTitle>
-                  <CardDescription>Receita vs Custo ao longo do tempo</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="h-[300px] w-full">
-                    {legacyData?.monthlyTrend ? (
-                      <ResponsiveContainer width="100%" height="100%">
-                        <AreaChart data={legacyData.monthlyTrend}>
-                          <defs>
-                            <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="5%" stopColor="#22c55e" stopOpacity={0.1} />
-                              <stop offset="95%" stopColor="#22c55e" stopOpacity={0} />
-                            </linearGradient>
-                            <linearGradient id="colorCost" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="5%" stopColor="#ef4444" stopOpacity={0.1} />
-                              <stop offset="95%" stopColor="#ef4444" stopOpacity={0} />
-                            </linearGradient>
-                          </defs>
-                          <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                          <XAxis dataKey="month" className="text-xs" />
-                          <YAxis tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`} className="text-xs" />
-                          <Tooltip
-                            formatter={(value: number) => [formatCurrency(value), '']}
-                            contentStyle={{
-                              backgroundColor: 'hsl(var(--card))',
-                              border: '1px solid hsl(var(--border))',
-                              borderRadius: '8px',
-                            }}
-                          />
-                          <Legend />
-                          <Area
-                            type="monotone"
-                            dataKey="revenue"
-                            name="Receita"
-                            stroke="#22c55e"
-                            fillOpacity={1}
-                            fill="url(#colorRevenue)"
-                          />
-                          <Area
-                            type="monotone"
-                            dataKey="cost"
-                            name="Custo"
-                            stroke="#ef4444"
-                            fillOpacity={1}
-                            fill="url(#colorCost)"
-                          />
-                        </AreaChart>
-                      </ResponsiveContainer>
-                    ) : (
-                      <div className="flex items-center justify-center h-full text-muted-foreground">
-                        Dados de tendência não disponíveis
-                      </div>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Gráfico de pizza por categoria */}
-              <Card variant="premium">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <PieChartIcon className="h-5 w-5" />
-                    Distribuição de Custos
-                  </CardTitle>
-                  <CardDescription>Por categoria no período</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {categoryData.length > 0 ? (
-                    <div className="h-[300px] w-full">
-                      <ResponsiveContainer width="100%" height="100%">
-                        <PieChart>
-                          <Pie
-                            data={categoryData}
-                            cx="50%"
-                            cy="50%"
-                            innerRadius={60}
-                            outerRadius={100}
-                            paddingAngle={5}
-                            dataKey="value"
-                          >
-                            {categoryData.map((entry, index) => (
-                              <Cell key={`cell-${index}`} fill={entry.color} />
-                            ))}
-                          </Pie>
-                          <Tooltip formatter={(value: number) => formatCurrency(value)} />
-                        </PieChart>
-                      </ResponsiveContainer>
-                      {/* Legenda */}
-                      <div className="mt-4 space-y-2">
-                        {categoryData.slice(0, 5).map((item) => (
-                          <div key={item.name} className="flex items-center justify-between text-sm">
-                            <div className="flex items-center gap-2">
-                              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }} />
-                              <span className="text-muted-foreground truncate max-w-[150px]">{item.name}</span>
-                            </div>
-                            <span className="font-medium">{formatCurrency(item.value)}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="h-[300px] flex items-center justify-center text-muted-foreground">
-                      Nenhum custo lançado no período
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </div>
+            <FinancialCharts
+              categoryData={categoryData}
+              budgetVsActualData={budgetVsActualData}
+              formatCurrency={formatCurrency}
+            />
           </TabsContent>
 
           <TabsContent value="costs" className="bg-transparent border-0 p-0 shadow-none space-y-4">
@@ -558,14 +398,14 @@ function CustosPageContent() {
                           <div>
                             <p className="font-medium">{cost.description}</p>
                             <p className="text-xs text-muted-foreground">
-                              {cost.category?.name || 'Sem categoria'} • {new Date(cost.costDate).toLocaleDateString('pt-BR')}
-                              {cost.company?.name && ` • ${cost.company.name}`}
+                              {cost.category?.name || 'Sem categoria'} • {new Date(cost.cost_date).toLocaleDateString('pt-BR')}
+                              {cost.empresa?.name && ` • ${cost.empresa.name}`}
                               {cost.transportadora?.name && ` • ${cost.transportadora.name}`}
                             </p>
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
-                          {cost.isRecurring && (
+                          {cost.is_recurring && (
                             <Badge variant="outline" className="text-xs">
                               <RefreshCw className="h-3 w-3 mr-1" />
                               Recorrente

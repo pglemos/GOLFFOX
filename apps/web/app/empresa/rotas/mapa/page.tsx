@@ -1,12 +1,13 @@
 ﻿"use client"
 
-import { useSearchParams } from "@/lib/next-navigation"
 import { Suspense } from "react"
+import { useEffect, useState } from "react"
+
 import { AppShell } from "@/components/app-shell"
 import { FleetMap } from "@/components/fleet-map"
-import { useEffect, useState } from "react"
-import { supabase } from "@/lib/supabase"
 import { useOperatorTenant } from "@/components/providers/empresa-tenant-provider"
+import { useSearchParams } from "@/lib/next-navigation"
+import { supabase } from "@/lib/supabase"
 
 function OperatorMapaPageInner() {
   const params = useSearchParams()

@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getSupabaseAdmin } from '@/lib/supabase-client'
+
 import { requireAuth } from '@/lib/api-auth'
-import { logError } from '@/lib/logger'
-import { documentSchema } from '@/lib/validation/schemas'
 import { getDocumentsConfig, EntityType } from '@/lib/documents-config'
+import { logError } from '@/lib/logger'
+import { getSupabaseAdmin } from '@/lib/supabase-client'
+import { documentSchema } from '@/lib/validation/schemas'
 
 interface DocumentHandlerConfig {
     entityType: EntityType

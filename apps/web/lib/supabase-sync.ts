@@ -4,18 +4,19 @@
  * Implementa retry com backoff exponencial, logging estruturado e fallback local
  */
 
-import { supabase } from './supabase'
 import { SupabaseClient } from '@supabase/supabase-js'
+
 import { error as logError } from './logger'
+import { supabase } from './supabase'
 
 export interface SyncOperation {
   id?: string
   resourceType: string
   resourceId: string
   action: 'create' | 'update' | 'delete'
-   
+
   data: Record<string, unknown>
-   
+
   metadata?: Record<string, unknown>
 }
 
@@ -141,7 +142,7 @@ function validateSyncData(
       if (!data.plate) errors.push('Placa é obrigatória')
       if (!data.model) errors.push('Modelo é obrigatório')
       // Validar capacity apenas se existir (pode não existir no schema)
-      if (data.capacity !== undefined && data.capacity !== null && data.capacity < 1) {
+      if (data.capacity !== undefined && data.capacity !== null && (data.capacity as number) < 1) {
         errors.push('Capacidade deve ser maior que zero')
       }
       break
@@ -208,15 +209,15 @@ function validateSyncData(
 function mapDataToSupabase(
   resourceType: string,
   data: Record<string, unknown>
-): Record<string, any> {
+): Record<string, unknown> {
   const mapped: Record<string, any> = { ...data }
 
   // Ajustes específicos por tipo
   switch (resourceType) {
     case 'veiculo':
       // Garantir que campos numéricos sejam números
-      if (mapped.year) mapped.year = parseInt(mapped.year) || null
-      if (mapped.capacity) mapped.capacity = parseInt(mapped.capacity) || null
+      if (mapped.year) mapped.year = parseInt(mapped.year as string) || null
+      if (mapped.capacity) mapped.capacity = parseInt(mapped.capacity as string) || null
 
       // Garantir boolean
       if (typeof mapped.is_active !== 'boolean') {
@@ -324,7 +325,7 @@ async function executeSyncWithRetry(
     }
 
     // Executar operação no Supabase
-    let response: any
+    let response: { data: any; status: number }
 
     // Cast seguro para permitir tabelas dinâmicas
     const client = supabase as SupabaseClient<any, 'public', any>
@@ -397,7 +398,8 @@ async function executeSyncWithRetry(
       // Status HTTP fora do intervalo 200-299
       throw new Error(`HTTP ${httpStatus}: ${JSON.stringify(response)}`)
     }
-  } catch (error: unknown) {
+  } catch (err: any) {
+    const error = err as any
     const errorMessage = error.message || 'Erro desconhecido'
     const errorCode = error.code || error.status || 500
     const errorBody = error.response?.data || error.body || error

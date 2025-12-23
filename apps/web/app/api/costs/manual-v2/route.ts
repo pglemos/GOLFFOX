@@ -7,11 +7,12 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { getSupabaseAdmin } from '@/lib/supabase-client'
+
 import { requireAuth } from '@/lib/api-auth'
 import { logError } from '@/lib/logger'
-import type { ManualCost, ManualCostInsert, CostFilters } from '@/types/financial'
+import { getSupabaseAdmin } from '@/lib/supabase-client'
 import { createCostSchema } from '@/lib/validation/schemas'
+import type { ManualCost, ManualCostInsert, CostFilters } from '@/types/financial'
 
 export const runtime = 'nodejs'
 
@@ -49,15 +50,15 @@ export async function GET(request: NextRequest) {
 
         // Filtros
         const filters: CostFilters = {
-            categoryId: searchParams.get('category_id') || undefined,
-            vehicleId: searchParams.get('veiculo_id') || undefined,
-            routeId: searchParams.get('route_id') || undefined,
+            category_id: searchParams.get('category_id') || undefined,
+            veiculo_id: searchParams.get('veiculo_id') || undefined,
+            route_id: searchParams.get('route_id') || undefined,
             status: (searchParams.get('status') as CostFilters['status']) || undefined,
-            isRecurring: searchParams.get('is_recurring') ? searchParams.get('is_recurring') === 'true' : undefined,
-            dateFrom: searchParams.get('date_from') || undefined,
-            dateTo: searchParams.get('date_to') || undefined,
-            amountMin: searchParams.get('amount_min') ? parseFloat(searchParams.get('amount_min')!) : undefined,
-            amountMax: searchParams.get('amount_max') ? parseFloat(searchParams.get('amount_max')!) : undefined,
+            is_recurring: searchParams.get('is_recurring') ? searchParams.get('is_recurring') === 'true' : undefined,
+            date_from: searchParams.get('date_from') || undefined,
+            date_to: searchParams.get('date_to') || undefined,
+            amount_min: searchParams.get('amount_min') ? parseFloat(searchParams.get('amount_min')!) : undefined,
+            amount_max: searchParams.get('amount_max') ? parseFloat(searchParams.get('amount_max')!) : undefined,
             search: searchParams.get('search') || undefined,
         }
 
@@ -86,32 +87,32 @@ export async function GET(request: NextRequest) {
         // Admin vê tudo (sem filtro adicional)
 
         // Aplicar filtros
-        if (filters.categoryId) {
-            query = query.eq('category_id', filters.categoryId)
+        if (filters.category_id) {
+            query = query.eq('category_id', filters.category_id)
         }
-        if (filters.vehicleId) {
-            query = query.eq('veiculo_id', filters.vehicleId)
+        if (filters.veiculo_id) {
+            query = query.eq('veiculo_id', filters.veiculo_id)
         }
-        if (filters.routeId) {
-            query = query.eq('route_id', filters.routeId)
+        if (filters.route_id) {
+            query = query.eq('route_id', filters.route_id)
         }
         if (filters.status) {
             query = query.eq('status', filters.status)
         }
-        if (filters.isRecurring !== undefined) {
-            query = query.eq('is_recurring', filters.isRecurring)
+        if (filters.is_recurring !== undefined) {
+            query = query.eq('is_recurring', filters.is_recurring)
         }
-        if (filters.dateFrom) {
-            query = query.gte('cost_date', filters.dateFrom)
+        if (filters.date_from) {
+            query = query.gte('cost_date', filters.date_from)
         }
-        if (filters.dateTo) {
-            query = query.lte('cost_date', filters.dateTo)
+        if (filters.date_to) {
+            query = query.lte('cost_date', filters.date_to)
         }
-        if (filters.amountMin !== undefined) {
-            query = query.gte('amount', filters.amountMin)
+        if (filters.amount_min !== undefined) {
+            query = query.gte('amount', filters.amount_min)
         }
-        if (filters.amountMax !== undefined) {
-            query = query.lte('amount', filters.amountMax)
+        if (filters.amount_max !== undefined) {
+            query = query.lte('amount', filters.amount_max)
         }
         if (filters.search) {
             query = query.ilike('description', `%${filters.search}%`)
@@ -144,35 +145,35 @@ export async function GET(request: NextRequest) {
             )
         }
 
-        // Transformar para camelCase
+        // Transformar para a interface ManualCost
         const costs: ManualCost[] = (data || []).map((row: any) => ({
             id: row.id,
-            companyId: row.company_id,
-            carrierId: row.transportadora_id,
-            categoryId: row.category_id,
+            company_id: row.company_id,
+            transportadora_id: row.transportadora_id,
+            category_id: row.category_id,
             description: row.description,
             amount: parseFloat(row.amount),
-            costDate: row.cost_date,
-            isRecurring: row.is_recurring,
-            recurringInterval: row.recurring_interval,
-            recurringEndDate: row.recurring_end_date,
-            parentRecurringId: row.parent_recurring_id,
-            vehicleId: row.veiculo_id,
-            routeId: row.route_id,
-            driverId: row.motorista_id,
-            attachmentUrl: row.attachment_url,
-            attachmentName: row.attachment_name,
+            cost_date: row.cost_date,
+            is_recurring: row.is_recurring,
+            recurring_interval: row.recurring_interval,
+            recurring_end_date: row.recurring_end_date,
+            parent_recurring_id: row.parent_recurring_id,
+            veiculo_id: row.veiculo_id,
+            route_id: row.route_id,
+            motorista_id: row.motorista_id,
+            attachment_url: row.attachment_url,
+            attachment_name: row.attachment_name,
             notes: row.notes,
             status: row.status,
-            createdBy: row.created_by,
-            approvedBy: row.approved_by,
-            approvedAt: row.approved_at,
-            createdAt: row.created_at,
-            updatedAt: row.updated_at,
+            created_by: row.created_by,
+            approved_by: row.approved_by,
+            approved_at: row.approved_at,
+            created_at: row.created_at,
+            updated_at: row.updated_at,
             category: row.category,
             veiculo: row.veiculo,
             route: row.route,
-            company: row.company,
+            empresa: row.company,
             transportadora: row.transportadora,
         }))
 
@@ -254,14 +255,14 @@ export async function POST(request: NextRequest) {
         const validated = validation.data
 
         // Definir tenant baseado no papel
-        let companyId = body.companyId
-        let carrierId = body.carrierId
+        let companyId = body.company_id || body.companyId
+        let carrierId = body.transportadora_id || body.carrierId
 
         if (profile?.role === 'gestor_empresa' || profile?.role === 'gestor_empresa') {
-            companyId = profile.company_id || body.companyId
+            companyId = profile.company_id || companyId
             carrierId = null
         } else if (profile?.role === 'gestor_transportadora' || profile?.role === 'gestor_transportadora' || profile?.role === 'gestor_empresa') {
-            carrierId = profile.transportadora_id || body.carrierId
+            carrierId = profile.transportadora_id || carrierId
             companyId = null
         }
         // Admin pode especificar qualquer tenant
@@ -310,35 +311,35 @@ export async function POST(request: NextRequest) {
             )
         }
 
-        // Mapear retorno para camelCase
+        // Mapear retorno para ManualCost
         const newCost: ManualCost = {
             id: data.id,
-            companyId: data.company_id,
-            carrierId: data.transportadora_id,
-            categoryId: data.category_id,
+            company_id: data.company_id,
+            transportadora_id: data.transportadora_id,
+            category_id: data.category_id,
             description: data.description,
             amount: parseFloat(data.amount),
-            costDate: data.cost_date,
-            isRecurring: data.is_recurring,
-            recurringInterval: data.recurring_interval,
-            recurringEndDate: data.recurring_end_date,
-            parentRecurringId: data.parent_recurring_id,
-            vehicleId: data.veiculo_id,
-            routeId: data.route_id,
-            driverId: data.motorista_id,
-            attachmentUrl: data.attachment_url,
-            attachmentName: data.attachment_name,
+            cost_date: data.cost_date,
+            is_recurring: data.is_recurring,
+            recurring_interval: data.recurring_interval,
+            recurring_end_date: data.recurring_end_date,
+            parent_recurring_id: data.parent_recurring_id,
+            veiculo_id: data.veiculo_id,
+            route_id: data.route_id,
+            motorista_id: data.motorista_id,
+            attachment_url: data.attachment_url,
+            attachment_name: data.attachment_name,
             notes: data.notes,
             status: data.status,
-            createdBy: data.created_by,
-            approvedBy: data.approved_by,
-            approvedAt: data.approved_at,
-            createdAt: data.created_at,
-            updatedAt: data.updated_at,
+            created_by: data.created_by,
+            approved_by: data.approved_by,
+            approved_at: data.approved_at,
+            created_at: data.created_at,
+            updated_at: data.updated_at,
             category: data.category,
             veiculo: data.veiculo,
             route: data.route,
-            company: data.company,
+            empresa: data.company,
             transportadora: data.transportadora,
         }
 

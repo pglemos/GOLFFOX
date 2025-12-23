@@ -1,12 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getSupabaseAdmin } from '@/lib/supabase-client'
-import { requireAuth } from '@/lib/api-auth'
-import { applyRateLimit } from '@/lib/rate-limit'
+
 import { z } from 'zod'
-import { CarrierInsert } from '@/types/carrier'
-import { logger, logError } from '@/lib/logger'
+
+import { requireAuth } from '@/lib/api-auth'
 import { successResponse, errorResponse, validationErrorResponse } from '@/lib/api-response'
+import { logger, logError } from '@/lib/logger'
+import { applyRateLimit } from '@/lib/rate-limit'
+import { getSupabaseAdmin } from '@/lib/supabase-client'
 import { createTransportadoraSchema } from '@/lib/validation/schemas'
+import { CarrierInsert } from '@/types/carrier'
 
 export const runtime = 'nodejs'
 

@@ -4,6 +4,7 @@
  */
 
 import { useQuery, useMemo } from '@tanstack/react-query'
+
 import {
   getFinancialData,
   getCosts,

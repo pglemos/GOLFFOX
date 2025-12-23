@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseServiceRole } from '@/lib/supabase-server'
+
 import { logError } from '@/lib/logger'
+import { supabaseServiceRole } from '@/lib/supabase-server'
 
 export async function GET(request: NextRequest) {
   const authHeader = request.headers.get('authorization')

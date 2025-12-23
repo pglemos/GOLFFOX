@@ -4,8 +4,9 @@
  * Gerenciador de alertas proativos baseados em métricas e thresholds
  */
 
-import { debug, warn, logError } from '@/lib/logger'
 import { createClient } from '@supabase/supabase-js'
+
+import { debug, warn, logError } from '@/lib/logger'
 
 export interface AlertRule {
   id: string

@@ -1,9 +1,11 @@
 "use client"
 
-import { usePathname } from "@/lib/next-navigation"
 import { useState } from "react"
+
 import Image from "next/image"
+
 import { useOperatorTenant, useEmpresaTenant } from "@/components/providers/empresa-tenant-provider"
+import { usePathname } from "@/lib/next-navigation"
 
 interface EmpresaLogoSectionProps {
     panelHomeUrl: string

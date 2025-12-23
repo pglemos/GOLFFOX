@@ -4,8 +4,8 @@
  * Sanitiza PII (CPF, endereços completos) antes de inserir
  */
 
-import { supabase } from './supabase'
 import { warn, error as logError } from './logger'
+import { supabase } from './supabase'
 
 export interface AuditLogDetails {
   [key: string]: any

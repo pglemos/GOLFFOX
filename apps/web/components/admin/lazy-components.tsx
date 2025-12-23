@@ -8,6 +8,7 @@
 'use client'
 
 import { lazy } from 'react'
+
 import { withLazyLoading, TablePageSkeleton, DashboardPageSkeleton, MapPageSkeleton } from '@/components/shared/lazy-page-wrapper'
 
 /**

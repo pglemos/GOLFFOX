@@ -1,16 +1,17 @@
 "use client"
 
-import { AppShell } from "@/components/app-shell"
-import { Card } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { MapPin, DollarSign, FileText } from "lucide-react"
 import { motion } from "framer-motion"
-import { useAuthFast } from "@/hooks/use-auth-fast"
+import { MapPin, DollarSign, FileText } from "lucide-react"
+
+import { AppShell } from "@/components/app-shell"
+import { Button } from "@/components/ui/button"
+import { Card } from "@/components/ui/card"
+import { useAuth } from "@/components/providers/auth-provider"
 
 const Link: any = require("next/link")
 
 export default function AdminMin() {
-  const { user, loading } = useAuthFast()
+  const { user, loading } = useAuth()
 
   if (loading) {
     return (

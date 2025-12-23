@@ -6,17 +6,22 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
+
 import { createClient } from '@supabase/supabase-js'
-import { normalizeRole } from '@/lib/role-mapper'
-import { debug, warn, error as logError } from '@/lib/logger'
-import { getCachedAuth, setCachedAuth, invalidateCachedAuth } from './auth-cache'
+
 import { getSupabaseUrl, getSupabaseAnonKey, getSupabaseServiceKey } from '@/lib/env'
+import { debug, warn, error as logError } from '@/lib/logger'
+import { normalizeRole } from '@/lib/role-mapper'
+
+import { getCachedAuth, setCachedAuth, invalidateCachedAuth } from './auth-cache'
+
 
 export interface AuthenticatedUser {
   id: string
   email: string
   role: string
-  companyId?: string | null
+  company_id?: string | null
+  transportadora_id?: string | null
 }
 
 const isDevelopment = process.env.NODE_ENV === 'development'
@@ -150,7 +155,15 @@ export async function validateAuth(request: NextRequest): Promise<AuthenticatedU
       const sessionCookie = request.cookies.get('golffox-session')?.value
       if (sessionCookie) {
         try {
-          const sessionData = decodeBase64Json(sessionCookie)
+          const sessionData = decodeBase64Json(sessionCookie) as {
+            id: string,
+            role: string,
+            email: string,
+            company_id?: string,
+            companyId?: string,
+            transportadora_id?: string,
+            name?: string
+          }
           if (sessionData && sessionData.id && sessionData.role && sessionData.email) {
             // Usar dados do cookie como fallback quando não há token do Supabase
             // Isso permite autenticação via cookie mesmo sem token válido
@@ -177,7 +190,8 @@ export async function validateAuth(request: NextRequest): Promise<AuthenticatedU
                   id: userData.id,
                   email: userData.email || sessionData.email || '',
                   role: normalizedRole,
-                  companyId: userData.company_id || sessionData.companyId || null
+                  company_id: userData.company_id || sessionData.company_id || sessionData.companyId || null,
+                  transportadora_id: userData.transportadora_id || sessionData.transportadora_id || null
                 }
 
                 debug('Usuário autenticado via cookie fallback', {
@@ -195,7 +209,8 @@ export async function validateAuth(request: NextRequest): Promise<AuthenticatedU
               id: sessionData.id,
               email: sessionData.email || '',
               role: normalizedRole,
-              companyId: sessionData.companyId || sessionData.company_id || null
+              company_id: sessionData.company_id || sessionData.companyId || null,
+              transportadora_id: sessionData.transportadora_id || null
             }
 
             warn('Usando dados do cookie diretamente (sem validação do banco)', {
@@ -286,12 +301,13 @@ export async function validateAuth(request: NextRequest): Promise<AuthenticatedU
     // Normalizar role para garantir consistência (EN → PT-BR)
     const rawRole = userData.role || user.user_metadata?.role || user.app_metadata?.role || 'passageiro'
     const normalizedRole = normalizeRole(rawRole)
-    
+
     const authenticatedUser: AuthenticatedUser = {
       id: userData.id,
       email: userData.email || user.email || '',
       role: normalizedRole,
-      companyId: userData.company_id || null
+      company_id: userData.company_id || null,
+      transportadora_id: userData.transportadora_id || null
     }
 
     debug('Usuário autenticado e dados obtidos do banco', {
@@ -321,9 +337,9 @@ export function hasRole(user: AuthenticatedUser | null, requiredRole: string | s
 
   // Normalizar role do usuário
   const userRole = normalizeRole(user.role)
-  
+
   // Normalizar roles requeridas
-  const roles = Array.isArray(requiredRole) 
+  const roles = Array.isArray(requiredRole)
     ? requiredRole.map(r => normalizeRole(r))
     : [normalizeRole(requiredRole)]
 
@@ -407,7 +423,7 @@ export async function requireCompanyAccess(
   // Verificar se usuário tem acesso à empresa via gf_user_company_map
   let supabaseUrl: string | null = null
   let supabaseAnonKey: string | null = null
-  
+
   try {
     supabaseUrl = getSupabaseUrl()
     supabaseAnonKey = getSupabaseAnonKey()
@@ -430,7 +446,7 @@ export async function requireCompanyAccess(
       // Service key não configurado - continuar sem ela
       serviceKey = null
     }
-    
+
     if (serviceKey) {
       const supabaseAdmin = createClient(supabaseUrl, serviceKey, {
         auth: { persistSession: false, autoRefreshToken: false }

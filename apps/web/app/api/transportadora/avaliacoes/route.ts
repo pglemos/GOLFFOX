@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
+
+import { requireAuth } from '@/lib/api-auth';
 import { logError } from '@/lib/logger';
 import { getSupabaseAdmin } from '@/lib/supabase-client';
-import { requireAuth } from '@/lib/api-auth';
 
 // GET /api/transportadora/avaliacoes - Avaliações NPS das viagens
 export async function GET(request: NextRequest) {

@@ -1,13 +1,15 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { AppShell } from "@/components/app-shell"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { useAuth } from "@/hooks/use-auth"
+
 import { TrendingUp, ArrowUpRight, ArrowDownRight, Calendar, DollarSign, BarChart3 } from "lucide-react"
+
+import { AppShell } from "@/components/app-shell"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { useAuth } from "@/hooks/use-auth"
 import { supabase } from "@/lib/supabase"
 
 interface Forecast {

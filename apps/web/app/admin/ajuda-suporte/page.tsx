@@ -1,15 +1,18 @@
 "use client"
 
 import { useState } from "react"
-import { AppShell } from "@/components/app-shell"
-import { Card } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { HelpCircle, MessageCircle, ExternalLink, CheckCircle } from "lucide-react"
+
 import { motion } from "framer-motion"
-import { useAuthFast } from "@/hooks/use-auth-fast"
+import { HelpCircle, MessageCircle, ExternalLink, CheckCircle } from "lucide-react"
+
+import { AppShell } from "@/components/app-shell"
+import { useAuth } from "@/components/providers/auth-provider"
+import { Button } from "@/components/ui/button"
+import { Card } from "@/components/ui/card"
+
 
 export default function AjudaSuportePage() {
-  const { user, loading } = useAuthFast()
+  const { user, loading } = useAuth()
   const [statusSistema] = useState({ status: 'online', timestamp: new Date() })
 
   if (loading) {
@@ -36,16 +39,16 @@ export default function AjudaSuportePage() {
             whileHover={{ y: -4 }}
             className="group"
           >
-          <Card variant="premium" className="p-6">
-            <div className="p-2 rounded-lg bg-gradient-to-br from-bg-brand-light to-bg-brand-soft w-fit mb-4 group-hover:scale-110 transition-transform duration-300">
-              <HelpCircle className="h-6 w-6 text-brand" />
-            </div>
-            <h3 className="font-bold text-lg mb-2">FAQ</h3>
-            <p className="text-sm text-text-muted-foreground mb-4">Perguntas frequentes sobre o sistema</p>
-            <Button variant="outline" size="sm">
-              Ver FAQ
-            </Button>
-          </Card>
+            <Card variant="premium" className="p-6">
+              <div className="p-2 rounded-lg bg-gradient-to-br from-bg-brand-light to-bg-brand-soft w-fit mb-4 group-hover:scale-110 transition-transform duration-300">
+                <HelpCircle className="h-6 w-6 text-brand" />
+              </div>
+              <h3 className="font-bold text-lg mb-2">FAQ</h3>
+              <p className="text-sm text-text-muted-foreground mb-4">Perguntas frequentes sobre o sistema</p>
+              <Button variant="outline" size="sm">
+                Ver FAQ
+              </Button>
+            </Card>
           </motion.div>
 
           <motion.div
@@ -55,21 +58,21 @@ export default function AjudaSuportePage() {
             whileHover={{ y: -4 }}
             className="group"
           >
-          <Card variant="premium" className="p-6">
-            <div className="p-2 rounded-lg bg-gradient-to-br from-bg-brand-light to-bg-brand-soft w-fit mb-4 group-hover:scale-110 transition-transform duration-300">
-              <MessageCircle className="h-6 w-6 text-brand" />
-            </div>
-            <h3 className="font-bold text-lg mb-2">Contato WhatsApp</h3>
-            <p className="text-sm text-text-muted-foreground mb-4">Fale com nosso suporte</p>
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={() => window.open("https://wa.me/5531999999999", "_blank", "noopener,noreferrer")}
-            >
-              <ExternalLink className="h-4 w-4 mr-2" />
-              Abrir WhatsApp
-            </Button>
-          </Card>
+            <Card variant="premium" className="p-6">
+              <div className="p-2 rounded-lg bg-gradient-to-br from-bg-brand-light to-bg-brand-soft w-fit mb-4 group-hover:scale-110 transition-transform duration-300">
+                <MessageCircle className="h-6 w-6 text-brand" />
+              </div>
+              <h3 className="font-bold text-lg mb-2">Contato WhatsApp</h3>
+              <p className="text-sm text-text-muted-foreground mb-4">Fale com nosso suporte</p>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => window.open("https://wa.me/5531999999999", "_blank", "noopener,noreferrer")}
+              >
+                <ExternalLink className="h-4 w-4 mr-2" />
+                Abrir WhatsApp
+              </Button>
+            </Card>
           </motion.div>
         </div>
 
@@ -78,20 +81,20 @@ export default function AjudaSuportePage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
         >
-        <Card variant="premium" className="p-6">
-          <div className="flex items-center gap-2 mb-4">
-            <div className={`p-2 rounded-lg ${statusSistema.status === 'online' ? 'bg-success-light' : 'bg-error-light'}`}>
-              <CheckCircle className={`h-5 w-5 ${statusSistema.status === 'online' ? 'text-success' : 'text-error'}`} />
+          <Card variant="premium" className="p-6">
+            <div className="flex items-center gap-2 mb-4">
+              <div className={`p-2 rounded-lg ${statusSistema.status === 'online' ? 'bg-success-light' : 'bg-error-light'}`}>
+                <CheckCircle className={`h-5 w-5 ${statusSistema.status === 'online' ? 'text-success' : 'text-error'}`} />
+              </div>
+              <h3 className="font-bold text-lg">Status do Sistema</h3>
             </div>
-            <h3 className="font-bold text-lg">Status do Sistema</h3>
-          </div>
-          <p className="text-sm text-text-muted-foreground">
-            Status: <span className="font-medium text-success">Online</span>
-          </p>
-          <p className="text-xs text-text-muted-foreground mt-2">
-            Última verificação: {statusSistema.timestamp.toLocaleString()}
-          </p>
-        </Card>
+            <p className="text-sm text-text-muted-foreground">
+              Status: <span className="font-medium text-success">Online</span>
+            </p>
+            <p className="text-xs text-text-muted-foreground mt-2">
+              Última verificação: {statusSistema.timestamp.toLocaleString()}
+            </p>
+          </Card>
         </motion.div>
       </div>
     </AppShell>

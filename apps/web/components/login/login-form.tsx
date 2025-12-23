@@ -8,13 +8,15 @@
 "use client"
 
 import { memo } from 'react'
+
 import { motion, AnimatePresence } from 'framer-motion'
 import { Mail, Lock, Eye, EyeOff, ArrowRight, Sparkles, Shield, Zap } from 'lucide-react'
+
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { Checkbox } from '@/components/ui/checkbox'
-import { useReducedMotion } from '@/hooks/use-reduced-motion'
+import { Input } from '@/components/ui/input'
 import { sanitizeInput, type UseLoginReturn } from '@/hooks/use-login'
+import { useReducedMotion } from '@/hooks/use-reduced-motion'
 import { debug } from '@/lib/logger'
 
 interface LoginFormProps {

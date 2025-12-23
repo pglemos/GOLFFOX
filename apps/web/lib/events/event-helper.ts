@@ -4,11 +4,14 @@
  * Helper para facilitar criação e publicação de eventos de domínio
  */
 
+import { randomUUID } from 'crypto'
+
+import { debug, logError } from '@/lib/logger'
+
+import { eventPublisher } from './event-publisher'
 import { DomainEvent } from './event-store'
 import { eventStore } from './event-store'
-import { eventPublisher } from './event-publisher'
-import { debug, logError } from '@/lib/logger'
-import { randomUUID } from 'crypto'
+
 
 /**
  * Cria e publica um evento de domínio

@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseServiceRole } from '@/lib/supabase-server'
-import { requireAuth, validateAuth } from '@/lib/api-auth'
+
 import { z } from 'zod'
+
+import { requireAuth, validateAuth } from '@/lib/api-auth'
+import { supabaseServiceRole } from '@/lib/supabase-server'
 
 export const runtime = 'nodejs'
 

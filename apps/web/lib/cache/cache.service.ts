@@ -7,8 +7,9 @@
  * através do wrapper createNextCache().
  */
 
-import { logger } from '@/lib/logger'
 import { unstable_cache } from 'next/cache'
+
+import { logger } from '@/lib/logger'
 
 interface CacheEntry<T> {
   data: T

@@ -1,16 +1,18 @@
 ﻿"use client"
 
-import { AppShell } from "@/components/app-shell"
-import { Card } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Settings } from "lucide-react"
-import { motion } from "framer-motion"
 import { useEffect, useState } from "react"
+
+import { motion } from "framer-motion"
+import { Settings } from "lucide-react"
+
+import { AppShell } from "@/components/app-shell"
+import { Button } from "@/components/ui/button"
+import { Card } from "@/components/ui/card"
+import { useAuth } from "@/components/providers/auth-provider"
 import { supabase } from "@/lib/supabase"
-import { useAuthFast } from "@/hooks/use-auth-fast"
 
 export default function PreferenciasOperatorPage() {
-  const { user, loading: authLoading } = useAuthFast()
+  const { user, loading: authLoading } = useAuth()
   const [settings, setSettings] = useState<any>(null)
 
   useEffect(() => {
@@ -61,12 +63,12 @@ export default function PreferenciasOperatorPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
         >
-        <Card className="p-6 bg-card/50 backdrop-blur-sm border-border hover:shadow-xl transition-all duration-300">
-          <p className="text-sm text-ink-muted">Em breve: formulário de turnos padrão, tolerâncias, centros de custo, feriados corporativos e conectores (RH/SSO/Webhooks/API Keys).</p>
-          {settings && (
-            <pre className="mt-4 text-xs bg-bg-soft p-3 rounded-lg overflow-auto">{JSON.stringify(settings, null, 2)}</pre>
-          )}
-        </Card>
+          <Card className="p-6 bg-card/50 backdrop-blur-sm border-border hover:shadow-xl transition-all duration-300">
+            <p className="text-sm text-ink-muted">Em breve: formulário de turnos padrão, tolerâncias, centros de custo, feriados corporativos e conectores (RH/SSO/Webhooks/API Keys).</p>
+            {settings && (
+              <pre className="mt-4 text-xs bg-bg-soft p-3 rounded-lg overflow-auto">{JSON.stringify(settings, null, 2)}</pre>
+            )}
+          </Card>
         </motion.div>
       </div>
     </AppShell>

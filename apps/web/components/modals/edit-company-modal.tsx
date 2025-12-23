@@ -1,6 +1,13 @@
 "use client"
 
 import { useState, useEffect } from "react"
+
+import dynamic from "next/dynamic"
+
+import { Briefcase, Loader2, FileText } from "lucide-react"
+
+import { AddressForm, AddressData } from "@/components/address-form"
+import { Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
@@ -9,15 +16,12 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Briefcase, Loader2, FileText } from "lucide-react"
-import { notifySuccess, notifyError } from "@/lib/toast"
-import { globalSyncManager } from "@/lib/global-sync"
-import { AddressForm, AddressData } from "@/components/address-form"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import dynamic from "next/dynamic"
+import { globalSyncManager } from "@/lib/global-sync"
+import { notifySuccess, notifyError } from "@/lib/toast"
+
 
 // Lazy load seção de documentos
 const CompanyDocumentsSection = dynamic(() => import("@/components/company/company-documents-section"), { ssr: false })

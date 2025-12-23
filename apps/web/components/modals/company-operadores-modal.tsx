@@ -1,6 +1,10 @@
 "use client"
 
 import { useState, useEffect } from "react"
+
+import { Users, Plus, Edit, Trash2, Loader2 } from "lucide-react"
+
+import { Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
@@ -9,12 +13,11 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Users, Plus, Edit, Trash2, Loader2 } from "lucide-react"
-import { notifySuccess, notifyError } from "@/lib/toast"
 import { globalSyncManager } from "@/lib/global-sync"
+import { notifySuccess, notifyError } from "@/lib/toast"
+
 import { CreateUserModal } from "./create-operador-login-modal"
 import { EditUserModal } from "./edit-user-modal"
 

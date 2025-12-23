@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
+
 import { createClient } from '@supabase/supabase-js'
-import { requireCompanyAccess } from '@/lib/api-auth'
-import { withRateLimit } from '@/lib/rate-limit'
-import { logger } from '@/lib/logger'
-import { getSupabaseAdmin } from '@/lib/supabase-client'
 import nodemailer from 'nodemailer'
+
+import { requireCompanyAccess } from '@/lib/api-auth'
+import { logger } from '@/lib/logger'
+import { withRateLimit } from '@/lib/rate-limit'
+import { getSupabaseAdmin } from '@/lib/supabase-client'
 
 // Usar getSupabaseAdmin de supabase-client.ts (importado acima)
 

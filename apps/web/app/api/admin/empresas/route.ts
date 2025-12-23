@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
+
 import { requireAuth } from '@/lib/api-auth'
-import { withRateLimit } from '@/lib/rate-limit'
-import { CompanyService, type CompanyFilters, type CreateCompanyData } from '@/lib/services'
 import { formatError } from '@/lib/error-utils'
+import { withRateLimit } from '@/lib/rate-limit'
+import { CompanyService, type CompanyFilters, type CreateCompanyData } from '@/lib/services/server/company-service'
 import { createCompanySchema } from '@/lib/validation/schemas'
 // CQRS (opcional - pode usar diretamente o service ou via command)
 // import { CreateCompanyCommand, cqrsBus } from '@/lib/cqrs'
@@ -35,12 +36,12 @@ async function getCompaniesHandler(request: NextRequest) {
     }
 
     const searchParams = request.nextUrl.searchParams
-    
+
     // Filtros opcionais com suporte a paginação
     const page = parseInt(searchParams.get('page') || '1')
     const limit = parseInt(searchParams.get('limit') || '100')
     const offset = parseInt(searchParams.get('offset') || String((page - 1) * limit))
-    
+
     const filters: CompanyFilters = {
       isActive: searchParams.get('is_active') === 'true' ? true : searchParams.get('is_active') === 'false' ? false : undefined,
       search: searchParams.get('search') || undefined,
@@ -76,19 +77,19 @@ async function createCompanyHandler(request: NextRequest) {
     }
 
     const body = await request.json()
-    
+
     // Validar com Zod
     const validation = createCompanySchema.safeParse(body)
     if (!validation.success) {
       return NextResponse.json(
-        { 
-          error: 'Dados inválidos', 
-          details: validation.error.errors 
+        {
+          error: 'Dados inválidos',
+          details: validation.error.errors
         },
         { status: 400 }
       )
     }
-    
+
     const company = await CompanyService.createCompany(validation.data)
 
     return NextResponse.json({ data: company }, { status: 201 })

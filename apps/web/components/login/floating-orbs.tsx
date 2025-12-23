@@ -8,7 +8,9 @@
 "use client"
 
 import { memo, useMemo } from 'react'
+
 import { motion } from 'framer-motion'
+
 import { useReducedMotion } from '@/hooks/use-reduced-motion'
 
 interface OrbConfig {

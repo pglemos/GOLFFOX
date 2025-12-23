@@ -1,18 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+
 import { requireAuth } from '@/lib/api-auth'
 import { logError } from '@/lib/logger'
+import { UserService } from '@/lib/services/server/user-service'
 
 export const runtime = 'nodejs'
-
-function getSupabaseAdmin() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-  if (!url || !serviceKey) {
-    throw new Error('Supabase não configurado')
-  }
-  return createClient(url, serviceKey)
-}
 
 export async function GET(request: NextRequest) {
   try {
@@ -21,37 +13,36 @@ export async function GET(request: NextRequest) {
       return authErrorResponse
     }
 
-    const supabaseAdmin = getSupabaseAdmin()
+    const searchParams = request.nextUrl.searchParams
+    const pageParam = searchParams.get('page')
+    const limitParam = searchParams.get('limit')
 
-    // Buscar motoristas com relacionamento de transportadora
-    const { data, error } = await supabaseAdmin
-      .from('users')
-      .select('*, carriers:transportadora_id(id, name)')
-      .eq('role', 'motorista')
-      .order('created_at', { ascending: false })
+    // Se não passar parametros, assumimos comportamento "listar tudo" (ou max 1000) para compatibilidade retroativa
+    const page = pageParam ? parseInt(pageParam) : 1
+    const limit = limitParam ? parseInt(limitParam) : 1000
 
-    if (error) {
-      logError('Erro ao buscar motoristas', { error }, 'DriversListAPI')
-      return NextResponse.json(
-        { error: 'Erro ao buscar motoristas', message: error.message },
-        { status: 500 }
-      )
-    }
+    const search = searchParams.get('search') || undefined
+    const status = searchParams.get('status') || undefined
+    const carrierId = searchParams.get('transportadora_id') || undefined
 
-    // Mapear para incluir transportadora_name de forma plana
-    const driversWithCarrier = (data || []).map((d: any) => ({
-      ...d,
-      transportadora_name: d.carriers?.name || null,
-      carriers: undefined
-    }))
+    const { drivers, total } = await UserService.listDrivers({
+      page,
+      limit,
+      search,
+      status,
+      carrierId
+    })
 
-    // Retornar array diretamente para compatibilidade
-    return NextResponse.json(driversWithCarrier)
+    return NextResponse.json({
+      motoristas: drivers,
+      total,
+      success: true
+    })
   } catch (err) {
     logError('Erro ao listar motoristas', { error: err }, 'DriversListAPI')
     const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'
     return NextResponse.json(
-      { error: 'Erro ao listar motoristas', message: errorMessage },
+      { error: 'Erro ao listar motoristas', message: errorMessage, success: false },
       { status: 500 }
     )
   }

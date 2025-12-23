@@ -1,8 +1,8 @@
 "use client"
 
 import React, { useState, useEffect } from "react"
+
 // Substituir Link por <a> para evitar erro de export do next/link
-import { useRouter, usePathname } from "@/lib/next-navigation"
 import {
   Search,
   Settings2,
@@ -11,15 +11,10 @@ import {
   Loader2,
   PanelLeft
 } from "lucide-react"
+
+import { OperationalAlertsNotification } from "@/components/operational-alerts-notification"
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger
-} from "@/components/ui/dropdown-menu"
 import {
   Dialog,
   DialogContent,
@@ -28,15 +23,22 @@ import {
   DialogTitle,
   DialogTrigger
 } from "@/components/ui/dialog"
-import { supabase } from "@/lib/supabase"
-import { useNavigation } from "@/hooks/use-navigation"
-import { OperationalAlertsNotification } from "@/components/operational-alerts-notification"
-import { debug } from "@/lib/logger"
-import { useMobile } from "@/hooks/use-mobile"
-import { cn } from "@/lib/utils"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu"
+import { Input } from "@/components/ui/input"
 import { useSidebar } from "@/components/ui/sidebar"
 import { UserNotifications } from "@/components/user-notifications"
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
+import { useNavigation } from "@/hooks/use-navigation"
+import { useRouter, usePathname } from "@/lib/next-navigation"
+import { supabase } from "@/lib/supabase"
+import { debug } from "@/lib/logger"
+import { useResponsive } from "@/hooks/use-responsive"
+import { cn } from "@/lib/utils"
 
 interface TopbarProps {
   user?: {
@@ -45,6 +47,8 @@ interface TopbarProps {
     email: string
     role: string
     avatar_url?: string
+    company_id?: string | null
+    transportadora_id?: string | null
   }
   onToggleSidebar?: () => void
   isSidebarOpen?: boolean
@@ -62,7 +66,7 @@ export function Topbar({
   const router = useRouter()
   const pathname = usePathname()
   const { isTopbarItemActive: _isTopbarItemActive } = useNavigation()
-  const isMobile = useMobile() // Hook mobile-first
+  const { isMobile } = useResponsive()
   const [isLoggingOut, setIsLoggingOut] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false)
@@ -84,10 +88,10 @@ export function Topbar({
       // Remover timestamp existente e adicionar novo para forçar atualização
       const cleanUrl = user.avatar_url.split('?')[0]
       const urlWithCache = `${cleanUrl}?t=${Date.now()}`
-      debug('Topbar - Setting avatar URL from user prop', { 
+      debug('Topbar - Setting avatar URL from user prop', {
         original: user.avatar_url,
         cleanUrl,
-        urlWithCache 
+        urlWithCache
       }, 'Topbar')
       setAvatarUrl(urlWithCache)
     } else {
@@ -341,8 +345,8 @@ export function Topbar({
                       className="focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive inline-flex shrink-0 items-center justify-center gap-2 rounded-md text-sm font-medium whitespace-nowrap transition-all outline-none focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50 size-9 sm:hidden md:max-lg:inline-flex"
                       aria-label="Search"
                     >
-                      <Search className="h-4 w-4" />
-                      <span className="sr-only">Buscar</span>
+                      <Search className="h-4 w-4" aria-hidden="true" />
+                      <span className="sr-only">Abrir busca</span>
                     </button>
                   </DialogTrigger>
                 </div>
@@ -395,9 +399,9 @@ export function Topbar({
                       alt={user?.name || "User"}
                       className="object-cover"
                       onError={(e) => {
-                        debug('Topbar - Avatar image failed to load', { 
+                        debug('Topbar - Avatar image failed to load', {
                           avatarUrl,
-                          error: e 
+                          error: e
                         }, 'Topbar')
                         // Forçar fallback removendo a URL
                         setAvatarUrl(undefined)
@@ -410,11 +414,11 @@ export function Topbar({
                   <AvatarFallback className="rounded-md text-xs font-medium">
                     {user?.name
                       ? user.name
-                          .split(' ')
-                          .map(n => n[0])
-                          .join('')
-                          .toUpperCase()
-                          .slice(0, 2)
+                        .split(' ')
+                        .map(n => n[0])
+                        .join('')
+                        .toUpperCase()
+                        .slice(0, 2)
                       : 'U'}
                   </AvatarFallback>
                 </Avatar>

@@ -1,6 +1,11 @@
 "use client"
 
 import { useState } from "react"
+
+import { Briefcase, UserPlus, Loader2 } from "lucide-react"
+
+import { AddressForm, AddressData } from "@/components/address-form"
+import { Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
@@ -9,16 +14,13 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Briefcase, UserPlus, Loader2 } from "lucide-react"
+import { fetchWithErrorHandling } from "@/lib/api/fetch-with-error-handling"
+import { formatPhone, formatCEP, formatCPF, formatCNPJ } from "@/lib/format-utils"
+import { globalSyncManager } from "@/lib/global-sync"
 import { supabase } from "@/lib/supabase"
 import { notifySuccess, notifyError } from "@/lib/toast"
-import { globalSyncManager } from "@/lib/global-sync"
-import { formatPhone, formatCEP, formatCPF, formatCNPJ } from "@/lib/format-utils"
-import { AddressForm, AddressData } from "@/components/address-form"
-import { fetchWithErrorHandling } from "@/lib/api/fetch-with-error-handling"
 
 interface CreateOperadorModalProps {
   isOpen: boolean
@@ -190,15 +192,15 @@ export function CreateOperatorModal({
       setStep(7)
       notifySuccess('Empresa criada com sucesso!')
 
-      if (result.company) {
-        globalSyncManager.triggerSync('company.created', result.company)
+      if (data?.company) {
+        globalSyncManager.triggerSync('company.created', data.company)
       }
-      if (result.operador || result.userId) {
+      if (data?.operador || data?.userId) {
         globalSyncManager.triggerSync('user.created', {
-          id: result.userId || result.operatorId,
-          email: result.email || formData.responsibleEmail || '',
+          id: data.userId || data.operatorId,
+          email: data.email || formData.responsibleEmail || '',
           role: 'gestor_transportadora',
-          company_id: result.companyId
+          company_id: data.companyId || data.company_id
         })
       }
 

@@ -6,9 +6,11 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { monitoring, type HealthCheck } from '@/lib/monitoring'
+
 import { createClient } from '@supabase/supabase-js'
+
 import { logError } from '@/lib/logger'
+import { monitoring, type HealthCheck } from '@/lib/monitoring'
 import { applyRateLimit } from '@/lib/rate-limit'
 
 export const runtime = 'nodejs'

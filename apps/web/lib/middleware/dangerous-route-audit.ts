@@ -6,9 +6,11 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
+
 import { createClient } from '@supabase/supabase-js'
-import { logError, warn } from '@/lib/logger'
+
 import { validateAuth } from '@/lib/api-auth'
+import { logError, warn } from '@/lib/logger'
 
 export interface AuditContext {
   userId: string

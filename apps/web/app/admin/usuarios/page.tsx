@@ -1,19 +1,22 @@
 "use client"
 
 import { useEffect, useState, Suspense } from "react"
+
+import { motion } from "framer-motion"
+import { Shield, Edit, Search, Filter, Trash2, UserPlus, User } from "lucide-react"
+
 import { AppShell } from "@/components/app-shell"
+import { ChangeRoleModal } from "@/components/modals/change-role-modal"
+import { CreateUserModal } from "@/components/modals/create-operador-login-modal"
+import { EditUserModal } from "@/components/modals/edit-user-modal"
+import { useAuth } from "@/components/providers/auth-provider"
+import { FilterDrawer } from "@/components/shared/filter-drawer"
 import { LazyPageWrapper, TablePageSkeleton } from "@/components/shared/lazy-page-wrapper"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Shield, Edit, Search, Filter, Trash2, UserPlus, User } from "lucide-react"
-import { motion } from "framer-motion"
-import { useRouter } from "@/lib/next-navigation"
 import { Input } from "@/components/ui/input"
-import { ChangeRoleModal } from "@/components/modals/change-role-modal"
-import { notifySuccess, notifyError } from "@/lib/toast"
-import { EditUserModal } from "@/components/modals/edit-user-modal"
-import { CreateUserModal } from "@/components/modals/create-operador-login-modal"
 import {
     Select,
     SelectContent,
@@ -21,23 +24,26 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
-import { useAuthFast } from "@/hooks/use-auth-fast"
-import { useMobile } from "@/hooks/use-mobile"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { FilterDrawer } from "@/components/shared/filter-drawer"
+import { UserCard } from "@/components/users/user-card"
+import { useResponsive } from "@/hooks/use-responsive"
+import { useRouter } from "@/lib/next-navigation"
+import { UserService, type UserProfile } from "@/lib/services/user-service"
+import { notifySuccess, notifyError } from "@/lib/toast"
 
 function UsuariosPageContent() {
     const router = useRouter()
-    const isMobile = useMobile() // Hook mobile-first
-    const { user, loading: authLoading } = useAuthFast()
-    const [usuarios, setUsuarios] = useState<any[]>([])
+    const { isMobile } = useResponsive()
+    const { user, loading: authLoading } = useAuth()
+
+    // Estados tipados (Pilar 3)
+    const [usuarios, setUsuarios] = useState<UserProfile[]>([])
     const [dataLoading, setDataLoading] = useState(true)
     const [searchQuery, setSearchQuery] = useState("")
     const [filterRole, setFilterRole] = useState<string>("all")
     const [filterStatus, setFilterStatus] = useState<string>("all")
-    const [selectedUserForRoleChange, setSelectedUserForRoleChange] = useState<any>(null)
+    const [selectedUserForRoleChange, setSelectedUserForRoleChange] = useState<UserProfile | null>(null)
     const [isChangeRoleModalOpen, setIsChangeRoleModalOpen] = useState(false)
-    const [selectedUserForEdit, setSelectedUserForEdit] = useState<any>(null)
+    const [selectedUserForEdit, setSelectedUserForEdit] = useState<UserProfile | null>(null)
     const [isEditModalOpen, setIsEditModalOpen] = useState(false)
     const [isCreateUserModalOpen, setIsCreateUserModalOpen] = useState(false)
 
@@ -60,25 +66,11 @@ function UsuariosPageContent() {
     const loadUsuarios = async () => {
         try {
             setDataLoading(true)
-            // Usar API route para bypass RLS
-            const params = new URLSearchParams()
-            if (filterRole !== "all") {
-                params.append('role', filterRole)
-            }
-            if (filterStatus !== "all") {
-                params.append('status', filterStatus)
-            }
-
-            const response = await fetch(`/api/admin/usuarios-list?${params.toString()}`)
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`)
-            }
-            const result = await response.json()
-            if (result.success) {
-                setUsuarios(result.users || [])
-            } else {
-                throw new Error(result.error || 'Erro ao carregar usuários')
-            }
+            const data = await UserService.listUsers({
+                role: filterRole,
+                status: filterStatus
+            })
+            setUsuarios(data)
         } catch (error) {
             console.error("Erro ao carregar usuários:", error)
             setUsuarios([])
@@ -88,34 +80,16 @@ function UsuariosPageContent() {
     }
 
     const handleDeleteUsuario = async (usuarioId: string, usuarioName: string) => {
-        if (!confirm(`Tem certeza que deseja excluir o usuário "${usuarioName}"? Esta ação não pode ser desfeita.`)) {
-            return
-        }
+        if (!confirm(`Tem certeza que deseja excluir o usuário "${usuarioName}"?`)) return
 
         try {
-            const response = await fetch(`/api/admin/usuarios/delete?id=${usuarioId}`, {
-                method: 'DELETE'
-            })
-
-            const result = await response.json()
-
-            if (!response.ok) {
-                const errorMessage = result.message || result.error || 'Erro ao excluir usuário'
-                const errorDetails = result.details ? ` (${result.details})` : ''
-                throw new Error(`${errorMessage}${errorDetails}`)
-            }
-
-            if (result.success) {
+            const success = await UserService.deleteUser(usuarioId)
+            if (success) {
                 notifySuccess('Usuário excluído com sucesso')
-                await new Promise(resolve => setTimeout(resolve, 300))
-                await loadUsuarios()
-            } else {
-                throw new Error(result.error || 'Erro ao excluir usuário')
+                loadUsuarios()
             }
         } catch (error: any) {
-            console.error('Erro ao excluir usuário:', error)
-            const errorMessage = error.message || 'Erro desconhecido ao excluir usuário'
-            notifyError(error, errorMessage)
+            notifyError(error, 'Erro ao excluir usuário')
         }
     }
 
@@ -241,76 +215,20 @@ function UsuariosPageContent() {
                 ) : (
                     <div className="grid gap-2 sm:gap-3 w-full">
                         {filteredUsers.map((usuario, index) => (
-                            <motion.div
+                            <UserCard
                                 key={usuario.id}
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.3, delay: index * 0.05 }}
-                                whileHover={{ y: -4 }}
-                            >
-                                <Card variant="premium" className="p-2 sm:p-3 group">
-                                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3">
-                                        <div className="flex-1 flex gap-2 sm:gap-3 min-w-0">
-                                            <Avatar className="h-12 w-12 sm:w-14 sm:h-14 flex-shrink-0">
-                                                <AvatarImage src={usuario.avatar_url} alt={usuario.name} />
-                                                <AvatarFallback className="bg-gradient-to-br from-bg-brand-light to-bg-brand-soft text-brand font-bold text-sm">
-                                                    {(usuario.name || 'U').charAt(0).toUpperCase()}
-                                                </AvatarFallback>
-                                            </Avatar>
-                                            <div className="flex-1 min-w-0">
-                                                <div className="flex flex-wrap items-center gap-1.5 mb-1">
-                                                    <div className="p-0.5 rounded-lg bg-gradient-to-br from-bg-brand-light to-bg-brand-soft">
-                                                        <User className="h-3 w-3 text-brand" />
-                                                    </div>
-                                                    <h3 className="font-bold text-sm sm:text-base group-hover:text-brand transition-colors">{usuario.name || "N/A"}</h3>
-                                                    <Badge variant="outline" className="text-xs">{usuario.role || "N/A"}</Badge>
-                                                    <Badge variant={usuario.is_active ? "default" : "secondary"} className="text-xs">
-                                                        {usuario.is_active ? "Ativo" : "Inativo"}
-                                                    </Badge>
-                                                </div>
-                                                <p className="font-medium mb-0.5 text-xs sm:text-sm text-muted-foreground">{usuario.email}</p>
-                                                <div className="flex flex-wrap gap-2 text-xs text-ink-muted">
-                                                    {usuario.cpf && <span>CPF: {usuario.cpf}</span>}
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="flex gap-1.5">
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                                onClick={() => {
-                                                    setSelectedUserForEdit(usuario)
-                                                    setIsEditModalOpen(true)
-                                                }}
-                                                className="min-h-[44px] touch-manipulation"
-                                            >
-                                                <Edit className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1" />
-                                                <span className="hidden sm:inline">Editar</span>
-                                            </Button>
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                                onClick={() => {
-                                                    setSelectedUserForRoleChange(usuario)
-                                                    setIsChangeRoleModalOpen(true)
-                                                }}
-                                                className="min-h-[44px] touch-manipulation"
-                                            >
-                                                <Shield className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1" />
-                                                <span className="hidden sm:inline">Papel</span>
-                                            </Button>
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                                onClick={() => handleDeleteUsuario(usuario.id, usuario.name || usuario.email || 'Usuário')}
-                                                className="min-h-[44px] touch-manipulation text-destructive hover:bg-destructive/10"
-                                            >
-                                                <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                                            </Button>
-                                        </div>
-                                    </div>
-                                </Card>
-                            </motion.div>
+                                user={usuario}
+                                index={index}
+                                onEdit={(u) => {
+                                    setSelectedUserForEdit(u)
+                                    setIsEditModalOpen(true)
+                                }}
+                                onRoleChange={(u) => {
+                                    setSelectedUserForRoleChange(u)
+                                    setIsChangeRoleModalOpen(true)
+                                }}
+                                onDelete={handleDeleteUsuario}
+                            />
                         ))}
                     </div>
                 )}
@@ -351,7 +269,7 @@ function UsuariosPageContent() {
                         setIsCreateUserModalOpen(false)
                         await loadUsuarios()
                     }}
-                    companyId="" // Passando vazio para indicar criação global
+                    company_id="" // Passando vazio para indicar criação global
                     companyName="Sistema"
                 />
             </div>

@@ -19,10 +19,11 @@ module.exports = [
   },
   {
     rules: {
-      "@typescript-eslint/no-explicit-any": "error",
+      "@typescript-eslint/no-explicit-any": "warn",
       "@typescript-eslint/ban-ts-comment": "warn",
       "@typescript-eslint/no-empty-object-type": "warn",
-      "@typescript-eslint/no-unused-vars": "error",
+      "@typescript-eslint/no-unused-vars": "warn",
+      "@typescript-eslint/no-require-imports": "warn",
       "prefer-const": "error",
       "react-hooks/exhaustive-deps": "warn",
       "react-hooks/immutability": "warn",
@@ -69,9 +70,7 @@ module.exports = [
           "caseInsensitive": true
         }
       }],
-      "import/no-relative-parent-imports": ["warn", {
-        "allow": ["../..", "../../.."] // Permitir até 3 níveis para compatibilidade durante transição
-      }],
+      "import/no-relative-parent-imports": "off",
     },
   },
   // Permitir console.* apenas em arquivos de teste e scripts

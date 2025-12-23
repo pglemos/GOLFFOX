@@ -1,13 +1,16 @@
 import type { Metadata } from "next";
+
 import { Inter } from "next/font/google";
+
 import "./globals.css";
 import "./mobile-optimizations.css";
-import { ToasterProvider } from "@/components/providers/toaster-provider";
-import { AuthProvider } from "@/components/providers/auth-provider";
-import { WebVitalsInit } from "@/components/web-vitals-init";
-import { ErrorBoundary } from "@/components/error-boundary";
-import { ReactQueryProvider } from "@/lib/react-query-provider";
 import { ThemeProvider } from "next-themes";
+
+import { ErrorBoundary } from "@/components/error-boundary";
+import { AuthProvider } from "@/components/providers/auth-provider";
+import { ToasterProvider } from "@/components/providers/toaster-provider";
+import { WebVitalsInit } from "@/components/web-vitals-init";
+import { ReactQueryProvider } from "@/lib/react-query-provider";
 // Comentado temporariamente - incompatibilidade com Next.js 16 (useParams não exportado)
 // import { Analytics } from "@vercel/analytics/next";
 // import { SpeedInsights } from "@vercel/speed-insights/next";

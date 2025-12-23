@@ -4,10 +4,11 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
+
 import { requireAuth } from '@/lib/api-auth'
-import { getSupabaseAdmin } from '@/lib/supabase-client'
 import { successResponse, errorResponse } from '@/lib/api-response'
 import { logError } from '@/lib/logger'
+import { getSupabaseAdmin } from '@/lib/supabase-client'
 
 export const runtime = 'nodejs'
 

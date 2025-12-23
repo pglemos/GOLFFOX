@@ -3,9 +3,10 @@
  * Gerencia conexões Supabase Realtime com fallback para polling
  */
 
-import { supabase } from './supabase'
 import { RealtimeChannel, RealtimePostgresChangesPayload } from '@supabase/supabase-js'
+
 import { debug, warn, error } from './logger'
+import { supabase } from './supabase'
 
 export interface VeiculoPositionUpdate {
   veiculo_id: string
@@ -51,6 +52,8 @@ export type RealtimeUpdateType =
 
 export interface RealtimeServiceOptions {
   onUpdate?: (update: RealtimeUpdateType) => void
+  onVehicleUpdate?: (update: VeiculoPositionUpdate) => void
+  onAlertUpdate?: (update: AlertUpdate) => void
   onError?: (error: Error) => void
   onConnected?: () => void
   onDisconnected?: () => void
@@ -73,8 +76,8 @@ interface TripData {
 
 interface PositionData {
   trip_id: string
-  lat: number
-  lng: number
+  latitude: number
+  longitude: number
   speed: number | null
   heading: number | null
   timestamp: string
@@ -150,9 +153,9 @@ export class RealtimeService {
       if (this.options.enablePolling) {
         this.startPolling()
       }
-    } catch (err: unknown) {
+    } catch (err: any) {
       error('Erro ao conectar realtime', { error: err }, 'RealtimeService')
-      this.options.onError?.(err as Error)
+      this.options.onError?.(err instanceof Error ? err : new Error(String(err)))
 
       // Se realtime falhar, usar apenas polling
       if (this.options.enablePolling) {
@@ -209,45 +212,48 @@ export class RealtimeService {
             let tripData = this.tripCache.get(position.trip_id)
 
             if (!tripData) {
-              const { data, error: tripError } = await supabase
+              const { data, error: tripError } = await (supabase
                 .from('trips')
                 .select('id, veiculo_id, route_id, motorista_id, status')
                 .eq('id', position.trip_id)
-                .single()
+                .single() as any)
 
               if (tripError || !data) {
                 warn('Erro ao buscar trip para posição', { error: tripError }, 'RealtimeService')
                 return
               }
 
-              tripData = data
-              this.tripCache.set(tripData.id, tripData)
+              tripData = data as any
+              if (tripData?.id) {
+                this.tripCache.set(tripData.id, tripData)
+              }
             }
 
-            if (!position.lat || !position.lng) {
-              warn('Posição sem coordenadas válidas', { position }, 'RealtimeService')
+            if (!tripData || !position.latitude || !position.longitude) {
               return
             }
+
+            if (!tripData) return
 
             this.queueUpdate({
               type: 'position',
               data: {
                 veiculo_id: tripData.veiculo_id,
                 trip_id: position.trip_id,
-                motorista_id: tripData.motorista_id || position.motorista_id,
-                route_id: tripData.route_id || null,
-                lat: position.lat,
-                lng: position.lng,
+                motorista_id: tripData.motorista_id || (position as any).motorista_id || '',
+                route_id: tripData.route_id || '',
+                lat: position.latitude,
+                lng: position.longitude,
                 speed: position.speed || null,
                 heading: position.heading || null,
                 timestamp: position.timestamp || new Date().toISOString(),
-                vehicle_status: position.speed && position.speed > 0.83 ? 'moving' : 'stopped_short',
-                passenger_count: 0, // Seria necessário buscar
+                vehicle_status: (position.speed && position.speed > 0.83) ? 'moving' : 'stopped_short',
+                passenger_count: 0,
               },
             })
-          } catch (err: unknown) {
+          } catch (err: any) {
             error('Erro ao processar atualização de posição', { error: err }, 'RealtimeService')
-            this.options.onError?.(err as Error)
+            this.options.onError?.(err instanceof Error ? err : new Error(String(err)))
           }
         }
       )
@@ -392,12 +398,12 @@ export class RealtimeService {
       try {
         // Buscar últimas posições diretamente da tabela motorista_positions
         const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString()
-        const { data: positionsData, error } = await supabase
+        const { data: positionsData, error } = await (supabase
           .from('motorista_positions')
           .select(`
             trip_id,
-            lat,
-            lng,
+            latitude,
+            longitude,
             speed,
             heading,
             timestamp,
@@ -406,7 +412,7 @@ export class RealtimeService {
           .gte('timestamp', fiveMinutesAgo)
           .eq('trips.status', 'inProgress')
           .order('timestamp', { ascending: false })
-          .limit(100)
+          .limit(100) as any)
 
         if (error) {
           // Se der erro, apenas logar (não quebrar o polling)
@@ -417,16 +423,16 @@ export class RealtimeService {
         if (positionsData && positionsData.length > 0) {
           positionsData.forEach((pos: PositionWithTrip) => {
             const trip = pos.trips
-            if (trip && pos.lat && pos.lng) {
+            if (trip && pos.latitude && pos.longitude) {
               this.queueUpdate({
                 type: 'position',
                 data: {
-                  veiculo_id: trip.veiculo_id,
+                  veiculo_id: (trip as any).veiculo_id || (trip as any).vehicle_id,
                   trip_id: pos.trip_id,
-                  motorista_id: trip.motorista_id,
-                  route_id: trip.route_id,
-                  lat: pos.lat,
-                  lng: pos.lng,
+                  motorista_id: (trip as any).motorista_id,
+                  route_id: (trip as any).route_id,
+                  lat: pos.latitude,
+                  lng: pos.longitude,
                   speed: pos.speed || null,
                   heading: pos.heading || null,
                   timestamp: pos.timestamp,
@@ -437,7 +443,7 @@ export class RealtimeService {
             }
           })
         }
-      } catch (err: unknown) {
+      } catch (err: any) {
         error('Erro no polling de posições', { error: err }, 'RealtimeService')
       }
     }, this.options.pollingInterval)
@@ -505,6 +511,12 @@ export class RealtimeService {
     // Enviar updates em lote
     updates.forEach((update) => {
       this.options.onUpdate?.(update)
+
+      if (update.type === 'position' && this.options.onVehicleUpdate) {
+        this.options.onVehicleUpdate(update.data)
+      } else if (update.type === 'alert' && this.options.onAlertUpdate) {
+        this.options.onAlertUpdate(update.data)
+      }
     })
   }
 

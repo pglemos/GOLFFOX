@@ -1,8 +1,10 @@
 ﻿"use client"
 
 import { memo } from 'react'
+
 import { motion } from 'framer-motion'
 import { AlertCircle, Truck, Route, HelpCircle } from 'lucide-react'
+
 import { t } from '@/lib/i18n'
 
 interface ControlTowerCardsProps {

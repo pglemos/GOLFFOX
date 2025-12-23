@@ -1,7 +1,8 @@
 "use client"
 
-import type { Session } from '@supabase/supabase-js'
 import { supabase } from './client'
+
+import type { Session } from '@supabase/supabase-js'
 
 let bootstrapPromise: Promise<Session | null> | null = null
 

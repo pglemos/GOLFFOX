@@ -5,11 +5,13 @@
 'use client'
 
 import { Component, ReactNode } from 'react'
+
 import { AlertTriangle, RefreshCw } from 'lucide-react'
+
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { createAlert } from '@/lib/operational-alerts'
 import { logError } from '@/lib/logger'
+import { createAlert } from '@/lib/operational-alerts'
 
 interface Props {
   children: ReactNode

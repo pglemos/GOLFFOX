@@ -1,10 +1,12 @@
 "use client"
 
 import { useCallback, useState, useEffect } from "react"
+
 import { Upload, X, FileText, Image as ImageIcon, Loader2, Download, Eye } from "lucide-react"
+
 import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
 import { isImageFile, isPdfFile, formatFileSize } from "@/hooks/use-file-upload"
+import { cn } from "@/lib/utils"
 
 /**
  * Props do componente FileUpload

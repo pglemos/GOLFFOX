@@ -1,4 +1,5 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js'
+
 import type { Database } from '@/types/supabase'
 
 // Inicialização lazy para evitar falhas de build quando variáveis de ambiente não estão definidas.

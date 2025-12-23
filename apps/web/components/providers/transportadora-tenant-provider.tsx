@@ -1,6 +1,7 @@
 'use client'
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
+
 import { supabase } from '@/lib/supabase'
 
 interface TransportadoraContextType {
@@ -46,16 +47,16 @@ export function TransportadoraTenantProvider({ children }: TransportadoraTenantP
 
                 if (foundId) {
                     // Buscar dados da transportadora
-                    const { data: transportadoraData } = await supabase
-                        .from('transportadoras')
+                    const { data: transportadoraData } = await (supabase
+                        .from('carriers')
                         .select('id, name, logo_url')
                         .eq('id', foundId)
-                        .single()
+                        .single() as any)
 
                     if (transportadoraData) {
                         setTransportadoraId(transportadoraData.id)
                         setTransportadoraName(transportadoraData.name || 'Transportadora')
-                        setLogoUrl(transportadoraData.logo_url)
+                        setLogoUrl(transportadoraData.logo_url || null)
                     }
                 } else {
                     // Fallback para dev/test se necessário

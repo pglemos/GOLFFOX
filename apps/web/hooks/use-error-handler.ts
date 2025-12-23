@@ -1,9 +1,10 @@
 "use client"
 
 import { useCallback } from 'react'
-import { notifyError } from '@/lib/toast'
+
 import { trackError, type ErrorContext } from '@/lib/error-tracking'
 import { logError } from '@/lib/logger'
+import { notifyError } from '@/lib/toast'
 
 export interface UseErrorHandlerOptions {
   /** Mostrar toast de erro ao usuário (padrão: true) */

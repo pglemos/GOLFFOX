@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getSupabaseAdmin } from '@/lib/supabase-client'
+
 import { requireAuth } from '@/lib/api-auth'
 import { logError } from '@/lib/logger'
 import { invalidateEntityCache } from '@/lib/next-cache'
+import { getSupabaseAdmin } from '@/lib/supabase-client'
 
 // PUT /api/admin/transportadoras/[transportadoraId]/motoristas/[driverId]
 export async function PUT(

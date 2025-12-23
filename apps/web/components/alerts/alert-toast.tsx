@@ -1,8 +1,8 @@
 "use client"
 
+import { motion } from "framer-motion"
 import { AlertTriangle, X } from "lucide-react"
 import { toast } from "react-hot-toast"
-import { motion } from "framer-motion"
 
 interface AlertToastProps {
     t: any

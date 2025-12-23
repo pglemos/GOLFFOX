@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
+
 import { createClient } from '@supabase/supabase-js'
+
 import { debug, logError } from '@/lib/logger'
 
 // API para migrar usuários antigos para o novo formato de login com CPF

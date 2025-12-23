@@ -1,18 +1,16 @@
 "use client"
 
 import { useEffect, useState, useMemo, useCallback } from "react"
+
+import { motion } from "framer-motion"
+import { Navigation, Search, Eye, MapPin, Clock, Users, Truck, Calendar } from "lucide-react"
+
 import { AppShell } from "@/components/app-shell"
+import { useAuth } from "@/components/providers/auth-provider"
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { Navigation, Search, Eye, MapPin, Clock, Users, Truck, Calendar } from "lucide-react"
-import { notifyError } from "@/lib/toast"
-import { motion } from "framer-motion"
-import { useAuthFast } from "@/hooks/use-auth-fast"
-import { useDebounce } from "@/hooks/use-debounce"
-import { SkeletonList } from "@/components/ui/skeleton"
-import { supabase } from "@/lib/supabase"
 import {
     Select,
     SelectContent,
@@ -20,6 +18,10 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
+import { SkeletonList } from "@/components/ui/skeleton"
+import { useDebounce } from "@/hooks/use-debounce"
+import { supabase } from "@/lib/supabase"
+import { notifyError } from "@/lib/toast"
 
 interface Route {
     id: string
@@ -43,7 +45,7 @@ const STATUS_CONFIG = {
 }
 
 export default function TransportadoraRotasPage() {
-    const { user, loading: authLoading } = useAuthFast()
+    const { user, loading: authLoading } = useAuth()
     const [routes, setRoutes] = useState<Route[]>([])
     const [dataLoading, setDataLoading] = useState(true)
     const [searchQuery, setSearchQuery] = useState("")

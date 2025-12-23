@@ -4,15 +4,19 @@
  */
 
 import { motion } from "framer-motion"
-import { useMobile } from "@/hooks/use-mobile"
-import { cn } from "@/lib/utils"
-import { KpiCard } from "@/components/kpi-card"
-import { QuickActionsGrid } from "@/components/admin/dashboard/quick-actions-grid"
-import { ActivityTimeline } from "@/components/admin/dashboard/activity-timeline"
-import { AdminFilters } from "./admin-filters"
 import { Users, Truck, Navigation, AlertCircle, TrendingUp, Gauge, MapPin } from "lucide-react"
-import type { AggregatedKPIs } from "@/lib/business/kpi-calculations"
+
+import { ActivityTimeline } from "@/components/admin/dashboard/activity-timeline"
+import { QuickActionsGrid } from "@/components/admin/dashboard/quick-actions-grid"
+import { KpiCard } from "@/components/kpi-card"
+import { useMobile } from "@/hooks/use-mobile"
 import type { AuditLog } from "@/lib/api/admin-api"
+import type { AggregatedKPIs } from "@/lib/business/kpi-calculations"
+import { cn } from "@/lib/utils"
+
+import { AdminFilters } from "./admin-filters"
+
+
 
 export interface AdminFilters {
   empresa?: string

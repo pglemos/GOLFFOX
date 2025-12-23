@@ -1,6 +1,11 @@
 "use client"
 
 import { useState, useEffect } from "react"
+
+import { ClipboardCheck } from "lucide-react"
+
+import { Button } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox"
 import {
   Dialog,
   DialogContent,
@@ -8,12 +13,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
-import { ClipboardCheck } from "lucide-react"
-import { supabase } from "@/lib/supabase"
-import { notifySuccess, notifyError } from "@/lib/toast"
-import { useSupabaseSync } from "@/hooks/use-supabase-sync"
 import {
   Select,
   SelectContent,
@@ -22,7 +22,9 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
-import { Checkbox } from "@/components/ui/checkbox"
+import { useSupabaseSync } from "@/hooks/use-supabase-sync"
+import { supabase } from "@/lib/supabase"
+import { notifySuccess, notifyError } from "@/lib/toast"
 
 interface VeiculoChecklist {
   id?: string

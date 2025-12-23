@@ -1,14 +1,13 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { AppShell } from "@/components/app-shell"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { useAuth } from "@/hooks/use-auth"
+
 import { AlertTriangle, ArrowUp, Users, Clock, CheckCircle, XCircle } from "lucide-react"
-import { supabase } from "@/lib/supabase"
-import { notifySuccess, notifyError } from "@/lib/toast"
+
+import { AppShell } from "@/components/app-shell"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
     Dialog,
     DialogContent,
@@ -17,8 +16,11 @@ import {
     DialogFooter,
     DialogDescription,
 } from "@/components/ui/dialog"
-import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import { useAuth } from "@/hooks/use-auth"
+import { supabase } from "@/lib/supabase"
+import { notifySuccess, notifyError } from "@/lib/toast"
 
 interface EscalatedAlert {
     id: string

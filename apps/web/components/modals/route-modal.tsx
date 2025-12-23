@@ -1,18 +1,8 @@
 "use client"
 
 import { useState, useEffect } from "react"
+
 import { motion } from "framer-motion"
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
-  DialogTitle,
-  DialogDescription,
-  DialogFooter 
-} from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { 
   Route, 
   MapPin, 
@@ -23,15 +13,27 @@ import {
   Sparkles,
   Navigation
 } from "lucide-react"
+
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogHeader, 
+  DialogTitle,
+  DialogDescription,
+  DialogFooter 
+} from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { useSupabaseSync } from "@/hooks/use-supabase-sync"
+import { auditLogs } from "@/lib/audit-log"
+import { formatError } from "@/lib/error-utils"
+import { globalSyncManager } from "@/lib/global-sync"
+import { t } from "@/lib/i18n"
 import { supabase } from "@/lib/supabase"
 import { notifySuccess, notifyError } from "@/lib/toast"
-import { formatError } from "@/lib/error-utils"
-import { t } from "@/lib/i18n"
-import { auditLogs } from "@/lib/audit-log"
-import { useSupabaseSync } from "@/hooks/use-supabase-sync"
-import { globalSyncManager } from "@/lib/global-sync"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Badge } from "@/components/ui/badge"
 
 interface RouteData {
   id?: string

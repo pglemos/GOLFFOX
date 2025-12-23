@@ -1,7 +1,7 @@
 ﻿"use client"
 
 import { useMemo } from "react"
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
+
 import { TrendingUp, Users, DollarSign } from "lucide-react"
 import {
   LineChart,
@@ -18,6 +18,8 @@ import {
   Pie,
   Cell,
 } from "recharts"
+
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 
 interface DashboardChartsProps {
   kpis: {

@@ -1,10 +1,12 @@
 "use client"
 
 import { useEffect, useRef } from "react"
+
 import { useQueryClient } from "@tanstack/react-query"
-import { supabase } from "@/lib/supabase"
-import { useOperatorTenant } from "@/components/providers/empresa-tenant-provider"
+
 import { showCriticalAlert } from "@/components/alerts/alert-toast"
+import { useOperatorTenant } from "@/components/providers/empresa-tenant-provider"
+import { supabase } from "@/lib/supabase"
 import { notifySuccess } from "@/lib/toast"
 
 export interface RealtimeProviderProps {

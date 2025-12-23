@@ -1,12 +1,10 @@
 "use client"
 
 import { useState, useMemo, useCallback, useEffect, useOptimistic } from "react"
-import { useFiltersReducer } from "@/hooks/reducers/filters-reducer"
+
 import dynamic from "next/dynamic"
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+
+import { motion } from "framer-motion"
 import {
   AlertTriangle,
   Search,
@@ -21,11 +19,16 @@ import {
   Trash2,
   Edit
 } from "lucide-react"
-import { notifySuccess, notifyError } from "@/lib/toast"
-import { motion } from "framer-motion"
-import { useGlobalSync } from "@/hooks/use-global-sync"
+
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { useFiltersReducer } from "@/hooks/reducers/filters-reducer"
 import { useDebounce } from "@/hooks/use-debounce"
+import { useGlobalSync } from "@/hooks/use-global-sync"
 import { supabase } from "@/lib/supabase"
+import { notifySuccess, notifyError } from "@/lib/toast"
 
 const EditAlertModal = dynamic(
   () => import("@/components/modals/edit-alert-modal").then(m => ({ default: m.EditAlertModal })),

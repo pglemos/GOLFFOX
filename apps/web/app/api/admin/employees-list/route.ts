@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
+
 import { createClient } from '@supabase/supabase-js'
+
 import { requireAuth } from '@/lib/api-auth'
 import { logError, debug } from '@/lib/logger'
 
@@ -44,7 +46,7 @@ export async function GET(request: NextRequest) {
     
     // Se não há dados em gf_employee_company, tentar buscar na tabela users
     let finalData = data
-    let finalError = error
+    const finalError = error
     let finalCount = count
     
     if ((!data || data.length === 0) && !error) {

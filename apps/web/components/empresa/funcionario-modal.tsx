@@ -1,15 +1,19 @@
 ﻿"use client"
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
+import { useState, useEffect } from "react"
+
+import { User } from "lucide-react"
+
+import { AddressForm, AddressData } from "@/components/address-form"
 import { Button } from "@/components/ui/button"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { User } from "lucide-react"
+import { error as logError } from "@/lib/logger"
 import { supabase } from "@/lib/supabase"
 import { notifySuccess, notifyError } from "@/lib/toast"
-import { error as logError } from "@/lib/logger"
-import { useState, useEffect } from "react"
-import { AddressForm, AddressData } from "@/components/address-form"
+
+
 
 interface FuncionarioModalProps {
   funcionario: any | null

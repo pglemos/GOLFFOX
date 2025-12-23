@@ -1,11 +1,13 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { AppShell } from "@/components/app-shell"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { useAuth } from "@/hooks/use-auth"
+
 import { TrendingUp, Route, DollarSign, BarChart3 } from "lucide-react"
+
+import { AppShell } from "@/components/app-shell"
+import { Badge } from "@/components/ui/badge"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { useAuth } from "@/hooks/use-auth"
 import { supabase } from "@/lib/supabase"
 
 interface RouteMargin {

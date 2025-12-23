@@ -1,11 +1,14 @@
-import { redirect } from "next/navigation"
-import { type Metadata } from "next"
 import { Suspense } from "react"
+
+import dynamic from "next/dynamic"
+import { redirect } from "next/navigation"
+
+import { type Metadata } from "next"
+
 import { AppShell } from "@/components/app-shell"
+import { SkeletonList } from "@/components/ui/skeleton"
 import { getServerUser, hasServerRole } from "@/lib/server-auth"
 import { getSupabaseAdmin } from "@/lib/supabase-client"
-import { SkeletonList } from "@/components/ui/skeleton"
-import dynamic from "next/dynamic"
 
 const AlertasPageClient = dynamic(
   () => import("@/components/admin/alertas/alertas-page-client").then(m => ({ default: m.AlertasPageClient })),

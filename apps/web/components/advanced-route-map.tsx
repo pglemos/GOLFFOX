@@ -1,20 +1,13 @@
 "use client"
 
 import { useEffect, useState, useCallback, useRef, memo, useTransition } from "react"
-import { usePlaybackReducer, useUIReducer, useNavigationReducer } from "@/hooks/reducers/playback-reducer"
+
 import { setOptions, importLibrary } from "@googlemaps/js-api-loader"
-import { Card } from "./ui/card"
-import { Button } from "./ui/button"
-import { Badge } from "./ui/badge"
 import { motion, AnimatePresence } from "framer-motion"
 import { Clock, Users, MapPin, Navigation, X, AlertCircle, Maximize2, Minimize2, RefreshCw, Timer, Route as RouteIcon, Layers, Play, Pause, RotateCcw, Phone, MessageSquare, User, Wifi, WifiOff, Activity, Accessibility, Keyboard } from "lucide-react"
-import { supabase } from "@/lib/supabase"
-import AdvancedTooltip from './advanced-tooltip'
-import TemporalProgressBar from './temporal-progress-bar'
-import { MapSkeletonLoader } from './map-skeleton-loader'
-import { InteractiveMarkerHotspot } from './interactive-marker-hotspot'
-import { AdvancedPlaybackControls } from './advanced-playback-controls'
-import { AccessibilityControls, useAccessibilityControls } from './accessibility-controls'
+
+import { usePlaybackReducer, useUIReducer, useNavigationReducer } from "@/hooks/reducers/playback-reducer"
+
 import { useResponsive, useReducedMotion } from '@/hooks/use-responsive'
 import { usePerformance } from '@/hooks/use-performance'
 import { useAccessibility } from '@/hooks/use-accessibility'
@@ -25,6 +18,16 @@ import { loadRouteData as loadRouteDataService, type RouteData, type RouteStop, 
 import { RouteHeader } from './route-map/route-header'
 import { ConnectivityIndicator } from './route-map/connectivity-indicator'
 import { formatDuration, formatDistance } from '@/lib/kpi-utils'
+import { supabase } from "@/lib/supabase"
+import { AccessibilityControls, useAccessibilityControls } from './accessibility-controls'
+import { AdvancedPlaybackControls } from './advanced-playback-controls'
+import AdvancedTooltip from './advanced-tooltip'
+import { InteractiveMarkerHotspot } from './interactive-marker-hotspot'
+import { MapSkeletonLoader } from './map-skeleton-loader'
+import TemporalProgressBar from './temporal-progress-bar'
+import { Badge } from "./ui/badge"
+import { Button } from "./ui/button"
+import { Card } from "./ui/card"
 
 // Tipos importados de route-data-loader
 // RouteData, RouteStop já importados acima

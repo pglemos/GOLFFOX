@@ -3,9 +3,11 @@
  * Responsável por sincronizar sessão com Supabase e definir cookies HttpOnly
  */
 
-import { supabase } from '@/lib/supabase'
 import { debug, warn, error } from '@/lib/logger'
+import { supabase } from '@/lib/supabase'
+
 import { storeUserData } from './auth-storage'
+
 import type { UserData, AuthStorageOptions } from './types'
 
 /**
@@ -47,8 +49,8 @@ async function syncSupabaseSession(
         const err = initCheckErr as Error
         if (
           err?.message?.includes('initializePromise') ||
-          initCheckErr?.message?.includes('undefined') ||
-          initCheckErr?.message === 'timeout'
+          (initCheckErr as any)?.message?.includes('undefined') ||
+          (initCheckErr as any)?.message === 'timeout'
         ) {
           debug('Supabase ainda inicializando, pulando setSession', {
             error: err?.message
@@ -140,7 +142,8 @@ async function setHttpOnlyCookie(userData: UserData, accessToken: string): Promi
           id: userData.id,
           email: userData.email,
           role: userData.role,
-          companyId: userData.companyId || null
+          company_id: userData.company_id || null,
+          transportadora_id: userData.transportadora_id || null
         },
         access_token: accessToken
       })

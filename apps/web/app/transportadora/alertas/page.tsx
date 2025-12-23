@@ -1,11 +1,8 @@
 "use client"
 
 import { useState } from "react"
-import { AppShell } from "@/components/app-shell"
-import { Card } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
+
+import { motion } from "framer-motion"
 import {
   AlertTriangle,
   AlertCircle,
@@ -19,11 +16,18 @@ import {
   XCircle,
   Clock,
 } from "lucide-react"
-import { cn } from "@/lib/utils"
-import { useAuth } from "@/hooks/use-auth"
-import { motion } from "framer-motion"
-import { useTransportadoraAlerts, useResolveTransportadoraAlert } from "@/hooks/use-transportadora-data"
+
+import { AppShell } from "@/components/app-shell"
 import { useTransportadoraTenant } from "@/components/providers/transportadora-tenant-provider"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { useAuth } from "@/hooks/use-auth"
+import { useTransportadoraAlerts, useResolveTransportadoraAlert } from "@/hooks/use-transportadora-data"
+import { cn } from "@/lib/utils"
+
+
 
 export default function AlertasPage() {
   const { user } = useAuth()

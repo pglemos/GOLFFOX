@@ -4,6 +4,8 @@
  * Define buckets, endpoints, tabelas e tipos de documentos para cada entidade
  */
 
+import { Building2, User, FileText, Briefcase } from "lucide-react"
+
 import {
     TransportadoraDocumentType,
     MotoristaDocumentType,
@@ -18,7 +20,6 @@ import {
     DRIVER_DOCS_WITH_EXPIRY,
     VEHICLE_DOCS_WITH_EXPIRY,
 } from "@/types/documents"
-import { Building2, User, FileText, Briefcase } from "lucide-react"
 
 export type EntityType = "transportadora" | "motorista" | "veiculo" | "company"
 

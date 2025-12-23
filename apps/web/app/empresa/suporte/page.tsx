@@ -1,19 +1,21 @@
 "use client"
 
+import { useState } from "react"
+
+import { LifeBuoy, Send } from "lucide-react"
+
 import { AppShell } from "@/components/app-shell"
-import { Card, CardHeader, CardContent, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { Card, CardHeader, CardContent, CardTitle, CardDescription } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { useState } from "react"
+import { Textarea } from "@/components/ui/textarea"
+import { useAuth } from "@/components/providers/auth-provider"
 import { notifySuccess, notifyError } from "@/lib/toast"
-import { LifeBuoy, Send } from "lucide-react"
-import { useAuthFast } from "@/hooks/use-auth-fast"
 
 export default function EmpresaSuportePage() {
-    const { user, loading } = useAuthFast()
+    const { user, loading } = useAuth()
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [formData, setFormData] = useState({
         subject: "",
@@ -44,7 +46,7 @@ export default function EmpresaSuportePage() {
     return (
         <AppShell
             panel="gestor_empresa"
-            user={            user ? {
+            user={user ? {
                 id: user.id,
                 name: user.name || "Gestor da Empresa",
                 email: user.email,

@@ -1,25 +1,15 @@
 "use client"
 
 import { useEffect, useState, useMemo, useCallback } from "react"
+
+import { motion } from "framer-motion"
+import { Wrench, Plus, Search, Edit, Trash2, Truck, Calendar, AlertTriangle, CheckCircle, Clock, ArrowUpRight } from "lucide-react"
+
 import { AppShell } from "@/components/app-shell"
+import { useAuth } from "@/components/providers/auth-provider"
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { Wrench, Plus, Search, Edit, Trash2, Truck, Calendar, AlertTriangle, CheckCircle, Clock, ArrowUpRight } from "lucide-react"
-import { notifySuccess, notifyError } from "@/lib/toast"
-import { motion } from "framer-motion"
-import { useAuthFast } from "@/hooks/use-auth-fast"
-import { useDebounce } from "@/hooks/use-debounce"
-import { SkeletonList } from "@/components/ui/skeleton"
-import { supabase } from "@/lib/supabase"
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select"
 import {
     Dialog,
     DialogContent,
@@ -27,8 +17,20 @@ import {
     DialogTitle,
     DialogFooter,
 } from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
+import { SkeletonList } from "@/components/ui/skeleton"
 import { Textarea } from "@/components/ui/textarea"
+import { useDebounce } from "@/hooks/use-debounce"
+import { supabase } from "@/lib/supabase"
+import { notifySuccess, notifyError } from "@/lib/toast"
 
 interface Maintenance {
     id: string
@@ -75,7 +77,7 @@ const STATUS_CONFIG = {
 }
 
 export default function ManutencaoPage() {
-    const { user, loading: authLoading } = useAuthFast()
+    const { user, loading: authLoading } = useAuth()
     const [maintenances, setMaintenances] = useState<Maintenance[]>([])
     const [veiculos, setVeiculos] = useState<veiculo[]>([])
     const [dataLoading, setDataLoading] = useState(true)

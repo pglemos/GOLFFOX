@@ -1,8 +1,9 @@
 "use client"
 
 import React from "react"
-import { useMobile } from "@/hooks/use-mobile"
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { useMobile } from "@/hooks/use-mobile"
 import { cn } from "@/lib/utils"
 
 interface ResponsiveChartProps {

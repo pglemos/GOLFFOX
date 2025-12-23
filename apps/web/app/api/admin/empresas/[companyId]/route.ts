@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
+
 import { requireAuth } from '@/lib/api-auth'
-import { invalidateEntityCache } from '@/lib/next-cache'
-import { getSupabaseAdmin } from '@/lib/supabase-client'
 import { logError } from '@/lib/logger'
+import { invalidateEntityCache } from '@/lib/next-cache'
+import { CompanyService } from '@/lib/services/server/company-service'
+import { getSupabaseAdmin } from '@/lib/supabase-client'
 
 export const runtime = 'nodejs'
 
@@ -27,7 +29,7 @@ export async function PUT(
 ) {
   const params = await context.params
 
-  const { companyId: companyIdParam  } = params
+  const { companyId: companyIdParam } = params
   try {
     // ✅ Validar autenticação (apenas admin)
     const authErrorResponse = await requireAuth(request, 'admin')
@@ -50,111 +52,47 @@ export async function PUT(
       )
     }
 
-    const supabaseAdmin = getSupabaseAdmin()
     const body = await request.json()
 
-    // Verificar se empresa existe e buscar cnpj para validação
-    const { data: existingCompany, error: fetchError } = await (supabaseAdmin
-      .from('companies') as any)
-      .select('id,cnpj')
-      .eq('id', companyId)
-      .single()
+    // Preparar dados para atualização
+    // Campos legados (para compatibilidade) mapeados para os campos corretos
+    const addressCity = body.address_city || body.city
+    const addressState = body.address_state || body.state
+    const addressZipCode = body.address_zip_code || body.zip_code
 
-    if (fetchError || !existingCompany) {
-      return NextResponse.json(
-        { error: 'Empresa não encontrada' },
-        { status: 404 }
-      )
-    }
-
-    // Validar CNPJ único se fornecido e diferente do atual
-    if (body.cnpj && body.cnpj !== (existingCompany as any).cnpj) {
-      const { data: companyWithSameCnpj } = await (supabaseAdmin
-        .from('companies') as any)
-        .select('id')
-        .eq('cnpj', body.cnpj)
-        .neq('id', companyId)
-        .single()
-
-      if (companyWithSameCnpj) {
-        return NextResponse.json(
-          { error: 'Uma empresa com este CNPJ já existe' },
-          { status: 400 }
-        )
-      }
-    }
-
-    // Validar email se fornecido
-    if (body.email) {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-      if (!emailRegex.test(body.email)) {
-        return NextResponse.json(
-          { error: 'Email inválido' },
-          { status: 400 }
-        )
-      }
-    }
-
-    // Preparar dados para atualização (apenas campos que existem na tabela)
-    const updateData: any = {}
-    if (body.name !== undefined) updateData.name = body.name.trim()
-    if (body.cnpj !== undefined) updateData.cnpj = body.cnpj?.trim() || null
-    if (body.address !== undefined) updateData.address = body.address?.trim() || null
-    // Campos de endereço separados
-    if (body.address_zip_code !== undefined) updateData.address_zip_code = body.address_zip_code?.trim() || null
-    if (body.address_street !== undefined) updateData.address_street = body.address_street?.trim() || null
-    if (body.address_number !== undefined) updateData.address_number = body.address_number?.trim() || null
-    if (body.address_neighborhood !== undefined) updateData.address_neighborhood = body.address_neighborhood?.trim() || null
-    if (body.address_complement !== undefined) updateData.address_complement = body.address_complement?.trim() || null
-    if (body.address_city !== undefined) updateData.address_city = body.address_city?.trim() || null
-    if (body.address_state !== undefined) updateData.address_state = body.address_state?.trim() || null
-    // Campos legados (para compatibilidade)
-    if (body.city !== undefined) updateData.address_city = body.city?.trim() || null
-    if (body.state !== undefined) updateData.address_state = body.state?.trim() || null
-    if (body.zip_code !== undefined) updateData.address_zip_code = body.zip_code?.trim() || null
-    if (body.address_number !== undefined) updateData.address_number = body.address_number?.trim() || null
-    if (body.address_complement !== undefined) updateData.address_complement = body.address_complement?.trim() || null
-    if (body.phone !== undefined) updateData.phone = body.phone?.trim() || null
-    if (body.email !== undefined) updateData.email = body.email?.trim() || null
-    if (body.is_active !== undefined) updateData.is_active = body.is_active
-
-    // Atualizar empresa
-    const { data: updatedCompany, error: updateError } = await (supabaseAdmin
-      .from('companies') as any)
-      .update(updateData)
-      .eq('id', companyId)
-      .select()
-      .single()
-
-    if (updateError) {
-      logError('Erro ao atualizar empresa', { error: updateError, companyId }, 'CompaniesUpdateAPI')
-      return NextResponse.json(
-        { 
-          error: 'Erro ao atualizar empresa',
-          message: updateError.message || 'Erro desconhecido',
-          details: process.env.NODE_ENV === 'development' ? updateError : undefined
-        },
-        { status: 500 }
-      )
-    }
-
-    // Invalidar cache após atualização
-    await invalidateEntityCache('company', companyId)
+    // Delegar para o serviço
+    const updatedCompany = await CompanyService.updateCompany(companyId, {
+      name: body.name,
+      cnpj: body.cnpj,
+      address: body.address,
+      phone: body.phone,
+      email: body.email,
+      is_active: body.is_active,
+      address_zip_code: addressZipCode,
+      address_street: body.address_street,
+      address_number: body.address_number,
+      address_neighborhood: body.address_neighborhood,
+      address_complement: body.address_complement,
+      address_city: addressCity,
+      address_state: addressState
+    })
 
     return NextResponse.json({
       success: true,
       company: updatedCompany
     })
-  } catch (err) {
+  } catch (err: any) {
     logError('Erro ao atualizar empresa', { error: err, companyId: (await context.params).companyId }, 'CompaniesUpdateAPI')
-    const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'
+    const message = err.message
+    const status = message.includes('obrigatório') || message.includes('inválido') || message.includes('já existe') ? 400 : 500
+
     return NextResponse.json(
-      { 
+      {
         error: 'Erro ao atualizar empresa',
-        message: errorMessage,
+        message: message,
         details: process.env.NODE_ENV === 'development' ? String(err) : undefined
       },
-      { status: 500 }
+      { status }
     )
   }
 }
@@ -169,7 +107,7 @@ export async function DELETE(
 ) {
   const params = await context.params
 
-  const { companyId: companyIdParam  } = params
+  const { companyId: companyIdParam } = params
   try {
     // ✅ Validar autenticação (apenas admin)
     const authErrorResponse = await requireAuth(request, 'admin')
@@ -228,21 +166,7 @@ export async function DELETE(
 
     if (totalDependencies > 0) {
       // Soft delete se tiver dependências
-      const { error: updateError } = await (supabaseAdmin
-        .from('companies') as any)
-        .update({ is_active: false })
-        .eq('id', companyId)
-
-      if (updateError) {
-        logError('Erro ao arquivar empresa', { error: updateError, companyId }, 'CompaniesArchiveAPI')
-        return NextResponse.json(
-          { error: 'Erro ao arquivar empresa', message: updateError.message },
-          { status: 500 }
-        )
-      }
-
-      // Invalidar cache após arquivamento
-      await invalidateEntityCache('company', companyId)
+      await CompanyService.updateCompany(companyId, { is_active: false })
 
       return NextResponse.json({
         success: true,
@@ -256,21 +180,7 @@ export async function DELETE(
       })
     } else {
       // Hard delete se não tiver dependências
-      const { error: deleteError } = await supabaseAdmin
-        .from('companies')
-        .delete()
-        .eq('id', companyId)
-
-      if (deleteError) {
-        logError('Erro ao excluir empresa', { error: deleteError, companyId }, 'CompaniesDeleteAPI')
-        return NextResponse.json(
-          { error: 'Erro ao excluir empresa', message: deleteError.message },
-          { status: 500 }
-        )
-      }
-
-      // Invalidar cache após exclusão
-      await invalidateEntityCache('company', companyId)
+      await CompanyService.deleteCompany(companyId, true)
 
       return NextResponse.json({
         success: true,

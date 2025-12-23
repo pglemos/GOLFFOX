@@ -5,11 +5,15 @@
 
 'use client'
 
-import { Card } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Slider } from '@/components/ui/slider'
 import { useState } from 'react'
+
 import { Play, Pause, Square, SkipBack, SkipForward, Gauge } from 'lucide-react'
+
+import { Button } from '@/components/ui/button'
+import { Card } from '@/components/ui/card'
+import { Slider } from '@/components/ui/slider'
+
+
 
 interface PlaybackControlsProps {
   isPlaying: boolean

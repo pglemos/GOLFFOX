@@ -1,10 +1,12 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Card } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
+
 import { motion } from "framer-motion"
 import { Search, RefreshCw, CheckCircle, AlertCircle, Cookie, Globe, Settings } from "lucide-react"
+
+import { Button } from "@/components/ui/button"
+import { Card } from "@/components/ui/card"
 
 export default function DiagnosticoPage() {
   const [resultado, setResultado] = useState<any>(null)

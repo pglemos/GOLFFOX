@@ -4,8 +4,9 @@
  * Publica eventos de domínio para handlers
  */
 
-import { DomainEvent } from './event-store'
 import { debug, logError } from '@/lib/logger'
+
+import { DomainEvent } from './event-store'
 
 export type EventHandler<T extends DomainEvent = DomainEvent> = (event: T) => Promise<void>
 

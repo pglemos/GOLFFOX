@@ -1,9 +1,10 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
+
 import { useFileUpload } from "@/hooks/use-file-upload"
-import { notifySuccess, notifyError } from "@/lib/toast"
 import { getDocumentsConfig, EntityType, getFilteredDocumentTypes } from "@/lib/documents-config"
+import { notifySuccess, notifyError } from "@/lib/toast"
 import { BaseDocument } from "@/types/documents"
 
 interface UseDocumentsOptions {

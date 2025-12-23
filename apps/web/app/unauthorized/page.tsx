@@ -1,11 +1,15 @@
 "use client"
 
-import { useSearchParams, useRouter } from "@/lib/next-navigation"
-import { Card } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { ShieldAlert, ArrowLeft } from "lucide-react"
-import { motion } from "framer-motion"
 import { Suspense } from "react"
+
+import { motion } from "framer-motion"
+import { ShieldAlert, ArrowLeft } from "lucide-react"
+
+import { Button } from "@/components/ui/button"
+import { Card } from "@/components/ui/card"
+import { useSearchParams, useRouter } from "@/lib/next-navigation"
+
+
 
 function UnauthorizedContent() {
   const searchParams = useSearchParams()

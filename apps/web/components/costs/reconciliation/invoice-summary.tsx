@@ -1,8 +1,8 @@
 "use client"
 
 import { Badge } from "@/components/ui/badge"
-import { formatCurrency } from "@/lib/kpi-utils"
 import type { Invoice } from "@/hooks/use-reconciliation"
+import { formatCurrency } from "@/lib/kpi-utils"
 
 interface InvoiceSummaryProps {
   invoice: Invoice

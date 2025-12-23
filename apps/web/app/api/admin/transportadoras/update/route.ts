@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseServiceRole } from '@/lib/supabase-server'
-import { requireAuth } from '@/lib/api-auth'
+
 import { z } from 'zod'
-import { CarrierUpdate } from '@/types/carrier'
-import { invalidateEntityCache } from '@/lib/next-cache'
+
+import { requireAuth } from '@/lib/api-auth'
 import { successResponse, errorResponse, validationErrorResponse } from '@/lib/api-response'
+import { invalidateEntityCache } from '@/lib/next-cache'
+import { supabaseServiceRole } from '@/lib/supabase-server'
+import { CarrierUpdate } from '@/types/carrier'
 
 export const runtime = 'nodejs'
 

@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import { supabase } from "@/lib/supabase"
+
 import { useTransportadoraTenant } from "@/components/providers/transportadora-tenant-provider"
+import { supabase } from "@/lib/supabase"
 import { notifySuccess, notifyError } from "@/lib/toast"
 
 export function useTransportadoraAlerts() {

@@ -5,31 +5,9 @@
 'use client'
 
 import { useEffect, useState, useCallback, useRef, useTransition } from 'react'
-import { useRouter, useSearchParams } from '@/lib/next-navigation'
-import { loadGoogleMapsAPI } from '@/lib/google-maps-loader'
-import { RealtimeService, RealtimeUpdateType } from '@/lib/realtime-service'
-import { PlaybackService } from '@/lib/playback-service'
-import { getMapsBillingMonitor } from '@/lib/maps-billing-monitor'
-import { detectRouteDeviation } from '@/lib/route-deviation-detector'
-import { createAlert } from '@/lib/operational-alerts'
-import { analyzeTrajectory, type PlannedRoutePoint, type ActualPosition, type TrajectoryAnalysis } from '@/lib/trajectory-analyzer'
-import { 
-  isValidCoordinate, 
-  normalizeCoordinate 
-} from '@/lib/coordinate-validator'
-import { loadVehicles } from '@/lib/services/map/map-services/vehicle-loader'
-import { TrajectoryPanel } from './trajectory-panel'
-import { MapFilters } from './filters'
-import { MapLayers } from './layers'
-import { HeatmapLayer } from './heatmap-layer'
-import { VehiclePanel, RoutePanel, AlertsPanel } from './panels'
-import { PlaybackControls } from './playback-controls'
+
+import { MarkerClusterer } from '@googlemaps/markerclusterer'
 import { AnimatePresence } from 'framer-motion'
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-import { useKeyboardShortcuts } from './keyboard-shortcuts'
-import { Card } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
 import { 
   RefreshCw, 
   AlertCircle, 
@@ -37,11 +15,41 @@ import {
   Download,
   Map as MapIcon 
 } from 'lucide-react'
+
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card } from '@/components/ui/card'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import { 
+  isValidCoordinate, 
+  normalizeCoordinate 
+} from '@/lib/coordinate-validator'
+import { formatError, getErrorMeta } from '@/lib/error-utils'
+import { loadGoogleMapsAPI } from '@/lib/google-maps-loader'
+import { useRouter, useSearchParams } from '@/lib/next-navigation'
+import { RealtimeService, RealtimeUpdateType } from '@/lib/realtime-service'
+import { PlaybackService } from '@/lib/playback-service'
+import { getMapsBillingMonitor } from '@/lib/maps-billing-monitor'
+import { detectRouteDeviation } from '@/lib/route-deviation-detector'
+import { createAlert } from '@/lib/operational-alerts'
+import { loadVehicles } from '@/lib/services/map/map-services/vehicle-loader'
+import { analyzeTrajectory, type PlannedRoutePoint, type ActualPosition, type TrajectoryAnalysis } from '@/lib/trajectory-analyzer'
+import { TrajectoryPanel } from './trajectory-panel'
+import { MapFilters } from './filters'
+import { MapLayers } from './layers'
+import { HeatmapLayer } from './heatmap-layer'
+import { VehiclePanel, RoutePanel, AlertsPanel } from './panels'
+import { PlaybackControls } from './playback-controls'
+
+
+
+import { useKeyboardShortcuts } from './keyboard-shortcuts'
+
+
+
 import { supabase } from '@/lib/supabase'
-import { MarkerClusterer } from '@googlemaps/markerclusterer'
 import { notifySuccess, notifyError } from '@/lib/toast'
 import { debug, warn, error as logError } from '@/lib/logger'
-import { formatError, getErrorMeta } from '@/lib/error-utils'
 import { t } from '@/lib/i18n'
 import type { Veiculo, RoutePolyline, MapAlert, MapsBillingStatus, HistoricalTrajectory, RouteStop } from '@/types/map'
 import { useMapFilters } from '@/stores/map-filters'

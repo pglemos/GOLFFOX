@@ -1,7 +1,13 @@
 "use client"
 
 import { useState, useEffect } from "react"
+
+import dynamic from "next/dynamic"
+
 import { motion } from "framer-motion"
+import { Truck, Upload, X, Calendar, Wrench, ClipboardCheck, FileText } from "lucide-react"
+
+import { Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
@@ -9,6 +15,8 @@ import {
   DialogTitle,
   DialogFooter
 } from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import {
   Select,
   SelectContent,
@@ -16,18 +24,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Truck, Upload, X, Calendar, Wrench, ClipboardCheck, FileText } from "lucide-react"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { useSupabaseSync } from "@/hooks/use-supabase-sync"
+import { auditLogs } from "@/lib/audit-log"
+import { formatError } from "@/lib/error-utils"
+import { t } from "@/lib/i18n"
 import { supabase } from "@/lib/supabase"
 import { notifySuccess, notifyError } from "@/lib/toast"
-import { t } from "@/lib/i18n"
-import { formatError } from "@/lib/error-utils"
-import { auditLogs } from "@/lib/audit-log"
-import { useSupabaseSync } from "@/hooks/use-supabase-sync"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import dynamic from "next/dynamic"
 
 // Lazy load seção de documentos
 const VeiculoDocumentsSection = dynamic(() => import("@/components/veiculo/veiculo-documents-section"), { ssr: false })

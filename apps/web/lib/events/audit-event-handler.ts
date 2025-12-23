@@ -5,9 +5,12 @@
  */
 
 import { DomainEvent } from './event-store'
-import { EventHandler } from './event-publisher'
+
 import { createClient } from '@supabase/supabase-js'
+
 import { logError, debug } from '@/lib/logger'
+
+import { EventHandler } from './event-publisher'
 
 class AuditEventHandler {
   private supabase: ReturnType<typeof createClient> | null = null

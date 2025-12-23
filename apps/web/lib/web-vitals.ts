@@ -4,6 +4,7 @@
  */
 
 import { onCLS, onFCP, onINP, onLCP, onTTFB } from 'web-vitals'
+
 import { warn, debug } from './logger'
 
 export interface WebVitalMetric {

@@ -1,16 +1,19 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+
+import { ColumnDef } from "@tanstack/react-table"
+import { FileText, Calendar, AlertTriangle, Plus } from "lucide-react"
+import { ArrowUpDown, MoreHorizontal } from "lucide-react"
+
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { formatCurrency } from "@/lib/kpi-utils"
-import { FileText, Calendar, AlertTriangle, Plus } from "lucide-react"
-import { supabase } from "@/lib/supabase"
-import { SkeletonList } from "@/components/ui/skeleton"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { DataTablePremium } from "@/components/ui/data-table-premium"
-import { ColumnDef } from "@tanstack/react-table"
-import { ArrowUpDown, MoreHorizontal } from "lucide-react"
+import { SkeletonList } from "@/components/ui/skeleton"
+import { formatCurrency } from "@/lib/kpi-utils"
+import { supabase } from "@/lib/supabase"
+
 
 interface Contract {
     id: string

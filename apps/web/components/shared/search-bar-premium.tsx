@@ -1,10 +1,12 @@
 "use client"
 
 import { useState, useDeferredValue, useMemo } from "react"
+
 import { motion, AnimatePresence } from "framer-motion"
-import { Input } from "@/components/ui/input"
 import { Search, X } from "lucide-react"
+
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import { fadeInUp } from "@/lib/animations"
 
 interface SearchBarPremiumProps {

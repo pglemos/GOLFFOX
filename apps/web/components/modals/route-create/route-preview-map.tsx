@@ -1,7 +1,9 @@
 import React from "react"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
+
 import { Navigation } from "lucide-react"
+
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import type { EmployeeLite, OptimizeRouteResponse } from "@/types/routes"
 
 interface RoutePreviewMapProps {

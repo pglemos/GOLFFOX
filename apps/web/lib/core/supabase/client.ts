@@ -6,6 +6,7 @@
 "use client"
 
 import { createClient, SupabaseClient } from '@supabase/supabase-js'
+
 import type { Database } from '@/types/supabase'
 
 type SupabaseClientType = SupabaseClient<Database>

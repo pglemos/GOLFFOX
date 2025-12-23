@@ -1,18 +1,20 @@
 "use client"
 
-import { AppShell } from "@/components/app-shell"
-import { Card } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Settings } from "lucide-react"
-import { motion } from "framer-motion"
 import { useEffect, useState } from "react"
-import { supabase } from "@/lib/supabase"
+
+import { motion } from "framer-motion"
+import { Settings } from "lucide-react"
+
+import { AppShell } from "@/components/app-shell"
+import { useAuth } from "@/components/providers/auth-provider"
+import { Button } from "@/components/ui/button"
+import { Card } from "@/components/ui/card"
 import { useRouter } from "@/lib/next-navigation"
-import { useAuthFast } from "@/hooks/use-auth-fast"
+import { supabase } from "@/lib/supabase"
 
 export default function PreferenciasTransportadoraPage() {
   const router = useRouter()
-  const { user, loading: authLoading } = useAuthFast()
+  const { user, loading: authLoading } = useAuth()
 
   if (authLoading) {
     return (
@@ -42,7 +44,7 @@ export default function PreferenciasTransportadoraPage() {
             <p className="text-sm sm:text-base text-muted-foreground">Configurações da transportadora</p>
           </div>
           <Button variant="outline" className="w-full sm:w-auto">
-            <Settings className="h-4 w-4 mr-2" /> 
+            <Settings className="h-4 w-4 mr-2" />
             Salvar
           </Button>
         </div>
@@ -52,12 +54,12 @@ export default function PreferenciasTransportadoraPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
         >
-        <Card className="p-4 sm:p-6 bg-card/50 backdrop-blur-sm border-border hover:shadow-xl transition-all duration-300">
-          <h2 className="text-lg sm:text-xl font-semibold mb-4">Informações da Transportadora</h2>
-          <p className="text-sm sm:text-base text-ink-muted">
-            As configurações de preferências da transportadora estarão disponíveis em breve.
-          </p>
-        </Card>
+          <Card className="p-4 sm:p-6 bg-card/50 backdrop-blur-sm border-border hover:shadow-xl transition-all duration-300">
+            <h2 className="text-lg sm:text-xl font-semibold mb-4">Informações da Transportadora</h2>
+            <p className="text-sm sm:text-base text-ink-muted">
+              As configurações de preferências da transportadora estarão disponíveis em breve.
+            </p>
+          </Card>
         </motion.div>
       </div>
     </AppShell>

@@ -1,9 +1,10 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
+
+import { getDiscrepancyStatus } from "@/lib/cost-utils/discrepancy-calculator"
 import { supabase } from "@/lib/supabase"
 import { notifyError, notifySuccess } from "@/lib/toast"
-import { getDiscrepancyStatus } from "@/lib/cost-utils/discrepancy-calculator"
 
 export interface InvoiceLine {
   id: string

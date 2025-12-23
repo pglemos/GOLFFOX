@@ -1,6 +1,11 @@
 "use client"
 
 import { useState, useEffect, useMemo } from "react"
+
+import { Search, CheckCircle2, XCircle } from "lucide-react"
+
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
@@ -9,12 +14,9 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Search, CheckCircle2, XCircle } from "lucide-react"
-import { supabase } from "@/lib/supabase"
-import { maskCPF } from "@/lib/geocoding"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { maskCPF } from "@/lib/geocoding"
+import { supabase } from "@/lib/supabase"
 
 interface motorista {
   id: string

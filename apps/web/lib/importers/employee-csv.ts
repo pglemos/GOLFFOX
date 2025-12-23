@@ -1,8 +1,9 @@
 import Papa from 'papaparse'
 import { z } from 'zod'
+
 import { geocodeAddress } from '@/lib/google-maps'
-import { supabase } from '@/lib/supabase'
 import { warn, error as logError } from '@/lib/logger'
+import { supabase } from '@/lib/supabase'
 
 // Função para validar CPF
 function validateCPF(cpf: string): boolean {

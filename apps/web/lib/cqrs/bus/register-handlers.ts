@@ -5,8 +5,8 @@
  */
 
 import { cqrsBus } from './cqrs-bus'
-import { CreateCompanyHandler } from '../handlers/create-company.handler'
 import { CreateCompanyCommand } from '../commands/create-company.command'
+import { CreateCompanyHandler } from '../handlers/create-company.handler'
 
 // Registrar handlers
 const createCompanyHandler = new CreateCompanyHandler()

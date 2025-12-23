@@ -1,12 +1,14 @@
 "use client"
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
-import { Badge } from "@/components/ui/badge"
 import { FileText } from "lucide-react"
+
+import { Badge } from "@/components/ui/badge"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { useReconciliation } from "@/hooks/use-reconciliation"
-import { InvoiceSummary } from "./reconciliation/invoice-summary"
-import { DiscrepancyTable } from "./reconciliation/discrepancy-table"
+
 import { DiscrepancySummary } from "./reconciliation/discrepancy-summary"
+import { DiscrepancyTable } from "./reconciliation/discrepancy-table"
+import { InvoiceSummary } from "./reconciliation/invoice-summary"
 import { ModalActions } from "./reconciliation/modal-actions"
 
 interface ReconciliationModalProps {

@@ -1,139 +1,62 @@
 "use client"
 
-import * as React from "react"
-import { logError } from '@/lib/logger'
-import { trackError } from '@/lib/error-tracking'
-import { createAlert } from '@/lib/operational-alerts'
+import { useEffect } from "react"
 
-export default function GlobalError({ error, reset }: { error: Error; reset: () => void }) {
-  // ✅ Log error estruturado com contexto completo
-  React.useEffect(() => {
-    const context = {
-      error: error.message,
-      stack: error.stack,
-      name: error.name,
-      url: typeof window !== 'undefined' ? window.location.href : 'unknown',
-      timestamp: new Date().toISOString(),
-      userAgent: typeof window !== 'undefined' ? window.navigator.userAgent : undefined,
-      area: 'global'
-    }
+import { AlertTriangle, RefreshCcw, Home } from "lucide-react"
 
-    logError('Global error capturado', context, 'GlobalError')
+import { Button } from "@/components/ui/button"
 
-    // Error tracking
-    trackError(error, context).catch((trackError) => {
-      logError('Erro ao rastrear erro global', { error: trackError }, 'GlobalError')
-    })
-
-    // Registrar alerta operacional
-    createAlert({
-      type: 'other',
-      severity: 'error',
-      title: 'Erro crítico na aplicação',
-      message: error.message || 'Erro desconhecido',
-      details: context,
-      source: 'global-error',
-    }).catch((alertError) => {
-      logError('Erro ao criar alerta operacional', { error: alertError }, 'GlobalError')
-    })
+export default function GlobalError({
+  error,
+  reset,
+}: {
+  error: Error & { digest?: string }
+  reset: () => void
+}) {
+  useEffect(() => {
+    // Log do erro para monitoramento operacional
+    console.error("[Global Error Boundary]:", error)
   }, [error])
 
   return (
     <html>
-      <body style={{ margin: 0, padding: 0, fontFamily: 'system-ui, sans-serif' }}>
-        <div style={{ 
-          minHeight: '100vh', 
-          display: 'flex', 
-          alignItems: 'center', 
-          justifyContent: 'center',
-          padding: '24px',
-          backgroundColor: '#f5f5f5'
-        }}>
-          <div style={{
-            maxWidth: '600px',
-            width: '100%',
-            backgroundColor: 'white',
-            borderRadius: '8px',
-            padding: '32px',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
-          }}>
-            <h1 style={{ 
-              fontSize: '24px', 
-              fontWeight: 'bold', 
-              marginBottom: '16px',
-              color: '#dc2626'
-            }}>
-              Ocorreu um erro crítico
-            </h1>
-            <p style={{ 
-              color: '#666', 
-              marginBottom: '24px',
-              lineHeight: '1.5'
-            }}>
-              {error.message || 'Um erro inesperado ocorreu. Por favor, tente novamente ou entre em contato com o suporte se o problema persistir.'}
-            </p>
-            
-            {process.env.NODE_ENV === 'development' && error.stack && (
-              <details style={{ 
-                marginBottom: '24px',
-                padding: '12px',
-                backgroundColor: '#f9f9f9',
-                borderRadius: '4px'
-              }}>
-                <summary style={{ 
-                  cursor: 'pointer', 
-                  fontWeight: '500',
-                  marginBottom: '8px'
-                }}>
-                  Detalhes técnicos (modo desenvolvimento)
-                </summary>
-                <pre style={{ 
-                  fontSize: '12px',
-                  overflow: 'auto',
-                  maxHeight: '200px',
-                  whiteSpace: 'pre-wrap',
-                  wordBreak: 'break-word'
-                }}>
-                  {error.stack}
-                </pre>
-              </details>
+      <body>
+        <div className="min-h-screen bg-bg flex items-center justify-center p-4">
+          <div className="max-w-md w-full text-center space-y-6">
+            <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-error-light border-4 border-error/20 mb-4">
+              <AlertTriangle className="h-10 w-10 text-error" />
+            </div>
+
+            <div className="space-y-2">
+              <h1 className="text-3xl font-extrabold text-ink tracking-tight">Ops! Algo deu errado.</h1>
+              <p className="text-ink-muted">
+                Um erro inesperado ocorreu. Nossa equipe técnica já foi notificada e estamos trabalhando nisso.
+              </p>
+            </div>
+
+            {error.digest && (
+              <div className="p-3 bg-bg-soft rounded-lg border border-border">
+                <code className="text-xs text-ink-muted break-all">ID do Erro: {error.digest}</code>
+              </div>
             )}
 
-            <div style={{ display: 'flex', gap: '12px' }}>
-              <button
-                onClick={reset}
-                style={{
-                  padding: '10px 20px',
-                  backgroundColor: '#2563eb',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '6px',
-                  cursor: 'pointer',
-                  fontSize: '14px',
-                  fontWeight: '500'
-                }}
+            <div className="flex flex-col sm:flex-row gap-3 justify-center pt-4">
+              <Button
+                onClick={() => reset()}
+                variant="default"
+                className="w-full sm:w-auto"
               >
-                Tentar novamente
-              </button>
-              <button
-                onClick={() => {
-                  if (typeof window !== 'undefined') {
-                    window.location.href = '/'
-                  }
-                }}
-                style={{
-                  padding: '10px 20px',
-                  backgroundColor: 'white',
-                  color: '#2563eb',
-                  border: '1px solid #2563eb',
-                  borderRadius: '6px',
-                  cursor: 'pointer',
-                  fontSize: '14px',
-                  fontWeight: '500'
-                }}
+                <RefreshCcw className="h-4 w-4 mr-2" />
+                Tentar Novamente
+              </Button>
+              <Button
+                onClick={() => window.location.href = '/'}
+                variant="outline"
+                className="w-full sm:w-auto"
               >
-                Ir para Home
-              </button>
+                <Home className="h-4 w-4 mr-2" />
+                Voltar ao Início
+              </Button>
             </div>
           </div>
         </div>

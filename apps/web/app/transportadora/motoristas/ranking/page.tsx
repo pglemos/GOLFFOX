@@ -1,10 +1,8 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { AppShell } from "@/components/app-shell"
-import { Card } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+
+import { motion } from "framer-motion"
 import {
   Users,
   DollarSign,
@@ -19,9 +17,13 @@ import {
   AlertCircle,
   UserPlus,
 } from "lucide-react"
-import { motion } from "framer-motion"
-import { notifyError } from "@/lib/toast"
+
+import { AppShell } from "@/components/app-shell"
+import { Button } from "@/components/ui/button"
+import { Card } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
 import { useAuth } from "@/hooks/use-auth"
+import { notifyError } from "@/lib/toast"
 
 const Link: any = require("next/link")
 

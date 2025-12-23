@@ -1,6 +1,10 @@
 "use client"
 
 import { useState, useEffect } from "react"
+
+import { Shield, AlertTriangle } from "lucide-react"
+
+import { Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
@@ -8,14 +12,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
-import { Shield, AlertTriangle } from "lucide-react"
-import { supabase } from "@/lib/supabase"
-import { notifySuccess, notifyError } from "@/lib/toast"
-import { formatError } from "@/lib/error-utils"
-import { auditLogs } from "@/lib/audit-log"
-import { useSupabaseSync } from "@/hooks/use-supabase-sync"
 import {
   Select,
   SelectContent,
@@ -23,6 +20,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { useSupabaseSync } from "@/hooks/use-supabase-sync"
+import { auditLogs } from "@/lib/audit-log"
+import { formatError } from "@/lib/error-utils"
+import { supabase } from "@/lib/supabase"
+import { notifySuccess, notifyError } from "@/lib/toast"
 
 interface ChangeRoleModalProps {
   user: any

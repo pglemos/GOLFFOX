@@ -1,10 +1,12 @@
 import React from "react"
-import { Input } from "@/components/ui/input"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Badge } from "@/components/ui/badge"
-import { Label } from "@/components/ui/label"
+
 import { Search, AlertTriangle } from "lucide-react"
+
+import { Badge } from "@/components/ui/badge"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { ScrollArea } from "@/components/ui/scroll-area"
 import { maskCPF } from "@/lib/geocoding"
 import type { EmployeeLite } from "@/types/routes"
 

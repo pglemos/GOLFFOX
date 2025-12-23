@@ -1,8 +1,8 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+
+import { TrendingUp, DollarSign, Route, Truck, Users, Building2 } from "lucide-react"
 import { 
   LineChart, 
   Line, 
@@ -15,9 +15,11 @@ import {
   Legend, 
   ResponsiveContainer 
 } from "recharts"
-import { TrendingUp, DollarSign, Route, Truck, Users, Building2 } from "lucide-react"
-import { supabase } from "@/lib/supabase"
+
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { formatCurrency, formatCount } from "@/lib/kpi-utils"
+import { supabase } from "@/lib/supabase"
 
 interface CostChartProps {
   companyId?: string

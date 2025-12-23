@@ -1,21 +1,23 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useDispatchFormReducer } from "@/hooks/reducers/form-reducer"
+
+import { motion } from "framer-motion"
+import { LifeBuoy, Send, Plus, Search, Clock, AlertCircle, Filter, ChevronDown, ChevronUp, Save, X, Trash2 } from "lucide-react"
+import { Edit } from "lucide-react"
+
 import { AppShell } from "@/components/app-shell"
+import { AssistanceModal } from "@/components/modals/assistance-modal"
+import { EditAssistanceModal } from "@/components/modals/edit-assistance-modal"
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { LifeBuoy, Send, Plus, Search, Clock, AlertCircle, Filter, ChevronDown, ChevronUp, Save, X, Trash2 } from "lucide-react"
-import { supabase } from "@/lib/supabase"
-import { useRouter } from "@/lib/next-navigation"
-import { AssistanceModal } from "@/components/modals/assistance-modal"
 import { Input } from "@/components/ui/input"
-import { motion } from "framer-motion"
+import { useDispatchFormReducer } from "@/hooks/reducers/form-reducer"
+import { useAuth } from "@/components/providers/auth-provider"
+import { useRouter } from "@/lib/next-navigation"
+import { supabase } from "@/lib/supabase"
 import { notifySuccess, notifyError } from "@/lib/toast"
-import { useAuthFast } from "@/hooks/use-auth-fast"
-import { EditAssistanceModal } from "@/components/modals/edit-assistance-modal"
-import { Edit } from "lucide-react"
 import {
   Select,
   SelectContent,
@@ -27,7 +29,7 @@ import { Label } from "@/components/ui/label"
 
 export default function SocorroPage() {
   const router = useRouter()
-  const { user, loading: authLoading } = useAuthFast()
+  const { user, loading: authLoading } = useAuth()
   const [dataLoading, setDataLoading] = useState(true)
   const [ocorrencias, setOcorrencias] = useState<any[]>([])
   const [selectedRequest, setSelectedRequest] = useState<any>(null)

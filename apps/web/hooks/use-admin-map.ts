@@ -11,36 +11,38 @@
  */
 
 import { useEffect, useState, useCallback, useRef } from 'react'
-import { loadGoogleMapsAPI } from '@/lib/google-maps-loader'
-import { RealtimeService, RealtimeUpdateType } from '@/lib/realtime-service'
-import { PlaybackService } from '@/lib/playback-service'
-import { getMapsBillingMonitor } from '@/lib/maps-billing-monitor'
-import { detectRouteDeviation } from '@/lib/route-deviation-detector'
-import { createAlert } from '@/lib/operational-alerts'
-import { 
-  analyzeTrajectory, 
-  type PlannedRoutePoint, 
-  type ActualPosition, 
-  type TrajectoryAnalysis 
-} from '@/lib/trajectory-analyzer'
+
+import { MarkerClusterer } from '@googlemaps/markerclusterer'
+
 import { isValidCoordinate, normalizeCoordinate } from '@/lib/coordinate-validator'
+import { loadGoogleMapsAPI } from '@/lib/google-maps-loader'
+import { t } from '@/lib/i18n'
+import { debug, warn, error as logError } from '@/lib/logger'
+import { getMapsBillingMonitor } from '@/lib/maps-billing-monitor'
+import { createAlert } from '@/lib/operational-alerts'
+import { PlaybackService } from '@/lib/playback-service'
+import { RealtimeService, RealtimeUpdateType } from '@/lib/realtime-service'
+import { detectRouteDeviation } from '@/lib/route-deviation-detector'
 import { loadVehicles } from '@/lib/services/map/map-services/vehicle-loader'
 import { supabase } from '@/lib/supabase'
-import { MarkerClusterer } from '@googlemaps/markerclusterer'
 import { notifySuccess, notifyError } from '@/lib/toast'
-import { debug, warn, error as logError } from '@/lib/logger'
-import { t } from '@/lib/i18n'
-import type { 
-  Veiculo, 
-  RoutePolyline, 
-  MapAlert, 
-  MapsBillingStatus, 
-  HistoricalTrajectory, 
-  RouteStop 
-} from '@/types/map'
+import {
+  analyzeTrajectory,
+  type PlannedRoutePoint,
+  type ActualPosition,
+  type TrajectoryAnalysis
+} from '@/lib/trajectory-analyzer'
 import { useMapFilters } from '@/stores/map-filters'
-import { useMapSelection } from '@/stores/map-selection'
 import { useMapPlayback } from '@/stores/map-playback'
+import { useMapSelection } from '@/stores/map-selection'
+import type {
+  Veiculo,
+  RoutePolyline,
+  MapAlert,
+  MapsBillingStatus,
+  HistoricalTrajectory,
+  RouteStop
+} from '@/types/map'
 
 export interface UseAdminMapOptions {
   companyId?: string
@@ -55,13 +57,13 @@ export interface UseAdminMapReturn {
   mapRef: React.RefObject<HTMLDivElement>
   mapInstance: google.maps.Map | null
   clusterer: MarkerClusterer | null
-  
+
   // Estado
   loading: boolean
   mapError: string | null
   listMode: boolean
   billingStatus: MapsBillingStatus | null
-  
+
   // Dados
   veiculos: Veiculo[]
   routes: RoutePolyline[]
@@ -69,7 +71,7 @@ export interface UseAdminMapReturn {
   historicalTrajectories: HistoricalTrajectory[]
   routeStops: RouteStop[]
   trajectoryAnalysis: TrajectoryAnalysis | null
-  
+
   // Ações
   refresh: () => Promise<void>
   exportMapImage: () => Promise<void>
@@ -115,7 +117,6 @@ export function useAdminMap(options: UseAdminMapOptions = {}): UseAdminMapReturn
   const [historicalTrajectories, setHistoricalTrajectories] = useState<HistoricalTrajectory[]>([])
   const [routeStops, setRouteStops] = useState<RouteStop[]>([])
   const [trajectoryAnalysis, setTrajectoryAnalysis] = useState<TrajectoryAnalysis | null>(null)
-  const [notifiedDeviations, setNotifiedDeviations] = useState<Set<string>>(new Set())
 
   // Inicializar filtros com props
   useEffect(() => {
@@ -128,59 +129,53 @@ export function useAdminMap(options: UseAdminMapOptions = {}): UseAdminMapReturn
   const loadInitialData = useCallback(async (signal: AbortSignal) => {
     try {
       debug('Carregando dados iniciais do mapa', {}, 'useAdminMap')
-      
-      // Carregar veículos
-      const vehiclesData = await loadVehicles({
-        companyId: companyFilter,
-        routeId: routeFilter,
-        vehicleId: veiculoFilter,
-      })
-      
+
+      // Carregar veículos - passamos apenas o companyId conforme assinatura do serviço
+      const vehiclesData = await loadVehicles(companyFilter || undefined)
+
       if (signal.aborted) return
       setVeiculos(vehiclesData)
 
       // Carregar rotas
       const { data: routesData, error: routesError } = await supabase
         .from('routes')
-        .select('id, name, polyline, color, company_id')
+        .select('id, name, company_id')
         .order('name')
-      
+
       if (signal.aborted) return
       if (routesError) {
         logError('Erro ao carregar rotas', { error: routesError }, 'useAdminMap')
       } else if (routesData) {
         setRoutes(routesData.map(r => ({
-          id: r.id,
-          name: r.name,
-          polyline: r.polyline || '',
-          color: r.color || '#4285f4',
-          companyId: r.company_id,
+          route_id: r.id,
+          route_name: r.name,
+          company_id: r.company_id,
+          polyline_points: [], // Será preenchido por lazy loading ou via route_stops se necessário
+          stops_count: 0
         })))
       }
 
-      // Carregar alertas
-      const { data: alertsData, error: alertsError } = await supabase
-        .from('alerts')
-        .select('*')
-        .eq('is_resolved', false)
+      // Carregar alertas (incidentes abertos)
+      const { data: alertsData, error: alertsError } = await (supabase
+        .from('gf_incidents')
+        .select('id, company_id, route_id, veiculo_id, severity, description, created_at')
+        .eq('status', 'open')
         .order('created_at', { ascending: false })
-        .limit(50)
-      
+        .limit(50) as any)
+
       if (signal.aborted) return
       if (alertsError) {
         logError('Erro ao carregar alertas', { error: alertsError }, 'useAdminMap')
       } else if (alertsData) {
         setAlerts(alertsData.map(a => ({
-          id: a.id,
-          type: a.type,
-          severity: a.severity,
-          message: a.message,
-          lat: a.lat,
-          lng: a.lng,
-          vehicleId: a.veiculo_id,
-          routeId: a.route_id,
-          createdAt: a.created_at,
-          isResolved: a.is_resolved,
+          alert_id: a.id,
+          alert_type: 'incident',
+          company_id: a.company_id,
+          route_id: a.route_id,
+          veiculo_id: (a as any).veiculo_id || (a as any).vehicle_id,
+          severity: (a.severity as any) || 'medium',
+          description: a.description,
+          created_at: a.created_at
         })))
       }
 
@@ -203,7 +198,7 @@ export function useAdminMap(options: UseAdminMapOptions = {}): UseAdminMapReturn
 
     const initMap = async () => {
       const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
-      
+
       if (!apiKey) {
         if (isMounted) {
           setMapError(t('common', 'errors.mapApiKeyMissing'))
@@ -241,9 +236,9 @@ export function useAdminMap(options: UseAdminMapOptions = {}): UseAdminMapReturn
 
         // Detectar modo dark
         const isDark = window.matchMedia?.('(prefers-color-scheme: dark)').matches
-        
+
         const mapStyles = getMapStyles(isDark)
-        
+
         const map = new google.maps.Map(mapRef.current, {
           center: initialCenter,
           zoom: initialZoom,
@@ -256,10 +251,10 @@ export function useAdminMap(options: UseAdminMapOptions = {}): UseAdminMapReturn
         })
 
         mapInstanceRef.current = map
-        
-        debug('Mapa criado com sucesso', { 
-          center: map.getCenter()?.toJSON(), 
-          zoom: map.getZoom() 
+
+        debug('Mapa criado com sucesso', {
+          center: map.getCenter()?.toJSON(),
+          zoom: map.getZoom()
         }, 'useAdminMap')
 
         // Forçar resize
@@ -287,7 +282,7 @@ export function useAdminMap(options: UseAdminMapOptions = {}): UseAdminMapReturn
           setListMode(true)
           setLoading(false)
           if (!signal.aborted) {
-            loadInitialData(signal).catch(() => {})
+            loadInitialData(signal).catch(() => { })
           }
         }
       }
@@ -309,7 +304,7 @@ export function useAdminMap(options: UseAdminMapOptions = {}): UseAdminMapReturn
     realtimeServiceRef.current = new RealtimeService({
       onVehicleUpdate: (update) => {
         setVeiculos(prev => {
-          const index = prev.findIndex(v => v.id === update.id)
+          const index = prev.findIndex(v => v.veiculo_id === update.veiculo_id)
           if (index === -1) return prev
           const updated = [...prev]
           updated[index] = { ...updated[index], ...update }
@@ -331,11 +326,11 @@ export function useAdminMap(options: UseAdminMapOptions = {}): UseAdminMapReturn
     realtimeServiceRef.current = null
     playbackServiceRef.current?.stop()
     playbackServiceRef.current = null
-    
+
     // Limpar markers
     markersRef.current.forEach(marker => marker.setMap(null))
     markersRef.current.clear()
-    
+
     // Limpar clusterer
     clustererRef.current?.clearMarkers()
     clustererRef.current = null
@@ -345,7 +340,7 @@ export function useAdminMap(options: UseAdminMapOptions = {}): UseAdminMapReturn
   const refresh = useCallback(async () => {
     const signal = abortControllerRef.current?.signal
     if (!signal || signal.aborted) return
-    
+
     setLoading(true)
     await loadInitialData(signal)
     setLoading(false)
@@ -371,7 +366,7 @@ export function useAdminMap(options: UseAdminMapOptions = {}): UseAdminMapReturn
 
   // Analisar trajetória de veículo
   const analyzeVehicleTrajectory = useCallback(async (vehicleId: string) => {
-    const vehicle = veiculos.find(v => v.id === vehicleId)
+    const vehicle = veiculos.find(v => v.veiculo_id === vehicleId)
     if (!vehicle) {
       notifyError('Veículo não encontrado')
       return
@@ -379,12 +374,12 @@ export function useAdminMap(options: UseAdminMapOptions = {}): UseAdminMapReturn
 
     try {
       // Buscar trajetória histórica
-      const { data: trajectoryData, error } = await supabase
-        .from('vehicle_positions')
+      const { data: trajectoryData, error } = await (supabase
+        .from('motorista_positions')
         .select('*')
         .eq('veiculo_id', vehicleId)
         .order('timestamp', { ascending: true })
-        .limit(500)
+        .limit(500) as any)
 
       if (error) throw error
 
@@ -393,28 +388,28 @@ export function useAdminMap(options: UseAdminMapOptions = {}): UseAdminMapReturn
         return
       }
 
-      const actualPositions: ActualPosition[] = trajectoryData.map(p => ({
-        lat: p.lat,
-        lng: p.lng,
-        timestamp: new Date(p.timestamp).getTime(),
+      const actualPositions: ActualPosition[] = (trajectoryData || []).map((p: any) => ({
+        lat: p.latitude || p.lat,
+        lng: p.longitude || p.lng,
+        timestamp: new Date(p.recorded_at || p.timestamp).getTime(),
         speed: p.speed || 0,
       }))
 
       // Buscar rota planejada se disponível
-      let plannedRoute: PlannedRoutePoint[] = []
+      const plannedRoute: PlannedRoutePoint[] = []
       if (vehicle.route_id) {
         const route = routes.find(r => r.id === vehicle.route_id)
-        if (route?.polyline) {
+        if (route && (route as any).polyline) {
           // Decodificar polyline para pontos
-          // plannedRoute = decodePolyline(route.polyline)
+          // plannedRoute = decodePolyline((route as any).polyline)
         }
       }
 
       const analysis = analyzeTrajectory(plannedRoute, actualPositions)
       setTrajectoryAnalysis(analysis)
-    } catch (error) {
-      logError('Erro ao analisar trajetória', { error }, 'useAdminMap')
-      notifyError(error, 'Erro ao analisar trajetória')
+    } catch (err: any) {
+      logError('Erro ao analisar trajetória', { error: err }, 'useAdminMap')
+      notifyError(err, 'Erro ao analisar trajetória')
     }
   }, [veiculos, routes])
 
@@ -425,16 +420,16 @@ export function useAdminMap(options: UseAdminMapOptions = {}): UseAdminMapReturn
 
   return {
     // Refs
-    mapRef,
+    mapRef: mapRef as React.RefObject<HTMLDivElement>,
     mapInstance: mapInstanceRef.current,
     clusterer: clustererRef.current,
-    
+
     // Estado
     loading,
     mapError,
     listMode,
     billingStatus,
-    
+
     // Dados
     veiculos,
     routes,
@@ -442,7 +437,7 @@ export function useAdminMap(options: UseAdminMapOptions = {}): UseAdminMapReturn
     historicalTrajectories,
     routeStops,
     trajectoryAnalysis,
-    
+
     // Ações
     refresh,
     exportMapImage,

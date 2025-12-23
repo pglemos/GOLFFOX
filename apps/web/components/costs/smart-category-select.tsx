@@ -10,8 +10,9 @@
  */
 
 import { useState, useEffect, useMemo, useCallback } from "react"
+
 import { Check, ChevronsUpDown, Plus, Search, Loader2 } from "lucide-react"
-import { cn } from "@/lib/utils"
+
 import { Button } from "@/components/ui/button"
 import {
     Command,
@@ -27,6 +28,7 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover"
+import { cn } from "@/lib/utils"
 import type { CostCategory, ProfileType } from "@/types/financial"
 
 interface SmartCategorySelectProps {

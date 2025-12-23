@@ -5,11 +5,13 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
+
 import { createClient } from '@supabase/supabase-js'
+
 import { requireAuth } from '@/lib/api-auth'
 import { logError } from '@/lib/logger'
-import type { Budget, BudgetInsert } from '@/types/financial'
 import { budgetSchema } from '@/lib/validation/schemas'
+import type { Budget, BudgetInsert } from '@/types/financial'
 
 export const runtime = 'nodejs'
 

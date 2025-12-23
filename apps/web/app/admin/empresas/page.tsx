@@ -1,19 +1,22 @@
 "use client"
 
 import { useEffect, useState, useCallback, useMemo } from "react"
+
 import dynamic from "next/dynamic"
+import { useRouter } from "next/navigation"
+
+import { motion } from "framer-motion"
+import { Briefcase, Plus, Users, UserPlus, Trash2 } from "lucide-react"
+
 import { AppShell } from "@/components/app-shell"
+import { CompanyCard } from "@/components/companies/company-card"
+import { useAuth } from "@/components/providers/auth-provider"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
-import { Briefcase, Plus, Users, UserPlus, Trash2 } from "lucide-react"
-import { motion } from "framer-motion"
-import { supabase } from "@/lib/supabase"
-import { useRouter } from "@/lib/next-navigation"
-import { useAuthFast } from "@/hooks/use-auth-fast"
-import { useGlobalSync } from "@/hooks/use-global-sync"
-import { notifySuccess, notifyError } from "@/lib/toast"
-import { Edit } from "lucide-react"
 import { SkeletonList } from "@/components/ui/skeleton"
+import { useGlobalSync } from "@/hooks/use-global-sync"
+import { CompanyService, type Company } from "@/lib/services/company-service"
+import { notifySuccess, notifyError } from "@/lib/toast"
 
 // Lazy load modais pesados
 const CreateOperatorModal = dynamic(
@@ -31,92 +34,42 @@ const EditCompanyModal = dynamic(
 
 export default function EmpresasPage() {
   const router = useRouter()
-  const { user, loading: authLoading } = useAuthFast()
+  const { user, loading: authLoading } = useAuth()
   const [isCreateOperatorModalOpen, setIsCreateOperatorModalOpen] = useState(false)
   const [selectedCompanyForUsers, setSelectedCompanyForUsers] = useState<{ id: string; name: string } | null>(null)
   const [isUsersModalOpen, setIsUsersModalOpen] = useState(false)
   const [selectedCompanyForEdit, setSelectedCompanyForEdit] = useState<any>(null)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
 
-  // Usar API route para carregar empresas (bypass RLS com service role)
-  const [empresas, setEmpresas] = useState<any[]>([])
+  // Estados de dados tipados (Pilar 3)
+  const [empresas, setEmpresas] = useState<Company[]>([])
   const [loadingEmpresas, setLoadingEmpresas] = useState(true)
-  const [errorEmpresas, setErrorEmpresas] = useState<Error | null>(null)
+  const [errorEmpresas, setErrorEmpresas] = useState<string | null>(null)
 
   const loadEmpresas = useCallback(async () => {
     setLoadingEmpresas(true)
     setErrorEmpresas(null)
     try {
-      // ✅ Obter token do Supabase para autenticação
-      const { data: { session } } = await supabase.auth.getSession()
-
-      const headers: HeadersInit = {}
-      if (session?.access_token) {
-        headers['Authorization'] = `Bearer ${session.access_token}`
-      }
-
-      const response = await fetch('/api/admin/empresas-list', {
-        headers,
-        credentials: 'include',
-      })
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
-      const result = await response.json()
-      if (result.success) {
-        setEmpresas(result.companies || [])
-      } else {
-        throw new Error(result.error || 'Erro ao carregar empresas')
-      }
+      const data = await CompanyService.listCompanies()
+      setEmpresas(data)
     } catch (error: any) {
-      console.error('Erro ao carregar empresas:', error)
-      setErrorEmpresas(error)
-      setEmpresas([])
+      setErrorEmpresas(error.message || "Erro ao carregar empresas")
     } finally {
       setLoadingEmpresas(false)
     }
   }, [])
 
   const handleDeleteEmpresa = async (empresaId: string, empresaName: string) => {
-    if (!confirm(`Tem certeza que deseja excluir a empresa "${empresaName}"? Esta ação não pode ser desfeita.`)) {
-      return
-    }
+    if (!confirm(`Tem certeza que deseja excluir a empresa "${empresaName}"?`)) return
 
     try {
-      // ✅ Obter token do Supabase para autenticação
-      const { data: { session } } = await supabase.auth.getSession()
-
-      const headers: HeadersInit = {}
-      if (session?.access_token) {
-        headers['Authorization'] = `Bearer ${session.access_token}`
-      }
-
-      const response = await fetch(`/api/admin/empresas/delete?id=${empresaId}`, {
-        method: 'DELETE',
-        headers,
-        credentials: 'include',
-      })
-
-      const result = await response.json()
-
-      if (!response.ok) {
-        const errorMessage = result.message || result.error || 'Erro ao excluir empresa'
-        const errorDetails = result.details ? ` (${result.details})` : ''
-        throw new Error(`${errorMessage}${errorDetails}`)
-      }
-
-      if (result.success) {
+      const success = await CompanyService.deleteCompany(empresaId)
+      if (success) {
         notifySuccess('Empresa excluída com sucesso')
-        // Aguardar um pouco antes de recarregar para garantir que o banco foi atualizado
-        await new Promise(resolve => setTimeout(resolve, 300))
-        await loadEmpresas()
-      } else {
-        throw new Error(result.error || 'Erro ao excluir empresa')
+        loadEmpresas()
       }
     } catch (error: any) {
-      console.error('Erro ao excluir empresa:', error)
-      const errorMessage = error.message || 'Erro desconhecido ao excluir empresa'
-      notifyError(error, errorMessage)
+      notifyError(error, 'Erro ao excluir empresa')
     }
   }
 
@@ -176,7 +129,7 @@ export default function EmpresasPage() {
 
         {errorEmpresas && (
           <div className="bg-error-light border border-error-light rounded-lg p-3 sm:p-4 w-full">
-            <p className="text-xs sm:text-sm text-error break-words">Erro ao carregar empresas: {errorEmpresas instanceof Error ? errorEmpresas.message : String(errorEmpresas)}</p>
+            <p className="text-xs sm:text-sm text-error break-words">Erro: {errorEmpresas}</p>
           </div>
         )}
 
@@ -195,110 +148,23 @@ export default function EmpresasPage() {
           </Card>
         )}
 
-        {!loadingEmpresas && !errorEmpresas && Array.isArray(empresas) && empresas.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5 w-full max-w-full">
-            {empresas.map((empresa: any, index: number) => (
-              <motion.div
+        {!loadingEmpresas && !errorEmpresas && empresas.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5 w-full">
+            {empresas.map((empresa, index) => (
+              <CompanyCard
                 key={empresa.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.05 }}
-                whileHover={{ y: -4 }}
-                className="group"
-              >
-                <Card key={empresa.id} variant="premium" className="p-4 sm:p-5 overflow-hidden w-full flex flex-col">
-                  <div className="flex-1 flex flex-col gap-3 w-full">
-                    {/* Header com ícone e nome */}
-                    <div className="flex items-start gap-3 mb-1">
-                      <div className="p-2 rounded-lg bg-gradient-to-br from-bg-brand-light to-bg-brand-soft flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
-                        <Briefcase className="h-5 w-5 text-brand" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-bold text-base sm:text-lg break-words leading-tight text-ink group-hover:text-brand transition-colors">
-                          {empresa.name}
-                        </h3>
-                      </div>
-                    </div>
-
-                    {/* Informações da empresa */}
-                    <div className="space-y-2 flex-1">
-                      {empresa.address && (
-                        <div className="flex items-start gap-2">
-                          <span className="text-xs text-ink-muted font-medium min-w-[60px]">Endereço:</span>
-                          <p className="text-xs sm:text-sm text-ink-muted break-words flex-1 leading-relaxed" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
-                            {empresa.address}
-                          </p>
-                        </div>
-                      )}
-                      {empresa.phone && (
-                        <div className="flex items-start gap-2">
-                          <span className="text-xs text-ink-muted font-medium min-w-[60px]">Telefone:</span>
-                          <p className="text-xs sm:text-sm text-ink-muted break-words flex-1 leading-relaxed" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
-                            {empresa.phone}
-                          </p>
-                        </div>
-                      )}
-                      {empresa.email && (
-                        <div className="flex items-start gap-2">
-                          <span className="text-xs text-ink-muted font-medium min-w-[60px]">Email:</span>
-                          <p className="text-xs sm:text-sm text-ink-muted break-words flex-1 leading-relaxed" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
-                            {empresa.email}
-                          </p>
-                        </div>
-                      )}
-                      {!empresa.address && !empresa.phone && !empresa.email && (
-                        <p className="text-xs sm:text-sm text-ink-muted italic">Sem informações adicionais</p>
-                      )}
-                    </div>
-
-                    {/* Botões de ação */}
-                    <div className="grid grid-cols-2 gap-2 pt-2 border-t border-border">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          console.log('Abrindo modal de edição para empresa:', empresa)
-                          setSelectedCompanyForEdit(empresa)
-                          setIsEditModalOpen(true)
-                        }}
-                        className="w-full min-h-[44px] h-auto text-xs px-2 py-1.5 flex items-center justify-center gap-1.5 touch-manipulation"
-                        title="Editar empresa"
-                      >
-                        <Edit className="h-3.5 w-3.5 flex-shrink-0" />
-                        <span className="truncate hidden sm:inline">Editar</span>
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          setSelectedCompanyForUsers({ id: empresa.id, name: empresa.name })
-                          setIsUsersModalOpen(true)
-                        }}
-                        className="w-full min-h-[44px] h-auto text-xs px-2 py-1.5 flex items-center justify-center gap-1.5 touch-manipulation"
-                        title="Ver funcionários"
-                      >
-                        <Users className="h-3.5 w-3.5 flex-shrink-0" />
-                        <span className="truncate hidden sm:inline">Logins</span>
-                      </Button>
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          handleDeleteEmpresa(empresa.id, empresa.name)
-                        }}
-                        className="w-full col-span-2 min-h-[44px] h-auto text-xs px-2 py-1.5 flex items-center justify-center gap-1.5 touch-manipulation"
-                        title="Excluir empresa"
-                      >
-                        <Trash2 className="h-3.5 w-3.5 flex-shrink-0" />
-                        <span className="truncate">Excluir</span>
-                      </Button>
-                    </div>
-                  </div>
-                </Card>
-              </motion.div>
+                company={empresa}
+                index={index}
+                onEdit={(c) => {
+                  setSelectedCompanyForEdit(c)
+                  setIsEditModalOpen(true)
+                }}
+                onUsers={(c) => {
+                  setSelectedCompanyForUsers(c)
+                  setIsUsersModalOpen(true)
+                }}
+                onDelete={handleDeleteEmpresa}
+              />
             ))}
           </div>
         )}

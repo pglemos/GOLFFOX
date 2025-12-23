@@ -3,8 +3,8 @@
  * Monitora uso da API e alerta quando quota excedida
  */
 
-import { supabase } from './supabase'
 import { error as logError } from './logger'
+import { supabase } from './supabase'
 
 export interface MapsBillingStatus {
   usage: number

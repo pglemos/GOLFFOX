@@ -1,4 +1,8 @@
 import { useState, useEffect } from "react"
+
+import { User, Loader2, Search } from "lucide-react"
+
+import { Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
@@ -7,35 +11,17 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { User, Loader2, Search } from "lucide-react"
-import { notifySuccess, notifyError } from "@/lib/toast"
-import { globalSyncManager } from "@/lib/global-sync"
 import { useCep } from "@/hooks/use-cep"
 import { formatCPF, formatPhone, formatCEP } from "@/lib/format-utils"
-
-interface UserData {
-  id: string
-  name?: string | null
-  email?: string | null
-  role?: string | null
-  is_active?: boolean
-  phone?: string | null
-  cpf?: string | null
-  address_zip_code?: string | null
-  address_street?: string | null
-  address_number?: string | null
-  address_neighborhood?: string | null
-  address_complement?: string | null
-  address_city?: string | null
-  address_state?: string | null
-}
+import { globalSyncManager } from "@/lib/global-sync"
+import { UserProfile } from "@/lib/services/user-service"
+import { notifySuccess, notifyError } from "@/lib/toast"
 
 interface EditUserModalProps {
-  user: UserData | null
+  user: UserProfile | null
   isOpen: boolean
   onClose: () => void
   onSave: () => void
@@ -365,8 +351,8 @@ export function EditUserModal({
             >
               Cancelar
             </Button>
-            <Button 
-              type="submit" 
+            <Button
+              type="submit"
               disabled={loading}
               className="w-full sm:w-auto order-1 sm:order-2 bg-brand hover:bg-brand-hover text-base font-medium"
             >

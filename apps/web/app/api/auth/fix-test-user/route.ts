@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
+
 import { createClient } from '@supabase/supabase-js'
+
 import { logError, logger } from '@/lib/logger'
 
 export const runtime = 'nodejs'

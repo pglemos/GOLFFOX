@@ -2,6 +2,10 @@
 
 import { useState } from "react"
 
+import { motion } from "framer-motion"
+import { ChevronDown, Building2 } from "lucide-react"
+
+import { useOperatorTenant } from "@/components/providers/empresa-tenant-provider"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -9,10 +13,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
-import { ChevronDown, Building2 } from "lucide-react"
-import { useOperatorTenant } from "@/components/providers/empresa-tenant-provider"
 import operatorI18n from "@/i18n/operador.json"
-import { motion } from "framer-motion"
+
 
 export function CompanySelector() {
   const { tenantCompanyId, companyName, logoUrl, companies, switchTenant, brandTokens } = useOperatorTenant()

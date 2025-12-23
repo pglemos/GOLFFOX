@@ -1,14 +1,16 @@
 ﻿"use client"
 
 import { Suspense, useEffect, useState } from "react"
-import { AppShell } from "@/components/app-shell"
-import { Card } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Send } from "lucide-react"
+
 import { motion } from "framer-motion"
-import { supabase } from "@/lib/supabase"
-import { useRouter } from "@/lib/next-navigation"
+import { Send } from "lucide-react"
+
+import { AppShell } from "@/components/app-shell"
 import { BroadcastModal } from "@/components/empresa/broadcast-modal"
+import { Button } from "@/components/ui/button"
+import { Card } from "@/components/ui/card"
+import { useRouter } from "@/lib/next-navigation"
+import { supabase } from "@/lib/supabase"
 
 function ComunicacoesOperatorPageInner() {
   const router = useRouter()

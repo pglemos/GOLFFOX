@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion"
 import { LucideIcon, AlertCircle, Truck, Route, HelpCircle } from "lucide-react"
+
 import { Card, CardContent } from "@/components/ui/card"
 
 const Link: any = require("next/link")

@@ -124,3 +124,16 @@ export function isValidCNPJFormat(cnpj: string): boolean {
     const pattern = /^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/
     return pattern.test(cnpj)
 }
+
+export function formatDate(dateString: string): string {
+    if (!dateString) return 'N/A'
+    const date = new Date(dateString)
+    return date.toLocaleDateString('pt-BR')
+}
+
+export function formatCurrency(value: number): string {
+    return new Intl.NumberFormat('pt-BR', {
+        style: 'currency',
+        currency: 'BRL'
+    }).format(value)
+}

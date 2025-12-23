@@ -1,8 +1,10 @@
 import { useState, useEffect, useMemo } from "react"
+
+import { geocodeAddress } from "@/lib/geocoding"
 import { supabase } from "@/lib/supabase"
 import { notifyError } from "@/lib/toast"
-import { geocodeAddress } from "@/lib/geocoding"
 import type { EmployeeLite, OptimizeRouteResponse, RouteFormData } from "@/types/routes"
+import type { Database } from "@/types/supabase"
 
 export function useRouteCreate(isOpen: boolean) {
     const [formData, setFormData] = useState<Partial<RouteFormData>>({
@@ -96,11 +98,11 @@ export function useRouteCreate(isOpen: boolean) {
             const result = await response.json()
 
             if (result.success && result.companies && Array.isArray(result.companies)) {
-                const companiesData = (result.companies || []).filter((c: any) => c.is_active !== false)
-                const formattedCompanies = companiesData.map((c: any) => ({
+                const companiesData = (result.companies || []).filter((c: Database["public"]["Tables"]["companies"]["Row"]) => c.is_active !== false)
+                const formattedCompanies = companiesData.map((c: Database["public"]["Tables"]["companies"]["Row"]) => ({
                     id: c.id,
                     name: c.name || 'Sem nome'
-                })).filter((c: any) => c.id && c.name)
+                })).filter((c: { id: string; name: string }) => c.id && c.name)
 
                 setCompanies(formattedCompanies)
             } else {
@@ -136,11 +138,10 @@ export function useRouteCreate(isOpen: boolean) {
 
         setLoadingEmployees(true)
         try {
-            // @ts-ignore - Supabase type inference issue with views
-            let { data, error } = await ((supabase
-                .from("v_company_employees_secure" as any)
+            let { data, error } = await supabase
+                .from("v_company_employees_secure")
                 .select("*")
-                .eq("company_id", formData.company_id)) as any) as any
+                .eq("company_id", formData.company_id)
 
             if (error && (error.message?.includes("does not exist") || (error as any).code === "PGRST205")) {
                 try {

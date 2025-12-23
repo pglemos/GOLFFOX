@@ -3,11 +3,11 @@
  * Lógica de negócio para gestão de empresas
  */
 
-import { logger } from '@/lib/logger'
-import { CompanyRepository, type Company as CompanyEntity } from '@/lib/repositories'
 import { withCache, cacheService } from '@/lib/cache/cache.service'
-import { cacheDataFetch } from '@/lib/react-cache'
 import { publishCreatedEvent } from '@/lib/events'
+import { logger } from '@/lib/logger'
+import { cacheDataFetch } from '@/lib/react-cache'
+import { CompanyRepository, type Company as CompanyEntity } from '@/lib/repositories'
 
 export interface CompanyFilters {
   isActive?: boolean
@@ -20,6 +20,13 @@ export interface CreateCompanyData {
   name: string
   cnpj?: string | null
   address?: string | null
+  address_zip_code?: string | null
+  address_street?: string | null
+  address_number?: string | null
+  address_neighborhood?: string | null
+  address_complement?: string | null
+  address_city?: string | null
+  address_state?: string | null
   phone?: string | null
   email?: string | null
 }
@@ -104,6 +111,13 @@ export class CompanyService {
         name: name.trim(),
         cnpj: cnpj?.trim() || null,
         address: address?.trim() || null,
+        address_zip_code: companyData.address_zip_code?.trim() || null,
+        address_street: companyData.address_street?.trim() || null,
+        address_number: companyData.address_number?.trim() || null,
+        address_neighborhood: companyData.address_neighborhood?.trim() || null,
+        address_complement: companyData.address_complement?.trim() || null,
+        address_city: companyData.address_city?.trim() || null,
+        address_state: companyData.address_state?.trim() || null,
         phone: phone?.trim() || null,
         email: email?.trim() || null,
         is_active: true,
@@ -199,6 +213,13 @@ export class CompanyService {
       if (updateData.name !== undefined) updatePayload.name = updateData.name.trim()
       if (updateData.cnpj !== undefined) updatePayload.cnpj = updateData.cnpj?.trim() || null
       if (updateData.address !== undefined) updatePayload.address = updateData.address?.trim() || null
+      if (updateData.address_zip_code !== undefined) updatePayload.address_zip_code = updateData.address_zip_code?.trim() || null
+      if (updateData.address_street !== undefined) updatePayload.address_street = updateData.address_street?.trim() || null
+      if (updateData.address_number !== undefined) updatePayload.address_number = updateData.address_number?.trim() || null
+      if (updateData.address_neighborhood !== undefined) updatePayload.address_neighborhood = updateData.address_neighborhood?.trim() || null
+      if (updateData.address_complement !== undefined) updatePayload.address_complement = updateData.address_complement?.trim() || null
+      if (updateData.address_city !== undefined) updatePayload.address_city = updateData.address_city?.trim() || null
+      if (updateData.address_state !== undefined) updatePayload.address_state = updateData.address_state?.trim() || null
       if (updateData.phone !== undefined) updatePayload.phone = updateData.phone?.trim() || null
       if (updateData.email !== undefined) updatePayload.email = updateData.email?.trim() || null
       if (updateData.is_active !== undefined) updatePayload.is_active = updateData.is_active

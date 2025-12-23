@@ -1,12 +1,14 @@
 export const runtime = 'nodejs'
-import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
+import { NextRequest, NextResponse } from 'next/server'
+
 import { createClient } from '@supabase/supabase-js'
-import { getUserRoleByEmail } from '@/lib/user-role'
-import { normalizeRole } from '@/lib/role-mapper'
+
+import { getSupabaseUrl, getSupabaseAnonKey, getSupabaseServiceKey } from '@/lib/env'
 import { debug, error as logError } from '@/lib/logger'
 import { withRateLimit } from '@/lib/rate-limit'
-import { getSupabaseUrl, getSupabaseAnonKey, getSupabaseServiceKey } from '@/lib/env'
+import { normalizeRole } from '@/lib/role-mapper'
+import { getUserRoleByEmail } from '@/lib/user-role'
 
 const EMAIL_REGEX =
   /^(?:[a-zA-Z0-9_'^&\/+\-])+(?:\.(?:[a-zA-Z0-9_'^&\/+\-])+)*@(?:(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,})$/

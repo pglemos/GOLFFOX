@@ -3,8 +3,8 @@
  * Gerencia animação de marcadores no tempo histórico
  */
 
-import { supabase } from './supabase'
 import { error as logError, warn } from './logger'
+import { supabase } from './supabase'
 
 export interface HistoricalPosition {
   position_id: string

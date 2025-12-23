@@ -1,20 +1,25 @@
 "use client"
 
 import { useEffect, useState, useMemo, useCallback } from "react"
+
 import dynamic from "next/dynamic"
+import Link from "next/link"
+
+import { motion } from "framer-motion"
+import { Users, Plus, Search, Edit, Trash2, Phone, Mail } from "lucide-react"
+
 import { AppShell } from "@/components/app-shell"
+import { useAuth } from "@/components/providers/auth-provider"
+import { DriverCard } from "@/components/transportadora/driver-card"
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { Users, Plus, Search, Edit, Trash2, Phone, Mail } from "lucide-react"
-import { notifySuccess, notifyError } from "@/lib/toast"
-import { motion } from "framer-motion"
-import { useAuth } from "@/hooks/use-auth"
-import { useDebounce } from "@/hooks/use-debounce"
 import { SkeletonList } from "@/components/ui/skeleton"
+import { useDebounce } from "@/hooks/use-debounce"
+import { DriverService, type Driver } from "@/lib/services/driver-service"
+import { notifySuccess, notifyError } from "@/lib/toast"
 
-const Link: any = require("next/link")
 
 // Lazy load modal
 const MotoristaModal = dynamic(
@@ -35,26 +40,18 @@ interface motorista {
 
 export default function TransportadoraMotoristasListPage() {
     const { user } = useAuth()
-    const [motoristas, setMotoristas] = useState<motorista[]>([])
+    const [motoristas, setMotoristas] = useState<Driver[]>([])
     const [dataLoading, setDataLoading] = useState(true)
-    const [selectedMotorista, setSelectedMotorista] = useState<motorista | null>(null)
+    const [selectedMotorista, setSelectedMotorista] = useState<Driver | null>(null)
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [searchQuery, setSearchQuery] = useState("")
     const debouncedSearchQuery = useDebounce(searchQuery, 300)
 
-    useEffect(() => {
-        if (user) {
-            loadDrivers()
-        }
-    }, [user])
-
     const loadDrivers = useCallback(async () => {
         try {
             setDataLoading(true)
-            const response = await fetch('/api/transportadora/motoristas')
-            if (!response.ok) throw new Error('Erro ao carregar motoristas')
-            const data = await response.json()
-            setMotoristas(Array.isArray(data) ? data : data.motoristas || [])
+            const data = await DriverService.listDrivers()
+            setMotoristas(data)
         } catch (error) {
             notifyError(error, "Erro ao carregar motoristas")
             setMotoristas([])
@@ -62,6 +59,12 @@ export default function TransportadoraMotoristasListPage() {
             setDataLoading(false)
         }
     }, [])
+
+    useEffect(() => {
+        if (user) {
+            loadDrivers()
+        }
+    }, [user, loadDrivers])
 
     const filteredDrivers = useMemo(() => {
         if (!debouncedSearchQuery) return motoristas
@@ -78,10 +81,11 @@ export default function TransportadoraMotoristasListPage() {
         if (!confirm(`Excluir motorista "${driverName}"?`)) return
 
         try {
-            const response = await fetch(`/api/transportadora/motoristas/delete?id=${driverId}`, { method: 'DELETE' })
-            if (!response.ok) throw new Error('Erro ao excluir')
-            notifySuccess('Motorista excluído')
-            loadDrivers()
+            const success = await DriverService.deleteDriver(driverId)
+            if (success) {
+                notifySuccess('Motorista excluído')
+                loadDrivers()
+            }
         } catch (error) {
             notifyError(error, "Erro ao excluir motorista")
         }
@@ -93,8 +97,8 @@ export default function TransportadoraMotoristasListPage() {
             name: "",
             email: "",
             role: "motorista",
-            transportadora_id: (user as any)?.transportadora_id
-        })
+            transportadora_id: user?.companyId || ""
+        } as Driver)
         setIsModalOpen(true)
     }
 
@@ -152,66 +156,18 @@ export default function TransportadoraMotoristasListPage() {
                 ) : (
                     <div className="grid gap-3 sm:gap-4 w-full">
                         {filteredDrivers.length === 0 ? (
-                            <Card className="p-8 text-center">
+                            <Card variant="premium" className="p-8 text-center">
                                 <Users className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
                                 <p className="text-muted-foreground">Nenhum motorista encontrado</p>
                             </Card>
                         ) : (
                             filteredDrivers.map((motorista) => (
-                                <motion.div
+                                <DriverCard
                                     key={motorista.id}
-                                    initial={{ opacity: 0, y: 20 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ duration: 0.3 }}
-                                    whileHover={{ y: -4 }}
-                                >
-                                    <Card className="p-3 sm:p-4 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-border hover:border-text-brand/30 group">
-                                        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
-                                            <div className="flex-1 min-w-0">
-                                                <div className="flex flex-wrap items-center gap-2 mb-2">
-                                                    <div className="p-1 rounded-lg bg-gradient-to-br from-bg-brand-light to-bg-brand-soft">
-                                                        <Users className="h-4 w-4 text-brand" />
-                                                    </div>
-                                                    <h3 className="font-bold text-base sm:text-lg group-hover:text-brand transition-colors">{motorista.name}</h3>
-                                                    <Badge variant={motorista.is_active !== false ? "default" : "secondary"}>
-                                                        {motorista.is_active !== false ? "Ativo" : "Inativo"}
-                                                    </Badge>
-                                                </div>
-                                                <div className="space-y-1 text-sm text-ink-muted">
-                                                    <div className="flex items-center gap-2">
-                                                        <Mail className="h-3 w-3" />
-                                                        <span>{motorista.email}</span>
-                                                    </div>
-                                                    {motorista.phone && (
-                                                        <div className="flex items-center gap-2">
-                                                            <Phone className="h-3 w-3" />
-                                                            <span>{motorista.phone}</span>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            </div>
-                                            <div className="flex gap-2">
-                                                <Button
-                                                    variant="outline"
-                                                    size="sm"
-                                                    onClick={() => { setSelectedMotorista(motorista); setIsModalOpen(true) }}
-                                                    className="min-h-[44px] touch-manipulation"
-                                                >
-                                                    <Edit className="h-4 w-4 mr-1" />
-                                                    Editar
-                                                </Button>
-                                                <Button
-                                                    variant="outline"
-                                                    size="sm"
-                                                    onClick={() => handleDelete(motorista.id, motorista.name)}
-                                                    className="min-h-[44px] touch-manipulation text-destructive hover:bg-destructive/10"
-                                                >
-                                                    <Trash2 className="h-4 w-4" />
-                                                </Button>
-                                            </div>
-                                        </div>
-                                    </Card>
-                                </motion.div>
+                                    driver={motorista}
+                                    onEdit={(d) => { setSelectedMotorista(d); setIsModalOpen(true) }}
+                                    onDelete={handleDelete}
+                                />
                             ))
                         )}
                     </div>

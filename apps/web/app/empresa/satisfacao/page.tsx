@@ -1,12 +1,14 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { AppShell } from "@/components/app-shell"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { useAuth } from "@/hooks/use-auth"
+
 import { Star, ThumbsUp, ThumbsDown, TrendingUp, MessageSquare, Users } from "lucide-react"
+
+import { AppShell } from "@/components/app-shell"
+import { Badge } from "@/components/ui/badge"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
+import { useAuth } from "@/hooks/use-auth"
 
 interface SatisfactionData {
     overall_rating: number

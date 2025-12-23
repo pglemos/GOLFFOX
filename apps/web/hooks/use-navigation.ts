@@ -1,7 +1,8 @@
 "use client"
 
-import { usePathname } from "@/lib/next-navigation"
 import { useEffect, useState } from "react"
+
+import { usePathname } from "@/lib/next-navigation"
 
 export interface NavigationState {
   currentPath: string

@@ -1,8 +1,9 @@
 "use client"
 
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
-import { supabase } from '@/lib/supabase'
+
 import { debug, warn } from '@/lib/logger'
+import { supabase } from '@/lib/supabase'
 
 interface QueryOptions {
   retryAttempts?: number

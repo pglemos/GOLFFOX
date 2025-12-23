@@ -1,6 +1,7 @@
 "use client"
 
 import { Suspense } from "react"
+
 import { RotasPageContent } from "./rotas-content"
 
 export default function RotasPage() {

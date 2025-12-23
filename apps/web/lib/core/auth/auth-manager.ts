@@ -3,12 +3,14 @@
  * Responsável por login, logout e operações principais de autenticação
  */
 
-import { supabase } from '@/lib/supabase'
 import { error } from '@/lib/logger'
+import { supabase } from '@/lib/supabase'
 import { getUserRoleByEmail } from '@/lib/user-role'
+
 import { persistSession } from './auth-session'
 import { getStoredUser, clearStoredUser } from './auth-storage'
 import { hasRole, getRedirectUrl } from './auth-utils'
+
 import type { UserData, AuthStorageOptions } from './types'
 
 /**

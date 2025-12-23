@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
+
 import { requireAuth } from '@/lib/api-auth'
-import { withRateLimit } from '@/lib/rate-limit'
-import { logger, logError } from '@/lib/logger'
-import { invalidateEntityCache } from '@/lib/next-cache'
-import { getSupabaseAdmin } from '@/lib/supabase-client'
 import { validationErrorResponse, errorResponse, successResponse } from '@/lib/api-response'
+import { logger, logError } from '@/lib/logger'
+import { withRateLimit } from '@/lib/rate-limit'
+import { UserService } from '@/lib/services/server/user-service'
+import { getSupabaseAdmin } from '@/lib/supabase-client'
 
 export const runtime = 'nodejs'
 
@@ -46,39 +47,17 @@ async function handleDelete(request: NextRequest) {
 
     const supabaseAdmin = getSupabaseAdmin()
 
-    // Excluir permanentemente o usuário do banco de dados
-    // A tabela users tem referência a auth.users com ON DELETE CASCADE,
-    // então excluir da tabela users também excluirá do Auth automaticamente
-    // As foreign keys com ON DELETE CASCADE vão excluir automaticamente dados relacionados
-
     logger.log(`🗑️ Tentando excluir usuário: ${userId}`)
 
-    // Primeiro, setar driver_id para NULL em trips se o usuário for motorista
-    await supabaseAdmin
-      .from('trips')
-      .update({ driver_id: null })
-      .eq('driver_id', userId)
+    // Delegar para UserService
+    await UserService.deleteUser(userId)
 
-    // Agora excluir o usuário
-    const { data, error } = await supabaseAdmin
-      .from('users')
-      .delete()
-      .eq('id', userId)
-      .select()
-
-    if (error) {
-      logError('Erro ao excluir usuário', { error, userId, details: error.details, hint: error.hint, code: error.code }, 'UsersDeleteAPI')
-      return errorResponse(error, 500, 'Erro ao excluir usuário')
-    }
-
-    // Invalidar cache após exclusão
-    await invalidateEntityCache('user', userId)
-
-    logger.log(`✅ Usuário excluído com sucesso: ${userId}`, data)
+    logger.log(`✅ Usuário excluído com sucesso: ${userId}`)
 
     return successResponse(null, 200, { message: 'Usuário excluído com sucesso' })
   } catch (error: any) {
-    logError('Erro ao excluir usuário', { error, userId: request.nextUrl.searchParams.get('id') }, 'UsersDeleteAPI')
+    const userId = request.nextUrl.searchParams.get('id')
+    logError('Erro ao excluir usuário', { error, userId }, 'UsersDeleteAPI')
     return errorResponse(error, 500, 'Erro ao excluir usuário')
   }
 }

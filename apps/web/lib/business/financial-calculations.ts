@@ -36,7 +36,7 @@ export function calculateFinancialKPIs(
     revenueEntries30d: revenues.length,
     criticalAlerts: 0,
     warningAlerts: 0,
-    recurringCostsCount: costs.filter((c) => c.isRecurring).length,
+    recurringCostsCount: costs.filter((c) => c.is_recurring).length,
   }
 }
 
@@ -72,7 +72,7 @@ export function calculateBudgetVariance(
 ): BudgetVariance[] {
   return budgets.map((budget) => {
     const actual = costs
-      .filter((c) => c.categoryId === budget.categoryId)
+      .filter((c) => c.category_id === budget.categoryId)
       .reduce((sum, c) => sum + c.amount, 0)
 
     return {
@@ -99,7 +99,7 @@ export function calculateMarginPercent(
  * Calcular total de custos recorrentes
  */
 export function calculateRecurringCostsCount(costs: ManualCost[]): number {
-  return costs.filter((c) => c.isRecurring).length
+  return costs.filter((c) => c.is_recurring).length
 }
 
 /**

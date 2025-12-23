@@ -1,24 +1,14 @@
 "use client"
 
 import { useEffect, useState, useMemo, useCallback } from "react"
+
+import { motion } from "framer-motion"
+import { Users, Plus, Search, Edit, Trash2, Phone, Mail, Briefcase, Shield } from "lucide-react"
+
 import { AppShell } from "@/components/app-shell"
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { Users, Plus, Search, Edit, Trash2, Phone, Mail, Briefcase, Shield } from "lucide-react"
-import { notifySuccess, notifyError } from "@/lib/toast"
-import { motion } from "framer-motion"
-import { useAuthFast } from "@/hooks/use-auth-fast"
-import { useDebounce } from "@/hooks/use-debounce"
-import { SkeletonList } from "@/components/ui/skeleton"
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select"
 import {
     Dialog,
     DialogContent,
@@ -27,7 +17,19 @@ import {
     DialogFooter,
     DialogDescription,
 } from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
+import { SkeletonList } from "@/components/ui/skeleton"
+import { useAuth } from "@/components/providers/auth-provider"
+import { useDebounce } from "@/hooks/use-debounce"
+import { notifySuccess, notifyError } from "@/lib/toast"
 
 interface Employee {
     id: string
@@ -47,7 +49,7 @@ interface Company {
 }
 
 export default function EmpresasFuncionariosPage() {
-    const { user, loading: authLoading } = useAuthFast()
+    const { user, loading: authLoading } = useAuth()
     const [employees, setEmployees] = useState<Employee[]>([])
     const [companies, setCompanies] = useState<Company[]>([])
     const [dataLoading, setDataLoading] = useState(true)

@@ -1,8 +1,9 @@
 "use client"
 
 import React, { useRef, useCallback } from "react"
+
 import { useVirtualizer } from "@tanstack/react-virtual"
-import { useMobile } from "@/hooks/use-mobile"
+
 import { Card, CardContent } from "@/components/ui/card"
 import { 
   Table, 
@@ -12,6 +13,7 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table"
+import { useMobile } from "@/hooks/use-mobile"
 import { cn } from "@/lib/utils"
 
 interface DataTableMobileProps<T> {

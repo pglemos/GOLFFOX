@@ -1,14 +1,13 @@
 "use client"
 
 import { FileText, RefreshCw, Save } from "lucide-react"
+
 import { Button } from "@/components/ui/button"
-import { Label } from "@/components/ui/label"
-import { Input } from "@/components/ui/input"
-import { FileUpload } from "@/components/ui/file-upload"
 import { DocumentCard } from "@/components/ui/document-card"
+import { FileUpload } from "@/components/ui/file-upload"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
-import { useDocuments } from "@/hooks/use-documents"
-import { EntityType } from "@/lib/documents-config"
 import {
     Select,
     SelectContent,
@@ -16,6 +15,8 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
+import { useDocuments } from "@/hooks/use-documents"
+import { EntityType } from "@/lib/documents-config"
 
 interface DocumentsSectionProps {
     entityType: EntityType

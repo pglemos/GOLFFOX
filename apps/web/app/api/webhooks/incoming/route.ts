@@ -1,8 +1,10 @@
-import { NextResponse, NextRequest } from 'next/server'
-import { supabase } from '@/lib/supabase'
-import { applyRateLimit } from '@/lib/rate-limit'
-import { logger } from '@/lib/logger'
 import crypto from 'crypto'
+
+import { NextResponse, NextRequest } from 'next/server'
+
+import { logger } from '@/lib/logger'
+import { applyRateLimit } from '@/lib/rate-limit'
+import { supabase } from '@/lib/supabase'
 
 /**
  * Valida assinatura HMAC do webhook

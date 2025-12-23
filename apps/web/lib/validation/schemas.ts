@@ -40,8 +40,17 @@ export const updateUserSchema = createUserSchema.partial().extend({
 
 export const createCompanySchema = z.object({
   name: nameSchema,
+  cnpj: z.string().optional().nullable(),
   email: emailSchema.optional().nullable(),
   phone: z.string().optional().nullable(),
+  address: z.string().optional().nullable(),
+  address_zip_code: z.string().optional().nullable(),
+  address_street: z.string().optional().nullable(),
+  address_number: z.string().optional().nullable(),
+  address_neighborhood: z.string().optional().nullable(),
+  address_complement: z.string().optional().nullable(),
+  address_city: z.string().optional().nullable(),
+  address_state: z.string().optional().nullable(),
   is_active: z.boolean().default(true),
 })
 

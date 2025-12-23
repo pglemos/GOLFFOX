@@ -3,8 +3,9 @@
  * Centraliza todas as chamadas relacionadas a custos
  */
 
-import { fetchWithAuth } from '../fetch-with-auth'
 import type { ManualCostInsert, ManualCost, CostCategory } from '@/types/financial'
+
+import { fetchWithAuth } from '../fetch-with-auth'
 
 export interface CostFilters {
   page?: number
@@ -12,9 +13,9 @@ export interface CostFilters {
   date_from?: string
   date_to?: string
   company_id?: string
-  carrier_id?: string
+  transportadora_id?: string
   category_id?: string
-  vehicle_id?: string
+  veiculo_id?: string
   route_id?: string
 }
 
@@ -82,10 +83,10 @@ export async function getCostCategories(): Promise<CostCategoriesResponse> {
     })
 
     if (!response.ok) {
-      const error = await response.json().catch(() => ({}))
+      const errorData = await response.json().catch(() => ({})) as any
       return {
         success: false,
-        error: error.error || 'Erro ao buscar categorias',
+        error: errorData.error || 'Erro ao buscar categorias',
       }
     }
 
@@ -110,15 +111,15 @@ export async function getCostCategories(): Promise<CostCategoriesResponse> {
 export async function getCosts(filters: CostFilters = {}): Promise<CostsResponse> {
   try {
     const params = new URLSearchParams()
-    
+
     if (filters.page) params.append('page', filters.page.toString())
     if (filters.page_size) params.append('page_size', filters.page_size.toString())
     if (filters.date_from) params.append('date_from', filters.date_from)
     if (filters.date_to) params.append('date_to', filters.date_to)
     if (filters.company_id) params.append('company_id', filters.company_id)
-    if (filters.carrier_id) params.append('carrier_id', filters.carrier_id)
+    if (filters.transportadora_id) params.append('transportadora_id', filters.transportadora_id)
     if (filters.category_id) params.append('category_id', filters.category_id)
-    if (filters.vehicle_id) params.append('vehicle_id', filters.vehicle_id)
+    if (filters.veiculo_id) params.append('veiculo_id', filters.veiculo_id)
     if (filters.route_id) params.append('route_id', filters.route_id)
 
     const queryString = params.toString()

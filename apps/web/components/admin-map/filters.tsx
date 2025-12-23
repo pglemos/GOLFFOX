@@ -5,10 +5,14 @@
 'use client'
 
 import { useState, useEffect, useCallback, useRef, memo } from 'react'
+
+import { motion } from 'framer-motion'
+import { Calendar, Clock, Search, Radio, Loader2 } from 'lucide-react'
+
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
 import { 
   Select,
   SelectContent,
@@ -16,11 +20,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Calendar, Clock, Search, Radio, Loader2 } from 'lucide-react'
-import { supabase } from '@/lib/supabase'
-import { motion } from 'framer-motion'
-import { PeriodPicker } from './period-picker'
 import { warn, error as logError } from '@/lib/logger'
+import { supabase } from '@/lib/supabase'
+
+
+import { PeriodPicker } from './period-picker'
 
 interface MapFiltersProps {
   filters: {

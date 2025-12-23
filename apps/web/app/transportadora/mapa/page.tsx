@@ -1,18 +1,20 @@
 "use client"
 
 import { useEffect, useState, Suspense } from "react"
+
+import { Map, Filter, Layers, Navigation, RefreshCw, Maximize2 } from "lucide-react"
+
 import { AppShell } from "@/components/app-shell"
 import { FleetMap } from "@/components/fleet-map"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Label } from "@/components/ui/label"
-import { Switch } from "@/components/ui/switch"
-import { supabase } from "@/lib/supabase"
-import { useRouter, useSearchParams } from "@/lib/next-navigation"
 import { useAuth } from "@/components/providers/auth-provider"
-import { Map, Filter, Layers, Navigation, RefreshCw, Maximize2 } from "lucide-react"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Switch } from "@/components/ui/switch"
+import { useRouter, useSearchParams } from "@/lib/next-navigation"
+import { supabase } from "@/lib/supabase"
 
 function TransportadoraMapaContent() {
   const router = useRouter()

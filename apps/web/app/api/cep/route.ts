@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { withRateLimit } from '@/lib/rate-limit'
+
 import { warn, error as logError } from '@/lib/logger'
+import { withRateLimit } from '@/lib/rate-limit'
 
 async function cepHandler(request: NextRequest) {
     let cep: string | null = null

@@ -1,22 +1,24 @@
 ﻿"use client"
 
-import { AppShell } from "@/components/app-shell"
-import { Card } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { FileText, Download, BarChart3 } from "lucide-react"
-import { motion } from "framer-motion"
 import { useEffect, useState } from "react"
-import { supabase } from "@/lib/supabase"
-import { useRouter } from "@/lib/next-navigation"
-import { notifySuccess, notifyError } from "@/lib/toast"
-import { exportToCSV, exportToExcel, exportToPDF, formatDelaysReport, formatOccupancyReport, formatNotBoardedReport, type ReportData } from "@/lib/export-utils"
+
+import { motion } from "framer-motion"
+import { FileText, Download, BarChart3 } from "lucide-react"
+
+import { AppShell } from "@/components/app-shell"
+import { useOperatorTenant } from "@/components/providers/empresa-tenant-provider"
+import { Button } from "@/components/ui/button"
+import { Card } from "@/components/ui/card"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { useOperatorTenant } from "@/components/providers/empresa-tenant-provider"
+import { exportToCSV, exportToExcel, exportToPDF, formatDelaysReport, formatOccupancyReport, formatNotBoardedReport, type ReportData } from "@/lib/export-utils"
+import { useRouter } from "@/lib/next-navigation"
+import { supabase } from "@/lib/supabase"
+import { notifySuccess, notifyError } from "@/lib/toast"
 
 export default function RelatoriosOperatorPage() {
   const router = useRouter()

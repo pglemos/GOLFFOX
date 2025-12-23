@@ -6,11 +6,13 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Badge } from '@/components/ui/badge'
+
 import { AlertCircle } from 'lucide-react'
+
+import { Badge } from '@/components/ui/badge'
+import { usePathname } from '@/lib/next-navigation'
 import { getUnresolvedAlerts, hasCriticalAlerts } from '@/lib/operational-alerts'
 import { supabase } from '@/lib/supabase'
-import { usePathname } from '@/lib/next-navigation'
 
 export function OperationalAlertsBadge() {
   const [alertCount, setAlertCount] = useState(0)

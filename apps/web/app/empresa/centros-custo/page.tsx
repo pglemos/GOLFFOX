@@ -1,10 +1,12 @@
 "use client"
 
-import { useOperatorTenant } from "@/components/providers/empresa-tenant-provider"
+import { Loader2 } from "lucide-react"
+
 import { AppShell } from "@/components/app-shell"
+import { useOperatorTenant } from "@/components/providers/empresa-tenant-provider"
 import { CostCentersList } from "@/components/settings/cost-centers-list"
 import { useAuth } from "@/hooks/use-auth"
-import { Loader2 } from "lucide-react"
+
 
 export default function CentrosCustoEmpresaPage() {
     const { user, loading: isLoading } = useAuth()

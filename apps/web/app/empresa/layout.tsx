@@ -1,9 +1,11 @@
 ﻿'use client'
 
 import { Suspense } from 'react'
+
 export const dynamic = 'force-dynamic'
 import { EmpresaTenantProvider } from '@/components/providers/empresa-tenant-provider'
 import { RealtimeProvider } from '@/components/providers/realtime-provider'
+
 import { EmpresaErrorBoundary } from './error-boundary'
 
 function LoadingFallback() {

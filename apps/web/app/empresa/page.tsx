@@ -1,26 +1,28 @@
 ﻿"use client"
 
 import { useEffect, useState } from "react"
+
+import { MapPin, Clock, AlertTriangle, TrendingUp, DollarSign, CheckCircle, ArrowUpRight, ArrowDownRight, Minus } from "lucide-react"
+
 import { AppShell } from "@/components/app-shell"
+import { ControlTowerCards } from "@/components/empresa/control-tower-cards"
+import { ControlTowerVisual } from "@/components/empresa/dashboard/control-tower-visual"
+import { RecentAlertsCard } from "@/components/empresa/dashboard/recent-alerts-card"
+import { DashboardCharts } from "@/components/empresa/dashboard-charts"
+import { DashboardSkeleton } from "@/components/empresa/dashboard-skeleton"
+import { PeriodFilter, type PeriodFilter as PeriodFilterType } from "@/components/empresa/period-filter"
+import { KpiCard } from "@/components/kpi-card"
+import { useAuth } from "@/components/providers/auth-provider"
+import { useEmpresaTenant } from "@/components/providers/empresa-tenant-provider"
 import { Button } from "@/components/ui/button"
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card"
 import { useRouter } from "@/lib/next-navigation"
-import { useAuth } from "@/components/providers/auth-provider"
 
-import { ControlTowerCards } from "@/components/empresa/control-tower-cards"
-import { useEmpresaTenant } from "@/components/providers/empresa-tenant-provider"
-import { DashboardSkeleton } from "@/components/empresa/dashboard-skeleton"
-import { DashboardCharts } from "@/components/empresa/dashboard-charts"
-import { PeriodFilter, type PeriodFilter as PeriodFilterType } from "@/components/empresa/period-filter"
 import { useEmpresaKPIs, useControlTower } from "@/hooks/use-empresa-data"
 import { useRealtimeKPIs, useRealtimeAlerts } from "@/hooks/use-realtime-updates"
-import { KpiCard } from "@/components/kpi-card"
-import { ControlTowerVisual } from "@/components/empresa/dashboard/control-tower-visual"
-import { MapPin, Clock, AlertTriangle, TrendingUp, DollarSign, CheckCircle, ArrowUpRight, ArrowDownRight, Minus } from "lucide-react"
 import { useMobile } from "@/hooks/use-mobile"
 import { cn } from "@/lib/utils"
 import { ResponsiveChart } from "@/components/shared/responsive-chart"
-import { RecentAlertsCard } from "@/components/empresa/dashboard/recent-alerts-card"
 
 export default function EmpresaDashboard() {
   const router = useRouter()

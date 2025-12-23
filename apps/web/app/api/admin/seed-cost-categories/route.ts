@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getSupabaseAdmin } from '@/lib/supabase-server'
+
 import { requireAuth } from '@/lib/api-auth'
-import { withRateLimit } from '@/lib/rate-limit'
 import { logger, logError } from '@/lib/logger'
+import { withRateLimit } from '@/lib/rate-limit'
+import { getSupabaseAdmin } from '@/lib/supabase-server'
 
 /**
  * Endpoint para popular categorias de custo essenciais

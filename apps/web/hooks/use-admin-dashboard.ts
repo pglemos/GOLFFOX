@@ -3,15 +3,17 @@
  * Usa React Query para cache e estado
  */
 
-import { useQuery } from '@tanstack/react-query'
 import { useMemo } from 'react'
+
+import { useQuery } from '@tanstack/react-query'
+
 import { getAdminKPIs, getAuditLogs, type AdminFilters } from '@/lib/api/admin-api'
+import type { AuditLog } from '@/lib/api/admin-api'
 import {
   calculateAggregatedKPIs,
   type KpiData,
   type AggregatedKPIs,
 } from '@/lib/business/kpi-calculations'
-import type { AuditLog } from '@/lib/api/admin-api'
 
 /**
  * Hook para buscar KPIs do admin

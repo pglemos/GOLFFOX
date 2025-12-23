@@ -1,27 +1,19 @@
 "use client"
 
 import React, { useEffect, useState, useMemo, useCallback, useRef } from "react"
-import Image from "next/image"
+
 import dynamic from "next/dynamic"
+import Image from "next/image"
+
 import { useVirtualizer } from "@tanstack/react-virtual"
+import { motion } from "framer-motion"
+import { Truck, Plus, Search, Edit, Trash2, Building2, Calendar } from "lucide-react"
+
 import { AppShell } from "@/components/app-shell"
+import { VeiculoModal } from "@/components/modals/veiculo-modal"
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { Truck, Plus, Search, Edit, Trash2, Building2, Calendar } from "lucide-react"
-import { notifySuccess, notifyError } from "@/lib/toast"
-import { motion } from "framer-motion"
-import { useAuthFast } from "@/hooks/use-auth-fast"
-import { useDebounce } from "@/hooks/use-debounce"
-import { SkeletonList } from "@/components/ui/skeleton"
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select"
 import {
     Dialog,
     DialogContent,
@@ -30,10 +22,23 @@ import {
     DialogFooter,
     DialogDescription,
 } from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
+import { SkeletonList } from "@/components/ui/skeleton"
+import { useAuth } from "@/components/providers/auth-provider"
+import { useDebounce } from "@/hooks/use-debounce"
+import { notifySuccess, notifyError } from "@/lib/toast"
+
+
 
 // Lazy load modal - usar import direto para evitar problema de redefinição
-import { VeiculoModal } from "@/components/modals/veiculo-modal"
 
 interface veiculo {
     id: string
@@ -202,7 +207,7 @@ function VirtualizedVehicleList({
 }
 
 export default function TransportadoraVeiculosPage() {
-    const { user, loading: authLoading } = useAuthFast()
+    const { user, loading: authLoading } = useAuth()
     const [veiculos, setVeiculos] = useState<veiculo[]>([])
     const [transportadoras, setTransportadoras] = useState<Transportadora[]>([])
     const [dataLoading, setDataLoading] = useState(true)

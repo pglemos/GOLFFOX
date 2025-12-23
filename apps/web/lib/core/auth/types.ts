@@ -10,7 +10,8 @@ export interface UserData {
   refreshToken?: string
   name?: string
   avatar_url?: string | null
-  companyId?: string | null
+  company_id?: string | null
+  transportadora_id?: string | null
 }
 
 export interface AuthStorageOptions {

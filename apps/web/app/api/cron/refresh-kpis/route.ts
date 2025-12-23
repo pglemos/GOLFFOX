@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseServiceRole } from '@/lib/supabase-server'
-import { logError, debug } from '@/lib/logger'
+
 import { redisCacheService, createCacheKey } from '@/lib/cache/redis-cache.service'
+import { logError, debug } from '@/lib/logger'
+import { supabaseServiceRole } from '@/lib/supabase-server'
 
 export async function GET(request: NextRequest) {
   const authHeader = request.headers.get('authorization')

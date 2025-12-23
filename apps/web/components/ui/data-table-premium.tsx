@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+
 import {
     ColumnDef,
     ColumnFiltersState,
@@ -13,6 +14,16 @@ import {
     getSortedRowModel,
     useReactTable,
 } from "@tanstack/react-table"
+import { ChevronDown, SlidersHorizontal, ChevronLeft, ChevronRight } from "lucide-react"
+
+import { Button } from "@/components/ui/button"
+import {
+    DropdownMenu,
+    DropdownMenuCheckboxItem,
+    DropdownMenuContent,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Input } from "@/components/ui/input"
 import {
     Table,
     TableBody,
@@ -21,15 +32,7 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import {
-    DropdownMenu,
-    DropdownMenuCheckboxItem,
-    DropdownMenuContent,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { ChevronDown, SlidersHorizontal, ChevronLeft, ChevronRight } from "lucide-react"
+
 
 interface DataTablePremiumProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]

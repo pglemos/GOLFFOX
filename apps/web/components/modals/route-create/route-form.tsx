@@ -1,12 +1,14 @@
 import React from "react"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+
+import { Clock, Calendar, User, Truck, X, AlertTriangle } from "lucide-react"
+
+import { AddressAutocomplete } from "@/components/address-autocomplete"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Clock, Calendar, User, Truck, X, AlertTriangle } from "lucide-react"
-import { AddressAutocomplete } from "@/components/address-autocomplete"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import type { RouteFormData } from "@/types/routes"
 
 interface Company {

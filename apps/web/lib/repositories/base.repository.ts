@@ -4,6 +4,7 @@
  */
 
 import { createClient, SupabaseClient } from '@supabase/supabase-js'
+
 import { logger } from '@/lib/logger'
 
 function getSupabaseAdmin(): SupabaseClient {

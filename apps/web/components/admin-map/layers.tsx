@@ -6,13 +6,17 @@
 'use client'
 
 import { useEffect, useRef, memo } from 'react'
+
 import { MarkerClusterer } from '@googlemaps/markerclusterer'
-import { calculateHeading } from '@/lib/map-utils'
-import type { veiculo, RoutePolyline, Alert } from './admin-map'
-import type { HistoricalPosition } from '@/lib/playback-service'
-import { MarkerManager } from './marker-manager'
-import { debug, warn, error as logError } from '@/lib/logger'
+
 import { isValidPolyline, filterValidCoordinates, isValidCoordinate } from '@/lib/coordinate-validator'
+import { debug, warn, error as logError } from '@/lib/logger'
+import { calculateHeading } from '@/lib/map-utils'
+import type { HistoricalPosition } from '@/lib/playback-service'
+
+import { MarkerManager } from './marker-manager'
+
+import type { veiculo, RoutePolyline, Alert } from './admin-map'
 
 export interface HistoricalTrajectory {
   veiculo_id: string

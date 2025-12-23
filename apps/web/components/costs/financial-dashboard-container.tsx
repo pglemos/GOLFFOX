@@ -6,9 +6,11 @@
 "use client"
 
 import { useState } from "react"
+
 import { useFinancialData, useFinancialKPIs, useCategoryBreakdown, useBudgetVariance } from "@/hooks/use-financial-dashboard"
-import { FinancialDashboardExpandedPresentational } from "./financial-dashboard-presentational"
 import type { ProfileType } from "@/types/financial"
+
+import { FinancialDashboardExpandedPresentational } from "./financial-dashboard-presentational"
 
 // Cores para gráficos
 const COLORS = ['#F97316', '#2563EB', '#059669', '#7C3AED', '#DC2626', '#0891B2', '#6366F1', '#64748B']

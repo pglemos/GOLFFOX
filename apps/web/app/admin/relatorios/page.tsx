@@ -1,36 +1,39 @@
 "use client"
 
 import { useEffect, useState, useMemo, Suspense } from "react"
+
 import dynamic from "next/dynamic"
+
+import { motion } from "framer-motion"
+import { BarChart3, Download, FileText, Calendar, Filter, Clock, Mail, ChevronDown, ChevronUp, Save, X } from "lucide-react"
+import { Edit, Trash2 } from "lucide-react"
+
 import { AppShell } from "@/components/app-shell"
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { BarChart3, Download, FileText, Calendar, Filter, Clock, Mail, ChevronDown, ChevronUp, Save, X } from "lucide-react"
-import { useRouter } from "@/lib/next-navigation"
-import { 
-  formatDelaysReport,
-  formatOccupancyReport,
-  formatNotBoardedReport
-} from "@/lib/export-utils"
-import { withToast, notifySuccess, notifyError } from "@/lib/toast"
-import { t } from "@/lib/i18n"
-import { 
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { motion } from "framer-motion"
-import { Badge } from "@/components/ui/badge"
-import { Edit, Trash2 } from "lucide-react"
-import { useAuthFast } from "@/hooks/use-auth-fast"
+import { Input } from "@/components/ui/input"
 import { SkeletonList } from "@/components/ui/skeleton"
+import { useAuth } from "@/components/providers/auth-provider"
+import {
+  formatDelaysReport,
+  formatOccupancyReport,
+  formatNotBoardedReport
+} from "@/lib/export-utils"
+import { t } from "@/lib/i18n"
+import { useRouter } from "@/lib/next-navigation"
+import { withToast, notifySuccess, notifyError } from "@/lib/toast"
 
 // Lazy load modal pesado
 const ScheduleReportModal = dynamic(
   () => import("@/components/modals/schedule-report-modal").then(m => ({ default: m.ScheduleReportModal })),
-  { 
+  {
     ssr: false,
     loading: () => null
   }
@@ -47,7 +50,7 @@ interface ReportConfig {
 
 export default function RelatoriosPage() {
   const router = useRouter()
-  const { user, loading: authLoading } = useAuthFast()
+  const { user, loading: authLoading } = useAuth()
   const [filtersExpanded, setFiltersExpanded] = useState(false)
   const [tempDateStart, setTempDateStart] = useState(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0])
   const [tempDateEnd, setTempDateEnd] = useState(new Date().toISOString().split('T')[0])
@@ -81,39 +84,39 @@ export default function RelatoriosPage() {
 
   // Memoizar reports para evitar recriação
   const reports: ReportConfig[] = useMemo(() => [
-    { 
+    {
       id: 'delays',
-      title: 'Atrasos', 
+      title: 'Atrasos',
       description: 'Análise de atrasos por rota, motorista e horário',
       icon: BarChart3,
       viewName: 'v_reports_delays',
       formatter: formatDelaysReport
     },
-    { 
+    {
       id: 'occupancy',
-      title: 'Ocupação', 
+      title: 'Ocupação',
       description: 'Ocupação por horário (heatmap)',
       icon: BarChart3,
       viewName: 'v_reports_occupancy',
       formatter: formatOccupancyReport
     },
-    { 
+    {
       id: 'not_boarded',
-      title: 'Não Embarcados', 
+      title: 'Não Embarcados',
       description: 'Passageiros que não embarcaram',
       icon: FileText,
       viewName: 'v_reports_not_boarded',
       formatter: formatNotBoardedReport
     },
-    { 
+    {
       id: 'routes',
-      title: 'Rotas Eficientes', 
+      title: 'Rotas Eficientes',
       description: 'Análise de eficiência das rotas',
       icon: FileText
     },
-    { 
+    {
       id: 'motoristas',
-      title: 'Ranking de Motoristas', 
+      title: 'Ranking de Motoristas',
       description: 'Ranking por pontualidade, eficiência e conclusão',
       icon: BarChart3
     },
@@ -123,7 +126,7 @@ export default function RelatoriosPage() {
     if (user && !authLoading) {
       loadSchedules()
     }
-     
+
   }, [user, authLoading])
 
   const loadSchedules = async () => {
@@ -166,17 +169,17 @@ export default function RelatoriosPage() {
         const url = window.URL.createObjectURL(blob)
         const a = document.createElement('a')
         a.href = url
-        
+
         const contentDisposition = response.headers.get('content-disposition')
         let filename = `${report.id}-${dateStart}-${dateEnd}.${format === 'excel' ? 'xlsx' : format}`
-        
+
         if (contentDisposition) {
           const filenameMatch = contentDisposition.match(/filename="(.+)"/)
           if (filenameMatch) {
             filename = filenameMatch[1]
           }
         }
-        
+
         a.download = filename
         document.body.appendChild(a)
         a.click()
@@ -343,9 +346,9 @@ export default function RelatoriosPage() {
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
+                    <Button
+                      variant="outline"
+                      size="sm"
                       className="w-full"
                       onClick={() => {
                         setSelectedReportForSchedule(report.id)

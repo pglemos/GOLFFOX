@@ -4,6 +4,7 @@
  */
 
 import { NextResponse } from 'next/server'
+
 import { formatError } from './error-utils'
 
 export interface ApiResponse<T = unknown> {

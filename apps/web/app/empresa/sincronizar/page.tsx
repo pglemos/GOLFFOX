@@ -1,14 +1,16 @@
 ﻿"use client"
 
 import { useEffect, useState } from "react"
+
+import { motion } from "framer-motion"
+import { RefreshCw, CheckCircle, AlertCircle } from "lucide-react"
+
 import { AppShell } from "@/components/app-shell"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
-import { RefreshCw, CheckCircle, AlertCircle } from "lucide-react"
-import { motion } from "framer-motion"
-import { supabase } from "@/lib/supabase"
-import { useRouter } from "@/lib/next-navigation"
 import { geocodeAddress, optimizeRoute } from "@/lib/google-maps"
+import { useRouter } from "@/lib/next-navigation"
+import { supabase } from "@/lib/supabase"
 
 export default function SincronizarPage() {
   const router = useRouter()

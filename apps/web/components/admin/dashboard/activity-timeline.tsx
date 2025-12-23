@@ -1,13 +1,15 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { formatRelativeTime } from "@/lib/kpi-utils"
 import {
   Plus, Edit, Trash2, CheckCircle, XCircle, Settings, UserPlus, FileText, Activity, LucideIcon
 } from "lucide-react"
+
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { formatRelativeTime } from "@/lib/kpi-utils"
+
 
 interface ActivityItem {
   id: string

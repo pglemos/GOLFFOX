@@ -4,6 +4,7 @@
  */
 
 import { error } from '@/lib/logger'
+
 import type { UserData, AuthStorageOptions } from './types'
 
 const STORAGE_KEY = 'golffox-auth'
@@ -26,7 +27,9 @@ export function storeUserData(
     email: userData.email,
     role: userData.role,
     name: userData.name || userData.email.split('@')[0],
-    avatar_url: userData.avatar_url || null
+    avatar_url: userData.avatar_url || null,
+    company_id: userData.company_id || null,
+    transportadora_id: userData.transportadora_id || null
     // access_token removido - nunca armazenar no cliente
   }
   const safePayload = JSON.stringify(safePayloadObj)

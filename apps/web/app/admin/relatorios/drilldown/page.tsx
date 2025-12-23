@@ -1,12 +1,19 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { AppShell } from "@/components/app-shell"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { useAuth } from "@/hooks/use-auth"
+
 import { FileText, ChevronRight, Download, Filter, Calendar, DollarSign, Route, Users, Truck } from "lucide-react"
+
+import { AppShell } from "@/components/app-shell"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog"
 import {
     Select,
     SelectContent,
@@ -15,12 +22,6 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-} from "@/components/ui/dialog"
-import {
     Table,
     TableBody,
     TableCell,
@@ -28,6 +29,7 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
+import { useAuth } from "@/hooks/use-auth"
 
 interface ReportCategory {
     id: string

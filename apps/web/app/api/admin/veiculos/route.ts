@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseServiceRole } from '@/lib/supabase-server'
-import { requireAuth } from '@/lib/api-auth'
+
 import { z } from 'zod'
+
+import { requireAuth } from '@/lib/api-auth'
 import { logger, logError } from '@/lib/logger'
+import { supabaseServiceRole } from '@/lib/supabase-server'
 import { createVehicleSchema, validateWithSchema } from '@/lib/validation/schemas'
 
 export const runtime = 'nodejs'

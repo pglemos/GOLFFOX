@@ -1,14 +1,16 @@
 "use client"
 
 import { useState, useEffect } from "react"
+
+import { Eye, FileText, Search } from "lucide-react"
+
 import { AppShell } from "@/components/app-shell"
-import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Eye, FileText, Search } from "lucide-react"
-import { formatCurrency } from "@/lib/format"
 import { useAuth } from "@/hooks/use-auth"
+import { formatCurrency } from "@/lib/format"
 import { supabase } from "@/lib/supabase"
 
 interface Contract {

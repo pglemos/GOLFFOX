@@ -1,10 +1,12 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
+
+import { useLoadScript, Autocomplete } from "@react-google-maps/api"
+import { Loader2, MapPin } from "lucide-react"
+
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Loader2, MapPin } from "lucide-react"
-import { useLoadScript, Autocomplete } from "@react-google-maps/api"
 import { cn } from "@/lib/utils"
 
 interface AddressAutocompleteProps {

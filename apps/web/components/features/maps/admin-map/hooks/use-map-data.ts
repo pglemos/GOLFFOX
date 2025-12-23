@@ -4,12 +4,13 @@
  */
 
 import { useState, useCallback, useRef } from 'react'
-import { supabase } from '@/lib/supabase'
-import { loadVehicles } from '@/lib/services/map/map-services/vehicle-loader'
+
 import { isValidCoordinate, normalizeCoordinate } from '@/lib/coordinate-validator'
-import { debug, warn, error as logError } from '@/lib/logger'
-import { notifySuccess } from '@/lib/toast'
 import { t } from '@/lib/i18n'
+import { debug, warn, error as logError } from '@/lib/logger'
+import { loadVehicles } from '@/lib/services/map/map-services/vehicle-loader'
+import { supabase } from '@/lib/supabase'
+import { notifySuccess } from '@/lib/toast'
 import type { Veiculo, RoutePolyline, MapAlert, RouteStop } from '@/types/map'
 import type { SupabaseRoute, SupabaseStopWithRoute } from '@/types/supabase-data'
 

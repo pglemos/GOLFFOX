@@ -10,9 +10,11 @@
 'use client'
 
 import React, { Suspense, ComponentType, Component, ReactNode, ErrorInfo } from 'react'
-import { Skeleton } from '@/components/ui/skeleton'
-import { Button } from '@/components/ui/button'
+
 import { AlertCircle, RefreshCw } from 'lucide-react'
+
+import { Button } from '@/components/ui/button'
+import { Skeleton } from '@/components/ui/skeleton'
 
 interface LazyPageWrapperProps {
   children: React.ReactNode

@@ -1,11 +1,13 @@
 "use client"
 
 import React from "react"
+
 import { motion } from "framer-motion"
 import { type LucideIcon, ArrowUpRight, ArrowDownRight, Minus } from "lucide-react"
-import { cn } from "@/lib/utils"
+
 import { Card } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
+import { cn } from "@/lib/utils"
 
 interface KpiCardProps {
   icon: LucideIcon

@@ -1,7 +1,8 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
 import { RefreshCw, Maximize2, Minimize2, X } from "lucide-react"
+
+import { Button } from "@/components/ui/button"
 
 interface MapControlsProps {
   isMobile: boolean

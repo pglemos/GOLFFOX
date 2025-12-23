@@ -1,7 +1,8 @@
 "use client"
 
-import { DiscrepancyRow } from "./discrepancy-row"
 import type { InvoiceLine } from "@/hooks/use-reconciliation"
+
+import { DiscrepancyRow } from "./discrepancy-row"
 
 interface DiscrepancyTableProps {
   invoiceLines: InvoiceLine[]

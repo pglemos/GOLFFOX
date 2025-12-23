@@ -1,20 +1,11 @@
 "use client"
 
 import { useEffect, useState, useCallback, useMemo } from "react"
+
 import { useTransportadoraRealtime } from "@/hooks/use-transportadora-realtime"
-import { AppShell } from "@/components/app-shell"
-import { Button } from "@/components/ui/button"
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { KpiCard } from "@/components/kpi-card"
-import { DataTable } from "@/components/transportadora/data-table"
-import { QuickActions } from "@/components/transportadora/quick-actions"
-import { RecentActivities } from "@/components/transportadora/recent-activities"
-import { FilterDrawer } from "@/components/shared/filter-drawer"
 import { ResponsiveChart } from "@/components/shared/responsive-chart"
 import { LazyWrapper } from "@/components/shared/lazy-wrapper"
-import { useMobile } from "@/hooks/use-mobile"
+import { useResponsive } from "@/hooks/use-responsive"
 import dynamic from "next/dynamic"
 
 // Lazy load componentes pesados
@@ -45,12 +36,22 @@ import { supabase } from "@/lib/supabase"
 import { useRouter } from "@/lib/next-navigation"
 import { useAuth } from "@/components/providers/auth-provider"
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts"
+import { AppShell } from "@/components/app-shell"
+import { KpiCard } from "@/components/kpi-card"
+import { FilterDrawer } from "@/components/shared/filter-drawer"
+import { DataTable } from "@/components/transportadora/data-table"
+import { QuickActions } from "@/components/transportadora/quick-actions"
+import { RecentActivities } from "@/components/transportadora/recent-activities"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { t } from "@/lib/i18n"
 import { cn } from "@/lib/utils"
 
 export default function TransportadoraDashboard() {
   const router = useRouter()
-  const isMobile = useMobile()
+  const { isMobile } = useResponsive()
   const { user, loading } = useAuth()
 
   // Redirecionar para login se não autenticado ou sem role adequada

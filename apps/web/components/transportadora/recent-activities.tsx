@@ -1,7 +1,6 @@
 "use client"
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+import { motion } from "framer-motion"
 import { 
   Truck, 
   Users, 
@@ -10,9 +9,12 @@ import {
   Wrench,
   Clock
 } from "lucide-react"
-import { formatRelativeTime } from "@/lib/kpi-utils"
-import { motion } from "framer-motion"
+
+import { Badge } from "@/components/ui/badge"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { t } from "@/lib/i18n"
+import { formatRelativeTime } from "@/lib/kpi-utils"
+
 
 interface Activity {
   id: string

@@ -1,13 +1,16 @@
 ﻿"use client"
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Label } from "@/components/ui/label"
+import { useState, useRef } from "react"
+
 import { Upload, FileSpreadsheet, AlertCircle, CheckCircle2 } from "lucide-react"
+
+import { Button } from "@/components/ui/button"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
+import { Label } from "@/components/ui/label"
+import type { EmployeeRow, ParseResult, ImportResult } from '@/lib/importers/employee-csv'
+import { warn, error as logError } from "@/lib/logger"
 import { supabase } from "@/lib/supabase"
 import { notifySuccess, notifyError, notifyInfo, notifyWarning } from "@/lib/toast"
-import { useState, useRef } from "react"
-import { warn, error as logError } from "@/lib/logger"
 
 const operatorI18n: any = {
   csv_import: {
@@ -44,7 +47,6 @@ interface CSVImportModalProps {
   empresaId: string
 }
 
-import type { EmployeeRow, ParseResult, ImportResult } from '@/lib/importers/employee-csv'
 
 export function CSVImportModal({ isOpen, onClose, onSave, empresaId }: CSVImportModalProps) {
   const [loading, setLoading] = useState(false)

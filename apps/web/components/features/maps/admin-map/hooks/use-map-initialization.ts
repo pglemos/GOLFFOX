@@ -4,10 +4,11 @@
  */
 
 import { useEffect, useRef, useState } from 'react'
+
 import { loadGoogleMapsAPI } from '@/lib/google-maps-loader'
-import { getMapsBillingMonitor } from '@/lib/maps-billing-monitor'
-import { debug, warn, error as logError } from '@/lib/logger'
 import { t } from '@/lib/i18n'
+import { debug, warn, error as logError } from '@/lib/logger'
+import { getMapsBillingMonitor } from '@/lib/maps-billing-monitor'
 
 export interface UseMapInitializationOptions {
   mapRef: React.RefObject<HTMLDivElement>

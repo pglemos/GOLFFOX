@@ -3,9 +3,11 @@
  * Retorna a especificação OpenAPI da API
  */
 
-import { NextRequest, NextResponse } from 'next/server'
 import { readFile } from 'fs/promises'
 import { join } from 'path'
+
+import { NextRequest, NextResponse } from 'next/server'
+
 import { applyRateLimit } from '@/lib/rate-limit'
 
 export const runtime = 'nodejs'

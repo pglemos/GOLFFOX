@@ -2,10 +2,10 @@
  * Serviço para carregamento e processamento de veículos para o mapa admin
  */
 
-import { supabase } from "@/lib/supabase"
-import { debug, warn, error as logError } from "@/lib/logger"
-import { getErrorMeta } from "@/lib/error-utils"
 import { isValidCoordinate, normalizeCoordinate } from "@/lib/coordinate-validator"
+import { getErrorMeta } from "@/lib/error-utils"
+import { debug, warn, error as logError } from "@/lib/logger"
+import { supabase } from "@/lib/supabase"
 import type { Veiculo } from "@/types/map"
 
 interface SupabaseVeiculo {
@@ -34,8 +34,8 @@ interface SupabaseTrip {
 
 interface SupabasePosition {
   trip_id: string
-  lat: number
-  lng: number
+  latitude: number
+  longitude: number
   speed: number | null
   timestamp: string
   veiculo_id?: string
@@ -82,8 +82,8 @@ export async function loadVehicles(companyId?: string): Promise<Veiculo[]> {
 
     if (vehiclesError) {
       logError('Erro na query de veículos', getErrorMeta(vehiclesError))
-      debug('Detalhes do erro', { 
-        error: vehiclesError.message, 
+      debug('Detalhes do erro', {
+        error: vehiclesError.message,
         code: vehiclesError.code,
         details: vehiclesError.details,
         hint: vehiclesError.hint
@@ -121,7 +121,7 @@ export async function loadVehicles(companyId?: string): Promise<Veiculo[]> {
                 .select('id, plate, is_active')
                 .eq('is_active', true)
                 .limit(100)
-              
+
               if (minimalData) {
                 finalVeiculosData = minimalData as SupabaseVeiculo[]
                 debug(`Query mínima retornou ${finalVeiculosData.length} veículos`, {}, 'VehicleLoader')
@@ -135,8 +135,8 @@ export async function loadVehicles(companyId?: string): Promise<Veiculo[]> {
         }
       }
     } else {
-      finalVeiculosData = veiculosData || []
-      debug(`Query principal retornou ${finalVeiculosData.length} veículos`, { 
+      finalVeiculosData = (veiculosData as any) || []
+      debug(`Query principal retornou ${finalVeiculosData.length} veículos`, {
         companyId,
         total: finalVeiculosData.length,
         sample: finalVeiculosData.slice(0, 3).map(v => ({ id: v.id, plate: v.plate }))
@@ -144,12 +144,12 @@ export async function loadVehicles(companyId?: string): Promise<Veiculo[]> {
     }
 
     if (!finalVeiculosData || finalVeiculosData.length === 0) {
-      warn('Nenhum veículo ativo encontrado', { 
-        companyId, 
+      warn('Nenhum veículo ativo encontrado', {
+        companyId,
         hasError: !!vehiclesError,
-        errorMessage: vehiclesError?.message 
+        errorMessage: vehiclesError?.message
       }, 'VehicleLoader')
-      
+
       // Tentar uma última vez com query simples para diagnóstico
       try {
         const { data: testData, error: testError } = await supabase
@@ -157,7 +157,7 @@ export async function loadVehicles(companyId?: string): Promise<Veiculo[]> {
           .select('id, plate, is_active')
           .eq('is_active', true)
           .limit(5)
-        
+
         if (testData && testData.length > 0) {
           warn(`Query de teste encontrou ${testData.length} veículos, mas query principal não`, {
             testData: testData.map(v => ({ id: v.id, plate: v.plate }))
@@ -168,13 +168,13 @@ export async function loadVehicles(companyId?: string): Promise<Veiculo[]> {
       } catch (testErr) {
         logError('Erro na query de teste', { error: testErr }, 'VehicleLoader')
       }
-      
+
       return []
     }
 
     // Buscar trips ativas (mas não restringir veículos apenas a esses)
     const vehicleIds = finalVeiculosData.map((v) => v.id)
-    const { data: activeTrips } = await supabase
+    const { data: activeTrips } = await (supabase
       .from('trips')
       .select(`
         id,
@@ -186,13 +186,14 @@ export async function loadVehicles(companyId?: string): Promise<Veiculo[]> {
         users!trips_driver_id_fkey(id, name)
       `)
       .in('veiculo_id', vehicleIds)
-      .eq('status', 'inProgress')
+      .eq('status', 'inProgress') as any)
 
     const tripsByVehicle = new Map<string, SupabaseTrip>()
     if (activeTrips) {
-      activeTrips.forEach((trip: SupabaseTrip) => {
-        if (!tripsByVehicle.has(trip.veiculo_id)) {
-          tripsByVehicle.set(trip.veiculo_id, trip)
+      activeTrips.forEach((trip: SupabaseTrip | any) => {
+        const vId = trip.veiculo_id
+        if (vId && !tripsByVehicle.has(vId)) {
+          tripsByVehicle.set(vId, trip)
         }
       })
     }
@@ -200,28 +201,28 @@ export async function loadVehicles(companyId?: string): Promise<Veiculo[]> {
     // Buscar últimas posições de TODAS as trips (não apenas inProgress)
     // Primeiro, buscar trips recentes (últimas 24h) para ter mais chances de encontrar posições
     const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
-    const { data: recentTrips } = await supabase
+    const { data: recentTrips } = await (supabase
       .from('trips')
       .select('id, veiculo_id')
       .in('veiculo_id', vehicleIds)
       .gte('created_at', oneDayAgo)
-      .order('created_at', { ascending: false })
+      .order('created_at', { ascending: false }) as any)
 
     const tripIds = recentTrips?.map((t: { id: string }) => t.id) || []
     let lastPositions: SupabasePosition[] = []
 
     if (tripIds.length > 0) {
       const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString()
-      const { data: recentPositions } = await supabase
+      const { data: recentPositions } = await (supabase
         .from('motorista_positions')
-        .select('trip_id, lat, lng, speed, timestamp')
+        .select('trip_id, latitude, longitude, speed, timestamp')
         .in('trip_id', tripIds)
         .gte('timestamp', fiveMinutesAgo)
-        .order('timestamp', { ascending: false })
+        .order('timestamp', { ascending: false }) as any)
 
       if (recentPositions && recentPositions.length > 0) {
         const tripToVehicle = new Map(
-          recentTrips?.map((t: { id: string; veiculo_id: string }) => [t.id, t.veiculo_id]) || []
+          recentTrips?.map((t: any) => [t.id, t.veiculo_id]) || []
         )
         lastPositions = (recentPositions || []).map((pos: SupabasePosition) => ({
           ...pos,
@@ -231,16 +232,16 @@ export async function loadVehicles(companyId?: string): Promise<Veiculo[]> {
         // Buscar últimas posições conhecidas se não há recentes
         const { data: allPositions } = await supabase
           .from('motorista_positions')
-          .select('trip_id, lat, lng, speed, timestamp')
+          .select('trip_id, latitude, longitude, speed, timestamp')
           .in('trip_id', tripIds)
           .order('timestamp', { ascending: false })
           .limit(tripIds.length * 10)
 
         if (allPositions) {
           const tripToVehicle = new Map(
-            recentTrips?.map((t: { id: string; veiculo_id: string }) => [t.id, t.veiculo_id]) || []
+            recentTrips?.map((t: any) => [t.id, t.veiculo_id]) || []
           )
-          lastPositions = (allPositions || []).map((pos: SupabasePosition) => ({
+          lastPositions = (allPositions || []).map((pos: any) => ({
             ...pos,
             veiculo_id: tripToVehicle.get(pos.trip_id),
           }))
@@ -279,8 +280,8 @@ export async function loadVehicles(companyId?: string): Promise<Veiculo[]> {
         vehicleStatus = 'stopped_long'
       }
 
-      const lat = lastPos?.lat || null
-      const lng = lastPos?.lng || null
+      const lat = lastPos?.latitude || null
+      const lng = lastPos?.longitude || null
 
       return {
         veiculo_id: v.id,
@@ -319,7 +320,7 @@ export async function loadVehicles(companyId?: string): Promise<Veiculo[]> {
       }
     })
 
-    debug(`Carregados ${normalizedVehicles.length} veículos`, { 
+    debug(`Carregados ${normalizedVehicles.length} veículos`, {
       count: normalizedVehicles.length,
       withCoords: normalizedVehicles.filter(v => v.lat && v.lng).length,
       withoutCoords: normalizedVehicles.filter(v => !v.lat || !v.lng).length,

@@ -1,8 +1,9 @@
 'use client'
 
 import { createContext, useContext, useState, useEffect, ReactNode, useCallback, useMemo } from 'react'
-import { supabase } from '@/lib/supabase'
+
 import { useRouter, useSearchParams, usePathname } from '@/lib/next-navigation'
+import { supabase } from '@/lib/supabase'
 import { ensureSupabaseSession } from '@/lib/supabase-session'
 
 interface TenantContextType {

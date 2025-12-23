@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getSupabaseAdmin } from '@/lib/supabase-client'
+
 import { requireAuth } from '@/lib/api-auth'
+import { successResponse, errorResponse, notFoundResponse, validationErrorResponse } from '@/lib/api-response'
 import { logger, logError } from '@/lib/logger'
 import { invalidateEntityCache } from '@/lib/next-cache'
-import { successResponse, errorResponse, notFoundResponse, validationErrorResponse } from '@/lib/api-response'
+import { getSupabaseAdmin } from '@/lib/supabase-client'
 
 export const runtime = 'nodejs'
 

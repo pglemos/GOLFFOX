@@ -167,7 +167,7 @@ export async function getUserInfo(): Promise<{
   try {
     const { supabase } = await import('../supabase')
     const { data: { session } } = await supabase.auth.getSession()
-    
+
     if (!session?.user) {
       return {}
     }
@@ -183,9 +183,9 @@ export async function getUserInfo(): Promise<{
     }
 
     return {
-      role: userData.role,
-      company_id: userData.company_id,
-      transportadora_id: userData.transportadora_id,
+      role: (userData as any).role,
+      company_id: (userData as any).company_id,
+      transportadora_id: (userData as any).transportadora_id,
     }
   } catch (error) {
     console.error('Erro ao buscar informações do usuário:', error)

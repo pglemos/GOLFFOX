@@ -136,7 +136,7 @@ export function adjustForContrast(
   const bgLuminance = getLuminance(bgRgb.r, bgRgb.g, bgRgb.b)
   const shouldDarken = bgLuminance > 0.5
 
-  let adjustedRgb = { ...fgRgb }
+  const adjustedRgb = { ...fgRgb }
   const step = shouldDarken ? -5 : 5
   const limit = shouldDarken ? 0 : 255
 

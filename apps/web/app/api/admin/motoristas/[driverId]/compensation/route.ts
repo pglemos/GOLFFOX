@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getSupabaseAdmin } from '@/lib/supabase-client'
+
+import { z } from 'zod'
+
 import { requireAuth } from '@/lib/api-auth'
 import { logError } from '@/lib/logger'
-import { z } from 'zod'
+import { getSupabaseAdmin } from '@/lib/supabase-client'
+
 
 // Schema de validação
 const compensationSchema = z.object({

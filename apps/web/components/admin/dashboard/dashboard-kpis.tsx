@@ -2,11 +2,12 @@
 
 import { motion } from "framer-motion"
 import { Users, Truck, Navigation, AlertCircle, TrendingUp, Gauge } from "lucide-react"
-import { formatCount } from "@/lib/kpi-utils"
+
+import { Badge } from "@/components/ui/badge"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { staggerContainer, listItem } from "@/lib/animations"
 import { t } from '@/lib/i18n'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+import { formatCount } from "@/lib/kpi-utils"
 
 interface DashboardKPIsProps {
     kpis: {

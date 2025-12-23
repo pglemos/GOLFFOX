@@ -1,8 +1,9 @@
 "use server"
 
 import { NextRequest, NextResponse } from "next/server"
-import { logError } from '@/lib/logger'
+
 import { requireAuth } from '@/lib/api-auth'
+import { logError } from '@/lib/logger'
 
 export async function GET(request: NextRequest) {
   // Verificar autenticação admin

@@ -6,6 +6,7 @@
  */
 
 import { Redis } from '@upstash/redis'
+
 import { debug, warn, logError } from '@/lib/logger'
 
 // Reutilizar conexão Redis do rate-limit.ts

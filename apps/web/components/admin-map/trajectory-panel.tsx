@@ -5,11 +5,12 @@
 
 'use client'
 
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { X, TrendingUp, TrendingDown, Clock, Map, AlertTriangle } from 'lucide-react'
 import { motion } from 'framer-motion'
+import { X, TrendingUp, TrendingDown, Clock, Map, AlertTriangle } from 'lucide-react'
+
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { modalContent } from '@/lib/animations'
 import type { TrajectoryAnalysis } from '@/lib/trajectory-analyzer'
 

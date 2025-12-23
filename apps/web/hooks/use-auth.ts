@@ -1,8 +1,9 @@
 "use client"
 
 import { useState, useEffect, useCallback } from 'react'
-import { supabase } from '@/lib/supabase'
+
 import { useRouter } from '@/lib/next-navigation'
+import { supabase } from '@/lib/supabase'
 
 interface User {
   id: string

@@ -5,9 +5,9 @@
  * com timeout, retry automático e tratamento de erros
  */
 
-import { retry, type RetryOptions, type RetryResult } from './retry-service'
-import { logError } from './logger'
 import { trackError, type ErrorContext } from './error-tracking'
+import { logError } from './logger'
+import { retry, type RetryOptions, type RetryResult } from './retry-service'
 
 export interface SafeAsyncOptions<T> extends RetryOptions {
   /** Timeout em milissegundos (padrão: 30000 = 30s) */

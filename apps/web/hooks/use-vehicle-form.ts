@@ -4,7 +4,9 @@
  */
 
 import { useState, useCallback, useEffect } from 'react'
+
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+
 import {
   createVehicle,
   updateVehicle,
@@ -214,13 +216,13 @@ export function useVehicleForm(options: UseVehicleFormOptions = {}) {
       if (formData.transportadora_id) {
         vehicleData.transportadora_id = formData.transportadora_id
       }
-    } else if (userInfo.role === 'gestor_transportadora' || userInfo.role === 'operador') {
+    } else if (userInfo.role === 'gestor_empresa' || userInfo.role === 'empresa') {
       if (userInfo.company_id) {
         vehicleData.company_id = userInfo.company_id
       } else if (formData.company_id) {
         vehicleData.company_id = formData.company_id
       }
-    } else if (userInfo.role === 'gestor_transportadora' || userInfo.role === 'transportadora') {
+    } else if (userInfo.role === 'gestor_transportadora' || userInfo.role === 'transportadora' || userInfo.role === 'operador') {
       if (userInfo.transportadora_id) {
         vehicleData.transportadora_id = userInfo.transportadora_id
       }
@@ -257,7 +259,6 @@ export function useVehicleForm(options: UseVehicleFormOptions = {}) {
     if (
       data.capacity !== null &&
       data.capacity !== undefined &&
-      data.capacity !== '' &&
       (isNaN(data.capacity) || data.capacity < 1)
     ) {
       return 'Capacidade deve ser um número maior que zero'
@@ -307,7 +308,7 @@ export function useVehicleForm(options: UseVehicleFormOptions = {}) {
         } else {
           // Create
           const createdVehicle = await createMutation.mutateAsync(vehicleData)
-          
+
           // Upload da foto após criar (agora temos o ID)
           if (photoFile && createdVehicle?.id) {
             try {

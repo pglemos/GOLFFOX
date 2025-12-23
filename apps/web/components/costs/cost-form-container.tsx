@@ -6,14 +6,18 @@
 "use client"
 
 import { useState, useCallback } from "react"
-import { useForm } from "react-hook-form"
+
 import { zodResolver } from "@hookform/resolvers/zod"
-import { z } from "zod"
 import { format } from "date-fns"
-import { notifyError } from "@/lib/toast"
+import { useForm } from "react-hook-form"
+import { z } from "zod"
+
 import { useCreateCost } from "@/hooks/use-costs"
-import { CostFormPresentational } from "./cost-form-presentational"
+import { notifyError } from "@/lib/toast"
 import type { ManualCostInsert, ProfileType, CostCategory } from "@/types/financial"
+
+import { CostFormPresentational } from "./cost-form-presentational"
+
 
 // Schema de validação
 const costFormSchema = z.object({
@@ -126,7 +130,7 @@ export function CostFormContainer({
     const onSubmit = useCallback(async (e: React.FormEvent) => {
         e.preventDefault()
         const data = form.getValues()
-        
+
         try {
             // Fazer upload do anexo se houver
             let attachmentUrl = null
@@ -140,22 +144,22 @@ export function CostFormContainer({
 
             // Montar payload
             const payload: ManualCostInsert = {
-                companyId,
-                carrierId,
-                categoryId: data.categoryId,
+                company_id: companyId,
+                transportadora_id: carrierId,
+                category_id: data.categoryId,
                 description: data.description,
                 amount: parseFloat(data.amount.replace(',', '.')),
-                costDate: format(data.costDate, 'yyyy-MM-dd'),
-                isRecurring: data.isRecurring,
-                recurringInterval: data.isRecurring ? data.recurringInterval : undefined,
-                recurringEndDate: data.isRecurring && data.recurringEndDate
+                cost_date: format(data.costDate, 'yyyy-MM-dd'),
+                is_recurring: data.isRecurring,
+                recurring_interval: data.isRecurring ? data.recurringInterval : undefined,
+                recurring_end_date: data.isRecurring && data.recurringEndDate
                     ? format(data.recurringEndDate, 'yyyy-MM-dd')
                     : undefined,
-                vehicleId: data.vehicleId || undefined,
-                routeId: data.routeId || undefined,
+                veiculo_id: data.vehicleId || undefined,
+                route_id: data.routeId || undefined,
                 notes: data.notes,
-                attachmentUrl,
-                attachmentName,
+                attachment_url: attachmentUrl,
+                attachment_name: attachmentName,
             }
 
             await createCostMutation.mutateAsync(payload)

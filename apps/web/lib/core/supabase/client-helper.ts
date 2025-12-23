@@ -6,11 +6,13 @@
  */
 
 import { NextRequest } from 'next/server'
+
 import { createClient, SupabaseClient } from '@supabase/supabase-js'
-import { supabaseServiceRole } from '@/lib/supabase-server'
+
 import type { AuthenticatedUser } from '@/lib/api-auth'
 import { validateAuth } from '@/lib/api-auth'
 import { getSupabaseUrl, getSupabaseAnonKey, getSupabaseServiceKey } from '@/lib/env'
+import { supabaseServiceRole } from '@/lib/supabase-server'
 import type { Database } from '@/types/supabase'
 
 /**

@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
+
 import { createClient } from '@supabase/supabase-js'
+
 import { requireAuth } from '@/lib/api-auth'
-import { withRateLimit } from '@/lib/rate-limit'
 import { logError } from '@/lib/logger'
 import { withDangerousRouteAudit, AuditContext } from '@/lib/middleware/dangerous-route-audit'
+import { withRateLimit } from '@/lib/rate-limit'
 import { validateSQLOrThrow } from '@/lib/validation/sql-validator'
 
 export const runtime = 'nodejs'

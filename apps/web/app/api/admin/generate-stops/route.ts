@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
+
+import { createClient } from '@supabase/supabase-js'
+
 import { validateBrazilianAddress } from '../../../../lib/address-validator'
 import { geocodeAddress } from '../../../../lib/geocoding'
+import { log, getLogs, clearLogs } from '../../../../lib/logger'
 import { getEmployeesForRoute } from '../../../../lib/stops/employee-source'
 import { sortStops } from '../../../../lib/stops/stop-sorting'
-import { log, getLogs, clearLogs } from '../../../../lib/logger'
-import { createClient } from '@supabase/supabase-js'
 
 export const runtime = 'nodejs'
 

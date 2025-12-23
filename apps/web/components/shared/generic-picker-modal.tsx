@@ -9,6 +9,10 @@
 "use client"
 
 import { useState, useEffect, useMemo, useCallback, ReactNode } from "react"
+
+import { Search, AlertTriangle, CheckCircle2, XCircle, Loader2 } from "lucide-react"
+
+import { Badge, BadgeProps } from "@/components/ui/badge"
 import {
   Dialog,
   DialogContent,
@@ -17,10 +21,8 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
-import { Badge, BadgeProps } from "@/components/ui/badge"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { Search, AlertTriangle, CheckCircle2, XCircle, Loader2 } from "lucide-react"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import type { MotoristaPicker, VeiculoPicker } from "@/types/entities"
 
 // ============================================================================
@@ -32,7 +34,7 @@ import type { MotoristaPicker, VeiculoPicker } from "@/types/entities"
  */
 export interface PickerItem {
   id: string
-  [key: string]: unknown
+  [key: string]: any
 }
 
 /**
@@ -182,7 +184,7 @@ export function GenericPickerModal<T extends PickerItem>({
   // Carregar itens via fetchItems
   const loadItems = useCallback(async () => {
     if (!fetchItems) return
-    
+
     setLoading(true)
     setError(null)
     try {
@@ -202,7 +204,8 @@ export function GenericPickerModal<T extends PickerItem>({
     if (modalOpen && fetchItems && !itemsProp) {
       loadItems()
     }
-  }, [modalOpen, loadItems, fetchItems, itemsProp, ...deps])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [modalOpen, loadItems, fetchItems, itemsProp, ...deps as any[]])
 
   // Filtrar itens
   const filteredItems = useMemo(() => {
@@ -242,9 +245,17 @@ export function GenericPickerModal<T extends PickerItem>({
 
   // Renderizar valor de coluna
   const renderColumnValue = (column: PickerColumn<T>, item: T): ReactNode => {
-    const value = column.key.includes(".") 
-      ? column.key.split(".").reduce((obj: unknown, key) => (obj as Record<string, unknown>)?.[key], item)
-      : item[column.key as keyof T]
+    const key = String(column.key)
+    let value: any = item
+
+    if (key.includes(".")) {
+      const parts = key.split(".")
+      for (const part of parts) {
+        value = value?.[part]
+      }
+    } else {
+      value = (item as any)[key]
+    }
 
     if (column.render) {
       return column.render(value, item)
@@ -358,9 +369,8 @@ export function GenericPickerModal<T extends PickerItem>({
                     return (
                       <div
                         key={item.id}
-                        className={`flex items-center justify-between p-3 border rounded-lg hover:bg-bg-soft cursor-pointer transition-colors ${
-                          !isSelectable ? "opacity-60 cursor-not-allowed" : ""
-                        }`}
+                        className={`flex items-center justify-between p-3 border rounded-lg hover:bg-bg-soft cursor-pointer transition-colors ${!isSelectable ? "opacity-60 cursor-not-allowed" : ""
+                          }`}
                         onClick={() => handleSelect(item)}
                         role="button"
                         tabIndex={0}
@@ -578,14 +588,14 @@ export function VeiculoPickerModal({
         item.is_active
           ? "default"
           : item.status === "maintenance"
-          ? "destructive"
-          : "secondary",
+            ? "destructive"
+            : "secondary",
       getText: (item) =>
         item.is_active
           ? "Ativo"
           : item.status === "maintenance"
-          ? "Manutenção"
-          : "Garagem",
+            ? "Manutenção"
+            : "Garagem",
     },
   ]
 

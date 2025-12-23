@@ -1,6 +1,7 @@
 "use client"
 
 import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from "@tanstack/react-query"
+
 import { supabase } from "@/lib/supabase"
 
 /**

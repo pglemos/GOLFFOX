@@ -6,8 +6,10 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
-import type { veiculo } from './admin-map'
+
 import { warn } from '@/lib/logger'
+
+import type { veiculo } from './admin-map'
 
 interface HeatmapLayerProps {
   map: google.maps.Map

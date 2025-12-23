@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+
 import { 
   DollarSign, 
   TrendingUp, 
@@ -25,6 +25,8 @@ import {
   Legend, 
   ResponsiveContainer 
 } from "recharts"
+
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { formatCurrency, formatCount } from "@/lib/kpi-utils"
 
 interface CostKPIs {

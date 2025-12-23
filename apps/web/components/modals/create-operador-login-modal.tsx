@@ -1,4 +1,8 @@
 import { useState, useEffect } from "react"
+
+import { Loader2, UserPlus, Key, Search } from "lucide-react"
+
+import { Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
@@ -7,14 +11,13 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Loader2, UserPlus, Key, Search } from "lucide-react"
-import { notifySuccess, notifyError } from "@/lib/toast"
-import { globalSyncManager } from "@/lib/global-sync"
 import { useCep } from "@/hooks/use-cep"
 import { formatCPF, formatPhone, formatCEP } from "@/lib/format-utils"
+import { globalSyncManager } from "@/lib/global-sync"
+import { CompanyService, type Company } from "@/lib/services/company-service"
+import { notifySuccess, notifyError } from "@/lib/toast"
 
 interface CreateOperadorLoginModalProps {
   isOpen: boolean
@@ -33,7 +36,7 @@ export function CreateUserModal({
 }: CreateOperadorLoginModalProps) {
   const [loading, setLoading] = useState(false)
   const { fetchCep, loading: loadingCep } = useCep()
-  const [companies, setCompanies] = useState<any[]>([])
+  const [companies, setCompanies] = useState<Company[]>([])
   const [loadingCompanies, setLoadingCompanies] = useState(false)
 
   const [formData, setFormData] = useState({
@@ -69,11 +72,8 @@ export function CreateUserModal({
   const loadCompanies = async () => {
     try {
       setLoadingCompanies(true)
-      const response = await fetch('/api/admin/empresas-list')
-      const result = await response.json()
-      if (result.success) {
-        setCompanies(result.companies || [])
-      }
+      const data = await CompanyService.listCompanies()
+      setCompanies(data)
     } catch (error) {
       console.error('Erro ao carregar empresas:', error)
     } finally {
@@ -154,10 +154,10 @@ export function CreateUserModal({
       if (result.success) {
         notifySuccess(`Usuário criado com sucesso!`)
 
-        // Trigger global sync
+        // Trigger global sync (Pilar 4: snake_case)
         if (formData.company_id) {
-          globalSyncManager.triggerSync('user.created', { companyId: formData.company_id })
-          globalSyncManager.triggerSync('company.updated', { companyId: formData.company_id })
+          globalSyncManager.triggerSync('user.created', { company_id: formData.company_id })
+          globalSyncManager.triggerSync('company.updated', { company_id: formData.company_id })
         } else {
           globalSyncManager.triggerSync('user.created', {})
         }

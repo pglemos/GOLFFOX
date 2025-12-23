@@ -1,7 +1,12 @@
 "use client"
 
 import { useState } from "react"
+
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import { formatDistanceToNow } from "date-fns"
+import { ptBR } from "date-fns/locale"
 import { Bell, Check, Trash2, Mail, Info, AlertTriangle, CheckCircle } from "lucide-react"
+
 import { Button } from "@/components/ui/button"
 import {
     Popover,
@@ -10,9 +15,6 @@ import {
 } from "@/components/ui/popover"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { supabase } from "@/lib/supabase"
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import { formatDistanceToNow } from "date-fns"
-import { ptBR } from "date-fns/locale"
 import { cn } from "@/lib/utils"
 
 interface Notification {

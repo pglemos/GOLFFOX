@@ -8,8 +8,9 @@
  * no mesmo worker. Não usar para dados críticos de segurança.
  */
 
-import type { AuthenticatedUser } from './api-auth'
 import crypto from 'crypto'
+
+import type { AuthenticatedUser } from './api-auth'
 
 interface CacheEntry {
   user: AuthenticatedUser

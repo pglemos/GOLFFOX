@@ -11,8 +11,10 @@
 'use client'
 
 import { useMemo } from 'react'
-import { VirtualizedTable, VirtualizedColumn } from './virtualized-table'
+
 import { DataTable } from '@/components/transportadora/data-table'
+
+import { VirtualizedTable, VirtualizedColumn } from './virtualized-table'
 
 interface SmartDataTableProps<T extends Record<string, unknown>> {
   data: T[]

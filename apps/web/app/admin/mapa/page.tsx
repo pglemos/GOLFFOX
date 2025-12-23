@@ -1,15 +1,18 @@
 "use client"
 
 import { Suspense } from "react"
-import { AppShell } from "@/components/app-shell"
+
 import dynamic from "next/dynamic"
-import { useSearchParams } from "@/lib/next-navigation"
+
 import { motion } from "framer-motion"
 import { MapPin } from "lucide-react"
-import { useAuthFast } from "@/hooks/use-auth-fast"
+
+import { AppShell } from "@/components/app-shell"
+import { useAuth } from "@/components/providers/auth-provider"
+import { useSearchParams } from "@/lib/next-navigation"
 
 // Lazy load AdminMap (componente pesado)
-const AdminMap = dynamic(() => import('@/components/admin-map').then(m => ({ default: m.AdminMap })), { 
+const AdminMap = dynamic(() => import('@/components/admin-map').then(m => ({ default: m.AdminMap })), {
   ssr: false,
   loading: () => <div className="w-full h-[600px] bg-muted animate-pulse rounded-lg flex items-center justify-center">
     <p className="text-ink-muted">Carregando mapa...</p>
@@ -18,8 +21,8 @@ const AdminMap = dynamic(() => import('@/components/admin-map').then(m => ({ def
 
 function MapaContent() {
   const searchParams = useSearchParams()
-  const { user, loading } = useAuthFast()
-  
+  const { user, loading } = useAuth()
+
   // Ler parâmetros da URL para rota específica e filtros
   const routeId = searchParams?.get('route') || null
   const companyId = searchParams?.get('company') || null
@@ -27,8 +30,8 @@ function MapaContent() {
   const latParam = searchParams?.get('lat')
   const lngParam = searchParams?.get('lng')
   const zoomParam = searchParams?.get('zoom')
-  
-  const initialCenter = latParam && lngParam 
+
+  const initialCenter = latParam && lngParam
     ? { lat: parseFloat(latParam), lng: parseFloat(lngParam) }
     : null
   const initialZoom = zoomParam ? parseInt(zoomParam, 10) : null
@@ -71,7 +74,7 @@ function MapaContent() {
           </div>
         </motion.div>
 
-        <AdminMap 
+        <AdminMap
           companyId={companyId || undefined}
           routeId={routeId || undefined}
           vehicleId={vehicleId || undefined}

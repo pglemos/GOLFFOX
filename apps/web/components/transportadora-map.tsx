@@ -1,7 +1,9 @@
 "use client"
 
 import { useEffect, useState, useCallback, useRef } from "react"
+
 import { Map as MapIcon } from "lucide-react"
+
 import { loadGoogleMapsAPI } from "@/lib/google-maps-loader"
 
 interface veiculo {

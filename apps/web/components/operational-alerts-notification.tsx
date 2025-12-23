@@ -6,7 +6,9 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+
 import { Bell, AlertCircle, XCircle, AlertTriangle, Info } from 'lucide-react'
+
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -16,9 +18,9 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu'
+import { useRouter, usePathname } from '@/lib/next-navigation'
 import { getUnresolvedAlerts, resolveAlert, type OperationalAlert } from '@/lib/operational-alerts'
 import { supabase } from '@/lib/supabase'
-import { useRouter, usePathname } from '@/lib/next-navigation'
 import { notifySuccess, notifyError } from '@/lib/toast'
 
 export function OperationalAlertsNotification() {

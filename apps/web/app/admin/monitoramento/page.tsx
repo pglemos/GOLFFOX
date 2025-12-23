@@ -1,12 +1,14 @@
 "use client"
 
 import { useState, useEffect } from "react"
+
+import { Activity, CheckCircle, XCircle, RefreshCw, Server, Database, Zap } from "lucide-react"
+
 import { AppShell } from "@/components/app-shell"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { useAuth } from "@/hooks/use-auth"
-import { Activity, CheckCircle, XCircle, RefreshCw, Server, Database, Zap } from "lucide-react"
 
 interface HealthStatus {
     status: 'ok' | 'error' | 'loading'

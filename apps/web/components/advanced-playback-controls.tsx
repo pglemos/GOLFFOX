@@ -1,11 +1,8 @@
 'use client'
 
 import React, { useState, useCallback } from 'react'
+
 import { motion, AnimatePresence } from 'framer-motion'
-import { Card, CardContent } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Slider } from '@/components/ui/slider'
 import { 
   Play, 
   Pause, 
@@ -23,6 +20,12 @@ import {
   MapPin,
   TrendingUp
 } from 'lucide-react'
+
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
+import { Slider } from '@/components/ui/slider'
+
 
 interface PlaybackState {
   isPlaying: boolean

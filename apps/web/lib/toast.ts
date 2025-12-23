@@ -1,4 +1,5 @@
 import toast from 'react-hot-toast'
+
 import { formatError } from '@/lib/error-utils'
 import { t, type I18nKey } from '@/lib/i18n'
 

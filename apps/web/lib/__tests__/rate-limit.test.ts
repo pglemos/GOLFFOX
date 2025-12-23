@@ -1,5 +1,6 @@
-import { applyRateLimit } from './rate-limit'
 import { NextRequest } from 'next/server'
+
+import { applyRateLimit } from './rate-limit'
 
 // Mock Redis and Ratelimit
 const mockLimit = jest.fn()

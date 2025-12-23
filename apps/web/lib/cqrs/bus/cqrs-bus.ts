@@ -4,9 +4,10 @@
  * Message bus para executar commands e queries
  */
 
+import { logError } from '@/lib/logger'
+
 import { ICommandHandler } from '../handlers/command-handler.interface'
 import { IQueryHandler } from '../handlers/query-handler.interface'
-import { logError } from '@/lib/logger'
 
 // Usar string como identificador ao invés de constructor
 type CommandType = string

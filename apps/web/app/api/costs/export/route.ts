@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getSupabaseAdmin } from '@/lib/supabase-client'
+
 import { requireCompanyAccess } from '@/lib/api-auth'
 import { exportToCSV, exportToExcel, exportToPDF } from '@/lib/export-utils'
-import { withRateLimit } from '@/lib/rate-limit'
 import { logError } from '@/lib/logger'
+import { withRateLimit } from '@/lib/rate-limit'
+import { getSupabaseAdmin } from '@/lib/supabase-client'
 
 async function exportHandler(request: NextRequest) {
   try {

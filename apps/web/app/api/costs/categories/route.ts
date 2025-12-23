@@ -5,7 +5,9 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
+
 import { createClient } from '@supabase/supabase-js'
+
 import { requireAuth } from '@/lib/api-auth'
 import { logError } from '@/lib/logger'
 import type { CostCategory, CostCategoryInsert, ProfileType } from '@/types/financial'

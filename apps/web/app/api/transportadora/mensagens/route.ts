@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getSupabaseAdmin } from '@/lib/supabase-client';
-import { logError } from '@/lib/logger';
+
 import { requireAuth } from '@/lib/api-auth';
+import { logError } from '@/lib/logger';
+import { getSupabaseAdmin } from '@/lib/supabase-client';
 
 // GET /api/transportadora/mensagens - Listar mensagens dos motoristas
 export async function GET(request: NextRequest) {

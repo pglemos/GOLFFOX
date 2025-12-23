@@ -1,6 +1,7 @@
 "use client"
 
 import React, { Suspense } from "react"
+
 import { cn } from "@/lib/utils"
 
 interface LazyWrapperProps {

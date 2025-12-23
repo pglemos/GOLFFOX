@@ -4,10 +4,11 @@
  * Handler para executar CreateCompanyCommand
  */
 
+import { publishCreatedEvent } from '@/lib/events'
+import { CompanyService } from '@/lib/services/server/company-service'
+
 import { ICommandHandler } from './command-handler.interface'
 import { CreateCompanyCommand } from '../commands/create-company.command'
-import { CompanyService } from '@/lib/services/company.service'
-import { publishCreatedEvent } from '@/lib/events'
 
 export class CreateCompanyHandler implements ICommandHandler<CreateCompanyCommand, any> {
   async handle(command: CreateCompanyCommand): Promise<any> {

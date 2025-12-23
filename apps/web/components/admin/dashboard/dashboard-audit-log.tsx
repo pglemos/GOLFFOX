@@ -1,14 +1,16 @@
 "use client"
 
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { formatRelativeTime } from "@/lib/kpi-utils"
-import { t } from '@/lib/i18n'
+import { motion } from "framer-motion"
 import {
     Plus, Edit, Trash2, CheckCircle, XCircle, Settings, UserPlus, FileText, Activity
 } from "lucide-react"
-import { motion } from "framer-motion"
+
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { t } from '@/lib/i18n'
+import { formatRelativeTime } from "@/lib/kpi-utils"
+
 
 interface AuditLog {
     id: string

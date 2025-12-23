@@ -1,15 +1,19 @@
 "use client"
 
 import { useState, useEffect, memo, useMemo } from "react"
-import { usePathname } from "@/lib/next-navigation"
-import { Topbar } from "./topbar"
-import { PremiumSidebar } from "./premium-sidebar"
-import { EnvVarsBanner } from "./env-vars-banner"
-import { cn } from "@/lib/utils"
+
 import { motion } from "framer-motion"
-import { debug } from "@/lib/logger"
-import { useMobile } from "@/hooks/use-mobile"
+
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar"
+import { useResponsive } from "@/hooks/use-responsive"
+import { debug } from "@/lib/logger"
+import { usePathname } from "@/lib/next-navigation"
+import { cn } from "@/lib/utils"
+
+import { EnvVarsBanner } from "./env-vars-banner"
+import { PremiumSidebar } from "./premium-sidebar"
+import { Topbar } from "./topbar"
+
 
 interface AppShellProps {
   user: {
@@ -18,6 +22,8 @@ interface AppShellProps {
     email: string
     role: string
     avatar_url?: string
+    company_id?: string | null
+    transportadora_id?: string | null
   }
   children: React.ReactNode
   panel?: 'admin' | 'gestor_empresa' | 'gestor_transportadora' | 'operador' | 'transportadora' | 'empresa'
@@ -27,7 +33,7 @@ interface AppShellProps {
 export const AppShell = memo(function AppShell({ user, children, panel }: AppShellProps) {
   const pathname = usePathname()
   const [isSidebarOpen, setIsSidebarOpen] = useState(false) // Sempre inicia colapsado
-  const isMobile = useMobile()
+  const { isMobile } = useResponsive()
 
   // Debug logging (apenas em desenvolvimento)
   useEffect(() => {
@@ -130,6 +136,10 @@ export const AppShell = memo(function AppShell({ user, children, panel }: AppShe
           transition={{ duration: 0.2 }}
           className="fixed inset-0 bg-black/60 z-[90] lg:hidden"
           onClick={() => setIsSidebarOpen(false)}
+          aria-label="Fechar menu lateral"
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => e.key === 'Escape' && setIsSidebarOpen(false)}
           style={{ pointerEvents: 'auto' }}
         />
       )}
@@ -185,9 +195,9 @@ export const AppShell = memo(function AppShell({ user, children, panel }: AppShe
             "*:hover:text-primary",
             "max-[450px]:flex-col min-[450px]:gap-4"
           )}>
-            <a href="/termos" className="transition-colors">Termos de Uso</a>
-            <a href="/privacidade" className="transition-colors">Privacidade</a>
-            <a href="/suporte" className="transition-colors">Suporte</a>
+            <a href="/termos" className="transition-colors" aria-label="Ver termos de uso">Termos de Uso</a>
+            <a href="/privacidade" className="transition-colors" aria-label="Ver política de privacidade">Privacidade</a>
+            <a href="/suporte" className="transition-colors" aria-label="Ir para central de suporte">Suporte</a>
           </div>
         </footer>
       </div>

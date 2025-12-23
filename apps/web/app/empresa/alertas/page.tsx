@@ -1,20 +1,23 @@
 ﻿"use client"
 
 import { useEffect, useState, Suspense, useCallback } from "react"
+
+import { motion } from "framer-motion"
+import { AlertTriangle, Search, Bell, Clock, CheckCircle, XCircle, Plus } from "lucide-react"
+import { useInView } from "react-intersection-observer"
+
 import { AppShell } from "@/components/app-shell"
+import { useOperatorTenant } from "@/components/providers/empresa-tenant-provider"
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { AlertTriangle, Search, Bell, Clock, CheckCircle, XCircle, Plus } from "lucide-react"
-import { supabase } from "@/lib/supabase"
-import { useRouter, useSearchParams } from "@/lib/next-navigation"
-import { motion } from "framer-motion"
-import { notifyError, notifySuccess } from "@/lib/toast"
-import { useOperatorTenant } from "@/components/providers/empresa-tenant-provider"
 import { useAlerts, useResolveAlert } from "@/hooks/use-empresa-data"
 import { useDebounce } from "@/lib/debounce"
-import { useInView } from "react-intersection-observer"
+import { useRouter, useSearchParams } from "@/lib/next-navigation"
+import { supabase } from "@/lib/supabase"
+import { notifyError, notifySuccess } from "@/lib/toast"
+
 
 function AlertasOperatorPageInner() {
   const router = useRouter()

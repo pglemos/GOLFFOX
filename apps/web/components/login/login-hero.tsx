@@ -8,8 +8,11 @@
 "use client"
 
 import { memo } from 'react'
+
 import { motion } from 'framer-motion'
+
 import { useReducedMotion } from '@/hooks/use-reduced-motion'
+
 import { FloatingOrbs } from './floating-orbs'
 
 /**

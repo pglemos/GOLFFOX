@@ -1,11 +1,13 @@
 "use client"
 
 import { useEffect, useState } from "react"
+
+import { Loader2 } from "lucide-react"
+
 import { AppShell } from "@/components/app-shell"
 import { ContractsList } from "@/components/contracts/contracts-list"
-import { useAuth } from "@/hooks/use-auth"
-import { Loader2 } from "lucide-react"
 import { useOperatorTenant } from "@/components/providers/empresa-tenant-provider"
+import { useAuth } from "@/hooks/use-auth"
 
 export default function ContratosEmpresaPage() {
     const { user, loading: isLoading } = useAuth()

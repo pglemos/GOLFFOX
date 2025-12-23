@@ -1,7 +1,8 @@
 import { useEffect, useRef, RefObject } from 'react'
+
 import { loadGoogleMapsAPI } from '@/lib/google-maps-loader'
-import { getMapsBillingMonitor } from '@/lib/maps-billing-monitor'
 import { debug, logError } from '@/lib/logger'
+import { getMapsBillingMonitor } from '@/lib/maps-billing-monitor'
 
 interface UseMapInitializationOptions {
   /**

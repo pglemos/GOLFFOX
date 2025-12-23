@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useRouter } from "@/lib/next-navigation"
+
 import { motion } from "framer-motion"
 import {
   Route,
@@ -19,30 +19,33 @@ import {
   Filter
 } from "lucide-react"
 
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { AppShell } from "@/components/app-shell"
 import { AdvancedNavigationButton } from "@/components/advanced-navigation-button"
-import { useAdvancedNavigation } from "@/hooks/use-advanced-navigation"
-import { supabase } from "@/lib/supabase"
+import { AppShell } from "@/components/app-shell"
 import { RouteModal } from "@/components/modals/route-modal"
-import { RouteCreateModal } from "./route-create-modal"
-import { notifySuccess, notifyError } from "@/lib/toast"
-import { useAuthFast } from "@/hooks/use-auth-fast"
-import { useGlobalSync } from "@/hooks/use-global-sync"
-import { SearchBarPremium } from "@/components/shared/search-bar-premium"
-import { FilterDrawer } from "@/components/shared/filter-drawer"
 import { EmptyState } from "@/components/shared/empty-state"
+import { FilterDrawer } from "@/components/shared/filter-drawer"
 import { LoadingSkeleton } from "@/components/shared/loading-skeleton"
+import { SearchBarPremium } from "@/components/shared/search-bar-premium"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { useAdvancedNavigation } from "@/hooks/use-advanced-navigation"
+import { useAuth } from "@/components/providers/auth-provider"
+import { useGlobalSync } from "@/hooks/use-global-sync"
+import { useRouter } from "@/lib/next-navigation"
+import { supabase } from "@/lib/supabase"
+
+import { notifySuccess, notifyError } from "@/lib/toast"
+import { RouteCreateModal } from "./route-create-modal"
+
 
 const Link: any = require("next/link")
 
 export function RotasPageContent() {
   const router = useRouter()
   const { TransitionOverlay } = useAdvancedNavigation()
-  const { user, loading } = useAuthFast()
+  const { user, loading } = useAuth()
   const [rotas, setRotas] = useState<any[]>([])
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedRoute, setSelectedRoute] = useState<any>(null)
@@ -115,7 +118,7 @@ export function RotasPageContent() {
     if (!loading && user) {
       void loadRotas()
     }
-     
+
   }, [loading, user])
 
   // Escutar eventos de sincronização global (apenas após carregamento inicial)

@@ -1,12 +1,14 @@
 ﻿"use client"
 
+import { useEffect, useState } from "react"
+
+import { motion } from "framer-motion"
+import { Shield, FileWarning } from "lucide-react"
+
 import { AppShell } from "@/components/app-shell"
 import { Card } from "@/components/ui/card"
-import { Shield, FileWarning } from "lucide-react"
-import { motion } from "framer-motion"
-import { useEffect, useState } from "react"
-import { supabase } from "@/lib/supabase"
 import { useRouter } from "@/lib/next-navigation"
+import { supabase } from "@/lib/supabase"
 
 export default function ConformidadeOperatorPage() {
   const router = useRouter()

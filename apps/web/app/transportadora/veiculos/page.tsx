@@ -1,131 +1,98 @@
 "use client"
 
 import { useEffect, useState } from "react"
+
+import { motion } from "framer-motion"
+import { Truck, Search, MapPin, FileText, Wrench, AlertCircle, Upload, Download, Grid3x3, List, Filter } from "lucide-react"
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
+
 import { AppShell } from "@/components/app-shell"
+import { DocumentList } from "@/components/documents/document-list"
+import { MaintenanceTimeline } from "@/components/maintenance/maintenance-timeline"
+import { useAuth } from "@/components/providers/auth-provider"
+import { DocumentUpload } from "@/components/transportadora/document-upload"
+import { VehicleCard } from "@/components/transportadora/vehicle-card"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { Truck, Search, Edit, MapPin, FileText, Wrench, AlertCircle, Calendar, ExternalLink, Upload, DollarSign, Clock, Grid3x3, List, Filter, Download } from "lucide-react"
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
-import { supabase } from "@/lib/supabase"
-import { ensureSupabaseSession } from "@/lib/supabase-session"
 import { useRouter } from "@/lib/next-navigation"
-import { motion } from "framer-motion"
-import { DocumentUpload } from "@/components/transportadora/document-upload"
+import { VehicleService, type Vehicle, type MaintenanceRecord } from "@/lib/services/vehicle-service"
+import { supabase } from "@/lib/supabase"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Textarea } from "@/components/ui/textarea"
+import { useResponsive } from "@/hooks/use-responsive"
+import { notifyError, notifySuccess } from "@/lib/toast"
+import { formatDate, formatCurrency } from "@/lib/format-utils"
 
 export default function TransportadoraVeiculosPage() {
   const router = useRouter()
-  const [user, setUser] = useState<any>(null)
-  const [loading, setLoading] = useState(true)
-  const [veiculos, setVeiculos] = useState<any[]>([])
-  const [vehiclesWithDetails, setVehiclesWithDetails] = useState<any[]>([])
+  const { isMobile } = useResponsive()
+  const { user, loading: authLoading } = useAuth()
+
+  const [veiculos, setVeiculos] = useState<Vehicle[]>([])
+  const [vehiclesWithDetails, setVehiclesWithDetails] = useState<Vehicle[]>([])
+  const [dataLoading, setDataLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState("")
   const [statusFilter, setStatusFilter] = useState<string>("all")
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
+  const [viewMode, setViewMode] = useState<"grid" | "list">(isMobile ? "list" : "grid")
   const [activeTab, setActiveTab] = useState("list")
   const [selectedVeiculo, setSelectedVeiculo] = useState<string | null>(null)
   const [documents, setDocuments] = useState<any[]>([])
-  const [maintenances, setMaintenances] = useState<any[]>([])
+  const [maintenances, setMaintenances] = useState<MaintenanceRecord[]>([])
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false)
   const [isMaintenanceModalOpen, setIsMaintenanceModalOpen] = useState(false)
   const [documentType, setDocumentType] = useState<string>('crlv')
-  const [maintenanceForm, setMaintenanceForm] = useState({
+  const [maintenanceForm, setMaintenanceForm] = useState<Partial<MaintenanceRecord>>({
     maintenance_type: 'preventiva',
     description: '',
-    scheduled_date: '',
+    scheduled_date: new Date().toISOString().split('T')[0],
     cost_parts_brl: 0,
     cost_labor_brl: 0,
     workshop_name: '',
     mechanic_name: '',
-    odometer_km: null as number | null,
-    status: 'scheduled' as 'scheduled' | 'in_progress' | 'completed' | 'cancelled'
+    odometer_km: null,
+    status: 'scheduled'
   })
 
   useEffect(() => {
-    const getUser = async () => {
-      const session = await ensureSupabaseSession()
-      if (!session) {
-        router.push("/")
-        return
-      }
-      setUser({ ...session.user })
-      setLoading(false)
+    if (user && !authLoading) {
       loadVeiculos()
     }
-    getUser()
-  }, [router])
+  }, [user, authLoading])
 
   const loadVeiculos = async () => {
     try {
-      // Buscar veículos da transportadora
-      const { data: userData } = await supabase
-        .from('users')
-        .select('transportadora_id')
-        .eq('id', user?.id)
-        .single()
-
-      let query = supabase
-        .from('veiculos')
-        .select('*')
-        .order('created_at', { ascending: false })
-
-      if (userData?.transportadora_id) {
-        query = query.eq('transportadora_id', userData.transportadora_id)
-      }
-
-      const { data, error } = await query
-
-      if (error) throw error
-      setVeiculos(data || [])
+      setDataLoading(true)
+      if (!user?.companyId) return
+      const data = await VehicleService.listVehicles(user.companyId)
+      setVeiculos(data)
     } catch (error) {
-      console.error("Erro ao carregar veículos:", error)
+      notifyError(error, "Erro ao carregar veículos")
+    } finally {
+      setDataLoading(false)
     }
   }
 
   const loadVehicleDocuments = async (vehicleId: string) => {
     try {
-      const session = await ensureSupabaseSession()
-      const res = await fetch(`/api/transportadora/veiculos/${vehicleId}/documents`, {
-        credentials: 'include',
-        headers: session?.access_token ? {
-          'Authorization': `Bearer ${session.access_token}`
-        } : {}
-      })
-      if (res.ok) {
-        const data = await res.json()
-        setDocuments(data || [])
-      } else {
-        console.error("Erro ao carregar documentos:", res.status, await res.text())
-      }
+      const data = await VehicleService.listDocuments(vehicleId)
+      setDocuments(data || [])
     } catch (error) {
-      console.error("Erro ao carregar documentos:", error)
+      notifyError(error, "Erro ao carregar documentos")
     }
   }
 
   const loadVehicleMaintenances = async (vehicleId: string) => {
     try {
-      const session = await ensureSupabaseSession()
-      const res = await fetch(`/api/transportadora/veiculos/${vehicleId}/maintenances`, {
-        credentials: 'include',
-        headers: session?.access_token ? {
-          'Authorization': `Bearer ${session.access_token}`
-        } : {}
-      })
-      if (res.ok) {
-        const data = await res.json()
-        setMaintenances(data || [])
-      } else {
-        console.error("Erro ao carregar manutenções:", res.status, await res.text())
-      }
+      const data = await VehicleService.listMaintenances(vehicleId)
+      setMaintenances(data || [])
     } catch (error) {
-      console.error("Erro ao carregar manutenções:", error)
+      notifyError(error, "Erro ao carregar manutenções")
     }
   }
 
@@ -133,34 +100,15 @@ export default function TransportadoraVeiculosPage() {
     if (!selectedVeiculo || !maintenanceForm.description) return
 
     try {
-      const session = await ensureSupabaseSession()
-      const res = await fetch(`/api/transportadora/veiculos/${selectedVeiculo}/maintenances`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(session?.access_token ? { 'Authorization': `Bearer ${session.access_token}` } : {})
-        },
-        body: JSON.stringify(maintenanceForm)
-      })
-
-      if (res.ok) {
-        setIsMaintenanceModalOpen(false)
-        setMaintenanceForm({
-          maintenance_type: 'preventiva',
-          description: '',
-          scheduled_date: '',
-          cost_parts_brl: 0,
-          cost_labor_brl: 0,
-          workshop_name: '',
-          mechanic_name: '',
-          odometer_km: null,
-          status: 'scheduled'
-        })
-        loadVehicleMaintenances(selectedVeiculo)
-      }
+      setDataLoading(true)
+      await VehicleService.saveMaintenance(selectedVeiculo, maintenanceForm)
+      notifySuccess("Manutenção registrada com sucesso!")
+      setIsMaintenanceModalOpen(false)
+      loadVehicleMaintenances(selectedVeiculo)
     } catch (error) {
-      console.error("Erro ao salvar manutenção:", error)
+      notifyError(error, "Erro ao salvar manutenção")
+    } finally {
+      setDataLoading(false)
     }
   }
 
@@ -240,7 +188,7 @@ export default function TransportadoraVeiculosPage() {
     loadVehicleDetails()
   }, [veiculos])
 
-  if (loading) {
+  if (authLoading) {
     return <div className="min-h-screen flex items-center justify-center"><div className="w-16 h-16 border-4 border-brand border-t-transparent rounded-full animate-spin mx-auto"></div></div>
   }
 
@@ -357,108 +305,24 @@ export default function TransportadoraVeiculosPage() {
             {viewMode === "grid" ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {filteredVeiculos.map((veiculo, index) => (
-                  <motion.div
-                    key={veiculo.id || index}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.05 }}
-                  >
-                    <Card className="p-4 hover:shadow-lg transition-shadow cursor-pointer" onClick={() => {
+                  <VehicleCard
+                    key={veiculo.id}
+                    vehicle={veiculo}
+                    index={index}
+                    onClick={() => {
                       setSelectedVeiculo(veiculo.id)
                       loadVehicleDocuments(veiculo.id)
                       loadVehicleMaintenances(veiculo.id)
-                    }}>
-                      <div className="space-y-3">
-                        {/* Foto e Status */}
-                        <div className="relative">
-                          {veiculo.photo_url ? (
-                            <img
-                              src={veiculo.photo_url}
-                              alt={veiculo.plate}
-                              className="w-full h-40 rounded-lg object-cover border border-border"
-                            />
-                          ) : (
-                            <div className="w-full h-40 rounded-lg bg-brand-light flex items-center justify-center border border-border">
-                              <Truck className="h-12 w-12 text-brand" />
-                            </div>
-                          )}
-                          <div className="absolute top-2 right-2">
-                            <Badge variant={veiculo.is_active ? "default" : "secondary"} className="shadow-lg">
-                              {veiculo.is_active ? "Ativo" : "Inativo"}
-                            </Badge>
-                          </div>
-                          {veiculo.hasExpiringDocs && (
-                            <div className="absolute top-2 left-2">
-                              <Badge variant="destructive" className="shadow-lg">
-                                <AlertCircle className="h-3 w-3 mr-1" />
-                                {veiculo.expiringDocsCount}
-                              </Badge>
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Informações */}
-                        <div>
-                          <div className="flex items-center gap-2 mb-1">
-                            <Truck className="h-4 w-4 text-brand" />
-                            <h3 className="font-bold text-lg">{veiculo.plate}</h3>
-                          </div>
-                          <p className="font-medium text-sm mb-2">{veiculo.model || "Sem modelo"}</p>
-                          <div className="space-y-1 text-xs text-ink-muted">
-                            <div className="flex justify-between">
-                              <span>Ano:</span>
-                              <span className="font-medium">{veiculo.year || "N/A"}</span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span>Capacidade:</span>
-                              <span className="font-medium">{veiculo.capacity || "N/A"} lugares</span>
-                            </div>
-                            {veiculo.lastMaintenance && (
-                              <div className="flex justify-between items-center pt-1 border-t border-border">
-                                <span className="flex items-center gap-1">
-                                  <Wrench className="h-3 w-3" />
-                                  Última manutenção:
-                                </span>
-                                <span className="font-medium">
-                                  {formatDate(veiculo.lastMaintenance.completed_date || veiculo.lastMaintenance.scheduled_date)}
-                                </span>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-
-                        {/* Ações */}
-                        <div className="flex gap-2 pt-2 border-t border-border">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="flex-1"
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              setSelectedVeiculo(veiculo.id)
-                              loadVehicleDocuments(veiculo.id)
-                              setActiveTab('documents')
-                            }}
-                          >
-                            <FileText className="h-4 w-4 mr-1" />
-                            Docs
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="flex-1"
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              router.push(`/transportadora/mapa?veiculo_id=${veiculo.id}`)
-                            }}
-                          >
-                            <MapPin className="h-4 w-4 mr-1" />
-                            Mapa
-                          </Button>
-                        </div>
-                      </div>
-                    </Card>
-                  </motion.div>
+                    }}
+                    onViewDocs={() => {
+                      setSelectedVeiculo(veiculo.id)
+                      loadVehicleDocuments(veiculo.id)
+                      setActiveTab('documents')
+                    }}
+                    onViewMap={() => {
+                      router.push(`/transportadora/mapa?veiculo_id=${veiculo.id}`)
+                    }}
+                  />
                 ))}
               </div>
             ) : (
@@ -607,124 +471,10 @@ export default function TransportadoraVeiculosPage() {
                       </Button>
                     </Card>
                   ) : (
-                    <div className="relative">
-                      {/* Timeline vertical */}
-                      <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-border-border"></div>
-                      <div className="space-y-6">
-                        {documents
-                          .sort((a, b) => {
-                            const dateA = a.expiry_date ? new Date(a.expiry_date).getTime() : 0
-                            const dateB = b.expiry_date ? new Date(b.expiry_date).getTime() : 0
-                            return dateB - dateA
-                          })
-                          .map((doc, index) => {
-                            const daysToExpiry = getDaysToExpiry(doc.expiry_date || '')
-                            const isExpiring = daysToExpiry !== null && daysToExpiry < 30
-                            return (
-                              <div key={doc.id} className="relative pl-12">
-                                {/* Timeline dot */}
-                                <div className={`absolute left-4 top-6 w-4 h-4 rounded-full border-2 ${doc.status === 'expired' ? 'bg-error border-error' :
-                                  isExpiring ? 'bg-warning border-warning' :
-                                    'bg-success border-success'
-                                  }`}></div>
-
-                                <Card className="p-4 hover:shadow-lg transition-shadow">
-                                  <div className="flex items-start justify-between gap-4">
-                                    <div className="flex-1">
-                                      <div className="flex items-center gap-2 mb-3">
-                                        <FileText className="h-5 w-5 text-brand" />
-                                        <h3 className="font-bold uppercase">{doc.document_type}</h3>
-                                        <Badge variant={doc.status === 'valid' ? 'default' : doc.status === 'expired' ? 'destructive' : 'secondary'}>
-                                          {doc.status === 'valid' ? 'Válido' : doc.status === 'expired' ? 'Vencido' : doc.status === 'pending' ? 'Pendente' : 'Cancelado'}
-                                        </Badge>
-                                        {isExpiring && (
-                                          <Badge variant={daysToExpiry! < 0 ? 'destructive' : 'outline'} className={daysToExpiry! >= 0 ? 'border-warning text-warning' : ''}>
-                                            {daysToExpiry! < 0
-                                              ? `Vencido há ${Math.abs(daysToExpiry!)} dias`
-                                              : `${daysToExpiry} dias restantes`}
-                                          </Badge>
-                                        )}
-                                      </div>
-
-                                      {/* Preview do documento se for imagem */}
-                                      {doc.file_url && (
-                                        <div className="mb-3">
-                                          {doc.file_url.match(/\.(jpg|jpeg|png|gif|webp)$/i) ? (
-                                            <div className="relative w-full max-w-xs">
-                                              <button
-                                                type="button"
-                                                onClick={() => window.open(doc.file_url, '_blank')}
-                                                className="relative w-full h-32 rounded-lg border border-border cursor-pointer hover:opacity-80 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 overflow-hidden"
-                                                aria-label={`Abrir imagem do documento ${doc.document_type} em nova aba`}
-                                              >
-                                                <img
-                                                  src={doc.file_url}
-                                                  alt={`Imagem do documento ${doc.document_type}${doc.document_number ? ` número ${doc.document_number}` : ''}`}
-                                                  className="w-full h-full object-cover pointer-events-none"
-                                                />
-                                                <div className="absolute inset-0 bg-black/0 hover:bg-black/10 rounded-lg transition-colors flex items-center justify-center pointer-events-none">
-                                                  <ExternalLink className="h-6 w-6 text-white opacity-0 hover:opacity-100 transition-opacity" />
-                                                </div>
-                                              </button>
-                                            </div>
-                                          ) : (
-                                            <div className="w-full max-w-xs p-8 bg-bg-hover rounded-lg border border-border flex items-center justify-center">
-                                              <FileText className="h-12 w-12 text-ink-muted" />
-                                            </div>
-                                          )}
-                                        </div>
-                                      )}
-
-                                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-ink-muted">
-                                        {doc.document_number && (
-                                          <div>
-                                            <span className="font-medium">Número:</span> {doc.document_number}
-                                          </div>
-                                        )}
-                                        {doc.expiry_date && (
-                                          <div className="flex items-center gap-2">
-                                            <Calendar className="h-4 w-4" />
-                                            <span>Vence em: {formatDate(doc.expiry_date)}</span>
-                                          </div>
-                                        )}
-                                        {doc.value_brl && (
-                                          <div>
-                                            <span className="font-medium">Valor:</span> {formatCurrency(parseFloat(doc.value_brl.toString()))}
-                                          </div>
-                                        )}
-                                        {doc.insurance_company && (
-                                          <div>
-                                            <span className="font-medium">Seguradora:</span> {doc.insurance_company}
-                                          </div>
-                                        )}
-                                        {doc.policy_number && (
-                                          <div>
-                                            <span className="font-medium">Apólice:</span> {doc.policy_number}
-                                          </div>
-                                        )}
-                                      </div>
-
-                                      {doc.file_url && (
-                                        <div className="mt-3 pt-3 border-t border-border">
-                                          <a
-                                            href={doc.file_url}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="inline-flex items-center gap-2 text-brand hover:underline"
-                                          >
-                                            <ExternalLink className="h-4 w-4" />
-                                            Ver documento completo
-                                          </a>
-                                        </div>
-                                      )}
-                                    </div>
-                                  </div>
-                                </Card>
-                              </div>
-                            )
-                          })}
-                      </div>
-                    </div>
+                    <DocumentList
+                      documents={documents}
+                      getDaysToExpiry={getDaysToExpiry}
+                    />
                   )}
                 </div>
               </div>
@@ -789,116 +539,10 @@ export default function TransportadoraVeiculosPage() {
                       </Button>
                     </Card>
                   ) : (
-                    <div className="relative">
-                      {/* Timeline vertical */}
-                      <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-border-border"></div>
-                      <div className="space-y-6">
-                        {maintenances
-                          .sort((a, b) => {
-                            const dateA = a.completed_date || a.scheduled_date || ''
-                            const dateB = b.completed_date || b.scheduled_date || ''
-                            return new Date(dateB).getTime() - new Date(dateA).getTime()
-                          })
-                          .map((maint, index) => {
-                            const totalCost = (parseFloat(maint.cost_parts_brl?.toString() || '0') + parseFloat(maint.cost_labor_brl?.toString() || '0'))
-                            return (
-                              <div key={maint.id} className="relative pl-12">
-                                {/* Timeline dot */}
-                                <div className={`absolute left-4 top-6 w-4 h-4 rounded-full border-2 ${maint.status === 'completed' ? 'bg-success border-success' :
-                                  maint.status === 'in_progress' ? 'bg-info border-info' :
-                                    maint.status === 'cancelled' ? 'bg-error border-error' :
-                                      'bg-warning border-warning'
-                                  }`}></div>
-
-                                <Card className="p-4 hover:shadow-lg transition-shadow">
-                                  <div className="flex items-start justify-between gap-4">
-                                    <div className="flex-1">
-                                      <div className="flex items-center gap-2 mb-3">
-                                        <Wrench className="h-5 w-5 text-brand" />
-                                        <h3 className="font-bold capitalize">{maint.maintenance_type.replace('_', ' ')}</h3>
-                                        <Badge variant={
-                                          maint.status === 'completed' ? 'default' :
-                                            maint.status === 'in_progress' ? 'secondary' :
-                                              maint.status === 'cancelled' ? 'destructive' : 'outline'
-                                        }>
-                                          {maint.status === 'scheduled' ? 'Agendada' :
-                                            maint.status === 'in_progress' ? 'Em Andamento' :
-                                              maint.status === 'completed' ? 'Concluída' : 'Cancelada'}
-                                        </Badge>
-                                      </div>
-
-                                      <p className="text-sm text-ink mb-3">{maint.description}</p>
-
-                                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-                                        {maint.scheduled_date && (
-                                          <div className="flex items-center gap-2">
-                                            <Calendar className="h-4 w-4 text-ink-muted" />
-                                            <span className="text-ink-muted">Agendada:</span>
-                                            <span className="font-medium">{formatDate(maint.scheduled_date)}</span>
-                                          </div>
-                                        )}
-                                        {maint.completed_date && (
-                                          <div className="flex items-center gap-2">
-                                            <Clock className="h-4 w-4 text-ink-muted" />
-                                            <span className="text-ink-muted">Concluída:</span>
-                                            <span className="font-medium">{formatDate(maint.completed_date)}</span>
-                                          </div>
-                                        )}
-                                        {maint.next_maintenance_date && (
-                                          <div className="flex items-center gap-2">
-                                            <Calendar className="h-4 w-4 text-ink-muted" />
-                                            <span className="text-ink-muted">Próxima:</span>
-                                            <span className="font-medium">{formatDate(maint.next_maintenance_date)}</span>
-                                          </div>
-                                        )}
-                                        {maint.odometer_km && (
-                                          <div className="flex items-center gap-2">
-                                            <Truck className="h-4 w-4 text-ink-muted" />
-                                            <span className="text-ink-muted">Odômetro:</span>
-                                            <span className="font-medium">{maint.odometer_km.toLocaleString('pt-BR')} km</span>
-                                          </div>
-                                        )}
-                                        {maint.workshop_name && (
-                                          <div>
-                                            <span className="text-ink-muted">Oficina:</span>
-                                            <span className="font-medium ml-1">{maint.workshop_name}</span>
-                                          </div>
-                                        )}
-                                        {maint.mechanic_name && (
-                                          <div>
-                                            <span className="text-ink-muted">Mecânico:</span>
-                                            <span className="font-medium ml-1">{maint.mechanic_name}</span>
-                                          </div>
-                                        )}
-                                      </div>
-
-                                      {totalCost > 0 && (
-                                        <div className="mt-3 pt-3 border-t border-border">
-                                          <div className="flex items-center gap-2">
-                                            <DollarSign className="h-4 w-4 text-ink-muted" />
-                                            <span className="text-sm text-ink-muted">Custo Total:</span>
-                                            <span className="font-semibold text-lg">{formatCurrency(totalCost)}</span>
-                                          </div>
-                                          {(maint.cost_parts_brl > 0 || maint.cost_labor_brl > 0) && (
-                                            <div className="flex gap-4 mt-2 text-xs text-ink-muted">
-                                              {maint.cost_parts_brl > 0 && (
-                                                <span>Peças: {formatCurrency(parseFloat(maint.cost_parts_brl.toString()))}</span>
-                                              )}
-                                              {maint.cost_labor_brl > 0 && (
-                                                <span>Mão de Obra: {formatCurrency(parseFloat(maint.cost_labor_brl.toString()))}</span>
-                                              )}
-                                            </div>
-                                          )}
-                                        </div>
-                                      )}
-                                    </div>
-                                  </div>
-                                </Card>
-                              </div>
-                            )
-                          })}
-                      </div>
-                    </div>
+                    <MaintenanceTimeline
+                      maintenances={maintenances}
+                      formatCurrency={formatCurrency}
+                    />
                   )}
                 </div>
 

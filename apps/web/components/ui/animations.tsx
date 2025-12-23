@@ -1,6 +1,7 @@
 "use client"
 
 import { motion } from "framer-motion"
+
 import { ReactNode } from "react"
 
 // Interfaces para props dos componentes de animação

@@ -1,30 +1,35 @@
 ﻿"use client"
 
 import { useEffect, useState } from "react"
-import { AppShell } from "@/components/app-shell"
-import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { Users, Search, Mail, Phone, Building, AlertCircle, Plus, MoreVertical, Edit, Trash2 } from "lucide-react"
+
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { motion } from "framer-motion"
-import { supabase } from "@/lib/supabase"
-import { useRouter } from "@/lib/next-navigation"
-import { notifySuccess, notifyError } from "@/lib/toast"
+import { Users, Search, Mail, Phone, Building, AlertCircle, Plus, MoreVertical, Edit, Trash2 } from "lucide-react"
+
+import { AppShell } from "@/components/app-shell"
 import { CSVImportModal } from "@/components/empresa/csv-import-modal"
 import { FuncionarioModal } from "@/components/empresa/funcionario-modal"
-import { FuncionariosErrorBoundary } from "./error-boundary"
 import { useOperatorTenant } from "@/components/providers/empresa-tenant-provider"
-import { useEmployees } from "@/hooks/use-empresa-data"
-import { useDebounce } from "@/lib/debounce"
-import { Pagination } from "@/components/ui/pagination"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card } from "@/components/ui/card"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { Input } from "@/components/ui/input"
+import { Pagination } from "@/components/ui/pagination"
+import { useEmployees } from "@/hooks/use-empresa-data"
+import { useDebounce } from "@/lib/debounce"
+import { useRouter } from "@/lib/next-navigation"
+import { supabase } from "@/lib/supabase"
+import { notifySuccess, notifyError } from "@/lib/toast"
+
+import { FuncionariosErrorBoundary } from "./error-boundary"
+
+
 
 interface Funcionario {
   id: string

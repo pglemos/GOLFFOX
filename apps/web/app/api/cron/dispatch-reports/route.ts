@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
+
 import { createClient } from '@supabase/supabase-js'
 import { Resend } from 'resend'
-import { alertCronFailure } from '@/lib/operational-alerts'
-import { logger } from '@/lib/logger'
+
 import { getSupabaseUrl, getSupabaseServiceKey } from '@/lib/env'
+import { logger } from '@/lib/logger'
+import { alertCronFailure } from '@/lib/operational-alerts'
 
 function getSupabaseAdmin() {
   const url = getSupabaseUrl()

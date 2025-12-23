@@ -1,13 +1,16 @@
 "use client"
 
 import { useState } from "react"
+
+import { motion } from "framer-motion"
+import { Database, CheckCircle, AlertCircle } from "lucide-react"
+
+import { AppShell } from "@/components/app-shell"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
+import { useAuth } from "@/components/providers/auth-provider"
 import { notifySuccess, notifyError } from "@/lib/toast"
-import { motion } from "framer-motion"
-import { AppShell } from "@/components/app-shell"
-import { useAuthFast } from "@/hooks/use-auth-fast"
-import { Database, CheckCircle, AlertCircle } from "lucide-react"
+
 
 const MIGRATION_SQL = `-- Execute este SQL no Supabase Dashboard (SQL Editor)
 -- Link: https://supabase.com/dashboard/project/vmoxzesvjcfmrebagcwo/sql/new
@@ -79,7 +82,7 @@ export default function MigratePage() {
     window.open("https://supabase.com/dashboard/project/vmoxzesvjcfmrebagcwo/sql/new", "_blank")
   }
 
-  const { user, loading } = useAuthFast()
+  const { user, loading } = useAuth()
 
   if (loading) {
     return (
@@ -112,58 +115,57 @@ export default function MigratePage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
         >
-        <Card variant="premium" className="p-6">
-          <h2 className="text-xl font-semibold mb-4">Status da Migração</h2>
-          <div className="flex gap-4 mb-4">
-            <Button onClick={checkMigration} disabled={checking}>
-              {checking ? "Verificando..." : "Verificar Colunas"}
-            </Button>
-            <Button onClick={openSupabaseDashboard} variant="outline">
-              Abrir Supabase Dashboard
-            </Button>
-          </div>
+          <Card variant="premium" className="p-6">
+            <h2 className="text-xl font-semibold mb-4">Status da Migração</h2>
+            <div className="flex gap-4 mb-4">
+              <Button onClick={checkMigration} disabled={checking}>
+                {checking ? "Verificando..." : "Verificar Colunas"}
+              </Button>
+              <Button onClick={openSupabaseDashboard} variant="outline">
+                Abrir Supabase Dashboard
+              </Button>
+            </div>
 
-          {status && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="mt-4 p-4 bg-bg-soft rounded-lg"
-            >
-              <h3 className="font-semibold mb-2 flex items-center gap-2">
-                <Database className="h-5 w-5 text-brand" />
-                Resultado:
-              </h3>
-              <div className="grid grid-cols-2 gap-2 text-sm">
-                {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                {status.results?.map((r: any, i: number) => (
-                  <motion.div
-                    key={i}
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: i * 0.05 }}
-                    className={`p-3 rounded-lg flex items-center gap-2 ${
-                      r.status === "exists" ? "bg-success-light text-success border border-success-light" :
-                      r.status === "needs_creation" ? "bg-warning-light text-warning border border-warning-light" :
-                      "bg-error-light text-error border border-error-light"
-                    }`}
-                  >
-                    {r.status === "exists" ? (
-                      <CheckCircle className="h-4 w-4 text-success" />
-                    ) : r.status === "needs_creation" ? (
-                      <AlertCircle className="h-4 w-4 text-warning" />
-                    ) : (
-                      <AlertCircle className="h-4 w-4 text-error" />
-                    )}
-                    <span className="font-medium">{r.table}.{r.column}</span>
-                    <span className="ml-auto">
-                      {r.status === "exists" ? "✅" : r.status === "needs_creation" ? "⚠️" : "❌"}
-                    </span>
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
-          )}
-        </Card>
+            {status && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="mt-4 p-4 bg-bg-soft rounded-lg"
+              >
+                <h3 className="font-semibold mb-2 flex items-center gap-2">
+                  <Database className="h-5 w-5 text-brand" />
+                  Resultado:
+                </h3>
+                <div className="grid grid-cols-2 gap-2 text-sm">
+                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                  {status.results?.map((r: any, i: number) => (
+                    <motion.div
+                      key={i}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: i * 0.05 }}
+                      className={`p-3 rounded-lg flex items-center gap-2 ${r.status === "exists" ? "bg-success-light text-success border border-success-light" :
+                          r.status === "needs_creation" ? "bg-warning-light text-warning border border-warning-light" :
+                            "bg-error-light text-error border border-error-light"
+                        }`}
+                    >
+                      {r.status === "exists" ? (
+                        <CheckCircle className="h-4 w-4 text-success" />
+                      ) : r.status === "needs_creation" ? (
+                        <AlertCircle className="h-4 w-4 text-warning" />
+                      ) : (
+                        <AlertCircle className="h-4 w-4 text-error" />
+                      )}
+                      <span className="font-medium">{r.table}.{r.column}</span>
+                      <span className="ml-auto">
+                        {r.status === "exists" ? "✅" : r.status === "needs_creation" ? "⚠️" : "❌"}
+                      </span>
+                    </motion.div>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+          </Card>
         </motion.div>
 
         <motion.div
@@ -171,29 +173,29 @@ export default function MigratePage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
         >
-        <Card variant="premium" className="p-6">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold">SQL para Executar</h2>
-            <Button onClick={copyToClipboard} variant={copied ? "default" : "outline"}>
-              {copied ? "✅ Copiado!" : "📋 Copiar SQL"}
-            </Button>
-          </div>
+          <Card variant="premium" className="p-6">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-semibold">SQL para Executar</h2>
+              <Button onClick={copyToClipboard} variant={copied ? "default" : "outline"}>
+                {copied ? "✅ Copiado!" : "📋 Copiar SQL"}
+              </Button>
+            </div>
 
-          <pre className="bg-ink-strong text-success p-4 rounded-lg overflow-x-auto text-sm whitespace-pre-wrap">
-            {MIGRATION_SQL}
-          </pre>
+            <pre className="bg-ink-strong text-success p-4 rounded-lg overflow-x-auto text-sm whitespace-pre-wrap">
+              {MIGRATION_SQL}
+            </pre>
 
-          <div className="mt-6 p-4 bg-info-light border border-info-light rounded-lg">
-            <h3 className="font-semibold text-info mb-2">📌 Instruções:</h3>
-            <ol className="list-decimal list-inside text-info space-y-2">
-              <li>Clique em "Copiar SQL" acima</li>
-              <li>Clique em "Abrir Supabase Dashboard"</li>
-              <li>Cole o SQL no editor</li>
-              <li>Clique em "Run" para executar</li>
-              <li>Volte aqui e clique em "Verificar Colunas" para confirmar</li>
-            </ol>
-          </div>
-        </Card>
+            <div className="mt-6 p-4 bg-info-light border border-info-light rounded-lg">
+              <h3 className="font-semibold text-info mb-2">📌 Instruções:</h3>
+              <ol className="list-decimal list-inside text-info space-y-2">
+                <li>Clique em "Copiar SQL" acima</li>
+                <li>Clique em "Abrir Supabase Dashboard"</li>
+                <li>Cole o SQL no editor</li>
+                <li>Clique em "Run" para executar</li>
+                <li>Volte aqui e clique em "Verificar Colunas" para confirmar</li>
+              </ol>
+            </div>
+          </Card>
         </motion.div>
       </div>
     </AppShell>

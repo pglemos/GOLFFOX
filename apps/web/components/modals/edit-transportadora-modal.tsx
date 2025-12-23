@@ -1,17 +1,22 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
+
+import dynamic from "next/dynamic"
+
+import { Building2, FileText, CreditCard, User } from "lucide-react"
+
+import { AddressForm, AddressData } from "@/components/address-form"
 import { Button } from "@/components/ui/button"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { notifySuccess, notifyError } from "@/lib/toast"
-import { supabase } from "@/lib/supabase"
-import { AddressForm, AddressData } from "@/components/address-form"
-import type { transportadora } from "@/types/carrier"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Building2, FileText, CreditCard, User } from "lucide-react"
-import dynamic from "next/dynamic"
+import { supabase } from "@/lib/supabase"
+import { notifySuccess, notifyError } from "@/lib/toast"
+import type { transportadora } from "@/types/carrier"
+
+
 
 // Lazy load seções pesadas
 const TransportadoraDocumentsSection = dynamic(() => import("@/components/transportadora/transportadora-documents-section"), { ssr: false })

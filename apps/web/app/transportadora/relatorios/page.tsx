@@ -1,18 +1,13 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { AppShell } from "@/components/app-shell"
-import { Card } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
+
+import { motion } from "framer-motion"
 import { BarChart3, Download, FileText, Calendar, Filter } from "lucide-react"
-import { supabase } from "@/lib/supabase"
-import { useRouter } from "@/lib/next-navigation"
-import { 
-  exportToCSV, 
-  exportToExcel, 
-  exportToPDF
-} from "@/lib/export-utils"
-import { notifySuccess, notifyError } from "@/lib/toast"
+
+import { AppShell } from "@/components/app-shell"
+import { Button } from "@/components/ui/button"
+import { Card } from "@/components/ui/card"
 import { 
   DropdownMenu,
   DropdownMenuContent,
@@ -20,7 +15,15 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
-import { motion } from "framer-motion"
+import { 
+  exportToCSV, 
+  exportToExcel, 
+  exportToPDF
+} from "@/lib/export-utils"
+import { useRouter } from "@/lib/next-navigation"
+import { supabase } from "@/lib/supabase"
+import { notifySuccess, notifyError } from "@/lib/toast"
+
 
 interface ReportConfig {
   id: string

@@ -3,8 +3,8 @@
  * Sempre busca o token da sessão do Supabase e inclui no header Authorization
  */
 
-import { supabase } from './supabase'
 import { error as logError, warn } from './logger'
+import { supabase } from './supabase'
 
 /**
  * Obtém o token de acesso da sessão do Supabase

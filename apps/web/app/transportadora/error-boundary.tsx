@@ -1,9 +1,11 @@
 "use client"
 
 import { Component, ReactNode } from "react"
-import { Card } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
+
 import { AlertTriangle, Home, RefreshCw } from "lucide-react"
+
+import { Button } from "@/components/ui/button"
+import { Card } from "@/components/ui/card"
 import { logError } from "@/lib/logger"
 import { createAlert } from "@/lib/operational-alerts"
 

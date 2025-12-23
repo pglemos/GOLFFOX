@@ -1,20 +1,9 @@
 "use client"
 
 import React, { useEffect, useMemo } from "react"
+
 import Link from "next/link"
-import { usePathname, useRouter } from "@/lib/next-navigation"
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarGroup,
-  SidebarGroupLabel,
-  SidebarGroupContent,
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton,
-  SidebarMenuBadge,
-  useSidebar
-} from "@/components/ui/sidebar"
+
 import {
   LayoutDashboard,
   MapPin,
@@ -40,7 +29,21 @@ import {
   UserCircle,
   UsersRound
 } from "lucide-react"
+
 import { OperationalAlertsBadge } from "@/components/operational-alerts-badge"
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupLabel,
+  SidebarGroupContent,
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarMenuButton,
+  SidebarMenuBadge,
+  useSidebar
+} from "@/components/ui/sidebar"
+import { usePathname, useRouter } from "@/lib/next-navigation"
 import { cn } from "@/lib/utils"
 
 // Tipos para itens de menu

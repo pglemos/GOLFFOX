@@ -1,7 +1,9 @@
 "use client"
 
 import { useState } from "react"
+
 import Image from "next/image"
+
 import {
     FileText,
     Image as ImageIcon,
@@ -12,16 +14,17 @@ import {
     Clock,
     XCircle
 } from "lucide-react"
-import { Card } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
+
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card } from "@/components/ui/card"
+import { isImageFile, formatFileSize } from "@/hooks/use-file-upload"
 import { cn } from "@/lib/utils"
 import {
     DocumentStatus,
     AlertLevel,
     STATUS_LABELS,
 } from "@/types/documents"
-import { isImageFile, formatFileSize } from "@/hooks/use-file-upload"
 
 /**
  * Props do componente DocumentCard

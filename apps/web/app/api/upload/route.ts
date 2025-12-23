@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
+
 import { requireAuth } from '@/lib/api-auth'
-import { getSupabaseAdmin } from '@/lib/supabase-client'
-import { applyRateLimit } from '@/lib/rate-limit'
 import { logError } from '@/lib/logger'
+import { applyRateLimit } from '@/lib/rate-limit'
+import { getSupabaseAdmin } from '@/lib/supabase-client'
 
 export const runtime = 'nodejs'
 

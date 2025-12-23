@@ -1,10 +1,12 @@
 "use client"
 
 import { useEffect, useState } from "react"
+
+import { Loader2 } from "lucide-react"
+
 import { AppShell } from "@/components/app-shell"
 import { FinancialDashboardExpanded } from "@/components/costs/financial-dashboard-expanded"
 import { useAuth } from "@/hooks/use-auth"
-import { Loader2 } from "lucide-react"
 
 export default function CustosTransportadoraPage() {
   const { user, loading: isLoading } = useAuth()

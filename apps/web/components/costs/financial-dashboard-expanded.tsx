@@ -10,6 +10,7 @@
  */
 
 import { useState, useEffect, useMemo } from "react"
+
 import { motion, AnimatePresence } from "framer-motion"
 import {
     DollarSign,
@@ -42,11 +43,10 @@ import {
     ResponsiveContainer,
     Legend,
 } from "recharts"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Button } from "@/components/ui/button"
+
 import { Badge } from "@/components/ui/badge"
-import { Skeleton } from "@/components/ui/skeleton"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import {
     Select,
     SelectContent,
@@ -62,7 +62,8 @@ import {
     SheetTitle,
     SheetTrigger,
 } from "@/components/ui/sheet"
-import { CostForm } from "./cost-form"
+import { Skeleton } from "@/components/ui/skeleton"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { formatCurrency } from "@/lib/kpi-utils"
 import type {
     ManualCost,
@@ -72,6 +73,8 @@ import type {
     ProfileType,
     AdminFinancialKPIs,
 } from "@/types/financial"
+
+import { CostForm } from "./cost-form"
 
 interface FinancialDashboardExpandedProps {
     profileType: ProfileType

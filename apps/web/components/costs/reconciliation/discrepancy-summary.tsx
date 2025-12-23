@@ -1,7 +1,7 @@
 "use client"
 
-import { getDiscrepancyStatus } from "@/lib/cost-utils/discrepancy-calculator"
 import type { InvoiceLine } from "@/hooks/use-reconciliation"
+import { getDiscrepancyStatus } from "@/lib/cost-utils/discrepancy-calculator"
 
 interface DiscrepancySummaryProps {
   invoiceLines: InvoiceLine[]

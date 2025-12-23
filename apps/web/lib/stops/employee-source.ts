@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
+
 import type { BrazilianAddress } from '../address-validator'
 
 export interface EmployeeRecord {

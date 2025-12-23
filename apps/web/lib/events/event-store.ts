@@ -5,6 +5,7 @@
  */
 
 import { createClient } from '@supabase/supabase-js'
+
 import { logError, debug } from '@/lib/logger'
 
 export interface DomainEvent {

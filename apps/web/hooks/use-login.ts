@@ -6,11 +6,12 @@
  */
 
 import { useState, useCallback, useRef, useEffect, useMemo } from 'react'
-import { useRouter, useSearchParams } from '@/lib/next-navigation'
+
 import { AuthManager } from '@/lib/auth'
-import { getUserRoleByEmail } from '@/lib/user-role'
-import { normalizeRole } from '@/lib/role-mapper'
 import { debug, error as logError, warn as logWarn } from '@/lib/logger'
+import { useRouter, useSearchParams } from '@/lib/next-navigation'
+import { normalizeRole } from '@/lib/role-mapper'
+import { getUserRoleByEmail } from '@/lib/user-role'
 
 // Constants
 const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/

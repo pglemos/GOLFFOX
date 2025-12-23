@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getSupabaseAdmin } from '@/lib/supabase-client'
+
 import { requireAuth } from '@/lib/api-auth'
+import { successResponse, errorResponse } from '@/lib/api-response'
 import { logError } from '@/lib/logger'
-import { invalidateEntityCache } from '@/lib/next-cache'
+import { UserService } from '@/lib/services/server/user-service'
+import { getSupabaseAdmin } from '@/lib/supabase-client'
 
 // PUT /api/admin/motoristas/[driverId] - Editar motorista
 export async function PUT(
@@ -14,7 +16,6 @@ export async function PUT(
   if (authError) return authError
 
   try {
-    const supabase = getSupabaseAdmin()
     const { driverId } = await context.params
     const body = await request.json()
 
@@ -27,56 +28,53 @@ export async function PUT(
       cnh,
       cnh_category,
       cnh_expiry,
-      is_active
+      is_active,
+      address_zip_code,
+      address_street,
+      address_number,
+      address_neighborhood,
+      address_complement,
+      address_city,
+      address_state
     } = body
 
     if (!name) {
-      return NextResponse.json(
-        { success: false, error: 'Nome é obrigatório' },
-        { status: 400 }
-      )
+      return errorResponse({ message: 'Nome é obrigatório' }, 400)
     }
 
-    const transportadoraId = transportadora_id
+    // Usar UserService para atualizar
+    const updatedMotorista = await UserService.updateUser(driverId, {
+      name,
+      email,
+      phone,
+      transportadora_id: transportadora_id || null,
+      cpf,
+      cnh,
+      cnh_category,
+      // cnh_expiry: cnh_expiry, // UserService ainda não suporta cnh_expiry na tipagem padrão, podemos adicionar ou tratar separado
+      is_active,
+      address_zip_code,
+      address_street,
+      address_number,
+      address_neighborhood,
+      address_complement,
+      address_city,
+      address_state
+    })
 
-    // Atualizar motorista na tabela users
-    const { data: motorista, error: driverError } = await (supabase
-      .from('users') as any)
-      .update({
-        name,
-        email: email || null,
-        phone: phone || null,
-        transportadora_id: transportadoraId || null,
-        cpf: cpf || null,
-        cnh: cnh || null,
-        cnh_category: cnh_category || null,
-        cnh_expiry: cnh_expiry || null,
-        is_active: is_active ?? true,
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', driverId)
-      .eq('role', 'motorista')
-      .select()
-      .single()
-
-    if (driverError) {
-      logError('Erro ao atualizar motorista', { error: driverError, driverId }, 'DriversUpdateAPI')
-      return NextResponse.json(
-        { success: false, error: driverError.message },
-        { status: 500 }
-      )
+    // Se houver campos não suportados pelo UserService padrão (como cnh_expiry), atualizar manualmente se necessário.
+    // Mas notei que cnh_expiry só aparece aqui na rota, não vi no Crate. Vou manter a consistência.
+    if (cnh_expiry) {
+      const supabase = getSupabaseAdmin()
+      await supabase.from('users').update({ cnh_expiry }).eq('id', driverId)
     }
 
-    // Invalidar cache após atualização
-    await invalidateEntityCache('motorista', driverId)
+    // Invalidação de cache já é feita no UserService
 
-    return NextResponse.json({ success: true, motorista })
+    return successResponse({ motorista: { ...updatedMotorista, cnh_expiry } })
   } catch (error: any) {
     logError('Erro na API de atualizar motorista', { error, driverId: (await context.params).driverId }, 'DriversUpdateAPI')
-    return NextResponse.json(
-      { success: false, error: error.message || 'Erro desconhecido' },
-      { status: 500 }
-    )
+    return errorResponse(error, 500, 'Erro ao atualizar motorista')
   }
 }
 

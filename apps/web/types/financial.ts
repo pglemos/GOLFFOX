@@ -75,73 +75,73 @@ export interface CostCategoryUpdate {
 
 export interface ManualCost {
     id: string;
-    companyId?: string | null;
-    carrierId?: string | null;
-    categoryId?: string | null;
+    company_id?: string | null;
+    transportadora_id?: string | null;
+    category_id?: string | null;
     description: string;
     amount: number;
-    costDate: string; // ISO date string
-    isRecurring: boolean;
-    recurringInterval?: RecurringInterval | null;
-    recurringEndDate?: string | null;
-    parentRecurringId?: string | null;
-    vehicleId?: string | null;
-    routeId?: string | null;
-    driverId?: string | null;
-    attachmentUrl?: string | null;
-    attachmentName?: string | null;
+    cost_date: string; // ISO date string
+    is_recurring: boolean;
+    recurring_interval?: RecurringInterval | null;
+    recurring_end_date?: string | null;
+    parent_recurring_id?: string | null;
+    veiculo_id?: string | null;
+    route_id?: string | null;
+    motorista_id?: string | null;
+    attachment_url?: string | null;
+    attachment_name?: string | null;
     notes?: string | null;
     status: CostStatus;
-    createdBy?: string | null;
-    approvedBy?: string | null;
-    approvedAt?: string | null;
-    createdAt: string;
-    updatedAt: string;
+    created_by?: string | null;
+    approved_by?: string | null;
+    approved_at?: string | null;
+    created_at: string;
+    updated_at: string;
     // Relacionamentos (quando join)
     category?: CostCategory | null;
     veiculo?: { id: string; plate: string; model?: string } | null;
     route?: { id: string; name: string } | null;
     motorista?: { id: string; name?: string; email: string } | null;
-    company?: { id: string; name: string } | null;
+    empresa?: { id: string; name: string } | null;
     transportadora?: { id: string; name: string } | null;
 }
 
 export interface ManualCostInsert {
-    companyId?: string | null;
-    carrierId?: string | null;
-    categoryId?: string | null;
+    company_id?: string | null;
+    transportadora_id?: string | null;
+    category_id?: string | null;
     description: string;
     amount: number;
-    costDate: string;
-    isRecurring?: boolean;
-    recurringInterval?: RecurringInterval | null;
-    recurringEndDate?: string | null;
-    vehicleId?: string | null;
-    routeId?: string | null;
-    driverId?: string | null;
-    attachmentUrl?: string | null;
-    attachmentName?: string | null;
+    cost_date: string;
+    is_recurring?: boolean;
+    recurring_interval?: RecurringInterval | null;
+    recurring_end_date?: string | null;
+    veiculo_id?: string | null;
+    route_id?: string | null;
+    motorista_id?: string | null;
+    attachment_url?: string | null;
+    attachment_name?: string | null;
     notes?: string | null;
     status?: CostStatus;
 }
 
 export interface ManualCostUpdate {
-    categoryId?: string | null;
+    category_id?: string | null;
     description?: string;
     amount?: number;
-    costDate?: string;
-    isRecurring?: boolean;
-    recurringInterval?: RecurringInterval | null;
-    recurringEndDate?: string | null;
-    vehicleId?: string | null;
-    routeId?: string | null;
-    driverId?: string | null;
-    attachmentUrl?: string | null;
-    attachmentName?: string | null;
+    cost_date?: string;
+    is_recurring?: boolean;
+    recurring_interval?: RecurringInterval | null;
+    recurring_end_date?: string | null;
+    veiculo_id?: string | null;
+    route_id?: string | null;
+    motorista_id?: string | null;
+    attachment_url?: string | null;
+    attachment_name?: string | null;
     notes?: string | null;
     status?: CostStatus;
-    approvedBy?: string | null;
-    approvedAt?: string | null;
+    approved_by?: string | null;
+    approved_at?: string | null;
 }
 
 // ============================================================
@@ -422,15 +422,15 @@ export interface FinancialDashboardData {
 // ============================================================
 
 export interface CostFilters {
-    categoryId?: string;
-    vehicleId?: string;
-    routeId?: string;
+    category_id?: string;
+    veiculo_id?: string;
+    route_id?: string;
     status?: CostStatus;
-    isRecurring?: boolean;
-    dateFrom?: string;
-    dateTo?: string;
-    amountMin?: number;
-    amountMax?: number;
+    is_recurring?: boolean;
+    date_from?: string;
+    date_to?: string;
+    amount_min?: number;
+    amount_max?: number;
     search?: string;
 }
 

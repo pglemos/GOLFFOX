@@ -3,14 +3,22 @@
  * Acesso a dados de empresas usando padrão Repository
  */
 
-import { BaseRepository, type PaginatedResult, type PaginationOptions, type FilterOptions } from './base.repository'
 import { logger } from '@/lib/logger'
+
+import { BaseRepository, type PaginatedResult, type PaginationOptions, type FilterOptions } from './base.repository'
 
 export interface Company {
   id: string
   name: string
   cnpj?: string | null
   address?: string | null
+  address_zip_code?: string | null
+  address_street?: string | null
+  address_number?: string | null
+  address_neighborhood?: string | null
+  address_complement?: string | null
+  address_city?: string | null
+  address_state?: string | null
   phone?: string | null
   email?: string | null
   is_active: boolean

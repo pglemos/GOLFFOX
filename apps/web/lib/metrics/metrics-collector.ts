@@ -5,8 +5,8 @@
  * Integrado com APM (Datadog)
  */
 
-import { debug, warn } from '@/lib/logger'
 import { redisCacheService } from '@/lib/cache/redis-cache.service'
+import { debug, warn } from '@/lib/logger'
 
 export interface Metric {
   name: string

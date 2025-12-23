@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
+
 import { useRouter, useSearchParams } from 'next/navigation'
 
 interface UrlFiltersOptions {

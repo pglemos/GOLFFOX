@@ -1,17 +1,20 @@
 "use client"
 
 import { Suspense } from "react"
+
+import { motion } from "framer-motion"
+import { AlertCircle } from "lucide-react"
+
 import { AppShell } from "@/components/app-shell"
 import { Card } from "@/components/ui/card"
-import { AlertCircle } from "lucide-react"
-import { useAuthFast } from "@/hooks/use-auth-fast"
-import StopGenerator from '../../../../components/stop-generation/stop-generator'
+import { useAuth } from "@/components/providers/auth-provider"
 import { useSearchParams } from "@/lib/next-navigation"
-import { motion } from "framer-motion"
+
+import StopGenerator from '../../../../components/stop-generation/stop-generator'
 
 function GerarPontosContent() {
   const searchParams = useSearchParams()
-  const { user, loading } = useAuthFast()
+  const { user, loading } = useAuth()
   const routeId = (searchParams?.get('routeId') as string) || ''
 
   if (loading) {

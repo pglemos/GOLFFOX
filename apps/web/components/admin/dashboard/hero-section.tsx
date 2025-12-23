@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion"
 import { TrendingUp, Users, Truck, AlertCircle } from "lucide-react"
+
 import { fadeInUp, staggerContainerFast } from "@/lib/animations"
 
 interface HeroSectionProps {

@@ -1,9 +1,9 @@
-﻿import common from '@/i18n/common.json'
-import operador from '@/i18n/operador.json'
-import admin from '@/i18n/admin.json'
-import transportadora from '@/i18n/transportadora.json'
-import ptBR from '@/i18n/pt-BR.json'
+﻿import admin from '@/i18n/admin.json'
+import common from '@/i18n/common.json'
 import enUS from '@/i18n/en-US.json'
+import operador from '@/i18n/operador.json'
+import ptBR from '@/i18n/pt-BR.json'
+import transportadora from '@/i18n/transportadora.json'
 
 type Namespace = 'common' | 'operador' | 'admin' | 'transportadora'
 

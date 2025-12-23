@@ -1,357 +1,131 @@
-'use client'
+"use client"
 
-import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react'
-import { supabase } from '@/lib/supabase'
-import { ensureSupabaseSession } from '@/lib/supabase-session'
+import React, { createContext, useContext, useState, useEffect, useCallback } from "react"
+
+import { useRouter, usePathname } from "next/navigation"
+
+import { supabase } from "@/lib/supabase"
 
 interface User {
   id: string
   email: string
-  name?: string
-  role?: string
+  name: string
+  role: string
   avatar_url?: string
-  companyId?: string
-  company_id?: string
+  company_id?: string | null
+  transportadora_id?: string | null
+  /** @deprecated use company_id */
+  companyId?: string | null
 }
 
 interface AuthContextType {
   user: User | null
   loading: boolean
-  error: string | null
-  reload: () => Promise<void>
-  clearCache: () => void
+  refresh: () => Promise<void>
+  signOut: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
-// Cache global do usuário (compartilhado entre componentes)
-let cachedUser: User | null = null
-let cacheTimestamp: number = 0
-const CACHE_DURATION = 5 * 60 * 1000 // 5 minutos
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const [user, setUser] = useState<User | null>(null)
+  const [loading, setLoading] = useState(true)
+  const router = useRouter()
+  const pathname = usePathname()
 
-/**
- * Provider de autenticação unificado
- * Consolida toda lógica de autenticação em um único lugar
- */
-export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(cachedUser)
-  const [loading, setLoading] = useState(!cachedUser)
-  const [error, setError] = useState<string | null>(null)
-
-  /**
-   * Lê usuário do cookie golffox-session (mais rápido, síncrono)
-   */
-  const getUserFromCookie = useCallback((): User | null => {
-    if (typeof document === 'undefined') return null
-
+  const loadUser = useCallback(async () => {
     try {
-      const cookieMatch = document.cookie.match(/golffox-session=([^;]+)/)
-      if (!cookieMatch) return null
+      setLoading(true)
 
-      const decoded = atob(cookieMatch[1])
-      const userData = JSON.parse(decoded)
-
-      if (userData?.id && userData?.email) {
-        return {
-          id: userData.id,
-          email: userData.email,
-          name: userData.name || userData.email.split('@')[0],
-          role: userData.role || 'user',
-          avatar_url: userData.avatar_url,
-          companyId: userData.companyId || userData.company_id,
-          company_id: userData.companyId || userData.company_id,
-        }
-      }
-
-      // ⚠️ FALLBACK: Se o cookie é HttpOnly, não estará em document.cookie
-      // Tentar recuperar do storage (síncrono e seguro para UI)
-      if (typeof window !== 'undefined') {
-        const stored = localStorage.getItem('golffox-auth') || sessionStorage.getItem('golffox-auth')
-        if (stored) {
+      // 1. Tentar ler cookie de sessão (Estratégia "Fast")
+      if (typeof document !== 'undefined') {
+        const cookieMatch = document.cookie.match(/golffox-session=([^;]+)/)
+        if (cookieMatch) {
           try {
-            const u = JSON.parse(stored)
-            if (u && u.id && u.email) {
-              return {
+            const decoded = atob(cookieMatch[1])
+            const u = JSON.parse(decoded)
+            if (u?.id && u?.email) {
+              setUser({
                 id: u.id,
                 email: u.email,
                 name: u.name || u.email.split('@')[0],
-                role: u.role || 'user',
+                role: u.role,
                 avatar_url: u.avatar_url,
-                companyId: u.companyId || u.company_id,
-                company_id: u.companyId || u.company_id,
-              }
+                company_id: u.company_id || u.companyId,
+                transportadora_id: u.transportadora_id || u.transportadoraId,
+                companyId: u.company_id || u.companyId
+              })
+              setLoading(false)
+              // Não retornamos aqui para permitir validação em segundo plano
             }
-          } catch { }
+          } catch (e) { }
         }
       }
-    } catch (err) {
-      // Cookie inválido ou malformado
-      console.warn('⚠️ Erro ao decodificar cookie de sessão:', err)
-    }
 
-    return null
-  }, [])
-
-  /**
-   * Carrega usuário usando múltiplas estratégias (cookie → API → Supabase)
-   */
-  const loadUser = useCallback(async (force = false): Promise<User | null> => {
-    // Se temos cache válido e não é forçado, usar cache
-    if (!force && cachedUser && Date.now() - cacheTimestamp < CACHE_DURATION) {
-      setUser(cachedUser)
-      setLoading(false)
-      setError(null)
-      return cachedUser
-    }
-
-    try {
-      setError(null)
-
-      // ✅ ESTRATÉGIA 1: Cookie golffox-session (mais rápido, síncrono)
-      const cookieUser = getUserFromCookie()
-      if (cookieUser) {
-        cachedUser = cookieUser
-        cacheTimestamp = Date.now()
-        setUser(cookieUser)
-        setLoading(false)
-        return cookieUser
-      }
-
-      // ✅ ESTRATÉGIA 2: API /api/auth/me (leitura do cookie httpOnly no servidor)
-      try {
-        const response = await fetch('/api/auth/me', {
-          credentials: 'include',
-          cache: 'no-store',
-        })
-
-        if (response.ok) {
-          const data = await response.json().catch(() => null)
-          const u = data?.user
-
-          if (u?.id && u?.email) {
-            const userObj: User = {
-              id: u.id,
-              email: u.email,
-              name: u.name || u.email.split('@')[0],
-              role: u.role || 'user',
-              avatar_url: u.avatar_url,
-              companyId: u.companyId || u.company_id,
-              company_id: u.companyId || u.company_id,
-            }
-
-            cachedUser = userObj
-            cacheTimestamp = Date.now()
-            setUser(userObj)
-            setLoading(false)
-            return userObj
-          }
+      // 2. Validar/Atualizar via API (Estratégia Segura)
+      const res = await fetch('/api/auth/me', { credentials: 'include' })
+      if (res.ok) {
+        const data = await res.json()
+        if (data.success && data.user) {
+          setUser(data.user)
+          return
         }
-      } catch (apiError) {
-        // Continuar para próxima estratégia
-        console.warn('⚠️ Erro ao buscar usuário via /api/auth/me:', apiError)
       }
 
-      // ✅ ESTRATÉGIA 3: Supabase Auth (fallback mais lento)
-      await ensureSupabaseSession()
-      const { data: { session }, error: sessionError } = await supabase.auth.getSession()
-
-      if (sessionError) {
-        console.error('❌ Erro ao verificar sessão Supabase:', sessionError)
-      }
-
+      // 3. Fallback: Supabase Session
+      const { data: { session } } = await supabase.auth.getSession()
       if (session?.user) {
-        // Buscar dados completos do usuário no banco
-        const { data: userData, error: userError } = await supabase
+        const { data: profile } = await supabase
           .from('users')
           .select('*')
           .eq('id', session.user.id)
           .maybeSingle()
 
-        if (userError) {
-          console.warn('⚠️ Erro ao buscar dados do usuário:', userError)
-        }
-
-        const userObj: User = {
+        const p = profile as any
+        setUser({
           id: session.user.id,
           email: session.user.email || '',
-          name: (userData as any)?.name || session.user.email?.split('@')[0] || 'Usuário',
-          role: (userData as any)?.role || 'user',
-          avatar_url: (userData as any)?.avatar_url || session.user.user_metadata?.avatar_url,
-          companyId: (userData as any)?.company_id,
-          company_id: (userData as any)?.company_id,
-        }
-
-        cachedUser = userObj
-        cacheTimestamp = Date.now()
-        setUser(userObj)
-        setLoading(false)
-        return userObj
+          name: p?.name || session.user.email?.split('@')[0] || 'Usuário',
+          role: p?.role || 'user',
+          avatar_url: p?.avatar_url,
+          company_id: p?.company_id || p?.empresa_id,
+          transportadora_id: p?.transportadora_id,
+          companyId: p?.company_id || p?.empresa_id
+        })
+      } else {
+        setUser(null)
       }
-
-      // Sem sessão válida
-      cachedUser = null
-      cacheTimestamp = 0
+    } catch (error) {
+      console.error("[AuthProvider] Erro ao carregar usuário:", error)
       setUser(null)
+    } finally {
       setLoading(false)
-      return null
-    } catch (err: any) {
-      console.error('❌ Erro ao carregar usuário:', err)
-      setError(err.message || 'Erro ao carregar autenticação')
-      setLoading(false)
-      return null
     }
-  }, [getUserFromCookie])
-
-  /**
-   * Recarrega usuário (força nova busca)
-   */
-  const reload = useCallback(async () => {
-    await loadUser(true)
-  }, [loadUser])
-
-  /**
-   * Limpa cache do usuário
-   */
-  const clearCache = useCallback(() => {
-    cachedUser = null
-    cacheTimestamp = 0
-    setUser(null)
   }, [])
 
-  // Carregar usuário na montagem (apenas uma vez)
+  const signOut = async () => {
+    await supabase.auth.signOut()
+    // Limpar cookies via API de logout se existir
+    await fetch('/api/auth/logout', { method: 'POST' }).catch(() => { })
+    setUser(null)
+    router.push('/')
+  }
+
   useEffect(() => {
-    let mounted = true
-    let hasLoaded = false
-
-    const initialLoad = async () => {
-      if (hasLoaded) return
-      hasLoaded = true
-
-      if (mounted) {
-        await loadUser()
-      }
-    }
-
-    initialLoad()
-
-    return () => {
-      mounted = false
-    }
-  }, []) // Executar apenas uma vez na montagem
-
-  // Escutar mudanças de sessão do Supabase
-  useEffect(() => {
-    let isHandling = false
-    let timeoutId: NodeJS.Timeout | null = null
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('🔄 Auth state changed:', event)
-
-      // Ignorar INITIAL_SESSION para evitar loops
-      if (event === 'INITIAL_SESSION') {
-        return
-      }
-
-      // Debounce para evitar múltiplas chamadas simultâneas
-      if (isHandling) {
-        return
-      }
-
-      isHandling = true
-
-      // Limpar timeout anterior se existir
-      if (timeoutId) {
-        clearTimeout(timeoutId)
-      }
-
-      timeoutId = setTimeout(async () => {
-        try {
-          if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-            // Recarregar usuário quando há mudança de sessão
-            await loadUser(true)
-          } else if (event === 'SIGNED_OUT') {
-            // Limpar usuário ao fazer logout
-            clearCache()
-            setUser(null)
-          }
-        } finally {
-          isHandling = false
-        }
-      }, 300) // Debounce de 300ms
-    })
-
-    return () => {
-      if (timeoutId) {
-        clearTimeout(timeoutId)
-      }
-      subscription.unsubscribe()
-    }
-  }, [loadUser, clearCache])
-
-  // Escutar eventos customizados auth:update (disparados quando há atualizações de perfil)
-  useEffect(() => {
-    let isHandling = false
-    let timeoutId: NodeJS.Timeout | null = null
-
-    const handleAuthUpdate = async () => {
-      console.log('🔄 auth:update event received')
-
-      // Debounce para evitar múltiplas chamadas simultâneas
-      if (isHandling) {
-        return
-      }
-
-      isHandling = true
-
-      // Limpar timeout anterior se existir
-      if (timeoutId) {
-        clearTimeout(timeoutId)
-      }
-
-      // Forçar recarregamento após pequeno delay para garantir que banco foi atualizado
-      timeoutId = setTimeout(async () => {
-        try {
-          await loadUser(true)
-        } finally {
-          isHandling = false
-        }
-      }, 500) // Debounce de 500ms
-    }
-
-    window.addEventListener('auth:update', handleAuthUpdate)
-
-    return () => {
-      if (timeoutId) {
-        clearTimeout(timeoutId)
-      }
-      window.removeEventListener('auth:update', handleAuthUpdate)
-    }
+    loadUser()
   }, [loadUser])
 
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        loading,
-        error,
-        reload,
-        clearCache,
-      }}
-    >
+    <AuthContext.Provider value={{ user, loading, refresh: loadUser, signOut }}>
       {children}
     </AuthContext.Provider>
   )
 }
 
-/**
- * Hook para acessar contexto de autenticação
- * @throws {Error} Se usado fora do AuthProvider
- */
 export function useAuth() {
   const context = useContext(AuthContext)
   if (context === undefined) {
-    throw new Error('useAuth deve ser usado dentro de um AuthProvider')
+    throw new Error("useAuth deve ser usado dentro de um AuthProvider")
   }
   return context
 }
-

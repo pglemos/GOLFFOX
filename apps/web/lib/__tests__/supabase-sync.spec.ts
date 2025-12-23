@@ -5,6 +5,7 @@
  * Testes para o serviço de sincronização com Supabase
  */
 
+import { supabase } from '../supabase'
 import {
   syncToSupabase,
   getSyncHistory,
@@ -13,7 +14,6 @@ import {
   getSyncStatus,
   clearFailedSync,
 } from '../supabase-sync'
-import { supabase } from '../supabase'
 
 // Mock do Supabase
 const mockInsert = jest.fn()

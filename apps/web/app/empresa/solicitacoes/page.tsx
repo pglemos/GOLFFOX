@@ -1,14 +1,16 @@
 ﻿"use client"
 
-import { AppShell } from "@/components/app-shell"
-import { Card } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Plus, Columns } from "lucide-react"
-import { motion } from "framer-motion"
 import { useEffect, useState } from "react"
-import { supabase } from "@/lib/supabase"
-import { useRouter } from "@/lib/next-navigation"
+
+import { motion } from "framer-motion"
+import { Plus, Columns } from "lucide-react"
+
+import { AppShell } from "@/components/app-shell"
 import { SolicitacaoModal } from "@/components/empresa/solicitacao-modal"
+import { Button } from "@/components/ui/button"
+import { Card } from "@/components/ui/card"
+import { useRouter } from "@/lib/next-navigation"
+import { supabase } from "@/lib/supabase"
 
 export default function SolicitacoesOperatorPage() {
   const router = useRouter()

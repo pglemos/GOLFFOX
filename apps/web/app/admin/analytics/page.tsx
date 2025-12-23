@@ -1,12 +1,13 @@
 "use client"
 
-import { AppShell } from "@/components/app-shell"
-import { Card } from "@/components/ui/card"
 import { BarChart3, Construction } from "lucide-react"
-import { useAuthFast } from "@/hooks/use-auth-fast"
+
+import { AppShell } from "@/components/app-shell"
+import { useAuth } from "@/components/providers/auth-provider"
+import { Card } from "@/components/ui/card"
 
 export default function AnalyticsPage() {
-    const { user, loading } = useAuthFast()
+    const { user, loading } = useAuth()
 
     if (loading || !user) {
         return (

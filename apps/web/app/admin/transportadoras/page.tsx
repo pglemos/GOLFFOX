@@ -1,24 +1,26 @@
 "use client"
 
 import { useEffect, useState, useCallback, useMemo } from "react"
+
+import { motion } from "framer-motion"
+import { Truck, Plus, UserPlus, Trash2, Edit, Search } from "lucide-react"
+
 import { AppShell } from "@/components/app-shell"
+import { CreateTransportadoraModal } from "@/components/modals/create-transportadora-modal"
+import { EditTransportadoraModal } from "@/components/modals/edit-transportadora-modal"
+import { TransportadoraUsersModal } from "@/components/modals/transportadora-users-modal"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Truck, Plus, UserPlus, Trash2, Edit, Search } from "lucide-react"
-import { motion } from "framer-motion"
-import { useRouter } from "@/lib/next-navigation"
-import { useAuthFast } from "@/hooks/use-auth-fast"
-import { useGlobalSync } from "@/hooks/use-global-sync"
+import { useAuth } from "@/components/providers/auth-provider"
 import { useDebounce } from "@/hooks/use-debounce"
+import { useGlobalSync } from "@/hooks/use-global-sync"
+import { useRouter } from "@/lib/next-navigation"
 import { notifySuccess, notifyError } from "@/lib/toast"
-import { CreateTransportadoraModal } from "@/components/modals/create-transportadora-modal"
-import { TransportadoraUsersModal } from "@/components/modals/transportadora-users-modal"
-import { EditTransportadoraModal } from "@/components/modals/edit-transportadora-modal"
 
 export default function TransportadorasPage() {
   const router = useRouter()
-  const { user, loading: authLoading } = useAuthFast()
+  const { user, loading: authLoading } = useAuth()
   const [carriers, setCarriers] = useState<any[]>([])
   const [loadingCarriers, setLoadingCarriers] = useState(true)
   const [errorCarriers, setErrorCarriers] = useState<Error | null>(null)

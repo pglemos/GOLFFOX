@@ -1,6 +1,17 @@
 ﻿"use client"
 
 import { useState, useMemo, useEffect } from "react"
+import React from "react"
+
+import { Route, Navigation } from "lucide-react"
+import { z } from "zod"
+
+import { EmployeeSelector } from "@/components/modals/route-create/employee-selector"
+import { RouteForm } from "@/components/modals/route-create/route-form"
+import { useGoogleMapsLoader } from "@/components/modals/route-create/use-google-maps-loader"
+import { GenericPickerModal, type PickerItem } from "@/components/shared/generic-picker-modal"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
@@ -9,22 +20,15 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Route, Navigation } from "lucide-react"
+import { geocodeAddress } from "@/lib/geocoding"
+import { optimizeRoute } from "@/lib/route-optimization"
 import { supabase } from "@/lib/supabase"
 import { notifySuccess, notifyError } from "@/lib/toast"
-import { optimizeRoute } from "@/lib/route-optimization"
-import { geocodeAddress } from "@/lib/geocoding"
-import { GenericPickerModal, type PickerItem } from "@/components/shared/generic-picker-modal"
-import { z } from "zod"
-import React from "react"
-import { useRouteCreate } from "./use-route-create"
-import { RouteForm } from "@/components/modals/route-create/route-form"
-import { EmployeeSelector } from "@/components/modals/route-create/employee-selector"
-import { useGoogleMapsLoader } from "@/components/modals/route-create/use-google-maps-loader"
 import type { OptimizeRouteResponse, EmployeeLite, RouteFormData } from "@/types/routes"
+
+import { useRouteCreate } from "./use-route-create"
+
 
 const routeSchema = z.object({
   name: z.string().min(1, "Nome é obrigatório"),

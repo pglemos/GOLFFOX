@@ -1,20 +1,24 @@
 ﻿"use client"
 
 import { useEffect, useState, useMemo } from "react"
-import { AppShell } from "@/components/app-shell"
-import { Card } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Input } from "@/components/ui/input"
-import { Navigation, Users, MapPin, Plus, Map as MapIcon, Search } from "lucide-react"
-import { motion } from "framer-motion"
-import { supabase } from "@/lib/supabase"
-import { useRouter } from "@/lib/next-navigation"
-import { Button } from "@/components/ui/button"
-import { useOperatorTenant } from "@/components/providers/empresa-tenant-provider"
-import { useDebounce } from "@/hooks/use-debounce"
+
 import { useQuery } from "@tanstack/react-query"
+import { motion } from "framer-motion"
+import { Navigation, Users, MapPin, Plus, Map as MapIcon, Search } from "lucide-react"
+
+import { AppShell } from "@/components/app-shell"
+import { useOperatorTenant } from "@/components/providers/empresa-tenant-provider"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { useDebounce } from "@/hooks/use-debounce"
 import { useActiveTrips } from "@/hooks/use-empresa-data"
 import operatorI18nData from "@/i18n/operador.json"
+import { useRouter } from "@/lib/next-navigation"
+import { supabase } from "@/lib/supabase"
+
+
 
 const operatorI18n: any = operatorI18nData ?? {
   routes_title: "Rotas",

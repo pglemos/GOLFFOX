@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useCallback, useRef } from 'react'
+
 import { globalSyncManager } from '@/lib/global-sync'
 
 type SyncEventType = 

@@ -6,12 +6,15 @@
 'use client'
 
 import { memo } from 'react'
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { X, Navigation, LifeBuoy, History, Clock, Users, MapPin } from 'lucide-react'
+
 import { motion } from 'framer-motion'
+import { X, Navigation, LifeBuoy, History, Clock, Users, MapPin } from 'lucide-react'
+
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { modalContent } from '@/lib/animations'
+
 import type { veiculo, RoutePolyline, Alert } from './admin-map'
 
 interface VeiculoPanelProps {

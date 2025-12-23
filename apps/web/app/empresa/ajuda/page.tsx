@@ -3,13 +3,15 @@
 export const dynamic = 'force-dynamic'
 
 import { useEffect, useState, Suspense } from "react"
-import { AppShell } from "@/components/app-shell"
-import { Card } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { HelpCircle, MessageCircle, FileText, ExternalLink } from "lucide-react"
+
 import { motion } from "framer-motion"
-import { supabase } from "@/lib/supabase"
+import { HelpCircle, MessageCircle, FileText, ExternalLink } from "lucide-react"
+
+import { AppShell } from "@/components/app-shell"
+import { Button } from "@/components/ui/button"
+import { Card } from "@/components/ui/card"
 import { useRouter } from "@/lib/next-navigation"
+import { supabase } from "@/lib/supabase"
 
 export default function AjudaOperatorPage() {
   const router = useRouter()
