@@ -627,15 +627,18 @@ export function VeiculoModal({ veiculo, isOpen, onClose, onSave, carriers }: Vei
 
                 <div className="space-y-3">
                   <Label htmlFor="status" className="text-base font-medium">Status</Label>
-                  <select
-                    id="status"
+                  <Select
                     value={formData.is_active ? "active" : "inactive"}
-                    onChange={(e) => setFormData({ ...formData, is_active: e.target.value === "active" })}
-                    className="min-h-[48px] w-full px-4 py-3 rounded-md border border-input bg-background text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                    onValueChange={(value) => setFormData({ ...formData, is_active: value === "active" })}
                   >
-                    <option value="active">Ativo</option>
-                    <option value="inactive">Inativo</option>
-                  </select>
+                    <SelectTrigger id="status">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="active">Ativo</SelectItem>
+                      <SelectItem value="inactive">Inativo</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
 

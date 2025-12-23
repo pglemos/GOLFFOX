@@ -216,7 +216,7 @@ export function CompanyUsersModal({
                           variant="destructive"
                           size="sm"
                           onClick={() => handleDeleteOperator(operador.id, operador.name || operador.email)}
-                          className="flex-1 sm:flex-none h-8 sm:h-9 text-xs"
+                          className="flex-1 sm:flex-none text-xs"
                         >
                           <Trash2 className="h-3.5 w-3.5 mr-1.5" />
                           Excluir

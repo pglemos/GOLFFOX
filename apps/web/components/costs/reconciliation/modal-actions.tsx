@@ -43,7 +43,8 @@ export function ModalActions({
           variant="outline"
           onClick={() => handleExport('csv')}
           disabled={processing || loading}
-          className="flex items-center justify-center gap-2 min-h-[44px] text-xs sm:text-sm w-full sm:w-auto"
+          size="sm"
+          className="flex items-center justify-center gap-2 w-full sm:w-auto"
         >
           <Download className="h-4 w-4 flex-shrink-0" />
           <span className="hidden sm:inline">Exportar CSV</span>
@@ -53,7 +54,8 @@ export function ModalActions({
           variant="outline"
           onClick={() => handleExport('pdf')}
           disabled={processing || loading}
-          className="flex items-center justify-center gap-2 min-h-[44px] text-xs sm:text-sm w-full sm:w-auto"
+          size="sm"
+          className="flex items-center justify-center gap-2 w-full sm:w-auto"
         >
           <Download className="h-4 w-4 flex-shrink-0" />
           <span className="hidden sm:inline">Exportar PDF</span>
@@ -75,7 +77,8 @@ export function ModalActions({
               variant="outline"
               onClick={onRequestRevision}
               disabled={processing}
-              className="min-h-[44px] text-xs sm:text-sm w-full sm:w-auto"
+              size="sm"
+              className="w-full sm:w-auto"
             >
               <span className="hidden sm:inline">Solicitar Revisão</span>
               <span className="sm:hidden">Revisão</span>
@@ -84,7 +87,8 @@ export function ModalActions({
               variant="outline"
               onClick={onReject}
               disabled={processing}
-              className="text-error hover:text-error min-h-[44px] text-xs sm:text-sm w-full sm:w-auto"
+              size="sm"
+              className="text-error hover:text-error w-full sm:w-auto"
             >
               <XCircle className="h-4 w-4 mr-2 flex-shrink-0" />
               Rejeitar
@@ -92,7 +96,8 @@ export function ModalActions({
             <Button
               onClick={onApprove}
               disabled={processing}
-              className="bg-success hover:bg-success min-h-[44px] text-xs sm:text-sm w-full sm:w-auto"
+              size="sm"
+              className="bg-success hover:bg-success w-full sm:w-auto"
             >
               <CheckCircle className="h-4 w-4 mr-2 flex-shrink-0" />
               {processing ? 'Processando...' : 'Aprovar'}
@@ -105,7 +110,8 @@ export function ModalActions({
               variant="outline"
               onClick={onReject}
               disabled={processing}
-              className="text-error hover:text-error min-h-[44px] text-xs sm:text-sm w-full sm:w-auto"
+              size="sm"
+              className="text-error hover:text-error w-full sm:w-auto"
             >
               <XCircle className="h-4 w-4 mr-2 flex-shrink-0" />
               Rejeitar
@@ -113,7 +119,8 @@ export function ModalActions({
             <Button
               onClick={onApprove}
               disabled={processing}
-              className="bg-success hover:bg-success min-h-[44px] text-xs sm:text-sm w-full sm:w-auto"
+              size="sm"
+              className="bg-success hover:bg-success w-full sm:w-auto"
             >
               <CheckCircle className="h-4 w-4 mr-2 flex-shrink-0" />
               {processing ? 'Processando...' : 'Aprovar'}

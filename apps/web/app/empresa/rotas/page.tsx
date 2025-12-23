@@ -127,14 +127,14 @@ export default function OperatorRotasPage() {
           </div>
           <div className="flex flex-wrap gap-2 w-full sm:w-auto">
             <a href="/operador/rotas/mapa" className="flex-1 sm:flex-initial">
-              <Button variant="outline" className="w-full sm:w-auto min-h-[44px] touch-manipulation text-xs sm:text-sm">
+              <Button variant="outline" className="w-full sm:w-auto touch-manipulation text-xs sm:text-sm">
                 <MapIcon className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                 <span className="hidden sm:inline">Ver no Mapa</span>
                 <span className="sm:hidden">Mapa</span>
               </Button>
             </a>
             <a href="/operador/solicitacoes">
-              <Button className="min-h-[44px] touch-manipulation">
+              <Button className="touch-manipulation">
                 <Plus className="h-4 w-4 mr-2" />
                 Nova Rota
               </Button>

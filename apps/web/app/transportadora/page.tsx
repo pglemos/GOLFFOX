@@ -494,7 +494,7 @@ export default function TransportadoraDashboard() {
               value={period}
               onValueChange={(value: "today" | "week" | "month" | "custom") => setPeriod(value)}
             >
-              <SelectTrigger className="w-full sm:w-40 min-h-[44px] touch-manipulation text-base">
+              <SelectTrigger className="w-full sm:w-40 text-base">
                 <Calendar className="h-4 w-4 mr-2" />
                 <SelectValue />
               </SelectTrigger>

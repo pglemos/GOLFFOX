@@ -5,6 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { notifySuccess, notifyError } from "@/lib/toast"
 
 interface CostCategory {
@@ -131,39 +132,43 @@ export function ManualCostForm({
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="group">Grupo de Custo *</Label>
-              <select
-                id="group"
-                className="min-h-[48px] w-full px-4 py-3 rounded-md border border-input bg-background text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              <Select
                 value={formData.selectedGroup}
-                onChange={(e) => {
-                  setFormData({ ...formData, selectedGroup: e.target.value, cost_category_id: '' })
+                onValueChange={(value) => {
+                  setFormData({ ...formData, selectedGroup: value, cost_category_id: '' })
                 }}
                 required
               >
-                <option value="">Selecione um grupo</option>
-                {groups.map(group => (
-                  <option key={group} value={group}>{group}</option>
-                ))}
-              </select>
+                <SelectTrigger id="group">
+                  <SelectValue placeholder="Selecione um grupo" />
+                </SelectTrigger>
+                <SelectContent>
+                  {groups.map(group => (
+                    <SelectItem key={group} value={group}>{group}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="category">Categoria *</Label>
-              <select
-                id="category"
-                className="min-h-[48px] w-full px-4 py-3 rounded-md border border-input bg-background text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              <Select
                 value={formData.cost_category_id}
-                onChange={(e) => setFormData({ ...formData, cost_category_id: e.target.value })}
-                required
+                onValueChange={(value) => setFormData({ ...formData, cost_category_id: value })}
                 disabled={!formData.selectedGroup}
+                required
               >
-                <option value="">Selecione uma categoria</option>
-                {filteredCategories.map(cat => (
-                  <option key={cat.id} value={cat.id}>
-                    {cat.category}{cat.subcategory ? ` - ${cat.subcategory}` : ''}
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger id="category">
+                  <SelectValue placeholder="Selecione uma categoria" />
+                </SelectTrigger>
+                <SelectContent>
+                  {filteredCategories.map(cat => (
+                    <SelectItem key={cat.id} value={cat.id}>
+                      {cat.category}{cat.subcategory ? ` - ${cat.subcategory}` : ''}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
 

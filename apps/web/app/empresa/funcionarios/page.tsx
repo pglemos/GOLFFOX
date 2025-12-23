@@ -244,7 +244,7 @@ function FuncionariosPageContent() {
               <span className="hidden sm:inline">Importar CSV</span>
               <span className="sm:hidden">CSV</span>
             </Button>
-            <Button variant="default" onClick={handleNew} className="w-full sm:w-auto min-h-[44px] touch-manipulation text-xs sm:text-sm">
+            <Button variant="default" onClick={handleNew} className="w-full sm:w-auto touch-manipulation text-xs sm:text-sm">
               <Plus className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
               <span className="hidden sm:inline">Novo Funcionário</span>
               <span className="sm:hidden">Novo</span>

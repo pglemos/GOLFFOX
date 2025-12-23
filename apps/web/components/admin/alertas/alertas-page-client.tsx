@@ -259,7 +259,7 @@ export function AlertasPageClient({ initialAlertas }: AlertasPageClientProps) {
           <h1 className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2 break-words">Alertas</h1>
           <p className="text-sm sm:text-base text-ink-muted break-words">Monitoramento e gestão de alertas do sistema</p>
         </div>
-        <Button variant="outline" onClick={handleExport} className="w-full sm:w-auto flex-shrink-0 min-h-[44px] touch-manipulation">
+        <Button variant="outline" onClick={handleExport} className="w-full sm:w-auto flex-shrink-0 touch-manipulation">
           <Download className="h-4 w-4 mr-2" />
           Exportar
         </Button>
@@ -302,7 +302,7 @@ export function AlertasPageClient({ initialAlertas }: AlertasPageClientProps) {
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-ink-muted pointer-events-none" />
                 <Input
                   placeholder="Buscar alertas..."
-                  className="pl-10 w-full min-h-[44px]"
+                  className="pl-10 w-full"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />

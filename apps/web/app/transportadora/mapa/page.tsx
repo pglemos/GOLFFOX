@@ -78,7 +78,7 @@ function TransportadoraMapaContent() {
               // Centralizar em todos os veículos
               window.location.reload()
             }}
-            className="w-full sm:w-auto min-h-[44px] touch-manipulation"
+            className="w-full sm:w-auto touch-manipulation"
           >
             <Navigation className="h-4 w-4 mr-2" />
             Centralizar

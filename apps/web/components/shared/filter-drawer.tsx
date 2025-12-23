@@ -79,7 +79,7 @@ export function FilterDrawer({
               placeholder={filter.placeholder || `Filtrar por ${filter.label.toLowerCase()}`}
               value={values[filter.key] || ""}
               onChange={(e) => onFilterChange(filter.key, e.target.value)}
-              className="min-h-[44px] text-base"
+              className="text-base"
             />
           )}
           {filter.type === "select" && (
@@ -87,7 +87,7 @@ export function FilterDrawer({
               value={values[filter.key] || "all"}
               onValueChange={(value) => onFilterChange(filter.key, value)}
             >
-              <SelectTrigger id={filter.key} className="min-h-[44px] text-base">
+              <SelectTrigger id={filter.key} className="text-base">
                 <SelectValue placeholder={`Selecione ${filter.label.toLowerCase()}`} />
               </SelectTrigger>
               <SelectContent>
@@ -106,7 +106,7 @@ export function FilterDrawer({
               type="date"
               value={values[filter.key] || ""}
               onChange={(e) => onFilterChange(filter.key, e.target.value)}
-              className="min-h-[44px] text-base"
+              className="text-base"
             />
           )}
         </div>
@@ -115,13 +115,13 @@ export function FilterDrawer({
         <Button
           variant="outline"
           onClick={onReset}
-          className="flex-1 min-h-[44px] touch-manipulation"
+          className="flex-1 touch-manipulation"
         >
           Limpar
         </Button>
         <Button
           onClick={() => setOpen(false)}
-          className="flex-1 min-h-[44px] touch-manipulation"
+          className="flex-1 touch-manipulation"
         >
           Aplicar
         </Button>
@@ -137,7 +137,7 @@ export function FilterDrawer({
             <Button
               variant="outline"
               className={cn(
-                "min-h-[44px] touch-manipulation",
+                "touch-manipulation",
                 hasActiveFilters && "border-primary bg-primary/5"
               )}
             >
@@ -179,7 +179,7 @@ export function FilterDrawer({
           <Button
             variant="outline"
             className={cn(
-              "min-h-[44px] touch-manipulation",
+              "touch-manipulation",
               hasActiveFilters && "border-primary bg-primary/5"
             )}
           >

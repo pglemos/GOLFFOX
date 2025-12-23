@@ -304,8 +304,8 @@ export default function MotoristasPage() {
                         </div>
                         {/* Actions */}
                         <div className="flex gap-2">
-                          <Button size="sm" variant="outline" className="h-8"><Award className="h-4 w-4" /></Button>
-                          <Button size="sm" variant="outline" className="h-8"><Star className="h-4 w-4" /></Button>
+                          <Button size="sm" variant="outline"><Award className="h-4 w-4" /></Button>
+                          <Button size="sm" variant="outline"><Star className="h-4 w-4" /></Button>
                         </div>
                       </div>
                     </div>

@@ -103,7 +103,7 @@ export function AdminFilters({ initialFilters, onFiltersChange }: AdminFiltersPr
           variant="outline"
           size="sm"
           className={cn(
-            "h-9 px-3 gap-2 relative",
+            "px-3 gap-2 relative",
             hasActiveFilters && "border-primary bg-primary/5 hover:bg-primary/10"
           )}
         >

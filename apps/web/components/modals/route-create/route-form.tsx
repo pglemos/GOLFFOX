@@ -67,7 +67,7 @@ export function RouteForm({
                         value={formData.name || ""}
                         onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
                         placeholder="Ex: Linha 101 - Rota Centro"
-                        className="text-base h-11 sm:h-12 px-4 py-3"
+                        className="text-base"
                     />
                 </div>
 
@@ -87,7 +87,7 @@ export function RouteForm({
                     >
                         <SelectTrigger
                             id="company"
-                            className="text-base h-11 sm:h-12 px-4 py-3"
+                            className="text-base"
                             aria-label="Selecione a empresa"
                         >
                             <SelectValue placeholder={loadingCompanies ? "Carregando empresas..." : "Selecione a empresa"} />
@@ -135,7 +135,7 @@ export function RouteForm({
                             value={formData.description || ""}
                             onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))}
                             placeholder="Descrição opcional da rota (ex: Rota principal do centro)"
-                            className="text-base h-11 sm:h-12 px-4 py-3"
+                            className="text-base"
                         />
                     </div>
 
@@ -187,7 +187,7 @@ export function RouteForm({
                                 type="time"
                                 value={formData.scheduled_time || ""}
                                 onChange={(e) => setFormData((prev) => ({ ...prev, scheduled_time: e.target.value }))}
-                                className="text-base h-11 sm:h-12 px-4 py-3"
+                                className="text-base"
                             />
                         </div>
                         <div className="grid gap-2.5">
@@ -253,7 +253,7 @@ export function RouteForm({
                                 value={newException}
                                 onChange={(e) => setNewException(e.target.value)}
                                 placeholder="dd/mm/aaaa"
-                                className="flex-1 text-base h-11 sm:h-12 px-4 py-3"
+                                className="flex-1 text-base"
                                 onKeyDown={(e) => {
                                     if (e.key === "Enter") {
                                         e.preventDefault()
@@ -261,7 +261,7 @@ export function RouteForm({
                                     }
                                 }}
                             />
-                            <Button type="button" onClick={addException} className="w-full sm:w-auto h-11 sm:h-12 text-base font-medium">
+                            <Button type="button" onClick={addException} className="w-full sm:w-auto text-base font-medium">
                                 Adicionar
                             </Button>
                         </div>
@@ -286,7 +286,7 @@ export function RouteForm({
                             </Label>
                             <Button
                                 variant="outline"
-                                className="w-full justify-start text-base h-11 sm:h-12 px-4 py-3"
+                                className="w-full justify-start text-base"
                                 onClick={onOpenMotoristaModal}
                                 aria-label="Selecionar motorista"
                             >
@@ -301,7 +301,7 @@ export function RouteForm({
                             </Label>
                             <Button
                                 variant="outline"
-                                className="w-full justify-start text-base h-11 sm:h-12 px-4 py-3"
+                                className="w-full justify-start text-base"
                                 onClick={onOpenVeiculoModal}
                                 aria-label="Selecionar veículo"
                             >

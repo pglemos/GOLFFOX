@@ -51,7 +51,7 @@ export default function PreferenciasOperatorPage() {
             <h1 className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2">Preferências & Integrações</h1>
             <p className="text-sm sm:text-base text-muted-foreground">Definições de turnos, tolerâncias e conectores</p>
           </div>
-          <Button variant="outline" className="w-full sm:w-auto min-h-[44px] touch-manipulation">
+          <Button variant="outline" className="w-full sm:w-auto touch-manipulation">
             <Settings className="h-4 w-4 mr-2" /> Salvar
           </Button>
         </div>

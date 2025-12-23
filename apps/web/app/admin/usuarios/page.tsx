@@ -134,7 +134,7 @@ function UsuariosPageContent() {
                     </div>
                     <Button
                         onClick={() => setIsCreateUserModalOpen(true)}
-                        className="w-full sm:w-auto flex-shrink-0 min-h-[44px] touch-manipulation"
+                        className="w-full sm:w-auto flex-shrink-0 touch-manipulation"
                     >
                         <UserPlus className="h-4 w-4 mr-2" />
                         <span className="hidden sm:inline">Criar Usuário</span>
@@ -228,7 +228,7 @@ function UsuariosPageContent() {
                     )}
                 </div>
 
-                {/* Tabela de Usuários - Mobile: Cards, Desktop: Tabela */}
+                {/* Lista de Usuários - Cards em Grid */}
                 {dataLoading && usuarios.length === 0 ? (
                     <div className="text-center py-12">
                         <div className="w-16 h-16 border-4 border-brand border-t-transparent rounded-full animate-spin mx-auto"></div>
@@ -239,159 +239,80 @@ function UsuariosPageContent() {
                         <p className="text-muted-foreground">Nenhum usuário encontrado</p>
                     </Card>
                 ) : (
-                    <Card variant="premium" className="overflow-hidden">
-                        {isMobile ? (
-                            // Mobile: Cards Layout
-                            <div className="p-3 space-y-3">
-                                {filteredUsers.map((usuario, index) => (
-                                    <Card
-                                        key={usuario.id}
-                                        className="mobile-table-card p-3 sm:p-4"
-                                    >
-                                        <div className="flex items-start gap-3">
-                                            <Avatar className="h-12 w-12 flex-shrink-0">
+                    <div className="grid gap-2 sm:gap-3 w-full">
+                        {filteredUsers.map((usuario, index) => (
+                            <motion.div
+                                key={usuario.id}
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.3, delay: index * 0.05 }}
+                                whileHover={{ y: -4 }}
+                            >
+                                <Card variant="premium" className="p-2 sm:p-3 group">
+                                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3">
+                                        <div className="flex-1 flex gap-2 sm:gap-3 min-w-0">
+                                            <Avatar className="h-12 w-12 sm:w-14 sm:h-14 flex-shrink-0">
                                                 <AvatarImage src={usuario.avatar_url} alt={usuario.name} />
-                                                <AvatarFallback className="bg-primary text-primary-foreground">
+                                                <AvatarFallback className="bg-gradient-to-br from-bg-brand-light to-bg-brand-soft text-brand font-bold text-sm">
                                                     {(usuario.name || 'U').charAt(0).toUpperCase()}
                                                 </AvatarFallback>
                                             </Avatar>
-                                            <div className="flex-1 min-w-0 space-y-2">
-                                                <div>
-                                                    <p className="font-semibold text-sm truncate">{usuario.name || "N/A"}</p>
-                                                    <p className="text-xs text-muted-foreground truncate">{usuario.email}</p>
-                                                </div>
-                                                <div className="flex items-center justify-between">
-                                                    <span className="text-xs text-muted-foreground">CPF:</span>
-                                                    <span className="text-xs font-medium">{usuario.cpf || "-"}</span>
-                                                </div>
-                                                <div className="flex items-center justify-between">
-                                                    <span className="text-xs text-muted-foreground">Papel:</span>
+                                            <div className="flex-1 min-w-0">
+                                                <div className="flex flex-wrap items-center gap-1.5 mb-1">
+                                                    <div className="p-0.5 rounded-lg bg-gradient-to-br from-bg-brand-light to-bg-brand-soft">
+                                                        <User className="h-3 w-3 text-brand" />
+                                                    </div>
+                                                    <h3 className="font-bold text-sm sm:text-base group-hover:text-brand transition-colors">{usuario.name || "N/A"}</h3>
                                                     <Badge variant="outline" className="text-xs">{usuario.role || "N/A"}</Badge>
-                                                </div>
-                                                <div className="flex items-center justify-between">
-                                                    <span className="text-xs text-muted-foreground">Status:</span>
                                                     <Badge variant={usuario.is_active ? "default" : "secondary"} className="text-xs">
                                                         {usuario.is_active ? "Ativo" : "Inativo"}
                                                     </Badge>
                                                 </div>
-                                                <div className="flex flex-col gap-2 pt-2 border-t">
-                                                    <Button
-                                                        variant="outline"
-                                                        size="sm"
-                                                        onClick={() => {
-                                                            setSelectedUserForEdit(usuario)
-                                                            setIsEditModalOpen(true)
-                                                        }}
-                                                        className="w-full min-h-[44px] touch-manipulation"
-                                                    >
-                                                        <Edit className="h-4 w-4 mr-2" />
-                                                        Editar
-                                                    </Button>
-                                                    <Button
-                                                        variant="outline"
-                                                        size="sm"
-                                                        onClick={() => {
-                                                            setSelectedUserForRoleChange(usuario)
-                                                            setIsChangeRoleModalOpen(true)
-                                                        }}
-                                                        className="w-full min-h-[44px] touch-manipulation"
-                                                    >
-                                                        <Shield className="h-4 w-4 mr-2" />
-                                                        Alterar Papel
-                                                    </Button>
-                                                    <Button
-                                                        variant="destructive"
-                                                        size="sm"
-                                                        onClick={() => handleDeleteUsuario(usuario.id, usuario.name || usuario.email || 'Usuário')}
-                                                        className="w-full min-h-[44px] touch-manipulation"
-                                                    >
-                                                        <Trash2 className="h-4 w-4 mr-2" />
-                                                        Excluir
-                                                    </Button>
+                                                <p className="font-medium mb-0.5 text-xs sm:text-sm text-muted-foreground">{usuario.email}</p>
+                                                <div className="flex flex-wrap gap-2 text-xs text-ink-muted">
+                                                    {usuario.cpf && <span>CPF: {usuario.cpf}</span>}
                                                 </div>
                                             </div>
                                         </div>
-                                    </Card>
-                                ))}
-                            </div>
-                        ) : (
-                            // Desktop: Table Layout
-                            <div className="overflow-x-auto -webkit-overflow-scrolling-touch rounded-lg border bg-white/5 backdrop-blur-xl">
-                                <table className="w-full min-w-[640px] bg-transparent">
-                                <thead className="bg-white/5 backdrop-blur-md">
-                                    <tr className="border-b border-white/10">
-                                        <th className="text-left p-2 sm:p-4 font-semibold text-xs sm:text-sm">Nome</th>
-                                        <th className="text-left p-2 sm:p-4 font-semibold text-xs sm:text-sm">Email</th>
-                                        <th className="text-left p-2 sm:p-4 font-semibold text-xs sm:text-sm">CPF</th>
-                                        <th className="text-left p-2 sm:p-4 font-semibold text-xs sm:text-sm">Papel</th>
-                                        <th className="text-left p-2 sm:p-4 font-semibold text-xs sm:text-sm">Status</th>
-                                        <th className="text-left p-2 sm:p-4 font-semibold text-xs sm:text-sm">Ações</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="bg-transparent">
-                                    {filteredUsers.map((usuario, index) => (
-                                        <motion.tr 
-                                            key={usuario.id} 
-                                            initial={{ opacity: 0, x: -20 }}
-                                            animate={{ opacity: 1, x: 0 }}
-                                            transition={{ delay: index * 0.02 }}
-                                            className="border-b border-white/10 hover:bg-white/5 transition-colors bg-transparent"
-                                        >
-                                            <td className="p-2 sm:p-4 text-xs sm:text-sm break-words">{usuario.name || "N/A"}</td>
-                                            <td className="p-2 sm:p-4 text-xs sm:text-sm break-words">{usuario.email}</td>
-                                            <td className="p-2 sm:p-4 text-xs sm:text-sm break-words">{usuario.cpf || "-"}</td>
-                                            <td className="p-2 sm:p-4">
-                                                <Badge variant="outline" className="text-xs whitespace-nowrap">{usuario.role || "N/A"}</Badge>
-                                            </td>
-                                            <td className="p-2 sm:p-4">
-                                                <Badge variant={usuario.is_active ? "default" : "secondary"} className="text-xs whitespace-nowrap">
-                                                    {usuario.is_active ? "Ativo" : "Inativo"}
-                                                </Badge>
-                                            </td>
-                                            <td className="p-2 sm:p-4">
-                                                <div className="flex flex-col sm:flex-row gap-1 sm:gap-2">
-                                                    <Button
-                                                        variant="outline"
-                                                        size="sm"
-                                                        onClick={() => {
-                                                            setSelectedUserForEdit(usuario)
-                                                            setIsEditModalOpen(true)
-                                                        }}
-                                                        className="min-h-[44px] touch-manipulation text-xs"
-                                                    >
-                                                        <Edit className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-2" />
-                                                        <span className="hidden sm:inline">Editar</span>
-                                                    </Button>
-                                                    <Button
-                                                        variant="outline"
-                                                        size="sm"
-                                                        onClick={() => {
-                                                            setSelectedUserForRoleChange(usuario)
-                                                            setIsChangeRoleModalOpen(true)
-                                                        }}
-                                                        className="min-h-[44px] touch-manipulation text-xs"
-                                                    >
-                                                        <Shield className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-2" />
-                                                        <span className="hidden sm:inline">Papel</span>
-                                                    </Button>
-                                                    <Button
-                                                        variant="destructive"
-                                                        size="sm"
-                                                        onClick={() => handleDeleteUsuario(usuario.id, usuario.name || usuario.email || 'Usuário')}
-                                                        className="min-h-[44px] touch-manipulation text-xs"
-                                                    >
-                                                        <Trash2 className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-2" />
-                                                        <span className="hidden sm:inline">Excluir</span>
-                                                    </Button>
-                                                </div>
-                                            </td>
-                                        </motion.tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                        )}
-                    </Card>
+                                        <div className="flex gap-1.5">
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={() => {
+                                                    setSelectedUserForEdit(usuario)
+                                                    setIsEditModalOpen(true)
+                                                }}
+                                                className="min-h-[44px] touch-manipulation"
+                                            >
+                                                <Edit className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1" />
+                                                <span className="hidden sm:inline">Editar</span>
+                                            </Button>
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={() => {
+                                                    setSelectedUserForRoleChange(usuario)
+                                                    setIsChangeRoleModalOpen(true)
+                                                }}
+                                                className="min-h-[44px] touch-manipulation"
+                                            >
+                                                <Shield className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1" />
+                                                <span className="hidden sm:inline">Papel</span>
+                                            </Button>
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={() => handleDeleteUsuario(usuario.id, usuario.name || usuario.email || 'Usuário')}
+                                                className="min-h-[44px] touch-manipulation text-destructive hover:bg-destructive/10"
+                                            >
+                                                <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                                            </Button>
+                                        </div>
+                                    </div>
+                                </Card>
+                            </motion.div>
+                        ))}
+                    </div>
                 )}
 
                 {/* Modal Trocar Papel */}

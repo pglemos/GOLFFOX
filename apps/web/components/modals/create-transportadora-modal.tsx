@@ -124,7 +124,7 @@ export function CreateTransportadoraModal({ isOpen, onClose, onSave }: CreateTra
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="w-[95vw] sm:w-[90vw] max-w-3xl max-h-[90vh] overflow-y-auto p-3 sm:p-6 mx-auto">
+      <DialogContent className="w-[95vw] sm:w-[90vw] max-w-3xl max-h-[90vh] overflow-y-auto p-4 sm:p-6 mx-auto">
         <DialogHeader className="pb-3 sm:pb-6">
           <DialogTitle className="text-lg sm:text-2xl font-bold break-words">
             Criar Nova Transportadora

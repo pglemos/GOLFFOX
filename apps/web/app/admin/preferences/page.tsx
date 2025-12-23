@@ -51,9 +51,9 @@ export default function AdminPreferencesPage() {
             <p className="text-xs sm:text-sm text-ink-muted break-words">Ajuste o tema e aparência da interface.</p>
           </div>
           <div className="flex flex-col sm:flex-row gap-2">
-            <Button variant="outline" className="w-full sm:w-auto min-h-[44px] touch-manipulation">Claro</Button>
-            <Button variant="outline" className="w-full sm:w-auto min-h-[44px] touch-manipulation">Escuro</Button>
-            <Button variant="default" className="w-full sm:w-auto min-h-[44px] touch-manipulation">Automático</Button>
+            <Button variant="outline" className="w-full sm:w-auto touch-manipulation">Claro</Button>
+            <Button variant="outline" className="w-full sm:w-auto touch-manipulation">Escuro</Button>
+            <Button variant="default" className="w-full sm:w-auto touch-manipulation">Automático</Button>
           </div>
         </Card>
         </motion.div>
@@ -69,8 +69,8 @@ export default function AdminPreferencesPage() {
             <p className="text-xs sm:text-sm text-ink-muted break-words">Habilite alertas críticos e emails de sistema.</p>
           </div>
           <div className="flex flex-col sm:flex-row gap-2">
-            <Button variant="outline" className="w-full sm:w-auto min-h-[44px] touch-manipulation">Silenciar</Button>
-            <Button variant="default" className="w-full sm:w-auto min-h-[44px] touch-manipulation">Habilitar</Button>
+            <Button variant="outline" className="w-full sm:w-auto touch-manipulation">Silenciar</Button>
+            <Button variant="default" className="w-full sm:w-auto touch-manipulation">Habilitar</Button>
           </div>
         </Card>
         </motion.div>

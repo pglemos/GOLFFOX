@@ -361,7 +361,7 @@ export function MotoristaModal({ motorista, isOpen, onClose, onSave, carriers = 
                         value={formData.transportadora_id || ""}
                         onValueChange={(value) => setFormData({ ...formData, transportadora_id: value })}
                       >
-                        <SelectTrigger className="min-h-[48px] px-4 py-3">
+                        <SelectTrigger>
                           <SelectValue placeholder="Selecione a transportadora" />
                         </SelectTrigger>
                         <SelectContent>
