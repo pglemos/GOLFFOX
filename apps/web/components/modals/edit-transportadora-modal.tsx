@@ -172,8 +172,8 @@ export function EditCarrierModal({ transportadora, isOpen, onClose, onSave }: Ed
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="w-[95vw] sm:w-[90vw] max-w-4xl max-h-[90vh] overflow-y-auto p-4 sm:p-6 mx-auto">
-        <DialogHeader className="pb-4 sm:pb-6">
+      <DialogContent className="w-[95vw] sm:w-[90vw] max-w-4xl max-h-[90vh] p-0 mx-auto !flex !flex-col overflow-hidden">
+        <DialogHeader className="px-4 sm:px-6 pt-4 sm:pt-6 pb-4 sm:pb-6 flex-shrink-0">
           <DialogTitle className="text-xl sm:text-2xl font-bold flex items-center gap-2">
             <Building2 className="h-5 w-5" />
             Editar Transportadora
@@ -183,24 +183,25 @@ export function EditCarrierModal({ transportadora, isOpen, onClose, onSave }: Ed
           </DialogDescription>
         </DialogHeader>
 
-        <Tabs defaultValue="dados" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="dados">
-              <Building2 className="h-4 w-4 mr-2" />Dados
-            </TabsTrigger>
-            <TabsTrigger value="documentos">
-              <FileText className="h-4 w-4 mr-2" />Docs
-            </TabsTrigger>
-            <TabsTrigger value="bancario">
-              <CreditCard className="h-4 w-4 mr-2" />Bancário
-            </TabsTrigger>
-            <TabsTrigger value="representante">
-              <User className="h-4 w-4 mr-2" />Rep.Legal
-            </TabsTrigger>
-          </TabsList>
+        <div className="flex-1 min-h-0 overflow-hidden flex flex-col">
+          <Tabs defaultValue="dados" className="w-full flex flex-col flex-1 min-h-0 overflow-hidden">
+            <TabsList className="grid w-full grid-cols-4 flex-shrink-0 mb-4 px-4 sm:px-6">
+              <TabsTrigger value="dados" className="text-xs sm:text-sm">
+                <Building2 className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />Dados
+              </TabsTrigger>
+              <TabsTrigger value="documentos" className="text-xs sm:text-sm">
+                <FileText className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />Docs
+              </TabsTrigger>
+              <TabsTrigger value="bancario" className="text-xs sm:text-sm">
+                <CreditCard className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />Bancário
+              </TabsTrigger>
+              <TabsTrigger value="representante" className="text-xs sm:text-sm">
+                <User className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />Rep.Legal
+              </TabsTrigger>
+            </TabsList>
 
-          <TabsContent value="dados" className="bg-transparent border-0 p-0 shadow-none">
-            <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+            <TabsContent value="dados" className="!mt-0 !rounded-none bg-transparent border-0 p-0 shadow-none flex-1 min-h-0 overflow-y-auto">
+            <form onSubmit={handleSubmit} className="space-y-8 sm:space-y-10 pb-4 px-4 sm:px-6">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                 <div className="col-span-1 sm:col-span-2">
                   <Label htmlFor="name" className="text-base font-medium">Nome da Transportadora *</Label>
@@ -210,7 +211,6 @@ export function EditCarrierModal({ transportadora, isOpen, onClose, onSave }: Ed
                     onChange={(e) => setName(e.target.value)}
                     required
                     placeholder="Ex: Transportes XYZ Ltda"
-                    className="text-base h-11 sm:h-12 px-4 py-3"
                   />
                 </div>
                 <div>
@@ -221,7 +221,6 @@ export function EditCarrierModal({ transportadora, isOpen, onClose, onSave }: Ed
                     onChange={(e) => setCnpj(e.target.value)}
                     placeholder="00.000.000/0000-00"
                     maxLength={18}
-                    className="text-base h-11 sm:h-12 px-4 py-3"
                   />
                 </div>
                 <div>
@@ -231,7 +230,6 @@ export function EditCarrierModal({ transportadora, isOpen, onClose, onSave }: Ed
                     value={stateRegistration}
                     onChange={(e) => setStateRegistration(e.target.value)}
                     placeholder="Ex: 123456789"
-                    className="text-base h-11 sm:h-12 px-4 py-3"
                   />
                 </div>
                 <div>
@@ -241,7 +239,6 @@ export function EditCarrierModal({ transportadora, isOpen, onClose, onSave }: Ed
                     value={municipalRegistration}
                     onChange={(e) => setMunicipalRegistration(e.target.value)}
                     placeholder="Ex: 987654321"
-                    className="text-base h-11 sm:h-12 px-4 py-3"
                   />
                 </div>
                 <div>
@@ -251,7 +248,6 @@ export function EditCarrierModal({ transportadora, isOpen, onClose, onSave }: Ed
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     placeholder="(00) 00000-0000"
-                    className="text-base h-11 sm:h-12 px-4 py-3"
                   />
                 </div>
                 <div>
@@ -262,7 +258,6 @@ export function EditCarrierModal({ transportadora, isOpen, onClose, onSave }: Ed
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="email@empresa.com"
-                    className="text-base h-11 sm:h-12 px-4 py-3"
                   />
                 </div>
                 <div>
@@ -272,7 +267,6 @@ export function EditCarrierModal({ transportadora, isOpen, onClose, onSave }: Ed
                     value={contactPerson}
                     onChange={(e) => setContactPerson(e.target.value)}
                     placeholder="Ex: João Silva"
-                    className="text-base h-11 sm:h-12 px-4 py-3"
                   />
                 </div>
                 <div className="col-span-1 sm:col-span-2">
@@ -295,20 +289,20 @@ export function EditCarrierModal({ transportadora, isOpen, onClose, onSave }: Ed
                   />
                 </div>
               </div>
-              <div className="flex flex-col sm:flex-row gap-3 sm:gap-2 justify-end pt-4 sm:pt-6 border-t mt-4 sm:mt-6">
+              <div className="flex flex-col sm:flex-row gap-4 pt-6 sm:pt-8 border-t border-white/20 mt-8 sm:mt-10 pb-2">
                 <Button
                   type="button"
                   variant="outline"
                   onClick={onClose}
                   disabled={loading}
-                  className="w-full sm:w-auto order-2 sm:order-1 min-h-[44px] text-base font-medium"
+                  className="w-full sm:w-auto order-2 sm:order-1 min-h-[52px] px-6 py-3 text-base font-medium touch-manipulation"
                 >
                   Cancelar
                 </Button>
                 <Button
                   type="submit"
                   disabled={loading || !name}
-                  className="w-full sm:w-auto order-1 sm:order-2 bg-brand hover:bg-brand-hover min-h-[44px] text-base font-medium"
+                  className="w-full sm:w-auto order-1 sm:order-2 bg-brand hover:bg-brand-hover min-h-[52px] px-6 py-3 text-base font-medium touch-manipulation"
                 >
                   {loading ? 'Salvando...' : 'Salvar Dados'}
                 </Button>
@@ -316,27 +310,34 @@ export function EditCarrierModal({ transportadora, isOpen, onClose, onSave }: Ed
             </form>
           </TabsContent>
 
-          <TabsContent value="documentos" className="bg-transparent border-0 p-0 shadow-none">
-            <TransportadoraDocumentsSection
-              transportadoraId={transportadora.id}
-              isEditing={true}
-            />
+          <TabsContent value="documentos" className="!mt-0 !rounded-none bg-transparent border-0 p-0 shadow-none flex-1 min-h-0 overflow-y-auto">
+            <div className="pb-4 px-4 sm:px-6">
+              <TransportadoraDocumentsSection
+                transportadoraId={transportadora.id}
+                isEditing={true}
+              />
+            </div>
           </TabsContent>
 
-          <TabsContent value="bancario" className="bg-transparent border-0 p-0 shadow-none">
-            <TransportadoraBankingSection
-              transportadoraId={transportadora.id}
-              isEditing={true}
-            />
+          <TabsContent value="bancario" className="!mt-0 !rounded-none bg-transparent border-0 p-0 shadow-none flex-1 min-h-0 overflow-y-auto">
+            <div className="pb-4 px-4 sm:px-6">
+              <TransportadoraBankingSection
+                transportadoraId={transportadora.id}
+                isEditing={true}
+              />
+            </div>
           </TabsContent>
 
-          <TabsContent value="representante" className="bg-transparent border-0 p-0 shadow-none">
-            <TransportadoraLegalRepSection
-              transportadoraId={transportadora.id}
-              isEditing={true}
-            />
+          <TabsContent value="representante" className="!mt-0 !rounded-none bg-transparent border-0 p-0 shadow-none flex-1 min-h-0 overflow-y-auto">
+            <div className="pb-4 px-4 sm:px-6">
+              <TransportadoraLegalRepSection
+                transportadoraId={transportadora.id}
+                isEditing={true}
+              />
+            </div>
           </TabsContent>
-        </Tabs>
+          </Tabs>
+        </div>
       </DialogContent>
     </Dialog>
   )

@@ -134,7 +134,7 @@ export function AssociateOperatorModal({
                 id="operador-email"
                 value={operatorEmail}
                 onChange={(e) => setOperatorEmail(e.target.value)}
-                className="w-full mt-1 h-11 sm:h-12 px-3 sm:px-4 py-2 sm:py-3 text-base border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-brand"
+                className="min-h-[48px] w-full mt-1 px-4 py-3 text-base border border-input bg-background rounded-md ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
               >
                 <option value="">Selecione um operador</option>
                 {operators.map((op) => (

@@ -214,7 +214,7 @@ export function CreateUserModal({
                   id="user-role"
                   value={formData.role}
                   onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                  className="flex h-11 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="min-h-[48px] w-full rounded-md border border-input bg-background px-4 py-3 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                   disabled={loading}
                   required
                 >
@@ -233,7 +233,7 @@ export function CreateUserModal({
                     id="company-select"
                     value={formData.company_id}
                     onChange={(e) => setFormData({ ...formData, company_id: e.target.value })}
-                    className="flex h-11 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="min-h-[48px] w-full rounded-md border border-input bg-background px-4 py-3 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                     disabled={loading || loadingCompanies}
                     required={formData.role !== 'admin'}
                   >
@@ -254,7 +254,6 @@ export function CreateUserModal({
                   placeholder="Nome completo"
                   disabled={loading}
                   required
-                  className="h-11"
                 />
               </div>
 
@@ -268,7 +267,6 @@ export function CreateUserModal({
                   disabled={loading}
                   required
                   maxLength={14}
-                  className="h-11"
                 />
               </div>
 
@@ -282,7 +280,6 @@ export function CreateUserModal({
                   placeholder="(11) 99999-9999"
                   disabled={loading}
                   maxLength={15}
-                  className="h-11"
                 />
               </div>
 
@@ -296,7 +293,6 @@ export function CreateUserModal({
                   placeholder="usuario@empresa.com"
                   disabled={loading}
                   required
-                  className="h-11"
                 />
               </div>
 
@@ -311,7 +307,6 @@ export function CreateUserModal({
                   disabled={loading}
                   required
                   minLength={6}
-                  className="h-11"
                 />
               </div>
 
@@ -332,9 +327,8 @@ export function CreateUserModal({
                     disabled={loading}
                     required
                     maxLength={9}
-                    className="h-11"
                   />
-                  <Button type="button" variant="outline" onClick={handleCepBlur} disabled={loading || loadingCep} className="h-11 px-4">
+                  <Button type="button" variant="outline" onClick={handleCepBlur} disabled={loading || loadingCep} className="min-h-[48px] px-4">
                     {loadingCep ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
                   </Button>
                 </div>
@@ -349,7 +343,6 @@ export function CreateUserModal({
                   placeholder="Rua Exemplo"
                   disabled={loading}
                   required
-                  className="h-11"
                 />
               </div>
 
@@ -362,7 +355,6 @@ export function CreateUserModal({
                   placeholder="123"
                   disabled={loading}
                   required
-                  className="h-11"
                 />
               </div>
 
@@ -375,7 +367,6 @@ export function CreateUserModal({
                   placeholder="Centro"
                   disabled={loading}
                   required
-                  className="h-11"
                 />
               </div>
 
@@ -387,7 +378,6 @@ export function CreateUserModal({
                   onChange={(e) => setFormData({ ...formData, address_complement: e.target.value })}
                   placeholder="Apto 101"
                   disabled={loading}
-                  className="h-11"
                 />
               </div>
 
@@ -397,7 +387,7 @@ export function CreateUserModal({
                   id="city"
                   value={formData.address_city}
                   readOnly
-                  className="h-11 bg-bg-soft"
+                  className="bg-bg-soft"
                 />
               </div>
 
@@ -407,7 +397,7 @@ export function CreateUserModal({
                   id="state"
                   value={formData.address_state}
                   readOnly
-                  className="h-11 bg-bg-soft"
+                  className="bg-bg-soft"
                 />
               </div>
             </div>

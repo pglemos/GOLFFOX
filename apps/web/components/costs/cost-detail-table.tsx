@@ -270,8 +270,8 @@ function CostDetailTableComponent({ costs, onReconcile, loading }: CostDetailTab
         )}>
           <select
             className={cn(
-              "rounded-lg border border-border bg-card text-sm touch-manipulation",
-              isMobile ? "flex-1 min-h-[44px] px-3 py-2" : "px-3 py-2"
+              "min-h-[48px] rounded-md border border-input bg-background text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 touch-manipulation",
+              isMobile ? "flex-1 px-4 py-3" : "px-4 py-3"
             )}
             value={grouping}
             onChange={(e) => setGrouping(e.target.value as GroupingLevel)}
@@ -282,7 +282,7 @@ function CostDetailTableComponent({ costs, onReconcile, loading }: CostDetailTab
           </select>
           {!isMobile && (
             <select
-              className="px-3 py-2 rounded-lg border border-border bg-card text-sm"
+              className="min-h-[48px] px-4 py-3 rounded-md border border-input bg-background text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
               value={pageSize}
               onChange={(e) => { setPageSize(parseInt(e.target.value)); setPage(0) }}
             >

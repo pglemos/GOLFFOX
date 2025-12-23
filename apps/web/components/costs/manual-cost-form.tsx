@@ -133,7 +133,7 @@ export function ManualCostForm({
               <Label htmlFor="group">Grupo de Custo *</Label>
               <select
                 id="group"
-                className="w-full px-3 py-2 rounded-lg border border-border bg-white text-sm"
+                className="min-h-[48px] w-full px-4 py-3 rounded-md border border-input bg-background text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                 value={formData.selectedGroup}
                 onChange={(e) => {
                   setFormData({ ...formData, selectedGroup: e.target.value, cost_category_id: '' })
@@ -151,7 +151,7 @@ export function ManualCostForm({
               <Label htmlFor="category">Categoria *</Label>
               <select
                 id="category"
-                className="w-full px-3 py-2 rounded-lg border border-border bg-white text-sm"
+                className="min-h-[48px] w-full px-4 py-3 rounded-md border border-input bg-background text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                 value={formData.cost_category_id}
                 onChange={(e) => setFormData({ ...formData, cost_category_id: e.target.value })}
                 required

@@ -218,12 +218,16 @@ export function FuncionarioModal({ funcionario, isOpen, onClose, onSave, empresa
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="w-[95vw] max-w-[600px] max-h-[90vh] overflow-y-auto p-5 sm:p-8">
-        <DialogHeader className="pb-4 sm:pb-6">
-          <DialogTitle className="text-xl sm:text-2xl font-bold">{funcionario ? "Editar Funcionário" : "Adicionar Funcionário"}</DialogTitle>
+      <DialogContent className="w-[95vw] sm:w-[90vw] max-w-4xl max-h-[90vh] p-0 mx-auto !flex !flex-col overflow-hidden">
+        <DialogHeader className="px-4 sm:px-6 pt-4 sm:pt-6 pb-4 sm:pb-6 flex-shrink-0">
+          <DialogTitle className="text-xl sm:text-2xl font-bold flex items-center gap-2 break-words">
+            <User className="h-5 w-5 flex-shrink-0" />
+            {funcionario ? "Editar Funcionário" : "Novo Funcionário"}
+          </DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="grid gap-6 sm:gap-6 py-4">
-          <div className="grid gap-2.5">
+        <div className="flex-1 min-h-0 overflow-hidden flex flex-col">
+          <form onSubmit={handleSubmit} className="flex-1 min-h-0 overflow-y-auto space-y-8 sm:space-y-10 pb-4 px-4 sm:px-6">
+          <div className="space-y-3">
             <Label htmlFor="name" className="text-base font-medium">Nome *</Label>
             <Input
               id="name"
@@ -231,11 +235,11 @@ export function FuncionarioModal({ funcionario, isOpen, onClose, onSave, empresa
               onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
               required
               placeholder="Digite o nome completo"
-              className="text-base h-11 sm:h-12 px-4 py-3"
+              className="min-h-[48px] px-4 py-3"
             />
           </div>
 
-          <div className="grid gap-2.5">
+          <div className="space-y-3">
             <Label htmlFor="email" className="text-base font-medium">Email *</Label>
             <Input
               id="email"
@@ -244,29 +248,29 @@ export function FuncionarioModal({ funcionario, isOpen, onClose, onSave, empresa
               onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
               required
               placeholder="exemplo@email.com"
-              className="text-base h-11 sm:h-12 px-4 py-3"
+              className="min-h-[48px] px-4 py-3"
             />
           </div>
 
-          <div className="grid gap-2.5">
+          <div className="space-y-3">
             <Label htmlFor="phone" className="text-base font-medium">Telefone</Label>
             <Input
               id="phone"
               value={formData.phone}
               onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
               placeholder="(11) 99999-9999"
-              className="text-base h-11 sm:h-12 px-4 py-3"
+              className="min-h-[48px] px-4 py-3"
             />
           </div>
 
-          <div className="grid gap-2.5">
+          <div className="space-y-3">
             <Label htmlFor="cpf" className="text-base font-medium">CPF</Label>
             <Input
               id="cpf"
               value={formData.cpf}
               onChange={(e) => setFormData(prev => ({ ...prev, cpf: e.target.value }))}
               placeholder="000.000.000-00"
-              className="text-base h-11 sm:h-12 px-4 py-3"
+              className="min-h-[48px] px-4 py-3"
             />
           </div>
 
@@ -292,7 +296,7 @@ export function FuncionarioModal({ funcionario, isOpen, onClose, onSave, empresa
             showTitle={true}
           />
 
-          <div className="flex items-center gap-3 py-2">
+          <div className="flex items-center gap-3 py-2 space-y-0">
             <input
               type="checkbox"
               id="is_active"
@@ -303,24 +307,25 @@ export function FuncionarioModal({ funcionario, isOpen, onClose, onSave, empresa
             <Label htmlFor="is_active" className="text-base font-medium cursor-pointer">Ativo</Label>
           </div>
 
-          <DialogFooter className="flex-col sm:flex-row gap-3 pt-6 border-t mt-4">
+          <DialogFooter className="flex-col sm:flex-row gap-4 pt-6 sm:pt-8 border-t border-white/20 mt-8 sm:mt-10 pb-2 px-4 sm:px-6">
             <Button
               type="button"
               variant="outline"
               onClick={onClose}
-              className="w-full sm:w-auto order-2 sm:order-1 h-11 sm:h-12 text-base font-medium"
+              className="w-full sm:w-auto order-2 sm:order-1 min-h-[52px] px-6 py-3 text-base font-medium touch-manipulation"
             >
               Cancelar
             </Button>
             <Button
               type="submit"
               disabled={loading}
-              className="bg-brand hover:bg-brand-hover w-full sm:w-auto order-1 sm:order-2 h-11 sm:h-12 text-base font-medium"
+              className="bg-brand hover:bg-brand-hover w-full sm:w-auto order-1 sm:order-2 min-h-[52px] px-6 py-3 text-base font-medium touch-manipulation"
             >
               {loading ? "Salvando..." : "Salvar"}
             </Button>
           </DialogFooter>
         </form>
+        </div>
       </DialogContent>
     </Dialog>
   )

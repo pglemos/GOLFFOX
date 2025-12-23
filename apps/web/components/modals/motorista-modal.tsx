@@ -268,91 +268,92 @@ export function MotoristaModal({ motorista, isOpen, onClose, onSave, carriers = 
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="w-[95vw] sm:w-[90vw] max-w-4xl max-h-[90vh] overflow-y-auto p-4 sm:p-6 mx-auto">
-        <DialogHeader className="pb-4 sm:pb-6">
+      <DialogContent className="w-[95vw] sm:w-[90vw] max-w-4xl max-h-[90vh] p-0 mx-auto !flex !flex-col overflow-hidden">
+        <DialogHeader className="px-4 sm:px-6 pt-4 sm:pt-6 pb-4 sm:pb-6 flex-shrink-0">
           <DialogTitle className="text-xl sm:text-2xl font-bold flex items-center gap-2 break-words">
             <Users className="h-5 w-5 flex-shrink-0" />
             {motorista ? "Editar Motorista" : "Cadastrar Motorista"}
           </DialogTitle>
         </DialogHeader>
 
-        <Tabs defaultValue="dados" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="dados">Dados</TabsTrigger>
-            <TabsTrigger value="documentos">Documentos</TabsTrigger>
-            <TabsTrigger value="salario">
-              <DollarSign className="h-4 w-4 mr-2" />Salário
-            </TabsTrigger>
-          </TabsList>
+        <div className="flex-1 min-h-0 overflow-hidden flex flex-col">
+          <Tabs defaultValue="dados" className="w-full flex flex-col flex-1 min-h-0 overflow-hidden">
+            <TabsList className="grid w-full grid-cols-3 gap-2 flex-shrink-0 mb-4 px-4 sm:px-6">
+              <TabsTrigger value="dados" className="text-xs sm:text-sm">Dados</TabsTrigger>
+              <TabsTrigger value="documentos" className="text-xs sm:text-sm">Documentos</TabsTrigger>
+              <TabsTrigger value="salario" className="text-xs sm:text-sm">
+                <DollarSign className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />Salário
+              </TabsTrigger>
+            </TabsList>
 
-          <TabsContent value="dados" className="bg-transparent border-0 p-0 shadow-none">
-            <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+            <TabsContent value="dados" className="!mt-0 !rounded-none bg-transparent border-0 p-0 shadow-none flex-1 min-h-0 overflow-y-auto">
+            <form onSubmit={handleSubmit} className="space-y-8 sm:space-y-10 pb-4 px-4 sm:px-6">
               {/* Dados Pessoais */}
-              <div className="space-y-4">
-                <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Dados Pessoais</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-2">
+              <div className="space-y-6">
+                <h3 className="text-base font-semibold text-muted-foreground uppercase tracking-wide mb-2">Dados Pessoais</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <div className="space-y-3">
                     <Label htmlFor="name" className="text-base font-medium">Nome Completo *</Label>
                     <Input
                       id="name"
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       required
-                      className="min-h-[44px] touch-manipulation"
+                      className="min-h-[48px] px-4 py-3 touch-manipulation"
                     />
                   </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Email *</Label>
+                  <div className="space-y-3">
+                    <Label htmlFor="email" className="text-base font-medium">Email *</Label>
                     <Input
                       id="email"
                       type="email"
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                       required
-                      className="min-h-[44px]"
+                      className="min-h-[48px] px-4 py-3"
                     />
                   </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="phone">Telefone *</Label>
+                  <div className="space-y-3">
+                    <Label htmlFor="phone" className="text-base font-medium">Telefone *</Label>
                     <Input
                       id="phone"
                       value={formData.phone || ""}
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                       placeholder="(00) 00000-0000"
-                      className="min-h-[44px]"
+                      className="min-h-[48px] px-4 py-3"
                     />
                   </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="rg">RG</Label>
+                  <div className="space-y-3">
+                    <Label htmlFor="rg" className="text-base font-medium">RG</Label>
                     <Input
                       id="rg"
                       value={formData.rg || ""}
                       onChange={(e) => setFormData({ ...formData, rg: e.target.value })}
                       placeholder="00.000.000-0"
-                      className="min-h-[44px]"
+                      className="min-h-[48px] px-4 py-3"
                     />
                   </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="cpf">CPF (Login) *</Label>
+                  <div className="space-y-3">
+                    <Label htmlFor="cpf" className="text-base font-medium">CPF (Login) *</Label>
                     <Input
                       id="cpf"
                       value={formData.cpf || ""}
                       onChange={(e) => setFormData({ ...formData, cpf: e.target.value })}
                       placeholder="000.000.000-00"
                       required
-                      className="min-h-[44px]"
+                      className="min-h-[48px] px-4 py-3"
                     />
-                    <p className="text-xs text-muted-foreground">Senha de acesso: últimos 6 dígitos do CPF</p>
+                    <p className="text-xs text-muted-foreground mt-2">Senha de acesso: últimos 6 dígitos do CPF</p>
                   </div>
 
                   {/* Campo Transportadora (apenas se lista de carriers for fornecida) */}
                   {carriers && carriers.length > 0 && (
-                    <div className="space-y-2 sm:col-span-2">
-                      <Label htmlFor="transportadora" className="flex items-center gap-1">
+                    <div className="space-y-3 sm:col-span-2">
+                      <Label htmlFor="transportadora" className="flex items-center gap-2 text-base font-medium">
                         <Building2 className="h-4 w-4" />
                         Transportadora
                       </Label>
@@ -360,7 +361,7 @@ export function MotoristaModal({ motorista, isOpen, onClose, onSave, carriers = 
                         value={formData.transportadora_id || ""}
                         onValueChange={(value) => setFormData({ ...formData, transportadora_id: value })}
                       >
-                        <SelectTrigger className="min-h-[44px]">
+                        <SelectTrigger className="min-h-[48px] px-4 py-3">
                           <SelectValue placeholder="Selecione a transportadora" />
                         </SelectTrigger>
                         <SelectContent>
@@ -377,27 +378,27 @@ export function MotoristaModal({ motorista, isOpen, onClose, onSave, carriers = 
               </div>
 
               {/* CNH */}
-              <div className="space-y-4">
-                <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">CNH</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="cnh">Número da CNH *</Label>
+              <div className="space-y-6">
+                <h3 className="text-base font-semibold text-muted-foreground uppercase tracking-wide mb-2">CNH</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <div className="space-y-3">
+                    <Label htmlFor="cnh" className="text-base font-medium">Número da CNH *</Label>
                     <Input
                       id="cnh"
                       value={formData.cnh || ""}
                       onChange={(e) => setFormData({ ...formData, cnh: e.target.value })}
                       placeholder="00000000000"
-                      className="min-h-[44px]"
+                      className="min-h-[48px] px-4 py-3"
                     />
                   </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="cnh_category">Categoria da CNH *</Label>
+                  <div className="space-y-3">
+                    <Label htmlFor="cnh_category" className="text-base font-medium">Categoria da CNH *</Label>
                     <select
                       id="cnh_category"
                       value={formData.cnh_category || ""}
                       onChange={(e) => setFormData({ ...formData, cnh_category: e.target.value })}
-                      className="flex h-11 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                      className="min-h-[48px] w-full rounded-md border border-input bg-background px-4 py-3 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                     >
                       <option value="">Selecione...</option>
                       <option value="A">A - Moto</option>
@@ -412,82 +413,82 @@ export function MotoristaModal({ motorista, isOpen, onClose, onSave, carriers = 
               </div>
 
               {/* Endereço */}
-              <div className="space-y-4">
-                <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Endereço</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="address_zip_code">CEP</Label>
+              <div className="space-y-6">
+                <h3 className="text-base font-semibold text-muted-foreground uppercase tracking-wide mb-2">Endereço</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                  <div className="space-y-3">
+                    <Label htmlFor="address_zip_code" className="text-base font-medium">CEP</Label>
                     <Input
                       id="address_zip_code"
                       value={formData.address_zip_code || ""}
                       onChange={(e) => setFormData({ ...formData, address_zip_code: e.target.value })}
                       placeholder="00000-000"
-                      className="min-h-[44px]"
+                      className="min-h-[48px] px-4 py-3"
                     />
                   </div>
 
-                  <div className="space-y-2 sm:col-span-2">
-                    <Label htmlFor="address_street">Rua</Label>
+                  <div className="space-y-3 sm:col-span-2">
+                    <Label htmlFor="address_street" className="text-base font-medium">Rua</Label>
                     <Input
                       id="address_street"
                       value={formData.address_street || ""}
                       onChange={(e) => setFormData({ ...formData, address_street: e.target.value })}
                       placeholder="Nome da rua"
-                      className="min-h-[44px]"
+                      className="min-h-[48px] px-4 py-3"
                     />
                   </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="address_number">Número</Label>
+                  <div className="space-y-3">
+                    <Label htmlFor="address_number" className="text-base font-medium">Número</Label>
                     <Input
                       id="address_number"
                       value={formData.address_number || ""}
                       onChange={(e) => setFormData({ ...formData, address_number: e.target.value })}
                       placeholder="123"
-                      className="min-h-[44px]"
+                      className="min-h-[48px] px-4 py-3"
                     />
                   </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="address_complement">Complemento</Label>
+                  <div className="space-y-3">
+                    <Label htmlFor="address_complement" className="text-base font-medium">Complemento</Label>
                     <Input
                       id="address_complement"
                       value={formData.address_complement || ""}
                       onChange={(e) => setFormData({ ...formData, address_complement: e.target.value })}
                       placeholder="Apto, Bloco..."
-                      className="min-h-[44px]"
+                      className="min-h-[48px] px-4 py-3"
                     />
                   </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="address_neighborhood">Bairro</Label>
+                  <div className="space-y-3">
+                    <Label htmlFor="address_neighborhood" className="text-base font-medium">Bairro</Label>
                     <Input
                       id="address_neighborhood"
                       value={formData.address_neighborhood || ""}
                       onChange={(e) => setFormData({ ...formData, address_neighborhood: e.target.value })}
                       placeholder="Nome do bairro"
-                      className="min-h-[44px]"
+                      className="min-h-[48px] px-4 py-3"
                     />
                   </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="address_city">Cidade</Label>
+                  <div className="space-y-3">
+                    <Label htmlFor="address_city" className="text-base font-medium">Cidade</Label>
                     <Input
                       id="address_city"
                       value={formData.address_city || ""}
                       onChange={(e) => setFormData({ ...formData, address_city: e.target.value })}
                       placeholder="Cidade"
-                      className="min-h-[44px]"
+                      className="min-h-[48px] px-4 py-3"
                     />
                   </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="address_state">Estado</Label>
+                  <div className="space-y-3">
+                    <Label htmlFor="address_state" className="text-base font-medium">Estado</Label>
                     <select
                       id="address_state"
                       value={formData.address_state || ""}
                       onChange={(e) => setFormData({ ...formData, address_state: e.target.value })}
-                      className="flex h-11 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                      className="min-h-[48px] w-full rounded-md border border-input bg-background px-4 py-3 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                     >
                       <option value="">UF</option>
                       <option value="AC">AC</option>
@@ -522,19 +523,19 @@ export function MotoristaModal({ motorista, isOpen, onClose, onSave, carriers = 
                 </div>
               </div>
 
-              <DialogFooter className="flex-col sm:flex-row gap-3 pt-4 sm:pt-6 border-t mt-4 sm:mt-6">
+              <DialogFooter className="flex-col sm:flex-row gap-4 pt-6 sm:pt-8 border-t border-white/20 mt-8 sm:mt-10 pb-2 px-4 sm:px-6">
                 <Button
                   type="button"
                   variant="outline"
                   onClick={onClose}
-                  className="w-full sm:w-auto order-2 sm:order-1 min-h-[44px] text-base font-medium touch-manipulation"
+                  className="w-full sm:w-auto order-2 sm:order-1 min-h-[52px] px-6 py-3 text-base font-medium touch-manipulation"
                 >
                   Cancelar
                 </Button>
                 <Button
                   type="submit"
                   disabled={loading}
-                  className="w-full sm:w-auto order-1 sm:order-2 bg-brand hover:bg-brand-hover min-h-[44px] text-base font-medium touch-manipulation"
+                  className="w-full sm:w-auto order-1 sm:order-2 bg-brand hover:bg-brand-hover min-h-[52px] px-6 py-3 text-base font-medium touch-manipulation"
                 >
                   {loading ? "Salvando..." : motorista ? "Atualizar" : "Cadastrar"}
                 </Button>
@@ -542,20 +543,25 @@ export function MotoristaModal({ motorista, isOpen, onClose, onSave, carriers = 
             </form>
           </TabsContent>
 
-          <TabsContent value="documentos" className="bg-transparent border-0 p-0 shadow-none">
-            <MotoristaDocumentsSection
-              motoristaId={motorista?.id ?? formData.id}
-              isEditing={!!motorista?.id || !!formData.id}
-            />
-          </TabsContent>
+            <TabsContent value="documentos" className="!mt-0 !rounded-none bg-transparent border-0 p-0 shadow-none flex-1 min-h-0 overflow-y-auto">
+              <div className="pb-4 px-4 sm:px-6">
+                <MotoristaDocumentsSection
+                  motoristaId={motorista?.id ?? formData.id}
+                  isEditing={!!motorista?.id || !!formData.id}
+                />
+              </div>
+            </TabsContent>
 
-          <TabsContent value="salario" className="bg-transparent border-0 p-0 shadow-none">
-            <MotoristaCompensationSection
-              motoristaId={motorista?.id ?? formData.id}
-              isEditing={!!motorista?.id || !!formData.id}
-            />
-          </TabsContent>
-        </Tabs>
+            <TabsContent value="salario" className="!mt-0 !rounded-none bg-transparent border-0 p-0 shadow-none flex-1 min-h-0 overflow-y-auto">
+              <div className="pb-4 px-4 sm:px-6">
+                <MotoristaCompensationSection
+                  motoristaId={motorista?.id ?? formData.id}
+                  isEditing={!!motorista?.id || !!formData.id}
+                />
+              </div>
+            </TabsContent>
+          </Tabs>
+        </div>
       </DialogContent>
     </Dialog>
   )

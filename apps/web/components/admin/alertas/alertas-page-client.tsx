@@ -308,7 +308,7 @@ export function AlertasPageClient({ initialAlertas }: AlertasPageClientProps) {
                 />
               </div>
               <select
-                className="px-3 py-2 rounded-lg border border-white/10 bg-white/5 backdrop-blur-md text-sm w-full sm:w-auto min-h-[44px] touch-manipulation hover:bg-white/10 hover:border-white/20 transition-all duration-300"
+                className="min-h-[48px] px-4 py-3 rounded-md border border-input bg-background text-sm w-full sm:w-auto ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 touch-manipulation"
                 value={tempFilterSeverity}
                 onChange={(e) => setTempFilterSeverity(e.target.value)}
               >
@@ -318,7 +318,7 @@ export function AlertasPageClient({ initialAlertas }: AlertasPageClientProps) {
                 <option value="info">Info</option>
               </select>
               <select
-                className="px-3 py-2 rounded-lg border border-white/10 bg-white/5 backdrop-blur-md text-sm w-full sm:w-auto min-h-[44px] touch-manipulation hover:bg-white/10 hover:border-white/20 transition-all duration-300"
+                className="min-h-[48px] px-4 py-3 rounded-md border border-input bg-background text-sm w-full sm:w-auto ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 touch-manipulation"
                 value={filtersState.temp.status}
                 onChange={(e) => filtersDispatch({ type: 'UPDATE_TEMP_STATUS', payload: e.target.value })}
               >

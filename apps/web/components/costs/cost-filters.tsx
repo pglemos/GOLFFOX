@@ -180,7 +180,7 @@ export function CostFilters({
               <div className="space-y-2">
                 <Label>Rota</Label>
                 <select
-                  className="w-full min-h-[44px] px-3 py-2 rounded-lg border border-border bg-white text-sm touch-manipulation"
+                  className="min-h-[48px] w-full px-4 py-3 rounded-md border border-input bg-background text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 touch-manipulation"
                   value={tempFilters.route_id || ''}
                   onChange={(e) => handleTempFilterChange('route_id', e.target.value || undefined)}
                 >
@@ -197,7 +197,7 @@ export function CostFilters({
               <div className="space-y-2">
                 <Label>Veículo</Label>
                 <select
-                  className="w-full px-3 py-2 rounded-lg border border-border bg-white text-sm"
+                  className="min-h-[48px] w-full px-4 py-3 rounded-md border border-input bg-background text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                   value={tempFilters.veiculo_id || ''}
                   onChange={(e) => handleTempFilterChange('veiculo_id', e.target.value || undefined)}
                 >
@@ -214,7 +214,7 @@ export function CostFilters({
               <div className="space-y-2">
                 <Label>Motorista</Label>
                 <select
-                  className="w-full px-3 py-2 rounded-lg border border-border bg-white text-sm"
+                  className="min-h-[48px] w-full px-4 py-3 rounded-md border border-input bg-background text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                   value={tempFilters.motorista_id || ''}
                   onChange={(e) => handleTempFilterChange('motorista_id', e.target.value || undefined)}
                 >
@@ -231,7 +231,7 @@ export function CostFilters({
               <div className="space-y-2">
                 <Label>Grupo de Custo</Label>
                 <select
-                  className="w-full px-3 py-2 rounded-lg border border-border bg-white text-sm"
+                  className="min-h-[48px] w-full px-4 py-3 rounded-md border border-input bg-background text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                   value={tempFilters.group_name || ''}
                   onChange={(e) => handleTempFilterChange('group_name', e.target.value || undefined)}
                 >
@@ -248,7 +248,7 @@ export function CostFilters({
               <div className="space-y-2">
                 <Label>Categoria</Label>
                 <select
-                  className="w-full px-3 py-2 rounded-lg border border-border bg-white text-sm"
+                  className="min-h-[48px] w-full px-4 py-3 rounded-md border border-input bg-background text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                   value={tempFilters.category_id || ''}
                   onChange={(e) => handleTempFilterChange('category_id', e.target.value || undefined)}
                 >
@@ -267,7 +267,7 @@ export function CostFilters({
               <div className="space-y-2">
                 <Label>Transportadora</Label>
                 <select
-                  className="w-full px-3 py-2 rounded-lg border border-border bg-white text-sm"
+                  className="min-h-[48px] w-full px-4 py-3 rounded-md border border-input bg-background text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                   value={tempFilters.transportadora_id || ''}
                   onChange={(e) => handleTempFilterChange('transportadora_id', e.target.value || undefined)}
                 >

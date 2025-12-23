@@ -199,7 +199,7 @@ function AlertasOperatorPageInner() {
             />
           </div>
           <select
-            className="px-3 py-2 rounded-lg border border-border bg-white text-sm"
+            className="min-h-[48px] px-4 py-3 rounded-md border border-input bg-background text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             value={filterType}
             onChange={(e) => setFilterType(e.target.value)}
           >

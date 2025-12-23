@@ -623,7 +623,7 @@ export default function OperatorConfiguracoesPage() {
                     id="language"
                     value={formData.language}
                     onChange={(e) => handleLanguageChange(e.target.value)}
-                    className="w-full px-3 py-2 border border-border rounded-lg bg-bg-bg focus:outline-none focus:ring-2 focus:ring-brand focus:ring-opacity-20"
+                    className="min-h-[48px] w-full px-4 py-3 border border-input bg-background rounded-md ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                   >
                     <option value="pt-BR">Português (Brasil)</option>
                     <option value="en-US">English (US)</option>
@@ -639,7 +639,7 @@ export default function OperatorConfiguracoesPage() {
                       id="timezone"
                       value={formData.timezone}
                       onChange={(e) => handleTimezoneChange(e.target.value)}
-                      className="w-full pl-10 pr-3 py-2 border border-border rounded-lg bg-bg-bg focus:outline-none focus:ring-2 focus:ring-brand focus:ring-opacity-20"
+                      className="min-h-[48px] w-full pl-10 pr-4 py-3 border border-input bg-background rounded-md ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                     >
                       <option value="America/Sao_Paulo">Brasília (GMT-3)</option>
                       <option value="America/Manaus">Manaus (GMT-4)</option>

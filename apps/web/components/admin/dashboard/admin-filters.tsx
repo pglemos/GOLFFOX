@@ -167,7 +167,7 @@ export function AdminFilters({ initialFilters, onFiltersChange }: AdminFiltersPr
             <div className="space-y-2">
               <label className="text-xs font-medium text-muted-foreground">Turno</label>
               <select
-                className="w-full h-9 px-3 py-2 rounded-md border border-input bg-background text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                className="min-h-[48px] w-full px-4 py-3 rounded-md border border-input bg-background text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                 value={tempFilters.turno}
                 onChange={(e) => setTempFilters({ ...tempFilters, turno: e.target.value })}
               >

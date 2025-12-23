@@ -14,9 +14,9 @@ const TabsList = React.forwardRef<
   <TabsPrimitive.List
     ref={ref}
     className={cn(
-      "inline-flex h-auto items-center justify-start gap-2 p-1.5",
-      "w-full rounded-xl bg-white/5 backdrop-blur-md border border-white/10",
-      "shadow-sm",
+      "inline-flex h-auto items-center justify-start gap-2 p-2",
+      "w-full rounded-2xl bg-white/30 backdrop-blur-xl border-2 border-white/40",
+      "shadow-xl shadow-black/10",
       className
     )}
     {...props}
@@ -32,12 +32,12 @@ const TabsTrigger = React.forwardRef<
     <TabsPrimitive.Trigger
       ref={ref}
       className={cn(
-        "inline-flex items-center justify-center whitespace-nowrap px-4 py-2.5 text-sm font-medium rounded-lg",
+        "inline-flex items-center justify-center whitespace-nowrap px-6 py-3 text-sm sm:text-base font-semibold rounded-xl",
         "transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50 focus-visible:ring-offset-2",
         "disabled:pointer-events-none disabled:opacity-50",
-        "text-ink-muted hover:text-white hover:bg-white/5",
-        "data-[state=active]:text-white data-[state=active]:bg-white/10 data-[state=active]:shadow-md data-[state=active]:border data-[state=active]:border-white/20",
-        "min-h-[44px] touch-manipulation",
+        "text-gray-800 hover:text-gray-900 hover:bg-white/25 hover:shadow-lg",
+        "data-[state=active]:text-gray-950 data-[state=active]:bg-white/40 data-[state=active]:shadow-xl data-[state=active]:border-2 data-[state=active]:border-white/50 data-[state=active]:scale-[1.03]",
+        "min-h-[48px] sm:min-h-[56px] touch-manipulation flex-1",
         className
       )}
       {...props}
@@ -53,9 +53,9 @@ const TabsContent = React.forwardRef<
   <TabsPrimitive.Content
     ref={ref}
     className={cn(
-      "mt-6 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50 focus-visible:ring-offset-2",
-      "rounded-xl bg-white/5 backdrop-blur-md border border-white/10 p-6",
-      "shadow-sm",
+      "mt-8 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50 focus-visible:ring-offset-2",
+      "rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 p-8",
+      "shadow-lg shadow-black/5",
       className
     )}
     {...props}

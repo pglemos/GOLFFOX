@@ -178,8 +178,8 @@ export function EditCompanyModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="w-[95vw] sm:w-[90vw] max-w-2xl max-h-[90vh] overflow-y-auto p-4 sm:p-6 mx-auto">
-        <DialogHeader className="pb-4 sm:pb-6">
+      <DialogContent className="w-[95vw] sm:w-[90vw] max-w-4xl max-h-[90vh] p-0 mx-auto !flex !flex-col overflow-hidden">
+        <DialogHeader className="px-4 sm:px-6 pt-4 sm:pt-6 pb-4 sm:pb-6 flex-shrink-0">
           <DialogTitle className="text-xl sm:text-2xl font-bold flex items-center gap-2 break-words">
             <Briefcase className="h-5 w-5 flex-shrink-0" />
             Editar Empresa
@@ -189,21 +189,22 @@ export function EditCompanyModal({
           </DialogDescription>
         </DialogHeader>
 
-        <Tabs defaultValue="dados" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="dados">
-              <Briefcase className="h-4 w-4 mr-2" />Dados
-            </TabsTrigger>
-            <TabsTrigger value="documentos">
-              <FileText className="h-4 w-4 mr-2" />Documentos
-            </TabsTrigger>
-          </TabsList>
+        <div className="flex-1 min-h-0 overflow-hidden flex flex-col">
+          <Tabs defaultValue="dados" className="w-full flex flex-col flex-1 min-h-0 overflow-hidden">
+            <TabsList className="grid w-full grid-cols-2 flex-shrink-0 mb-4 px-4 sm:px-6">
+              <TabsTrigger value="dados" className="text-xs sm:text-sm">
+                <Briefcase className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />Dados
+              </TabsTrigger>
+              <TabsTrigger value="documentos" className="text-xs sm:text-sm">
+                <FileText className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />Documentos
+              </TabsTrigger>
+            </TabsList>
 
-          <TabsContent value="dados" className="bg-transparent border-0 p-0 shadow-none">
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-                <div className="space-y-2 md:col-span-2">
-                  <Label htmlFor="name">Nome da Empresa *</Label>
+            <TabsContent value="dados" className="!mt-0 !rounded-none bg-transparent border-0 p-0 shadow-none flex-1 min-h-0 overflow-y-auto">
+            <form onSubmit={handleSubmit} className="space-y-8 sm:space-y-10 pb-4 px-4 sm:px-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div className="space-y-3 sm:col-span-2">
+                  <Label htmlFor="name" className="text-base font-medium">Nome da Empresa *</Label>
                   <Input
                     id="name"
                     value={formData.name}
@@ -211,22 +212,24 @@ export function EditCompanyModal({
                     placeholder="Nome da empresa"
                     required
                     disabled={loading}
+                    className="min-h-[48px] px-4 py-3"
                   />
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="cnpj">CNPJ</Label>
+                <div className="space-y-3">
+                  <Label htmlFor="cnpj" className="text-base font-medium">CNPJ</Label>
                   <Input
                     id="cnpj"
                     value={formData.cnpj}
                     onChange={(e) => setFormData({ ...formData, cnpj: e.target.value })}
                     placeholder="00.000.000/0000-00"
                     disabled={loading}
+                    className="min-h-[48px] px-4 py-3"
                   />
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="phone">Telefone</Label>
+                <div className="space-y-3">
+                  <Label htmlFor="phone" className="text-base font-medium">Telefone</Label>
                   <Input
                     id="phone"
                     type="tel"
@@ -234,11 +237,12 @@ export function EditCompanyModal({
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                     placeholder="(00) 00000-0000"
                     disabled={loading}
+                    className="min-h-[48px] px-4 py-3"
                   />
                 </div>
 
-                <div className="space-y-2 md:col-span-2">
-                  <Label htmlFor="email">Email</Label>
+                <div className="space-y-3 sm:col-span-2">
+                  <Label htmlFor="email" className="text-base font-medium">Email</Label>
                   <Input
                     id="email"
                     type="email"
@@ -246,6 +250,7 @@ export function EditCompanyModal({
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     placeholder="contato@empresa.com"
                     disabled={loading}
+                    className="min-h-[48px] px-4 py-3"
                   />
                 </div>
 
@@ -264,7 +269,7 @@ export function EditCompanyModal({
                   showTitle={true}
                 />
 
-                <div className="space-y-2 md:col-span-2">
+                <div className="space-y-3 sm:col-span-2">
                   <div className="flex items-center gap-2">
                     <input
                       type="checkbox"
@@ -272,29 +277,29 @@ export function EditCompanyModal({
                       checked={formData.is_active}
                       onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
                       disabled={loading}
-                      className="rounded"
+                      className="rounded w-5 h-5 cursor-pointer"
                     />
-                    <Label htmlFor="is_active" className="cursor-pointer">
+                    <Label htmlFor="is_active" className="cursor-pointer text-base font-medium">
                       Empresa ativa
                     </Label>
                   </div>
                 </div>
               </div>
 
-              <DialogFooter className="flex-col sm:flex-row gap-3 pt-4 sm:pt-6 border-t mt-4 sm:mt-6">
+              <DialogFooter className="flex-col sm:flex-row gap-4 pt-6 sm:pt-8 border-t border-white/20 mt-8 sm:mt-10 pb-2 px-4 sm:px-6">
                 <Button
                   type="button"
                   variant="outline"
                   onClick={onClose}
                   disabled={loading}
-                  className="w-full sm:w-auto order-2 sm:order-1 min-h-[44px] text-base font-medium"
+                  className="w-full sm:w-auto order-2 sm:order-1 min-h-[52px] px-6 py-3 text-base font-medium touch-manipulation"
                 >
                   Cancelar
                 </Button>
                 <Button
                   type="submit"
                   disabled={loading}
-                  className="w-full sm:w-auto order-1 sm:order-2 bg-brand hover:bg-brand-hover min-h-[44px] text-base font-medium"
+                  className="w-full sm:w-auto order-1 sm:order-2 bg-brand hover:bg-brand-hover min-h-[52px] px-6 py-3 text-base font-medium touch-manipulation"
                 >
                   {loading ? (
                     <>
@@ -309,13 +314,16 @@ export function EditCompanyModal({
             </form>
           </TabsContent>
 
-          <TabsContent value="documentos" className="bg-transparent border-0 p-0 shadow-none">
-            <CompanyDocumentsSection
-              companyId={company?.id}
-              isEditing={!!company?.id}
-            />
+          <TabsContent value="documentos" className="!mt-0 !rounded-none bg-transparent border-0 p-0 shadow-none flex-1 min-h-0 overflow-y-auto">
+            <div className="pb-4 px-4 sm:px-6">
+              <CompanyDocumentsSection
+                companyId={company?.id}
+                isEditing={!!company?.id}
+              />
+            </div>
           </TabsContent>
-        </Tabs>
+          </Tabs>
+        </div>
       </DialogContent>
     </Dialog>
   )

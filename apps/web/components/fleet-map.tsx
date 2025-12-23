@@ -691,7 +691,7 @@ export const FleetMap = memo(function FleetMap({ companyId, transportadoraId, ro
               onChange={(e) => handleFilterChange('route', e.target.value)}
             />
             <select
-              className="px-3 py-2 rounded-lg-custom border border-border bg-white min-w-[140px] text-sm focus:outline-none focus:ring-2 focus:ring-brand focus:ring-opacity-20"
+              className="min-h-[48px] px-4 py-3 rounded-md border border-input bg-background min-w-[140px] text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
               value={filters.status}
               onChange={(e) => handleFilterChange('status', e.target.value)}
             >

@@ -6,7 +6,7 @@ import { LazyPageWrapper, TablePageSkeleton } from "@/components/shared/lazy-pag
 import { Button } from "@/components/ui/button"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Shield, Edit, Search, Filter, ChevronDown, ChevronUp, Save, X, Trash2, UserPlus } from "lucide-react"
+import { Shield, Edit, Search, Filter, Trash2, UserPlus, User } from "lucide-react"
 import { motion } from "framer-motion"
 import { useRouter } from "@/lib/next-navigation"
 import { Input } from "@/components/ui/input"
@@ -33,25 +33,8 @@ function UsuariosPageContent() {
     const [usuarios, setUsuarios] = useState<any[]>([])
     const [dataLoading, setDataLoading] = useState(true)
     const [searchQuery, setSearchQuery] = useState("")
-    const [filtersExpanded, setFiltersExpanded] = useState(false)
-    const [tempFilterRole, setTempFilterRole] = useState<string>("all")
-    const [tempFilterStatus, setTempFilterStatus] = useState<string>("all")
     const [filterRole, setFilterRole] = useState<string>("all")
     const [filterStatus, setFilterStatus] = useState<string>("all")
-
-    const handleSaveFilters = () => {
-        setFilterRole(tempFilterRole)
-        setFilterStatus(tempFilterStatus)
-        setFiltersExpanded(false)
-    }
-
-    const handleResetFilters = () => {
-        setTempFilterRole("all")
-        setTempFilterStatus("all")
-        setFilterRole("all")
-        setFilterStatus("all")
-        setFiltersExpanded(false)
-    }
     const [selectedUserForRoleChange, setSelectedUserForRoleChange] = useState<any>(null)
     const [isChangeRoleModalOpen, setIsChangeRoleModalOpen] = useState(false)
     const [selectedUserForEdit, setSelectedUserForEdit] = useState<any>(null)
@@ -143,168 +126,127 @@ function UsuariosPageContent() {
     return (
         <AppShell user={{ id: user.id, name: user.name || "Admin", email: user.email, role: user.role || "admin", avatar_url: user.avatar_url }}>
             <div className="space-y-4 sm:space-y-6 w-full overflow-x-hidden">
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 w-full">
-                    <div className="min-w-0">
-                        <h1 className="text-2xl sm:text-3xl font-bold mb-2 break-words">Usuários</h1>
-                        <p className="text-sm sm:text-base text-ink-muted break-words">Gerencie todos os usuários do sistema</p>
+                {/* Header */}
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+                    <div className="min-w-0 flex-1">
+                        <h1 className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2">Usuários</h1>
+                        <p className="text-sm sm:text-base text-muted-foreground">Gerencie todos os usuários do sistema</p>
                     </div>
                     <Button
                         onClick={() => setIsCreateUserModalOpen(true)}
-                        className="w-full sm:w-auto flex-shrink-0 min-h-[44px] h-auto text-sm sm:text-base px-4 sm:px-6 py-2.5 sm:py-2.5 whitespace-nowrap touch-manipulation"
+                        className="w-full sm:w-auto flex-shrink-0 min-h-[44px] touch-manipulation"
                     >
-                        <UserPlus className="h-4 w-4 mr-2 flex-shrink-0" />
+                        <UserPlus className="h-4 w-4 mr-2" />
                         <span className="hidden sm:inline">Criar Usuário</span>
                         <span className="sm:hidden">Criar</span>
                     </Button>
                 </div>
 
-                {/* Busca - Sempre visível */}
-                <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground pointer-events-none z-10" />
-                    <Input
-                        placeholder="Buscar por nome, email ou CPF..."
-                        className="pl-10 w-full min-h-[44px] text-base"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                    />
+                {/* Search + Filter */}
+                <div className="flex flex-col sm:flex-row gap-2">
+                    <div className="relative flex-1">
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                        <Input
+                            placeholder="Buscar por nome, email ou CPF..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="pl-10"
+                        />
+                    </div>
+
+                    {isMobile ? (
+                        <FilterDrawer
+                            filters={[
+                                {
+                                    key: "role",
+                                    label: "Papel",
+                                    type: "select",
+                                    options: [
+                                        { label: "Administrador", value: "admin" },
+                                        { label: "Operador", value: "operador" },
+                                        { label: "Transportadora", value: "transportadora" },
+                                        { label: "Motorista", value: "motorista" },
+                                        { label: "Passageiro", value: "passageiro" }
+                                    ]
+                                },
+                                {
+                                    key: "status",
+                                    label: "Status",
+                                    type: "select",
+                                    options: [
+                                        { label: "Ativo", value: "active" },
+                                        { label: "Inativo", value: "inactive" }
+                                    ]
+                                }
+                            ]}
+                            values={{
+                                role: filterRole,
+                                status: filterStatus
+                            }}
+                            onFilterChange={(key, value) => {
+                                if (key === "role") {
+                                    setFilterRole(value)
+                                } else if (key === "status") {
+                                    setFilterStatus(value)
+                                }
+                            }}
+                            onReset={() => {
+                                setFilterRole("all")
+                                setFilterStatus("all")
+                            }}
+                            title="Filtros"
+                            description="Filtre os usuários por papel e status"
+                        />
+                    ) : (
+                        <>
+                            <Select value={filterRole} onValueChange={setFilterRole}>
+                                <SelectTrigger className="w-full sm:w-[220px]">
+                                    <Shield className="h-4 w-4 mr-2" />
+                                    <SelectValue placeholder="Papel" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">Todos os papéis</SelectItem>
+                                    <SelectItem value="admin">Administrador</SelectItem>
+                                    <SelectItem value="operador">Operador</SelectItem>
+                                    <SelectItem value="transportadora">Transportadora</SelectItem>
+                                    <SelectItem value="motorista">Motorista</SelectItem>
+                                    <SelectItem value="passageiro">Passageiro</SelectItem>
+                                </SelectContent>
+                            </Select>
+                            <Select value={filterStatus} onValueChange={setFilterStatus}>
+                                <SelectTrigger className="w-full sm:w-[220px]">
+                                    <Filter className="h-4 w-4 mr-2" />
+                                    <SelectValue placeholder="Status" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">Todos os status</SelectItem>
+                                    <SelectItem value="active">Ativo</SelectItem>
+                                    <SelectItem value="inactive">Inativo</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </>
+                    )}
                 </div>
 
-                {/* Filtros - Mobile: Drawer, Desktop: Card */}
-                {isMobile ? (
-                    <FilterDrawer
-                        filters={[
-                            {
-                                key: "role",
-                                label: "Papel",
-                                type: "select",
-                                options: [
-                                    { label: "Administrador", value: "admin" },
-                                    { label: "Operador", value: "operador" },
-                                    { label: "Transportadora", value: "transportadora" },
-                                    { label: "Motorista", value: "motorista" },
-                                    { label: "Passageiro", value: "passageiro" }
-                                ]
-                            },
-                            {
-                                key: "status",
-                                label: "Status",
-                                type: "select",
-                                options: [
-                                    { label: "Ativo", value: "active" },
-                                    { label: "Inativo", value: "inactive" }
-                                ]
-                            }
-                        ]}
-                        values={{
-                            role: tempFilterRole,
-                            status: tempFilterStatus
-                        }}
-                        onFilterChange={(key, value) => {
-                            if (key === "role") {
-                                setTempFilterRole(value)
-                            } else if (key === "status") {
-                                setTempFilterStatus(value)
-                            }
-                        }}
-                        onReset={handleResetFilters}
-                        title="Filtros"
-                        description="Filtre os usuários por papel e status"
-                    />
+                {/* Tabela de Usuários - Mobile: Cards, Desktop: Tabela */}
+                {dataLoading && usuarios.length === 0 ? (
+                    <div className="text-center py-12">
+                        <div className="w-16 h-16 border-4 border-brand border-t-transparent rounded-full animate-spin mx-auto"></div>
+                    </div>
+                ) : filteredUsers.length === 0 ? (
+                    <Card variant="premium" className="p-8 text-center">
+                        <User className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+                        <p className="text-muted-foreground">Nenhum usuário encontrado</p>
+                    </Card>
                 ) : (
                     <Card variant="premium" className="overflow-hidden">
-                        <CardHeader className="p-3 sm:p-6">
-                            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
-                                <div className="flex items-center gap-2 min-w-0">
-                                    <Filter className="h-4 w-4 sm:h-5 sm:w-5 text-brand flex-shrink-0" />
-                                    <CardTitle className="text-base sm:text-lg font-semibold break-words">Filtros</CardTitle>
-                                </div>
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => setFiltersExpanded(!filtersExpanded)}
-                                    className="gap-2 w-full sm:w-auto min-h-[44px] touch-manipulation"
-                                >
-                                    {filtersExpanded ? (
-                                        <>
-                                            <ChevronUp className="h-4 w-4" />
-                                            <span className="hidden sm:inline">Minimizar</span>
-                                            <span className="sm:hidden">Fechar</span>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <ChevronDown className="h-4 w-4" />
-                                            <span className="hidden sm:inline">Expandir</span>
-                                            <span className="sm:hidden">Abrir</span>
-                                        </>
-                                    )}
-                                </Button>
-                            </div>
-                        </CardHeader>
-                        {filtersExpanded && (
-                            <CardContent className="p-3 sm:p-6 pt-0">
-                                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-4">
-                                    <Select value={tempFilterRole} onValueChange={setTempFilterRole}>
-                                        <SelectTrigger className="w-full sm:w-[180px] min-h-[44px]">
-                                            <SelectValue placeholder="Todos os papéis" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="all">Todos os papéis</SelectItem>
-                                            <SelectItem value="admin">Administrador</SelectItem>
-                                            <SelectItem value="operador">Operador</SelectItem>
-                                            <SelectItem value="transportadora">Transportadora</SelectItem>
-                                            <SelectItem value="motorista">Motorista</SelectItem>
-                                            <SelectItem value="passageiro">Passageiro</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                    <Select value={tempFilterStatus} onValueChange={setTempFilterStatus}>
-                                        <SelectTrigger className="w-full sm:w-[180px] min-h-[44px]">
-                                            <SelectValue placeholder="Todos os status" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="all">Todos os status</SelectItem>
-                                            <SelectItem value="active">Ativo</SelectItem>
-                                            <SelectItem value="inactive">Inativo</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-2 sm:gap-2 pt-4 border-t border-border">
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={handleResetFilters}
-                                        className="gap-2 w-full sm:w-auto min-h-[44px] touch-manipulation"
-                                    >
-                                        <X className="h-4 w-4" />
-                                        Limpar
-                                    </Button>
-                                    <Button
-                                        size="sm"
-                                        onClick={handleSaveFilters}
-                                        className="gap-2 w-full sm:w-auto min-h-[44px] touch-manipulation"
-                                    >
-                                        <Save className="h-4 w-4" />
-                                        Salvar Filtros
-                                    </Button>
-                                </div>
-                            </CardContent>
-                        )}
-                    </Card>
-                )}
-
-                {/* Tabela de Usuários - Mobile: Cards, Desktop: Tabela */}
-                <Card variant="premium" className="overflow-hidden">
-                    {isMobile ? (
-                        /* Mobile: Cards Layout */
-                        <div className="p-3 space-y-3">
-                            {filteredUsers.length === 0 ? (
-                                <div className="text-center py-12">
-                                    <p className="text-sm text-muted-foreground">Nenhum usuário encontrado</p>
-                                </div>
-                            ) : (
-                                filteredUsers.map((usuario, index) => (
+                        {isMobile ? (
+                            // Mobile: Cards Layout
+                            <div className="p-3 space-y-3">
+                                {filteredUsers.map((usuario, index) => (
                                     <Card
                                         key={usuario.id}
-                                        className="mobile-table-card p-4"
+                                        className="mobile-table-card p-3 sm:p-4"
                                     >
                                         <div className="flex items-start gap-3">
                                             <Avatar className="h-12 w-12 flex-shrink-0">
@@ -370,32 +312,24 @@ function UsuariosPageContent() {
                                             </div>
                                         </div>
                                     </Card>
-                                ))
-                            )}
-                        </div>
-                    ) : (
-                        /* Desktop: Table Layout */
-                        <div className="overflow-x-auto -webkit-overflow-scrolling-touch rounded-lg border bg-white/5 backdrop-blur-xl">
-                            <table className="w-full min-w-[640px] bg-transparent">
-                            <thead className="bg-white/5 backdrop-blur-md">
-                                <tr className="border-b border-white/10">
-                                    <th className="text-left p-2 sm:p-4 font-semibold text-xs sm:text-sm">Nome</th>
-                                    <th className="text-left p-2 sm:p-4 font-semibold text-xs sm:text-sm">Email</th>
-                                    <th className="text-left p-2 sm:p-4 font-semibold text-xs sm:text-sm">CPF</th>
-                                    <th className="text-left p-2 sm:p-4 font-semibold text-xs sm:text-sm">Papel</th>
-                                    <th className="text-left p-2 sm:p-4 font-semibold text-xs sm:text-sm">Status</th>
-                                    <th className="text-left p-2 sm:p-4 font-semibold text-xs sm:text-sm">Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody className="bg-transparent">
-                                {filteredUsers.length === 0 ? (
-                                    <tr className="bg-transparent">
-                                        <td colSpan={6} className="p-6 sm:p-8 text-center text-muted-foreground text-sm sm:text-base">
-                                            Nenhum usuário encontrado
-                                        </td>
+                                ))}
+                            </div>
+                        ) : (
+                            // Desktop: Table Layout
+                            <div className="overflow-x-auto -webkit-overflow-scrolling-touch rounded-lg border bg-white/5 backdrop-blur-xl">
+                                <table className="w-full min-w-[640px] bg-transparent">
+                                <thead className="bg-white/5 backdrop-blur-md">
+                                    <tr className="border-b border-white/10">
+                                        <th className="text-left p-2 sm:p-4 font-semibold text-xs sm:text-sm">Nome</th>
+                                        <th className="text-left p-2 sm:p-4 font-semibold text-xs sm:text-sm">Email</th>
+                                        <th className="text-left p-2 sm:p-4 font-semibold text-xs sm:text-sm">CPF</th>
+                                        <th className="text-left p-2 sm:p-4 font-semibold text-xs sm:text-sm">Papel</th>
+                                        <th className="text-left p-2 sm:p-4 font-semibold text-xs sm:text-sm">Status</th>
+                                        <th className="text-left p-2 sm:p-4 font-semibold text-xs sm:text-sm">Ações</th>
                                     </tr>
-                                ) : (
-                                    filteredUsers.map((usuario, index) => (
+                                </thead>
+                                <tbody className="bg-transparent">
+                                    {filteredUsers.map((usuario, index) => (
                                         <motion.tr 
                                             key={usuario.id} 
                                             initial={{ opacity: 0, x: -20 }}
@@ -452,13 +386,13 @@ function UsuariosPageContent() {
                                                 </div>
                                             </td>
                                         </motion.tr>
-                                    ))
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
-                    )}
-                </Card>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                        )}
+                    </Card>
+                )}
 
                 {/* Modal Trocar Papel */}
                 {selectedUserForRoleChange && (

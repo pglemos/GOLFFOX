@@ -90,7 +90,7 @@ const SelectField = memo(({
 }: SelectFieldProps) => (
   <select
     id={id}
-    className="w-full px-3 py-2 rounded-lg border border-border bg-white text-sm disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand"
+    className="min-h-[48px] w-full px-4 py-3 rounded-md border border-input bg-background text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
     value={value}
     onChange={(e) => onChange(e.target.value)}
     required={required}
