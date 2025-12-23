@@ -64,11 +64,12 @@ function TransportadoraMapaContent() {
 
   return (
     <AppShell user={{ id: user?.id || "", name: user?.name || "Transportadora", email: user?.email || "", role: user?.role || "transportadora", avatar_url: user?.avatar_url }}>
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold mb-2">Mapa da Frota</h1>
-            <p className="text-ink-muted">Acompanhe sua frota em tempo real</p>
+      <div className="space-y-4 sm:space-y-6 w-full overflow-x-hidden">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+          <div className="min-w-0 flex-1">
+            <h1 className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2">Mapa da Frota</h1>
+            <p className="text-sm sm:text-base text-muted-foreground">Acompanhe sua frota em tempo real</p>
           </div>
           <Button
             variant="outline"
@@ -77,6 +78,7 @@ function TransportadoraMapaContent() {
               // Centralizar em todos os veículos
               window.location.reload()
             }}
+            className="w-full sm:w-auto min-h-[44px] touch-manipulation"
           >
             <Navigation className="h-4 w-4 mr-2" />
             Centralizar

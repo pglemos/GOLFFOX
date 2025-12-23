@@ -45,15 +45,18 @@ export default function MargensPage() {
 
     return (
         <AppShell panel="transportadora" user={user ? { id: user.id, name: user.name || 'Operador', email: user.email || '', role: user.role || 'operador' } : { id: 'mock', name: 'Operador', email: 'operador@golffox.com', role: 'operador' }}>
-            <div className="p-4 sm:p-6 lg:p-8 space-y-6">
-                <div>
-                    <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-2">
-                        <TrendingUp className="h-7 w-7 text-primary" />
-                        Margem por Rota
-                    </h1>
-                    <p className="text-sm text-muted-foreground mt-1">
-                        Análise de rentabilidade por rota/contrato
-                    </p>
+            <div className="space-y-4 sm:space-y-6 w-full overflow-x-hidden">
+                {/* Header */}
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+                    <div className="min-w-0 flex-1">
+                        <h1 className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2 flex items-center gap-2">
+                            <TrendingUp className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
+                            Margem por Rota
+                        </h1>
+                        <p className="text-sm sm:text-base text-muted-foreground">
+                            Análise de rentabilidade por rota/contrato
+                        </p>
+                    </div>
                 </div>
 
                 {/* Summary */}

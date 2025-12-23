@@ -282,7 +282,7 @@ export function ImportCostModal({ isOpen, onClose, onSave, companyId }: ImportCo
             variant="outline" 
             onClick={handleClose} 
             disabled={importing}
-            className="w-full sm:w-auto order-2 sm:order-1 min-h-[44px] text-base font-medium"
+            className="w-full sm:w-auto order-2 sm:order-1 text-base font-medium"
           >
             Cancelar
           </Button>
@@ -290,7 +290,7 @@ export function ImportCostModal({ isOpen, onClose, onSave, companyId }: ImportCo
             type="button"
             onClick={handleImport}
             disabled={!file || preview.length === 0 || importing}
-            className="bg-brand hover:bg-brand-hover w-full sm:w-auto order-1 sm:order-2 min-h-[44px] text-base font-medium"
+            className="bg-brand hover:bg-brand-hover w-full sm:w-auto order-1 sm:order-2 text-base font-medium"
           >
             {importing ? 'Importando...' : 'Importar'}
           </Button>

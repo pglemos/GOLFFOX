@@ -113,20 +113,22 @@ export default function ReceitasPage() {
 
     return (
         <AppShell panel="transportadora" user={user ? { id: user.id, name: user.name || 'Operador', email: user.email || '', role: user.role || 'operador' } : { id: 'mock', name: 'Operador', email: 'operador@golffox.com', role: 'operador' }}>
-            <div className="p-4 sm:p-6 lg:p-8 space-y-6">
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                    <div>
-                        <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-2">
-                            <DollarSign className="h-7 w-7 text-success" />
+            <div className="space-y-4 sm:space-y-6 w-full overflow-x-hidden">
+                {/* Header */}
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+                    <div className="min-w-0 flex-1">
+                        <h1 className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2 flex items-center gap-2">
+                            <DollarSign className="h-5 w-5 sm:h-6 sm:w-6 text-success" />
                             Receitas e Repasses
                         </h1>
-                        <p className="text-sm text-muted-foreground mt-1">
+                        <p className="text-sm sm:text-base text-muted-foreground">
                             Gerencie as receitas da transportadora
                         </p>
                     </div>
-                    <Button onClick={() => setDialogOpen(true)}>
+                    <Button onClick={() => setDialogOpen(true)} className="w-full sm:w-auto">
                         <Plus className="h-4 w-4 mr-2" />
-                        Nova Receita
+                        <span className="hidden sm:inline">Nova Receita</span>
+                        <span className="sm:hidden">Nova</span>
                     </Button>
                 </div>
 

@@ -72,28 +72,31 @@ export default function AdminContratosPage() {
 
     return (
         <AppShell panel="admin" user={user ? { id: user.id, name: user.name || "Admin", email: user.email || '', role: user.role || "admin" } : { id: 'mock', name: 'Admin', email: 'admin@golffox.com', role: 'admin' }}>
-            <div className="p-4 sm:p-6 lg:p-8 space-y-6">
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                    <div>
-                        <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-2">
-                            <FileText className="h-7 w-7 text-primary" />
+            <div className="space-y-4 sm:space-y-6 w-full overflow-x-hidden">
+                {/* Header */}
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+                    <div className="min-w-0 flex-1">
+                        <h1 className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2 flex items-center gap-2">
+                            <FileText className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
                             Gestão de Contratos
                         </h1>
-                        <p className="text-sm text-muted-foreground mt-1">
+                        <p className="text-sm sm:text-base text-muted-foreground">
                             Visão geral de contratos ativos e históricos
                         </p>
                     </div>
                 </div>
 
                 {/* Search */}
-                <div className="relative max-w-md">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                        placeholder="Buscar contratos..."
-                        className="pl-10"
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
-                    />
+                <div className="flex flex-col sm:flex-row gap-2">
+                    <div className="relative flex-1">
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                        <Input
+                            placeholder="Buscar contratos..."
+                            className="pl-10"
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                        />
+                    </div>
                 </div>
 
                 {/* Contracts List */}

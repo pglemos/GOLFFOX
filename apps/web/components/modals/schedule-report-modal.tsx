@@ -258,7 +258,7 @@ export function ScheduleReportModal({
               onValueChange={setSelectedCompany}
               required
             >
-              <SelectTrigger className="h-11 sm:h-12 text-base">
+              <SelectTrigger className="min-h-[48px] text-base">
                 <SelectValue placeholder="Selecione uma empresa" />
               </SelectTrigger>
               <SelectContent>
@@ -279,7 +279,7 @@ export function ScheduleReportModal({
               onValueChange={setSelectedReport}
               required
             >
-              <SelectTrigger className="h-11 sm:h-12 text-base">
+              <SelectTrigger className="min-h-[48px] text-base">
                 <SelectValue placeholder="Selecione um relatório" />
               </SelectTrigger>
               <SelectContent>
@@ -368,14 +368,14 @@ export function ScheduleReportModal({
               type="button" 
               variant="outline" 
               onClick={onClose}
-              className="w-full sm:w-auto order-2 sm:order-1 min-h-[44px] text-base font-medium"
+              className="w-full sm:w-auto order-2 sm:order-1 text-base font-medium"
             >
               Cancelar
             </Button>
             <Button 
               type="submit" 
               disabled={loading}
-              className="w-full sm:w-auto order-1 sm:order-2 bg-brand hover:bg-brand-hover min-h-[44px] text-base font-medium"
+              className="w-full sm:w-auto order-1 sm:order-2 bg-brand hover:bg-brand-hover text-base font-medium"
             >
               {loading ? "Salvando..." : "Agendar"}
             </Button>

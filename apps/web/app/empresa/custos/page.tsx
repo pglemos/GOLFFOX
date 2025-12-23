@@ -36,7 +36,7 @@ export default function CustosEmpresaPage() {
         avatar_url: user?.avatar_url
       }}
     >
-      <div className="container mx-auto py-6 space-y-6">
+      <div className="space-y-4 sm:space-y-6 w-full overflow-x-hidden">
         <FinancialDashboardExpanded
           profileType="empresa"
         />

@@ -230,7 +230,7 @@ export function VehicleChecklistModal({
               onValueChange={(value) => setFormData({ ...formData, motorista_id: value })}
               required
             >
-              <SelectTrigger className="h-11 sm:h-12 text-base">
+              <SelectTrigger className="min-h-[48px] text-base">
                 <SelectValue placeholder="Selecione o motorista" />
               </SelectTrigger>
               <SelectContent>
@@ -251,7 +251,7 @@ export function VehicleChecklistModal({
               type="date"
               value={formData.filled_at}
               onChange={(e) => setFormData({ ...formData, filled_at: e.target.value })}
-              className="w-full h-11 sm:h-12 px-3 sm:px-4 py-2 sm:py-3 rounded-lg border border-border bg-white text-base"
+              className="min-h-[48px] w-full px-4 py-3 rounded-md border border-input bg-background text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             />
           </div>
 
@@ -282,7 +282,7 @@ export function VehicleChecklistModal({
               onValueChange={(value) => setFormData({ ...formData, status: value })}
               required
             >
-              <SelectTrigger className="h-11 sm:h-12 text-base">
+              <SelectTrigger className="min-h-[48px] text-base">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -313,14 +313,14 @@ export function VehicleChecklistModal({
               type="button" 
               variant="outline" 
               onClick={onClose}
-              className="w-full sm:w-auto order-2 sm:order-1 min-h-[44px] text-base font-medium"
+              className="w-full sm:w-auto order-2 sm:order-1 text-base font-medium"
             >
               Cancelar
             </Button>
             <Button 
               type="submit" 
               disabled={loading}
-              className="w-full sm:w-auto order-1 sm:order-2 bg-brand hover:bg-brand-hover min-h-[44px] text-base font-medium"
+              className="w-full sm:w-auto order-1 sm:order-2 bg-brand hover:bg-brand-hover text-base font-medium"
             >
               {loading ? "Salvando..." : checklist ? "Atualizar" : "Cadastrar"}
             </Button>

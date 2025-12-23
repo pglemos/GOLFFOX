@@ -192,7 +192,7 @@ export function VehicleMaintenanceModal({
               onValueChange={(value) => setFormData({ ...formData, type: value })}
               required
             >
-              <SelectTrigger className="h-11 sm:h-12 text-base">
+              <SelectTrigger className="min-h-[48px] text-base">
                 <SelectValue placeholder="Selecione o tipo" />
               </SelectTrigger>
               <SelectContent>
@@ -217,7 +217,7 @@ export function VehicleMaintenanceModal({
               value={formData.due_at}
               onChange={(e) => setFormData({ ...formData, due_at: e.target.value })}
               required
-              className="h-11 sm:h-12 text-base"
+              className="text-base"
             />
           </div>
 
@@ -228,7 +228,7 @@ export function VehicleMaintenanceModal({
               value={formData.status}
               onValueChange={(value) => setFormData({ ...formData, status: value })}
             >
-              <SelectTrigger className="h-11 sm:h-12 text-base">
+              <SelectTrigger className="min-h-[48px] text-base">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -259,14 +259,14 @@ export function VehicleMaintenanceModal({
               type="button" 
               variant="outline" 
               onClick={onClose}
-              className="w-full sm:w-auto order-2 sm:order-1 min-h-[44px] text-base font-medium"
+              className="w-full sm:w-auto order-2 sm:order-1 text-base font-medium"
             >
               Cancelar
             </Button>
             <Button 
               type="submit" 
               disabled={loading}
-              className="w-full sm:w-auto order-1 sm:order-2 bg-brand hover:bg-brand-hover min-h-[44px] text-base font-medium"
+              className="w-full sm:w-auto order-1 sm:order-2 bg-brand hover:bg-brand-hover text-base font-medium"
             >
               {loading ? "Salvando..." : maintenance ? "Atualizar" : "Cadastrar"}
             </Button>

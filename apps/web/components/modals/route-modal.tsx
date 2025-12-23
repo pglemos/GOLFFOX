@@ -412,7 +412,7 @@ export function RouteModal({
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 placeholder="Ex: Linha 101 - Centro/Aeroporto"
-                className="h-11 sm:h-12 text-base"
+                className="text-base"
               />
             </div>
             <div>
@@ -421,7 +421,7 @@ export function RouteModal({
                 value={formData.company_id}
                 onValueChange={(value) => setFormData({ ...formData, company_id: value })}
               >
-                <SelectTrigger className="h-11 sm:h-12 text-base">
+                <SelectTrigger className="min-h-[48px] text-base">
                   <SelectValue placeholder="Selecione a empresa" />
                 </SelectTrigger>
                 <SelectContent>
@@ -443,7 +443,7 @@ export function RouteModal({
               value={formData.description || ""}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               placeholder="Descrição da rota"
-              className="h-11 sm:h-12 text-base"
+              className="text-base"
             />
           </div>
 
@@ -459,7 +459,7 @@ export function RouteModal({
                 value={formData.origin_address || ""}
                 onChange={(e) => setFormData({ ...formData, origin_address: e.target.value })}
                 placeholder="Endereço de origem"
-                className="h-11 sm:h-12 text-base"
+                className="text-base"
               />
             </div>
             <div>
@@ -472,7 +472,7 @@ export function RouteModal({
                 value={formData.destination_address || ""}
                 onChange={(e) => setFormData({ ...formData, destination_address: e.target.value })}
                 placeholder="Endereço de destino"
-                className="h-11 sm:h-12 text-base"
+                className="text-base"
               />
             </div>
           </div>
@@ -489,7 +489,7 @@ export function RouteModal({
                 type="time"
                 value={formData.scheduled_time || ""}
                 onChange={(e) => setFormData({ ...formData, scheduled_time: e.target.value })}
-                className="h-11 sm:h-12 text-base"
+                className="text-base"
               />
             </div>
             <div>
@@ -498,7 +498,7 @@ export function RouteModal({
                 value={formData.shift || 'manha'}
                 onValueChange={(value) => setFormData({ ...formData, shift: value })}
               >
-                <SelectTrigger className="h-11 sm:h-12 text-base">
+                <SelectTrigger className="min-h-[48px] text-base">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -528,7 +528,7 @@ export function RouteModal({
                     variant={isSelected ? "default" : "outline"}
                     size="sm"
                     onClick={() => toggleDay(day.value)}
-                    className="min-h-[44px] text-xs sm:text-sm"
+                    className="text-xs sm:text-sm"
                   >
                     <span className="hidden sm:inline">{day.label}</span>
                     <span className="sm:hidden">{day.label.substring(0, 3)}</span>
@@ -550,7 +550,7 @@ export function RouteModal({
                 value={newException}
                 onChange={(e) => setNewException(e.target.value)}
                 placeholder="dd/mm/aaaa"
-                className="flex-1 h-11 sm:h-12 text-base"
+                className="flex-1 text-base"
               />
               <Button type="button" onClick={addException} size="sm" className="min-h-[44px] text-xs sm:text-sm w-full sm:w-auto">
                 Adicionar
@@ -614,14 +614,14 @@ export function RouteModal({
             <Button 
               variant="outline" 
               onClick={onClose}
-              className="w-full sm:w-auto order-2 sm:order-1 min-h-[44px] text-base font-medium"
+              className="w-full sm:w-auto order-2 sm:order-1 text-base font-medium"
             >
               Cancelar
             </Button>
             <Button 
               onClick={handleSave} 
               disabled={loading}
-              className="w-full sm:w-auto order-1 sm:order-2 bg-brand hover:bg-brand-hover min-h-[44px] text-base font-medium"
+              className="w-full sm:w-auto order-1 sm:order-2 bg-brand hover:bg-brand-hover text-base font-medium"
             >
               {loading ? 'Salvando...' : 'Salvar'}
             </Button>

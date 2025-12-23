@@ -18,12 +18,15 @@ export default function AnalyticsPage() {
 
     return (
         <AppShell user={{ id: user.id, name: user.name || "Admin", email: user.email, role: user.role || "admin", avatar_url: user.avatar_url }}>
-            <div className="space-y-6">
-                <div className="flex items-center gap-3">
-                    <BarChart3 className="h-8 w-8 text-brand" />
-                    <div>
-                        <h1 className="text-2xl sm:text-3xl font-bold">Analytics</h1>
-                        <p className="text-sm text-ink-muted">Métricas e insights do sistema</p>
+            <div className="space-y-4 sm:space-y-6 w-full overflow-x-hidden">
+                {/* Header */}
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+                    <div className="min-w-0 flex-1">
+                        <h1 className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2 flex items-center gap-2">
+                            <BarChart3 className="h-5 w-5 sm:h-6 sm:w-6 text-brand" />
+                            Analytics
+                        </h1>
+                        <p className="text-sm sm:text-base text-muted-foreground">Métricas e insights do sistema</p>
                     </div>
                 </div>
 

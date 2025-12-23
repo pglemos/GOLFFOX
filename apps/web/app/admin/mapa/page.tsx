@@ -52,19 +52,22 @@ function MapaContent() {
       email: user.email,
       role: user.role || "admin"
     }}>
-      <div className="space-y-6 animate-fade-in">
+      <div className="space-y-4 sm:space-y-6 w-full overflow-x-hidden">
+        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="flex items-center gap-3"
+          className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4"
         >
-          <div className="p-3 rounded-lg-custom bg-brand-light">
-            <MapPin className="h-6 w-6 text-brand" />
-          </div>
-          <div>
-            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-1">Mapa da Frota</h1>
-            <p className="text-xs sm:text-sm md:text-base text-ink-muted">Visualize veículos e rotas em tempo real</p>
+          <div className="min-w-0 flex-1">
+            <h1 className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2 flex items-center gap-2">
+              <div className="p-2 rounded-lg bg-brand-light">
+                <MapPin className="h-5 w-5 sm:h-6 sm:w-6 text-brand" />
+              </div>
+              Mapa da Frota
+            </h1>
+            <p className="text-sm sm:text-base text-muted-foreground">Visualize veículos e rotas em tempo real</p>
           </div>
         </motion.div>
 

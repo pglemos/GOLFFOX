@@ -103,12 +103,12 @@ export default function AlertasPage() {
         avatar_url: undefined
       }}
     >
-      <div className="p-4 sm:p-6 lg:p-8 space-y-6">
+      <div className="space-y-4 sm:space-y-6 w-full overflow-x-hidden">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-bold">Alertas Operacionais</h1>
-            <p className="text-sm text-ink-muted mt-1">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+          <div className="min-w-0 flex-1">
+            <h1 className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2">Alertas Operacionais</h1>
+            <p className="text-sm sm:text-base text-muted-foreground">
               Monitore a saúde da sua frota e motoristas
             </p>
           </div>

@@ -428,9 +428,8 @@ export function TransportadoraDriversModal({ transportadora, isOpen, onClose }: 
                       disabled={loading}
                       required
                       maxLength={9}
-                      className="h-11"
                     />
-                    <Button type="button" variant="outline" onClick={handleCepBlur} disabled={loading || loadingCep} className="h-11 px-4">
+                    <Button type="button" variant="outline" onClick={handleCepBlur} disabled={loading || loadingCep} className="px-4">
                       {loadingCep ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
                     </Button>
                   </div>
@@ -445,7 +444,6 @@ export function TransportadoraDriversModal({ transportadora, isOpen, onClose }: 
                     placeholder="Rua Exemplo"
                     disabled={loading}
                     required
-                    className="h-11"
                   />
                 </div>
 
@@ -458,7 +456,6 @@ export function TransportadoraDriversModal({ transportadora, isOpen, onClose }: 
                     placeholder="123"
                     disabled={loading}
                     required
-                    className="h-11"
                   />
                 </div>
 
@@ -471,7 +468,6 @@ export function TransportadoraDriversModal({ transportadora, isOpen, onClose }: 
                     placeholder="Centro"
                     disabled={loading}
                     required
-                    className="h-11"
                   />
                 </div>
 
@@ -483,7 +479,6 @@ export function TransportadoraDriversModal({ transportadora, isOpen, onClose }: 
                     onChange={(e) => setFormData({ ...formData, address_complement: e.target.value })}
                     placeholder="Apto 101"
                     disabled={loading}
-                    className="h-11"
                   />
                 </div>
 
@@ -493,7 +488,7 @@ export function TransportadoraDriversModal({ transportadora, isOpen, onClose }: 
                     id="city"
                     value={formData.address_city}
                     readOnly
-                    className="h-11 bg-bg-soft"
+                    className="bg-bg-soft"
                   />
                 </div>
 
@@ -503,7 +498,7 @@ export function TransportadoraDriversModal({ transportadora, isOpen, onClose }: 
                     id="state"
                     value={formData.address_state}
                     readOnly
-                    className="h-11 bg-bg-soft"
+                    className="bg-bg-soft"
                   />
                 </div>
               </div>
@@ -514,7 +509,7 @@ export function TransportadoraDriversModal({ transportadora, isOpen, onClose }: 
                   variant="outline"
                   onClick={resetForm}
                   disabled={loading}
-                  className="w-full sm:w-auto order-2 sm:order-1 min-h-[44px] text-base font-medium"
+                  className="w-full sm:w-auto order-2 sm:order-1 text-base font-medium"
                 >
                   <X className="h-4 w-4 mr-2 flex-shrink-0" />
                   Cancelar
@@ -522,7 +517,7 @@ export function TransportadoraDriversModal({ transportadora, isOpen, onClose }: 
                 <Button
                   type="submit"
                   disabled={loading || !formData.name}
-                  className="w-full sm:w-auto order-1 sm:order-2 bg-brand hover:bg-brand-hover min-h-[44px] text-base font-medium"
+                  className="w-full sm:w-auto order-1 sm:order-2 bg-brand hover:bg-brand-hover text-base font-medium"
                 >
                   {loading ? 'Salvando...' : editingDriver ? 'Atualizar Motorista' : 'Criar Motorista'}
                 </Button>

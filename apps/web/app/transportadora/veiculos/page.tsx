@@ -261,11 +261,12 @@ export default function TransportadoraVeiculosPage() {
 
   return (
     <AppShell user={{ id: user?.id || "", name: user?.name || "Transportadora", email: user?.email || "", role: "transportadora", avatar_url: user?.avatar_url }}>
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold mb-2">Veículos</h1>
-            <p className="text-ink-muted">Gerencie a frota da transportadora</p>
+      <div className="space-y-4 sm:space-y-6 w-full overflow-x-hidden">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+          <div className="min-w-0 flex-1">
+            <h1 className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2">Veículos</h1>
+            <p className="text-sm sm:text-base text-muted-foreground">Gerencie a frota da transportadora</p>
           </div>
         </div>
 
@@ -276,11 +277,11 @@ export default function TransportadoraVeiculosPage() {
             <TabsTrigger value="maintenances">Manutenções</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="list" className="space-y-6">
+          <TabsContent value="list" className="space-y-4 sm:space-y-6">
             {/* Filtros e Busca */}
             <Card>
               <CardContent className="pt-6">
-                <div className="flex flex-col sm:flex-row gap-4">
+                <div className="flex flex-col sm:flex-row gap-2">
                   {/* Busca */}
                   <div className="relative flex-1">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-ink-light h-4 w-4" />

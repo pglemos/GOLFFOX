@@ -206,7 +206,8 @@ export function CompanyUsersModal({
                             setSelectedOperatorForEdit(operador)
                             setIsEditModalOpen(true)
                           }}
-                          className="flex-1 sm:flex-none h-8 sm:h-9 text-xs"
+                          className="flex-1 sm:flex-none text-xs"
+                          size="sm"
                         >
                           <Edit className="h-3.5 w-3.5 mr-1.5" />
                           Editar
@@ -233,7 +234,7 @@ export function CompanyUsersModal({
               type="button"
               variant="outline"
               onClick={onClose}
-              className="w-full sm:w-auto min-h-[44px] text-base font-medium"
+              className="w-full sm:w-auto text-base font-medium"
             >
               Fechar
             </Button>

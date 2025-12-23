@@ -171,7 +171,7 @@ export default function TransportadoraMotoristasPage() {
                     </div>
                     <Button
                         onClick={handleNewDriver}
-                        className="w-full sm:w-auto flex-shrink-0 min-h-[44px] touch-manipulation"
+                        className="w-full sm:w-auto flex-shrink-0"
                     >
                         <Plus className="h-4 w-4 mr-2" />
                         <span className="hidden sm:inline">Cadastrar Motorista</span>

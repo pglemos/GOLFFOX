@@ -217,22 +217,23 @@ export default function TransportadorasPage() {
           background: 'var(--bg)'
         } as React.CSSProperties}
       >
-        <div className="space-y-4 sm:space-y-6 w-full max-w-full min-w-0">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 w-full">
-            <div className="min-w-0 flex-1 w-full sm:w-auto">
+        <div className="space-y-4 sm:space-y-6 w-full overflow-x-hidden">
+          {/* Header */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+            <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2 sm:gap-3 mb-1 sm:mb-2">
-                <h1 className="text-xl sm:text-2xl md:text-3xl font-bold break-words leading-tight">Transportadoras</h1>
+                <h1 className="text-2xl sm:text-3xl font-bold break-words">Transportadoras</h1>
                 {!loadingCarriers && !errorCarriers && Array.isArray(carriers) && carriers.length > 0 && (
                   <span className="px-2.5 py-0.5 rounded-full text-xs sm:text-sm font-semibold bg-text-brand/10 text-brand">
                     {carriers.length}
                   </span>
                 )}
               </div>
-              <p className="text-xs sm:text-sm md:text-base text-ink-muted break-words leading-relaxed">Gerencie transportadoras</p>
+              <p className="text-sm sm:text-base text-muted-foreground break-words">Gerencie transportadoras</p>
             </div>
             <Button
               onClick={() => setIsCreateModalOpen(true)}
-              className="w-full sm:w-auto flex-shrink-0 min-h-[44px] h-auto text-sm sm:text-base px-4 sm:px-6 py-2.5 sm:py-2.5 whitespace-nowrap"
+              className="w-full sm:w-auto flex-shrink-0"
             >
               <Plus className="h-4 w-4 mr-2 flex-shrink-0" />
               <span className="hidden sm:inline">Criar Transportadora</span>

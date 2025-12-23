@@ -257,7 +257,7 @@ export default function ManutencaoPage() {
                     </div>
                     <Button
                         onClick={() => { setSelectedMaintenance(null); setIsModalOpen(true) }}
-                        className="w-full sm:w-auto flex-shrink-0 min-h-[44px] touch-manipulation"
+                        className="w-full sm:w-auto flex-shrink-0"
                     >
                         <Plus className="h-4 w-4 mr-2" />
                         <span className="hidden sm:inline">Nova Manutenção</span>

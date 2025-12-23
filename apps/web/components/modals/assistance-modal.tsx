@@ -183,7 +183,7 @@ export function AssistanceModal({ request, isOpen, onClose, onSave }: Assistance
                 Motorista de Socorro *
               </Label>
               <Select value={selectedDriverId} onValueChange={setSelectedDriverId}>
-                <SelectTrigger className="h-11 sm:h-12 text-base">
+                <SelectTrigger className="min-h-[48px] text-base">
                   <SelectValue placeholder="Selecione um motorista disponível" />
                 </SelectTrigger>
                 <SelectContent>
@@ -211,7 +211,7 @@ export function AssistanceModal({ request, isOpen, onClose, onSave }: Assistance
                 Veículo de Socorro *
               </Label>
               <Select value={selectedVehicleId} onValueChange={setSelectedVehicleId}>
-                <SelectTrigger className="h-11 sm:h-12 text-base">
+                <SelectTrigger className="min-h-[48px] text-base">
                   <SelectValue placeholder="Selecione um veículo disponível" />
                 </SelectTrigger>
                 <SelectContent>
@@ -250,14 +250,14 @@ export function AssistanceModal({ request, isOpen, onClose, onSave }: Assistance
             type="button" 
             variant="outline" 
             onClick={onClose}
-            className="w-full sm:w-auto order-2 sm:order-1 min-h-[44px] text-base font-medium"
+            className="w-full sm:w-auto order-2 sm:order-1 text-base font-medium"
           >
             Cancelar
           </Button>
           <Button 
-            onClick={handleDispatch}
+            onClick={handleDispatch} 
             disabled={loading || !selectedDriverId || !selectedVehicleId}
-            className="bg-error hover:bg-error/90 w-full sm:w-auto order-1 sm:order-2 min-h-[44px] text-base font-medium"
+            className="bg-error hover:bg-error/90 w-full sm:w-auto order-1 sm:order-2 text-base font-medium"
           >
             <Send className="h-4 w-4 mr-2 flex-shrink-0" />
             <span className="hidden sm:inline">{loading ? "Despachando..." : "Despachar Socorro"}</span>

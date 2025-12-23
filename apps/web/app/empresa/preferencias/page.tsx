@@ -44,13 +44,16 @@ export default function PreferenciasOperatorPage() {
 
   return (
     <AppShell user={{ id: user.id, name: user.name || "Operador", email: user.email, role: user.role || "operador", avatar_url: user.avatar_url }} panel="operador">
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold mb-2">Preferências & Integrações</h1>
-            <p className="text-ink-muted">Definições de turnos, tolerâncias e conectores</p>
+      <div className="space-y-4 sm:space-y-6 w-full overflow-x-hidden">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+          <div className="min-w-0 flex-1">
+            <h1 className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2">Preferências & Integrações</h1>
+            <p className="text-sm sm:text-base text-muted-foreground">Definições de turnos, tolerâncias e conectores</p>
           </div>
-          <Button variant="outline"><Settings className="h-4 w-4 mr-2" /> Salvar</Button>
+          <Button variant="outline" className="w-full sm:w-auto min-h-[44px] touch-manipulation">
+            <Settings className="h-4 w-4 mr-2" /> Salvar
+          </Button>
         </div>
 
         <motion.div

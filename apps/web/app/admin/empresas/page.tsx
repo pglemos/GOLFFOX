@@ -150,22 +150,23 @@ export default function EmpresasPage() {
 
   return (
     <AppShell user={{ id: user.id, name: user.name || "Admin", email: user.email, role: user.role || "admin", avatar_url: user.avatar_url }}>
-      <div className="w-full h-full space-y-4 sm:space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 w-full">
-          <div className="min-w-0 flex-1 w-full sm:w-auto">
+      <div className="space-y-4 sm:space-y-6 w-full overflow-x-hidden">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+          <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2 sm:gap-3 mb-1 sm:mb-2">
-              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold break-words leading-tight">Empresas</h1>
+              <h1 className="text-2xl sm:text-3xl font-bold break-words">Empresas</h1>
               {!loadingEmpresas && !errorEmpresas && Array.isArray(empresas) && empresas.length > 0 && (
                 <span className="px-2.5 py-0.5 rounded-full text-xs sm:text-sm font-semibold bg-text-brand/10 text-brand">
                   {empresas.length}
                 </span>
               )}
             </div>
-            <p className="text-xs sm:text-sm md:text-base text-ink-muted break-words leading-relaxed">Gerencie empresas e funcionários</p>
+            <p className="text-sm sm:text-base text-muted-foreground break-words">Gerencie empresas e funcionários</p>
           </div>
           <Button
             onClick={() => setIsCreateOperatorModalOpen(true)}
-            className="w-full sm:w-auto flex-shrink-0 min-h-[44px] h-auto text-sm sm:text-base px-4 sm:px-6 py-2.5 sm:py-2.5 whitespace-nowrap touch-manipulation"
+            className="w-full sm:w-auto flex-shrink-0"
           >
             <Plus className="h-4 w-4 mr-2 flex-shrink-0" />
             <span className="hidden sm:inline">Criar Empresa</span>

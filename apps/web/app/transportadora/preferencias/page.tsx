@@ -34,13 +34,14 @@ export default function PreferenciasTransportadoraPage() {
 
   return (
     <AppShell user={{ id: user.id, name: user.name || "Transportadora", email: user.email, role: user.role || "transportadora", avatar_url: user.avatar_url }} panel="transportadora">
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-bold mb-2">Preferências</h1>
-            <p className="text-sm sm:text-base text-ink-muted">Configurações da transportadora</p>
+      <div className="space-y-4 sm:space-y-6 w-full overflow-x-hidden">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+          <div className="min-w-0 flex-1">
+            <h1 className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2">Preferências</h1>
+            <p className="text-sm sm:text-base text-muted-foreground">Configurações da transportadora</p>
           </div>
-          <Button variant="outline">
+          <Button variant="outline" className="w-full sm:w-auto">
             <Settings className="h-4 w-4 mr-2" /> 
             Salvar
           </Button>

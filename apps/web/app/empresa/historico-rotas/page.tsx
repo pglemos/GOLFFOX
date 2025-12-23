@@ -105,19 +105,20 @@ export default function HistoricoRotasPage() {
 
     return (
         <AppShell panel="operador" user={user ? { id: user.id, name: user.name, email: user.email || '', role: user.role || 'operador', avatar_url: (user as any).avatar_url } : { id: 'mock', name: 'Operador', email: 'op@golffox.com', role: 'operador' }}>
-            <div className="p-4 sm:p-6 lg:p-8 space-y-6">
+            <div className="space-y-4 sm:space-y-6 w-full overflow-x-hidden">
                 {/* Header */}
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                    <div>
-                        <h1 className="text-2xl sm:text-3xl font-bold">Histórico de Rotas</h1>
-                        <p className="text-sm text-ink-muted mt-1">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+                    <div className="min-w-0 flex-1">
+                        <h1 className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2">Histórico de Rotas</h1>
+                        <p className="text-sm sm:text-base text-muted-foreground">
                             Consulte o histórico detalhado de execução das rotas
                         </p>
                     </div>
                     <div className="flex gap-2">
-                        <Button variant="outline">
+                        <Button variant="outline" className="w-full sm:w-auto">
                             <Calendar className="h-4 w-4 mr-2" />
-                            Exportar Relatório
+                            <span className="hidden sm:inline">Exportar Relatório</span>
+                            <span className="sm:hidden">Exportar</span>
                         </Button>
                     </div>
                 </div>

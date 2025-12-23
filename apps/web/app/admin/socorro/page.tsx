@@ -232,7 +232,7 @@ export default function SocorroPage() {
                   onValueChange={(value) => dispatchFormDispatch({ type: 'SET_ROUTE_ID', payload: value })}
                   disabled={dispatchFormState.loading.loadingResources}
                 >
-                  <SelectTrigger className={`h-12 text-base ${!dispatchFormState.selections.routeId ? 'border-error-light' : ''}`}>
+                  <SelectTrigger className={`min-h-[48px] text-base ${!dispatchFormState.selections.routeId ? 'border-error-light' : ''}`}>
                     <SelectValue placeholder="Selecione uma rota com problema" />
                   </SelectTrigger>
                   <SelectContent>
@@ -262,7 +262,7 @@ export default function SocorroPage() {
                   onValueChange={(value) => dispatchFormDispatch({ type: 'SET_DRIVER_ID', payload: value })}
                   disabled={dispatchFormState.loading.loadingResources}
                 >
-                  <SelectTrigger className="h-12 text-base">
+                  <SelectTrigger className="min-h-[48px] text-base">
                     <SelectValue placeholder="Selecione um motorista de socorro" />
                   </SelectTrigger>
                   <SelectContent>
@@ -292,7 +292,7 @@ export default function SocorroPage() {
                   onValueChange={(value) => dispatchFormDispatch({ type: 'SET_VEHICLE_ID', payload: value })}
                   disabled={dispatchFormState.loading.loadingResources}
                 >
-                  <SelectTrigger className="h-12 text-base">
+                  <SelectTrigger className="min-h-[48px] text-base">
                     <SelectValue placeholder="Selecione um veículo de socorro" />
                   </SelectTrigger>
                   <SelectContent>
@@ -316,7 +316,7 @@ export default function SocorroPage() {
                 <Button
                   onClick={handleDispatchEmergency}
                   disabled={dispatchFormState.loading.dispatching || !dispatchFormState.selections.routeId || !dispatchFormState.selections.driverId || !dispatchFormState.selections.vehicleId || dispatchFormState.loading.loadingResources}
-                  className="w-full bg-text-error hover:bg-text-error/90 h-12 text-base font-semibold"
+                  className="w-full bg-text-error hover:bg-text-error/90 text-base font-semibold"
                   size="lg"
                 >
                   <Send className="h-5 w-5 mr-2" />

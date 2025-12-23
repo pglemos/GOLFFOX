@@ -204,17 +204,17 @@ export function RotasPageContent() {
   return (
     <AppShell user={{ id: user.id, name: user.name || "Admin", email: user.email, role: user.role || "admin", avatar_url: user.avatar_url }}>
       <TransitionOverlay>
-        <div className="p-6 space-y-6">
+        <div className="space-y-4 sm:space-y-6 w-full overflow-x-hidden">
           {/* Header */}
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <div>
-              <h1 className="text-3xl font-bold text-text-ink-strong flex items-center gap-2">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+            <div className="min-w-0 flex-1">
+              <h1 className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2 flex items-center gap-2">
                 <div className="p-2 rounded-lg bg-gradient-to-br from-bg-brand-light to-bg-brand-soft">
-                  <Route className="h-6 w-6 text-brand" />
+                  <Route className="h-5 w-5 sm:h-6 sm:w-6 text-brand" />
                 </div>
                 Rotas
               </h1>
-              <p className="text-ink-muted mt-1">Gerencie as rotas do sistema</p>
+              <p className="text-sm sm:text-base text-muted-foreground">Gerencie as rotas do sistema</p>
             </div>
             <div className="flex gap-2">
               <RouteCreateModal
@@ -232,15 +232,16 @@ export function RotasPageContent() {
               <Button onClick={() => {
                 setSelectedRoute(null)
                 setIsModalOpen(true)
-              }}>
+              }} className="w-full sm:w-auto">
                 <Plus className="h-4 w-4 mr-2" />
-                Nova Rota
+                <span className="hidden sm:inline">Nova Rota</span>
+                <span className="sm:hidden">Nova</span>
               </Button>
             </div>
           </div>
 
           {/* Search Bar and Filters */}
-          <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex flex-col sm:flex-row gap-2">
             <div className="flex-1">
               <SearchBarPremium
                 value={searchQuery}

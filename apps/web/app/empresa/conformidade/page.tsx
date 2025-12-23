@@ -60,10 +60,13 @@ export default function ConformidadeOperatorPage() {
 
   return (
     <AppShell user={{ id: user?.id || "", name: user?.name || "Operador", email: user?.email || "", role: "operador", avatar_url: user?.avatar_url }}>
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold mb-2">Conformidade & Segurança</h1>
-          <p className="text-ink-muted">Incidentes, auditorias e documentos</p>
+      <div className="space-y-4 sm:space-y-6 w-full overflow-x-hidden">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+          <div className="min-w-0 flex-1">
+            <h1 className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2">Conformidade & Segurança</h1>
+            <p className="text-sm sm:text-base text-muted-foreground">Incidentes, auditorias e documentos</p>
+          </div>
         </div>
 
         <div className="grid gap-4">

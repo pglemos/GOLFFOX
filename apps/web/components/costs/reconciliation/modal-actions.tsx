@@ -65,7 +65,7 @@ export function ModalActions({
           variant="outline"
           onClick={onClose}
           disabled={processing}
-          className="min-h-[44px] text-base font-medium w-full sm:w-auto"
+          className="text-base font-medium w-full sm:w-auto"
         >
           Fechar
         </Button>

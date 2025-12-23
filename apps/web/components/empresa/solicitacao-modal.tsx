@@ -78,7 +78,7 @@ export function SolicitacaoModal({ isOpen, onClose, onSave, empresaId }: Solicit
           <div className="grid gap-2">
             <Label htmlFor="tipo" className="text-base font-medium">Tipo de Solicitação</Label>
             <Select value={tipo} onValueChange={setTipo}>
-              <SelectTrigger id="tipo" className="h-11 sm:h-12 text-base">
+              <SelectTrigger id="tipo" className="min-h-[48px] text-base">
                 <SelectValue placeholder="Selecione o tipo" />
               </SelectTrigger>
               <SelectContent>
@@ -168,14 +168,14 @@ export function SolicitacaoModal({ isOpen, onClose, onSave, empresaId }: Solicit
               type="button" 
               variant="outline" 
               onClick={onClose}
-              className="w-full sm:w-auto order-2 sm:order-1 min-h-[44px] text-base font-medium"
+              className="w-full sm:w-auto order-2 sm:order-1 text-base font-medium"
             >
               Cancelar
             </Button>
             <Button 
               type="submit" 
               disabled={loading} 
-              className="bg-brand hover:bg-brand-hover w-full sm:w-auto order-1 sm:order-2 min-h-[44px] text-base font-medium"
+              className="bg-brand hover:bg-brand-hover w-full sm:w-auto order-1 sm:order-2 text-base font-medium"
             >
               {loading ? "Enviando..." : "Enviar Solicitação"}
             </Button>

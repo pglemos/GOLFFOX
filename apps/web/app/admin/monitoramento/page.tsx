@@ -50,18 +50,19 @@ export default function MonitoramentoPage() {
 
     return (
         <AppShell panel="admin" user={user ? { id: user.id, name: user.name || 'Admin', email: user.email || '', role: user.role || 'admin' } : { id: 'mock', name: 'Admin', email: 'admin@golffox.com', role: 'admin' }}>
-            <div className="p-4 sm:p-6 lg:p-8 space-y-6">
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                    <div>
-                        <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-2">
-                            <Activity className="h-7 w-7 text-primary" />
+            <div className="space-y-4 sm:space-y-6 w-full overflow-x-hidden">
+                {/* Header */}
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+                    <div className="min-w-0 flex-1">
+                        <h1 className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2 flex items-center gap-2">
+                            <Activity className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
                             Monitoramento do Sistema
                         </h1>
-                        <p className="text-sm text-muted-foreground mt-1">
+                        <p className="text-sm sm:text-base text-muted-foreground">
                             Status de saúde e performance da plataforma
                         </p>
                     </div>
-                    <Button onClick={checkHealth} disabled={isChecking} variant="outline">
+                    <Button onClick={checkHealth} disabled={isChecking} variant="outline" className="w-full sm:w-auto">
                         <RefreshCw className={`h-4 w-4 mr-2 ${isChecking ? 'animate-spin' : ''}`} />
                         Verificar Agora
                     </Button>

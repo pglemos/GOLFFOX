@@ -29,10 +29,13 @@ export default function ContratosEmpresaPage() {
                 avatar_url: user?.avatar_url
             }}
         >
-            <div className="container mx-auto py-6 space-y-6">
-                <div>
-                    <h1 className="text-3xl font-bold mb-2">Contratos</h1>
-                    <p className="text-muted-foreground">Gerencie seus contratos e assinaturas</p>
+            <div className="space-y-4 sm:space-y-6 w-full overflow-x-hidden">
+                {/* Header */}
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+                    <div className="min-w-0 flex-1">
+                        <h1 className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2">Contratos</h1>
+                        <p className="text-sm sm:text-base text-muted-foreground">Gerencie seus contratos e assinaturas</p>
+                    </div>
                 </div>
 
                 {tenantCompanyId ? (

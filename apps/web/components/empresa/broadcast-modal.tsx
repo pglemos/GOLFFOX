@@ -69,7 +69,7 @@ export function BroadcastModal({ isOpen, onClose, onSave, empresaId }: Broadcast
           <div className="grid gap-2">
             <Label htmlFor="target" className="text-base font-medium">Enviar Para</Label>
             <Select value={target} onValueChange={setTarget}>
-              <SelectTrigger id="target" className="h-11 sm:h-12 text-base">
+              <SelectTrigger id="target" className="min-h-[48px] text-base">
                 <SelectValue placeholder="Selecione o grupo" />
               </SelectTrigger>
               <SelectContent>
@@ -93,7 +93,7 @@ export function BroadcastModal({ isOpen, onClose, onSave, empresaId }: Broadcast
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Ex: Aviso de Alteração de Rota"
               required
-              className="h-11 sm:h-12 text-base"
+              className="text-base"
             />
           </div>
 
@@ -114,14 +114,14 @@ export function BroadcastModal({ isOpen, onClose, onSave, empresaId }: Broadcast
               type="button" 
               variant="outline" 
               onClick={onClose}
-              className="w-full sm:w-auto order-2 sm:order-1 min-h-[44px] text-base font-medium"
+              className="w-full sm:w-auto order-2 sm:order-1 text-base font-medium"
             >
               Cancelar
             </Button>
             <Button 
               type="submit" 
               disabled={loading} 
-              className="bg-brand hover:bg-brand-hover w-full sm:w-auto order-1 sm:order-2 min-h-[44px] text-base font-medium"
+              className="bg-brand hover:bg-brand-hover w-full sm:w-auto order-1 sm:order-2 text-base font-medium"
             >
               <Send className="h-4 w-4 mr-2 flex-shrink-0" />
               <span className="hidden sm:inline">{loading ? "Enviando..." : "Enviar Broadcast"}</span>

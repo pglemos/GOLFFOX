@@ -338,15 +338,15 @@ export default function TransportadoraConfiguracoesPage() {
 
   return (
     <AppShell user={{ id: user.id, name: user.name || "Transportadora", email: user.email, role: user.role || "transportadora", avatar_url: user.avatar_url }} panel="transportadora">
-      <div className="w-full max-w-5xl mx-auto space-y-6">
+      <div className="space-y-4 sm:space-y-6 w-full overflow-x-hidden">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-border">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-2 mb-2">
-              <Settings2 className="h-6 w-6 sm:h-7 sm:w-7 text-brand" />
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+          <div className="min-w-0 flex-1">
+            <h1 className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2 flex items-center gap-2">
+              <Settings2 className="h-5 w-5 sm:h-6 sm:w-6 text-brand" />
               Configurações
             </h1>
-            <p className="text-sm sm:text-base text-ink-muted">
+            <p className="text-sm sm:text-base text-muted-foreground">
               Gerencie suas informações pessoais e preferências
             </p>
           </div>

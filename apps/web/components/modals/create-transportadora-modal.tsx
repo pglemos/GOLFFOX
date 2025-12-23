@@ -137,31 +137,31 @@ export function CreateTransportadoraModal({ isOpen, onClose, onSave }: CreateTra
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-6">
             <div className="col-span-1 sm:col-span-2">
               <Label htmlFor="name" className="text-base font-medium">Nome da Transportadora *</Label>
-              <Input id="name" value={name} onChange={e => setName(e.target.value)} required placeholder="Ex: Transportes XYZ Ltda" className="text-base min-h-[44px] h-11 sm:h-12 px-4 py-3" />
+              <Input id="name" value={name} onChange={e => setName(e.target.value)} required placeholder="Ex: Transportes XYZ Ltda" />
             </div>
             <div>
               <Label htmlFor="cnpj" className="text-base font-medium">CNPJ</Label>
-              <Input id="cnpj" value={cnpj} onChange={e => setCnpj(e.target.value)} placeholder="00.000.000/0000-00" maxLength={18} className="text-base min-h-[44px] h-11 sm:h-12 px-4 py-3" />
+              <Input id="cnpj" value={cnpj} onChange={e => setCnpj(e.target.value)} placeholder="00.000.000/0000-00" maxLength={18} />
             </div>
             <div>
               <Label htmlFor="stateRegistration" className="text-base font-medium">Inscrição Estadual</Label>
-              <Input id="stateRegistration" value={stateRegistration} onChange={e => setStateRegistration(e.target.value)} placeholder="123456789" className="text-base min-h-[44px] h-11 sm:h-12 px-4 py-3" />
+              <Input id="stateRegistration" value={stateRegistration} onChange={e => setStateRegistration(e.target.value)} placeholder="123456789" />
             </div>
             <div>
               <Label htmlFor="municipalRegistration" className="text-base font-medium">Inscrição Municipal</Label>
-              <Input id="municipalRegistration" value={municipalRegistration} onChange={e => setMunicipalRegistration(e.target.value)} placeholder="987654321" className="text-base min-h-[44px] h-11 sm:h-12 px-4 py-3" />
+              <Input id="municipalRegistration" value={municipalRegistration} onChange={e => setMunicipalRegistration(e.target.value)} placeholder="987654321" />
             </div>
             <div>
               <Label htmlFor="contactPerson" className="text-base font-medium">Pessoa de Contato</Label>
-              <Input id="contactPerson" value={contactPerson} onChange={e => setContactPerson(e.target.value)} placeholder="Nome do responsável" className="text-base min-h-[44px] h-11 sm:h-12 px-4 py-3" />
+              <Input id="contactPerson" value={contactPerson} onChange={e => setContactPerson(e.target.value)} placeholder="Nome do responsável" />
             </div>
             <div>
               <Label htmlFor="phone" className="text-base font-medium">Telefone</Label>
-              <Input id="phone" value={phone} onChange={e => setPhone(e.target.value)} placeholder="(11) 98765-4321" className="text-base min-h-[44px] h-11 sm:h-12 px-4 py-3" />
+              <Input id="phone" value={phone} onChange={e => setPhone(e.target.value)} placeholder="(11) 98765-4321" />
             </div>
             <div>
               <Label htmlFor="email" className="text-base font-medium">E-mail</Label>
-              <Input id="email" type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="contato@transportadora.com" className="text-base min-h-[44px] h-11 sm:h-12 px-4 py-3" />
+              <Input id="email" type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="contato@transportadora.com" />
             </div>
             <div className="col-span-1 sm:col-span-2">
               <AddressForm
@@ -185,8 +185,8 @@ export function CreateTransportadoraModal({ isOpen, onClose, onSave }: CreateTra
             </div>
           </div>
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-2 justify-end pt-4 sm:pt-6 border-t mt-4 sm:mt-6">
-            <Button type="button" variant="outline" onClick={onClose} disabled={loading} className="w-full sm:w-auto order-2 sm:order-1 min-h-[44px] text-base font-medium">Cancelar</Button>
-            <Button type="submit" disabled={loading || !name} className="w-full sm:w-auto order-1 sm:order-2 bg-brand hover:bg-brand-hover min-h-[44px] text-base font-medium">
+            <Button type="button" variant="outline" onClick={onClose} disabled={loading} className="w-full sm:w-auto order-2 sm:order-1 text-base font-medium">Cancelar</Button>
+            <Button type="submit" disabled={loading || !name} className="w-full sm:w-auto order-1 sm:order-2 bg-brand hover:bg-brand-hover text-base font-medium">
               {loading ? 'Criando...' : 'Salvar Transportadora'}
             </Button>
           </div>

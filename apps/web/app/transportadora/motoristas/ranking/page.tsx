@@ -124,18 +124,19 @@ export default function MotoristasPage() {
 
   return (
     <AppShell panel="transportadora" user={user ? { id: user.id, name: user.name || 'Transportadora', email: user.email || 'transp@golffox.com', role: user.role || 'transportadora', avatar_url: (user as any).avatar_url } : { id: 'mock', name: 'Transportadora', email: 'transp@golffox.com', role: 'transportadora' }}>
-      <div className="p-4 sm:p-6 lg:p-8 space-y-6">
+      <div className="space-y-4 sm:space-y-6 w-full overflow-x-hidden">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-bold">Gestão de Motoristas</h1>
-            <p className="text-sm text-ink-muted mt-1">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+          <div className="min-w-0 flex-1">
+            <h1 className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2">Gestão de Motoristas</h1>
+            <p className="text-sm sm:text-base text-muted-foreground">
               Classificação baseada em performance e indicadores
             </p>
           </div>
-          <Button className="bg-brand hover:bg-brand-hover">
+          <Button className="w-full sm:w-auto bg-brand hover:bg-brand-hover">
             <UserPlus className="h-4 w-4 mr-2" />
-            Adicionar Motorista
+            <span className="hidden sm:inline">Adicionar Motorista</span>
+            <span className="sm:hidden">Adicionar</span>
           </Button>
         </div>
 

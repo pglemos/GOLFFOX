@@ -198,7 +198,7 @@ export function RouteForm({
                                     setFormData((prev) => ({ ...prev, shift: value }))
                                 }
                             >
-                                <SelectTrigger id="shift" className="text-base h-11 sm:h-12 px-4 py-3">
+                                <SelectTrigger id="shift" className="text-base">
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>

@@ -119,7 +119,7 @@ export function TransportadoraUsersModal({ transportadora, isOpen, onClose, onSa
 
         <div className="space-y-4 sm:space-y-6">
           {!showCreateForm && (
-            <Button onClick={() => setShowCreateForm(true)} className="w-full min-h-[44px] text-sm sm:text-base">
+            <Button onClick={() => setShowCreateForm(true)} className="w-full text-sm sm:text-base">
               <UserPlus className="h-4 w-4 mr-2 flex-shrink-0" />
               <span className="hidden sm:inline">Criar Novo Login de Acesso</span>
               <span className="sm:hidden">Criar Login</span>
@@ -174,11 +174,11 @@ export function TransportadoraUsersModal({ transportadora, isOpen, onClose, onSa
                       setNewUserPassword("")
                     }}
                     disabled={loading}
-                    className="w-full sm:w-auto order-2 sm:order-1 min-h-[44px] text-base font-medium"
+                    className="w-full sm:w-auto order-2 sm:order-1 text-base font-medium"
                   >
                     Cancelar
                   </Button>
-                  <Button type="submit" disabled={loading} className="w-full sm:w-auto order-1 sm:order-2 bg-brand hover:bg-brand-hover min-h-[44px] text-base font-medium">
+                  <Button type="submit" disabled={loading} className="w-full sm:w-auto order-1 sm:order-2 bg-brand hover:bg-brand-hover text-base font-medium">
                     {loading ? 'Criando...' : 'Criar Usuário'}
                   </Button>
                 </div>

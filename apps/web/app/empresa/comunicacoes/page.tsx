@@ -69,14 +69,17 @@ function ComunicacoesOperatorPageInner() {
 
   return (
     <AppShell user={{ id: user?.id || "", name: user?.name || "Operador", email: user?.email || "", role: "operador", avatar_url: user?.avatar_url }}>
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold mb-2">Comunicações</h1>
-            <p className="text-ink-muted">Broadcasts internos e histórico</p>
+      <div className="space-y-4 sm:space-y-6 w-full overflow-x-hidden">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+          <div className="min-w-0 flex-1">
+            <h1 className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2">Comunicações</h1>
+            <p className="text-sm sm:text-base text-muted-foreground">Broadcasts internos e histórico</p>
           </div>
-          <Button className="bg-brand hover:bg-brand-hover" onClick={() => setIsModalOpen(true)}>
-            <Send className="h-4 w-4 mr-2" /> Novo Broadcast
+          <Button className="w-full sm:w-auto bg-brand hover:bg-brand-hover" onClick={() => setIsModalOpen(true)}>
+            <Send className="h-4 w-4 mr-2" />
+            <span className="hidden sm:inline">Novo Broadcast</span>
+            <span className="sm:hidden">Novo</span>
           </Button>
         </div>
 

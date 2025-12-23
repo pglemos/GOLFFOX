@@ -328,7 +328,7 @@ export function CreateUserModal({
                     required
                     maxLength={9}
                   />
-                  <Button type="button" variant="outline" onClick={handleCepBlur} disabled={loading || loadingCep} className="min-h-[48px] px-4">
+                  <Button type="button" variant="outline" onClick={handleCepBlur} disabled={loading || loadingCep} className="px-4">
                     {loadingCep ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
                   </Button>
                 </div>
@@ -415,14 +415,14 @@ export function CreateUserModal({
               onClick={onClose}
               disabled={loading}
               type="button"
-              className="w-full sm:w-auto order-2 sm:order-1 min-h-[44px] text-base font-medium"
+              className="w-full sm:w-auto order-2 sm:order-1 text-base font-medium"
             >
               Cancelar
             </Button>
             <Button
               type="submit"
               disabled={loading}
-              className="w-full sm:w-auto order-1 sm:order-2 bg-brand hover:bg-brand-hover min-h-[44px] text-base font-medium"
+              className="w-full sm:w-auto order-1 sm:order-2 bg-brand hover:bg-brand-hover text-base font-medium"
             >
               {loading ? (
                 <>

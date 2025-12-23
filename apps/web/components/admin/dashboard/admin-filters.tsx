@@ -147,7 +147,6 @@ export function AdminFilters({ initialFilters, onFiltersChange }: AdminFiltersPr
                 placeholder="Todas as empresas"
                 value={tempFilters.empresa}
                 onChange={(e) => setTempFilters({ ...tempFilters, empresa: e.target.value })}
-                className="h-9"
               />
             </div>
             
@@ -159,7 +158,7 @@ export function AdminFilters({ initialFilters, onFiltersChange }: AdminFiltersPr
                   type="date"
                   value={tempFilters.data}
                   onChange={(e) => setTempFilters({ ...tempFilters, data: e.target.value })}
-                  className="pl-10 h-9"
+                  className="pl-10"
                 />
               </div>
             </div>
@@ -186,14 +185,14 @@ export function AdminFilters({ initialFilters, onFiltersChange }: AdminFiltersPr
               variant="outline"
               size="sm"
               onClick={() => setFiltersExpanded(false)}
-              className="flex-1 h-9"
+              className="flex-1"
             >
               Cancelar
             </Button>
             <Button
               size="sm"
               onClick={handleSaveFilters}
-              className="flex-1 h-9"
+              className="flex-1"
             >
               <Save className="h-3.5 w-3.5 mr-1.5" />
               Aplicar

@@ -81,7 +81,7 @@ export default function SolicitacoesOperatorPage() {
             <p className="text-sm sm:text-base text-ink-muted break-words">Abra solicitações para a GOLF FOX e acompanhe o status</p>
           </div>
           <Button 
-            className="bg-brand hover:bg-brand-hover w-full sm:w-auto flex-shrink-0 min-h-[44px] text-sm sm:text-base px-4 sm:px-6 py-2 sm:py-2.5" 
+            className="bg-brand hover:bg-brand-hover w-full sm:w-auto flex-shrink-0" 
             onClick={() => setIsModalOpen(true)}
           >
             <Plus className="h-4 w-4 mr-2 flex-shrink-0" /> 
