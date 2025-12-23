@@ -105,6 +105,12 @@ tmp-*
 *.debug.html
 *.debug.png
 
+# TestSprite temporary files and documentation
+TESTSPRITE_*.md
+*TESTSPRITE*.md
+testsprite_tests/
+*testsprite*.js
+
 # Archive or backup files
 *.orig
 *.bak

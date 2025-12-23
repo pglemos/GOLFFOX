@@ -2,7 +2,19 @@
   "mcpServers": {
     "browsermcp": {
       "command": "npx",
-      "args": ["@browsermcp/mcp@latest"]
+      "args": [
+        "@browsermcp/mcp@latest"
+      ]
+    },
+    "TestSprite": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@testsprite/testsprite-mcp@latest"
+      ],
+      "env": {
+        "API_KEY": "sk-user-sGA6u-E1IXFjCTgvqHzr_eRecnu8qNSWXW5E0xarDLrXoRV0mQVFO4h36P1ZaSVGfr1yJdJ7Y5pwZt6DmZIG8ZmTaZ3qOn88f-fYNXqhWA7U7LBHK9YRiFb-i9W0_txW-GI"
+      }
     }
   }
 }

@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "@/lib/next-navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Checkbox } from "@/components/ui/checkbox"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Mail, Lock, Eye, EyeOff, ArrowRight, Sparkles, Shield, Zap } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { AuthManager } from "@/lib/auth"
@@ -130,6 +131,11 @@ function LoginContent() {
   const [transitioning, setTransitioning] = useState<boolean>(false)
   const sessionCheckRef = useRef<boolean>(false)
   const redirectingRef = useRef<boolean>(false)
+  const [showForgotPassword, setShowForgotPassword] = useState(false)
+  const [resetEmail, setResetEmail] = useState("")
+  const [resetLoading, setResetLoading] = useState(false)
+  const [resetSuccess, setResetSuccess] = useState(false)
+  const [resetError, setResetError] = useState<string | null>(null)
 
   // Verificar sessão apenas uma vez no mount, com tratamento de erro robusto
   useEffect(() => {
@@ -998,6 +1004,50 @@ function LoginContent() {
     ]
   )
 
+  // Função para lidar com recuperação de senha
+  const handleResetPassword = useCallback(async () => {
+    if (!resetEmail || !EMAIL_REGEX.test(resetEmail)) {
+      setResetError('Por favor, informe um e-mail válido')
+      return
+    }
+
+    setResetLoading(true)
+    setResetError(null)
+    setResetSuccess(false)
+
+    try {
+      const response = await fetch('/api/auth/reset-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: resetEmail }),
+      })
+
+      const data = await response.json()
+
+      if (response.ok && data.success) {
+        setResetSuccess(true)
+        setResetError(null)
+        // Fechar modal após 3 segundos
+        setTimeout(() => {
+          setShowForgotPassword(false)
+          setResetEmail('')
+          setResetSuccess(false)
+        }, 3000)
+      } else {
+        setResetError(data.error || 'Erro ao solicitar recuperação de senha')
+        setResetSuccess(false)
+      }
+    } catch (err: any) {
+      logError('Erro ao solicitar reset de senha', { error: err }, 'LoginPage')
+      setResetError('Erro ao processar solicitação. Tente novamente.')
+      setResetSuccess(false)
+    } finally {
+      setResetLoading(false)
+    }
+  }, [resetEmail])
+
   // Estatística sem animações (estilo minimalista)
   const StatItem = memo(({ value, label }: { value: string, label: string }) => {
     return (
@@ -1431,7 +1481,10 @@ function LoginContent() {
                     </motion.label>
                     <motion.button
                       type="button"
-                      onClick={() => debug('Forgot password clicked', {}, 'LoginPage')}
+                      onClick={() => {
+                        setResetEmail(email || '')
+                        setShowForgotPassword(true)
+                      }}
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                       className="text-brand hover:text-brand-hover font-semibold transition-colors touch-manipulation text-sm whitespace-nowrap"
@@ -1626,7 +1679,10 @@ function LoginContent() {
                   </label>
                   <button
                     type="button"
-                    onClick={() => debug('Forgot password clicked', {}, 'LoginPage')}
+                    onClick={() => {
+                      setResetEmail(email || '')
+                      setShowForgotPassword(true)
+                    }}
                     className="text-xs font-semibold text-brand hover:text-brand-hover transition-colors"
                   >
                     Esqueceu?
@@ -1722,6 +1778,100 @@ function LoginContent() {
           </motion.div>
         </div>
       </div>
+
+      {/* Modal de Recuperação de Senha */}
+      <Dialog open={showForgotPassword} onOpenChange={setShowForgotPassword}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold">Recuperar Senha</DialogTitle>
+            <DialogDescription>
+              Digite seu e-mail para receber instruções de recuperação de senha.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            {resetSuccess ? (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="p-4 bg-success-light/10 border border-success/20 rounded-xl text-sm text-success"
+              >
+                <div className="flex items-center gap-2">
+                  <Sparkles className="w-5 h-5" />
+                  <p className="font-medium">
+                    Se o e-mail estiver cadastrado, você receberá instruções para redefinir sua senha.
+                  </p>
+                </div>
+              </motion.div>
+            ) : (
+              <>
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold text-ink-strong" htmlFor="reset-email">
+                    E-mail
+                  </label>
+                  <Input
+                    id="reset-email"
+                    type="email"
+                    placeholder="seu@email.com"
+                    value={resetEmail}
+                    onChange={(e) => setResetEmail(sanitizeInput(e.target.value))}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && !resetLoading) {
+                        e.preventDefault()
+                        handleResetPassword()
+                      }
+                    }}
+                    className="w-full"
+                    autoFocus
+                  />
+                </div>
+                {resetError && (
+                  <motion.p
+                    initial={{ opacity: 0, y: -5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="text-sm text-error"
+                  >
+                    {resetError}
+                  </motion.p>
+                )}
+                <div className="flex gap-3 justify-end pt-2">
+                  <Button
+                    type="button"
+                    onClick={() => {
+                      setShowForgotPassword(false)
+                      setResetEmail('')
+                      setResetError(null)
+                      setResetSuccess(false)
+                    }}
+                    disabled={resetLoading}
+                    className="bg-transparent hover:bg-bg-hover border border-border"
+                  >
+                    Cancelar
+                  </Button>
+                  <Button
+                    type="button"
+                    onClick={handleResetPassword}
+                    disabled={resetLoading || !resetEmail || !EMAIL_REGEX.test(resetEmail)}
+                    className="bg-brand hover:bg-brand-hover"
+                  >
+                    {resetLoading ? (
+                      <span className="flex items-center gap-2">
+                        <motion.span
+                          animate={{ rotate: 360 }}
+                          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                          className="rounded-full h-4 w-4 border-2 border-white/30 border-t-white"
+                        />
+                        Enviando...
+                      </span>
+                    ) : (
+                      'Enviar'
+                    )}
+                  </Button>
+                </div>
+              </>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

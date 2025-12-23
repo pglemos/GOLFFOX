@@ -125,6 +125,35 @@ Object.defineProperty(window, 'scrollTo', {
   value: jest.fn(),
 })
 
+// Mock global fetch
+global.fetch = jest.fn((url, options) => {
+  // Default mock response
+  const mockResponse = {
+    ok: true,
+    status: 200,
+    statusText: 'OK',
+    json: async () => ({}),
+    text: async () => '',
+    headers: new Headers(),
+    redirected: false,
+    type: 'default',
+    url: typeof url === 'string' ? url : url.toString(),
+  }
+  return Promise.resolve(mockResponse)
+})
+
+// Mock Headers if not available
+if (typeof Headers === 'undefined') {
+  global.Headers = class Headers {
+    constructor() {}
+    append() {}
+    delete() {}
+    get() { return null }
+    has() { return false }
+    set() {}
+  }
+}
+
 // Suppress console errors during tests
 const originalError = console.error
 beforeAll(() => {
