@@ -4,7 +4,7 @@
  */
 
 import { NextRequest } from 'next/server'
-import { GET, POST } from '@/app/api/admin/companies/route'
+import { GET, POST } from '@/app/api/admin/empresas/route'
 
 // Mock de autenticação
 jest.mock('@/lib/api-auth', () => ({
@@ -24,7 +24,7 @@ describe('Companies API - Integration Tests', () => {
     jest.clearAllMocks()
   })
 
-  describe('GET /api/admin/companies', () => {
+  describe('GET /api/admin/empresas', () => {
     it('deve retornar lista de empresas', async () => {
       const { CompanyService } = await import('@/lib/services')
       ;(CompanyService.listCompanies as jest.Mock).mockResolvedValue({
@@ -37,7 +37,7 @@ describe('Companies API - Integration Tests', () => {
         hasPrev: false
       })
 
-      const request = new NextRequest('http://localhost:3000/api/admin/companies')
+      const request = new NextRequest('http://localhost:3000/api/admin/empresas')
       const response = await GET(request)
       const data = await response.json()
 
@@ -58,7 +58,7 @@ describe('Companies API - Integration Tests', () => {
         hasPrev: true
       })
 
-      const request = new NextRequest('http://localhost:3000/api/admin/companies?page=2&limit=20')
+      const request = new NextRequest('http://localhost:3000/api/admin/empresas?page=2&limit=20')
       const response = await GET(request)
       const data = await response.json()
 
@@ -71,7 +71,7 @@ describe('Companies API - Integration Tests', () => {
     })
   })
 
-  describe('POST /api/admin/companies', () => {
+  describe('POST /api/admin/empresas', () => {
     it('deve criar nova empresa', async () => {
       const { CompanyService } = await import('@/lib/services')
       const mockCompany = {
@@ -83,7 +83,7 @@ describe('Companies API - Integration Tests', () => {
       }
       ;(CompanyService.createCompany as jest.Mock).mockResolvedValue(mockCompany)
 
-      const request = new NextRequest('http://localhost:3000/api/admin/companies', {
+      const request = new NextRequest('http://localhost:3000/api/admin/empresas', {
         method: 'POST',
         body: JSON.stringify({
           name: 'New Company'
@@ -103,7 +103,7 @@ describe('Companies API - Integration Tests', () => {
         new Error('Nome da empresa é obrigatório')
       )
 
-      const request = new NextRequest('http://localhost:3000/api/admin/companies', {
+      const request = new NextRequest('http://localhost:3000/api/admin/empresas', {
         method: 'POST',
         body: JSON.stringify({})
       })

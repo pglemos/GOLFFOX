@@ -1,4 +1,4 @@
-import { GET } from '@/app/api/admin/users-list/route'
+import { GET } from '@/app/api/admin/usuarios-list/route'
 import { createAdminRequest } from '../../../helpers/api-test-helpers'
 import { mockSupabaseClient } from '../../../helpers/mock-supabase'
 import { createTestUser } from '../../../helpers/test-data'
@@ -18,7 +18,7 @@ jest.mock('@/lib/api-auth', () => ({
   }),
 }))
 
-describe('GET /api/admin/users-list', () => {
+describe('GET /api/admin/usuarios-list', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockSupabaseClient.clear()
@@ -53,7 +53,7 @@ describe('GET /api/admin/users-list', () => {
 
     const req = createAdminRequest({
       method: 'GET',
-      url: 'http://localhost:3000/api/admin/users-list?role=admin',
+      url: 'http://localhost:3000/api/admin/usuarios-list?role=admin',
     }) as NextRequest
 
     const response = await GET(req)
@@ -70,7 +70,7 @@ describe('GET /api/admin/users-list', () => {
 
     const req = createAdminRequest({
       method: 'GET',
-      url: 'http://localhost:3000/api/admin/users-list?status=active',
+      url: 'http://localhost:3000/api/admin/usuarios-list?status=active',
     }) as NextRequest
 
     const response = await GET(req)
@@ -87,7 +87,7 @@ describe('GET /api/admin/users-list', () => {
 
     const req = createAdminRequest({
       method: 'GET',
-      url: `http://localhost:3000/api/admin/users-list?company_id=${companyId}`,
+      url: `http://localhost:3000/api/admin/usuarios-list?company_id=${companyId}`,
     }) as NextRequest
 
     const response = await GET(req)

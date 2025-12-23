@@ -1,4 +1,4 @@
-import { GET } from '@/app/api/transportadora/reports/trips/route'
+import { GET } from '@/app/api/transportadora/relatorios/trips/route'
 import { createTransportadoraRequest } from '../../../helpers/api-test-helpers'
 import { mockSupabaseClient } from '../../../helpers/mock-supabase'
 import { createTestTransportadora, createTestRoute, createTestTrip } from '../../../helpers/test-data'
@@ -8,7 +8,7 @@ jest.mock('@supabase/supabase-js', () => ({
   createClient: jest.fn(() => mockSupabaseClient),
 }))
 
-describe('GET /api/transportadora/reports/trips', () => {
+describe('GET /api/transportadora/relatorios/trips', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockSupabaseClient.clear()
@@ -30,7 +30,7 @@ describe('GET /api/transportadora/reports/trips', () => {
 
     const req = createTransportadoraRequest({
       method: 'GET',
-      url: `http://localhost:3000/api/transportadora/reports/trips?transportadora_id=${transportadora.id}`,
+      url: `http://localhost:3000/api/transportadora/relatorios/trips?transportadora_id=${transportadora.id}`,
     }) as NextRequest
 
     const response = await GET(req)
@@ -52,7 +52,7 @@ describe('GET /api/transportadora/reports/trips', () => {
 
     const req = createTransportadoraRequest({
       method: 'GET',
-      url: `http://localhost:3000/api/transportadora/reports/trips?transportadora_id=${transportadora.id}&start_date=2024-01-01&end_date=2024-01-31`,
+      url: `http://localhost:3000/api/transportadora/relatorios/trips?transportadora_id=${transportadora.id}&start_date=2024-01-01&end_date=2024-01-31`,
     }) as NextRequest
 
     const response = await GET(req)
@@ -77,7 +77,7 @@ describe('GET /api/transportadora/reports/trips', () => {
 
     const req = createTransportadoraRequest({
       method: 'GET',
-      url: `http://localhost:3000/api/transportadora/reports/trips?transportadora_id=${transportadora.id}`,
+      url: `http://localhost:3000/api/transportadora/relatorios/trips?transportadora_id=${transportadora.id}`,
     }) as NextRequest
 
     const response = await GET(req)
@@ -93,7 +93,7 @@ describe('GET /api/transportadora/reports/trips', () => {
   it('deve rejeitar sem transportadora_id', async () => {
     const req = createTransportadoraRequest({
       method: 'GET',
-      url: 'http://localhost:3000/api/transportadora/reports/trips',
+      url: 'http://localhost:3000/api/transportadora/relatorios/trips',
     }) as NextRequest
 
     const response = await GET(req)

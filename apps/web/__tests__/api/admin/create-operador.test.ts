@@ -1,4 +1,4 @@
-import { POST } from '@/app/api/admin/create-operador/route'
+import { POST } from '@/app/api/admin/criar-operador/route'
 import { createAdminRequest } from '../../helpers/api-test-helpers'
 import { mockSupabaseClient } from '../../helpers/mock-supabase'
 import { NextRequest } from 'next/server'
@@ -37,7 +37,7 @@ jest.mock('@/lib/services', () => ({
   },
 }))
 
-describe('POST /api/admin/create-operador', () => {
+describe('POST /api/admin/criar-operador', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockSupabaseClient.clear()

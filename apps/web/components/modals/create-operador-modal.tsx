@@ -147,7 +147,7 @@ export function CreateOperatorModal({
         operatorId?: string
         email?: string
       }>(
-        '/api/admin/create-operador',
+        '/api/admin/criar-operador',
         {
           method: 'POST',
           headers: {

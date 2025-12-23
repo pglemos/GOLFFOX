@@ -241,7 +241,7 @@ export async function POST(request: NextRequest) {
       // Se ainda não tem route, retornar erro
       if (!route) {
         return NextResponse.json(
-          { error: 'Rota não encontrada', message: `A rota com ID ${routeId} não existe. Crie uma rota primeiro usando POST /api/admin/routes` },
+          { error: 'Rota não encontrada', message: `A rota com ID ${routeId} não existe. Crie uma rota primeiro usando POST /api/admin/rotas` },
           { status: 404 }
         )
       }

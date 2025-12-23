@@ -37,37 +37,37 @@ Corrigir todos os erros de exclusão em todas as abas e páginas do sistema, gar
 
 ## 📋 Rotas de Exclusão Corrigidas
 
-### ✅ 1. Veículos (`/api/admin/vehicles/delete`)
+### ✅ 1. Veículos (`/api/admin/veiculos/delete`)
 **Correções:**
 - Setar `trips.vehicle_id = NULL` antes de excluir
 - Logs detalhados adicionados
 - Tratamento de erros melhorado
 
-### ✅ 2. Motoristas (`/api/admin/drivers/delete`)
+### ✅ 2. Motoristas (`/api/admin/motoristas/delete`)
 **Correções:**
 - Setar `trips.driver_id = NULL` antes de excluir
 - Logs detalhados adicionados
 - Tratamento de erros melhorado
 
-### ✅ 3. Rotas (`/api/admin/routes/delete`)
+### ✅ 3. Rotas (`/api/admin/rotas/delete`)
 **Correções:**
 - Excluir `trips` relacionados explicitamente
 - Excluir `route_stops` antes da rota
 - Logs detalhados adicionados
 
-### ✅ 4. Empresas (`/api/admin/companies/delete`)
+### ✅ 4. Empresas (`/api/admin/empresas/delete`)
 **Correções:**
 - Logs detalhados adicionados
 - Tratamento de erros melhorado
 - Já estava funcionando corretamente
 
-### ✅ 5. Usuários (`/api/admin/users/delete`)
+### ✅ 5. Usuários (`/api/admin/usuarios/delete`)
 **Correções:**
 - Setar `trips.driver_id = NULL` antes de excluir
 - Logs detalhados adicionados
 - Tratamento de erros melhorado
 
-### ✅ 6. Alertas (`/api/admin/alerts/delete`)
+### ✅ 6. Alertas (`/api/admin/alertas/delete`)
 **Correções:**
 - Logs detalhados adicionados
 - Tratamento de erros melhorado

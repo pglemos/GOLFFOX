@@ -70,7 +70,7 @@ export default function () {
 
   // Teste de stress: Listar Usuários
   if (ADMIN_TOKEN) {
-    const usersList = http.get(`${BASE_URL}/api/admin/users-list`, {
+    const usersList = http.get(`${BASE_URL}/api/admin/usuarios-list`, {
       headers: createAuthHeaders(),
     })
     check(usersList, {

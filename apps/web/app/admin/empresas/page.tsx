@@ -55,7 +55,7 @@ export default function EmpresasPage() {
         headers['Authorization'] = `Bearer ${session.access_token}`
       }
 
-      const response = await fetch('/api/admin/companies-list', {
+      const response = await fetch('/api/admin/empresas-list', {
         headers,
         credentials: 'include',
       })
@@ -91,7 +91,7 @@ export default function EmpresasPage() {
         headers['Authorization'] = `Bearer ${session.access_token}`
       }
 
-      const response = await fetch(`/api/admin/companies/delete?id=${empresaId}`, {
+      const response = await fetch(`/api/admin/empresas/delete?id=${empresaId}`, {
         method: 'DELETE',
         headers,
         credentials: 'include',

@@ -18,13 +18,23 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { getUnresolvedAlerts, resolveAlert, type OperationalAlert } from '@/lib/operational-alerts'
 import { supabase } from '@/lib/supabase'
-import { useRouter } from '@/lib/next-navigation'
+import { useRouter, usePathname } from '@/lib/next-navigation'
 import { notifySuccess, notifyError } from '@/lib/toast'
 
 export function OperationalAlertsNotification() {
   const [alerts, setAlerts] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const router = useRouter()
+  const pathname = usePathname()
+
+  const getAlertsUrl = () => {
+    if (pathname?.startsWith('/transportadora')) return '/transportadora/alertas'
+    if (pathname?.startsWith('/empresa')) return '/empresa/alertas'
+    if (pathname?.startsWith('/operador')) return '/operador/alertas'
+    return '/admin/alertas'
+  }
+
+  const alertsUrl = getAlertsUrl()
 
   useEffect(() => {
     loadAlerts()
@@ -169,7 +179,7 @@ export function OperationalAlertsNotification() {
                 key={alert.id}
                 className="flex flex-col items-start gap-2 p-3 cursor-pointer"
                 onClick={() => {
-                  router.push('/admin/alertas')
+                  router.push(alertsUrl)
                 }}
               >
                 <div className="flex items-start gap-2 w-full">
@@ -210,7 +220,7 @@ export function OperationalAlertsNotification() {
                     className="h-6 text-xs"
                     onClick={(e) => {
                       e.stopPropagation()
-                      router.push('/admin/alertas')
+                      router.push(alertsUrl)
                     }}
                   >
                     Ver Detalhes
@@ -228,7 +238,7 @@ export function OperationalAlertsNotification() {
                 variant="outline"
                 size="sm"
                 className="w-full"
-                onClick={() => router.push('/admin/alertas')}
+                onClick={() => router.push(alertsUrl)}
               >
                 Ver Todos os Alertas
               </Button>
@@ -239,4 +249,3 @@ export function OperationalAlertsNotification() {
     </DropdownMenu>
   )
 }
-

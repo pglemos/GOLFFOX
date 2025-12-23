@@ -14,8 +14,8 @@
 - ✅ `app/api/auth/csrf/route.ts` - 1 ocorrência
 
 ### Admin APIs
-- ✅ `app/api/admin/alerts-list/route.ts` - 2 ocorrências
-- ✅ `app/api/admin/companies-list/route.ts` - 2 ocorrências
+- ✅ `app/api/admin/alertas-list/route.ts` - 2 ocorrências
+- ✅ `app/api/admin/empresas-list/route.ts` - 2 ocorrências
 - ✅ `app/api/admin/costs-options/route.ts` - 1 ocorrência
 - ✅ `app/api/admin/optimize-route/route.ts` - 1 ocorrência
 - ✅ `app/api/admin/assistance-requests-list/route.ts` - 2 ocorrências
@@ -45,11 +45,11 @@
 ## ⏳ Arquivos Restantes (~40 ocorrências)
 
 ### Prioridade Alta (APIs Críticas)
-- `app/api/admin/create-empresa-login/route.ts` - 10+ ocorrências
-- `app/api/admin/create-empresa-user/route.ts` - 8+ ocorrências
-- `app/api/admin/create-transportadora-login/route.ts` - 1 ocorrência
-- `app/api/admin/create-transportadora-login/route.ts` - 1 ocorrência
-- `app/api/admin/create-user/route.ts` - Múltiplas ocorrências
+- `app/api/admin/criar-empresa-login/route.ts` - 10+ ocorrências
+- `app/api/admin/criar-empresa-usuario/route.ts` - 8+ ocorrências
+- `app/api/admin/criar-transportadora-login/route.ts` - 1 ocorrência
+- `app/api/admin/criar-transportadora-login/route.ts` - 1 ocorrência
+- `app/api/admin/criar-usuario/route.ts` - Múltiplas ocorrências
 
 ### Prioridade Média
 - `app/api/admin/*` - ~30 ocorrências em vários arquivos

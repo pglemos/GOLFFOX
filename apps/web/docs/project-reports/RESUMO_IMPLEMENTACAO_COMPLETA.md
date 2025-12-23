@@ -62,34 +62,34 @@
 ### 3. Melhorias Técnicas
 
 #### **APIs com Service Role (Bypass RLS)**
-- ✅ `/api/admin/companies-list`
-- ✅ `/api/admin/routes-list`
-- ✅ `/api/admin/vehicles-list`
-- ✅ `/api/admin/drivers-list`
-- ✅ `/api/admin/alerts-list`
-- ✅ `/api/admin/users-list`
+- ✅ `/api/admin/empresas-list`
+- ✅ `/api/admin/rotas-list`
+- ✅ `/api/admin/veiculos-list`
+- ✅ `/api/admin/motoristas-list`
+- ✅ `/api/admin/alertas-list`
+- ✅ `/api/admin/usuarios-list`
 - ✅ `/api/admin/assistance-requests-list`
 - ✅ `/api/admin/kpis`
 - ✅ `/api/admin/audit-log`
 
 #### **APIs de Exclusão Permanente**
-- ✅ `/api/admin/companies/delete`
-- ✅ `/api/admin/routes/delete`
-- ✅ `/api/admin/vehicles/delete`
-- ✅ `/api/admin/drivers/delete`
-- ✅ `/api/admin/alerts/delete`
-- ✅ `/api/admin/users/delete`
+- ✅ `/api/admin/empresas/delete`
+- ✅ `/api/admin/rotas/delete`
+- ✅ `/api/admin/veiculos/delete`
+- ✅ `/api/admin/motoristas/delete`
+- ✅ `/api/admin/alertas/delete`
+- ✅ `/api/admin/usuarios/delete`
 - ✅ `/api/admin/assistance-requests/delete`
 
 #### **APIs de Edição**
-- ✅ `PUT /api/admin/companies/[companyId]`
-- ✅ `PUT /api/admin/alerts/[alertId]`
+- ✅ `PUT /api/admin/empresas/[companyId]`
+- ✅ `PUT /api/admin/alertas/[alertId]`
 - ✅ `PUT /api/admin/assistance-requests/[requestId]`
-- ✅ `PUT /api/admin/users/[userId]`
+- ✅ `PUT /api/admin/usuarios/[userId]`
 
 #### **APIs de Criação**
-- ✅ `POST /api/admin/create-operador` (criar empresa)
-- ✅ `POST /api/admin/create-operador-login` (criar login operador)
+- ✅ `POST /api/admin/criar-operador` (criar empresa)
+- ✅ `POST /api/admin/criar-operador-login` (criar login operador)
 
 ### 4. Componentes Criados
 

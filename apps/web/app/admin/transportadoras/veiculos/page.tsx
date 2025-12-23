@@ -245,7 +245,7 @@ export default function TransportadoraVeiculosPage() {
     const loadVehicles = useCallback(async () => {
         try {
             setDataLoading(true)
-            const response = await fetch('/api/admin/vehicles-list')
+            const response = await fetch('/api/admin/veiculos-list')
             if (!response.ok) throw new Error('Erro ao carregar veículos')
             const data = await response.json()
             setVeiculos(Array.isArray(data) ? data : data.veiculos || [])

@@ -44,12 +44,12 @@
 
 ### 1. API Routes Criadas/Atualizadas
 
-- ✅ `/api/admin/companies/delete` - Desativa empresa
-- ✅ `/api/admin/routes/delete` - Exclui rota (com validação de trips)
-- ✅ `/api/admin/vehicles/delete` - Desativa veículo
-- ✅ `/api/admin/drivers/delete` - Atualiza motorista
-- ✅ `/api/admin/users/delete` - Atualiza usuário
-- ✅ `/api/admin/alerts/delete` - Exclui alerta
+- ✅ `/api/admin/empresas/delete` - Desativa empresa
+- ✅ `/api/admin/rotas/delete` - Exclui rota (com validação de trips)
+- ✅ `/api/admin/veiculos/delete` - Desativa veículo
+- ✅ `/api/admin/motoristas/delete` - Atualiza motorista
+- ✅ `/api/admin/usuarios/delete` - Atualiza usuário
+- ✅ `/api/admin/alertas/delete` - Exclui alerta
 - ✅ `/api/admin/assistance-requests/delete` - Exclui solicitação
 
 ### 2. Frontend - Botões de Exclusão

@@ -23,13 +23,13 @@ Este documento descreve todas as features do Next.js 16 que foram implementadas 
   - `lib/react-cache.ts` - Helpers para `cache()` do React
 - **Aplicação**: 
   - Rotas de API atualizadas para usar invalidação de cache:
-    - `app/api/admin/companies/[companyId]/route.ts`
-    - `app/api/admin/alerts/[alertId]/route.ts`
-    - `app/api/admin/drivers/[driverId]/route.ts`
-    - `app/api/admin/vehicles/[vehicleId]/route.ts`
-    - `app/api/admin/users/[userId]/route.ts`
+    - `app/api/admin/empresas/[companyId]/route.ts`
+    - `app/api/admin/alertas/[alertId]/route.ts`
+    - `app/api/admin/motoristas/[driverId]/route.ts`
+    - `app/api/admin/veiculos/[vehicleId]/route.ts`
+    - `app/api/admin/usuarios/[userId]/route.ts`
     - `app/api/admin/transportadoras/update/route.ts`
-    - `app/api/admin/routes/delete/route.ts`
+    - `app/api/admin/rotas/delete/route.ts`
   - `lib/cache/cache.service.ts` atualizado com wrapper `createNextCache()` para `unstable_cache`
 - **Benefícios**: Controle granular de cache, invalidação eficiente, cache persistente entre requests
 
@@ -92,10 +92,10 @@ Este documento descreve todas as features do Next.js 16 que foram implementadas 
 - **Status**: ✅ Verificado
 - **Resultado**: Todas as rotas dinâmicas já estão usando `params: Promise<{...}>`
 - **Exemplos**:
-  - `app/api/admin/companies/[companyId]/route.ts`
-  - `app/api/admin/alerts/[alertId]/route.ts`
-  - `app/api/admin/drivers/[driverId]/route.ts`
-  - `app/api/admin/vehicles/[vehicleId]/route.ts`
+  - `app/api/admin/empresas/[companyId]/route.ts`
+  - `app/api/admin/alertas/[alertId]/route.ts`
+  - `app/api/admin/motoristas/[driverId]/route.ts`
+  - `app/api/admin/veiculos/[vehicleId]/route.ts`
 
 #### 8.2 next/image Defaults
 - **Status**: ✅ Verificado
@@ -132,13 +132,13 @@ Este documento descreve todas as features do Next.js 16 que foram implementadas 
    - `experimental.turbo` com resolveAlias
    - Logging melhorado
 3. `apps/web/app/layout.tsx` - Adicionado `experimental_ppr = true`
-4. `apps/web/app/api/admin/companies/[companyId]/route.ts` - Adicionada invalidação de cache
-5. `apps/web/app/api/admin/alerts/[alertId]/route.ts` - Adicionada invalidação de cache
-6. `apps/web/app/api/admin/drivers/[driverId]/route.ts` - Adicionada invalidação de cache
-7. `apps/web/app/api/admin/vehicles/[vehicleId]/route.ts` - Adicionada invalidação de cache
-8. `apps/web/app/api/admin/users/[userId]/route.ts` - Adicionada invalidação de cache
+4. `apps/web/app/api/admin/empresas/[companyId]/route.ts` - Adicionada invalidação de cache
+5. `apps/web/app/api/admin/alertas/[alertId]/route.ts` - Adicionada invalidação de cache
+6. `apps/web/app/api/admin/motoristas/[driverId]/route.ts` - Adicionada invalidação de cache
+7. `apps/web/app/api/admin/veiculos/[vehicleId]/route.ts` - Adicionada invalidação de cache
+8. `apps/web/app/api/admin/usuarios/[userId]/route.ts` - Adicionada invalidação de cache
 9. `apps/web/app/api/admin/transportadoras/update/route.ts` - Adicionada invalidação de cache
-10. `apps/web/app/api/admin/routes/delete/route.ts` - Adicionada invalidação de cache
+10. `apps/web/app/api/admin/rotas/delete/route.ts` - Adicionada invalidação de cache
 11. `apps/web/lib/cache/cache.service.ts` - Adicionado wrapper `createNextCache()` para `unstable_cache`
 8. `apps/web/components/sidebar.tsx` - Aplicado View Transitions e prefetching otimizado
 9. `apps/web/components/premium-sidebar.tsx` - Aplicado View Transitions e prefetching otimizado

@@ -36,7 +36,6 @@ const IGNORE_PATTERNS = [
   /docs\/.*\.md$/, // Documentação histórica
   /supabase\/migrations\/.*\.sql$/, // Migrations SQL (podem referenciar nomes antigos)
   /scripts\/.*\.js$/, // Scripts de migração
-  /testsprite_tests/, // Testes automatizados
   /\.drawio$/, // Diagramas
   /README\.md$/, // README pode ter exemplos
 ]

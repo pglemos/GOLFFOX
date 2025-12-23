@@ -135,11 +135,9 @@ async function loginHandler(req: NextRequest) {
   // ✅ SEGURANÇA: CSRF é obrigatório em produção para prevenir ataques CSRF
   const isTestMode = req.headers.get('x-test-mode') === 'true'
   const isDevelopment = process.env.NODE_ENV === 'development'
-  const userAgent = req.headers.get('user-agent') || ''
-  const isTestSprite = userAgent.includes('TestSprite') || userAgent.includes('testsprite')
 
   // Permitir bypass APENAS em desenvolvimento/teste (nunca em produção)
-  const allowCSRFBypass = isTestMode || isDevelopment || isTestSprite
+  const allowCSRFBypass = isTestMode || isDevelopment
 
   // Verificar se há header CSRF presente (mesmo em modo de teste, se fornecido, deve ser válido)
   const csrfHeader = req.headers.get('x-csrf-token')

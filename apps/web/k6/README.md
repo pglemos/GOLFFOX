@@ -23,9 +23,9 @@ Testes de carga gradual para validar performance sob carga normal.
 
 **APIs testadas:**
 - `GET /api/health` - Health check
-- `GET /api/admin/users-list` - Listar usuários
+- `GET /api/admin/usuarios-list` - Listar usuários
 - `GET /api/admin/kpis` - KPIs administrativos
-- `GET /api/admin/companies` - Listar empresas
+- `GET /api/admin/empresas` - Listar empresas
 
 ### 2. Stress Tests (`stress-tests.js`)
 Testes de stress para identificar limites do sistema.
@@ -38,7 +38,7 @@ Testes de stress para identificar limites do sistema.
 **APIs testadas:**
 - `GET /api/health` - Health check
 - `GET /api/admin/kpis` - KPIs (endpoint mais pesado)
-- `GET /api/admin/users-list` - Listar usuários
+- `GET /api/admin/usuarios-list` - Listar usuários
 
 ### 3. Spike Tests (`spike-tests.js`)
 Testes de pico para simular tráfego súbito.

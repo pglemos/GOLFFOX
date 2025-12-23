@@ -73,7 +73,7 @@
 - **Mudança:** Mapeamento de erros de autenticação para sempre retornar 401, mesmo se Supabase retornar 400
 
 ### 2. TC003 - operador Creation (Mensagens de erro melhoradas)
-- **Arquivo:** `web-app/app/api/admin/create-operador/route.ts`
+- **Arquivo:** `web-app/app/api/admin/criar-operador/route.ts`
 - **Mudança:** Mensagens de erro mais descritivas com detalhes em modo de desenvolvimento
 
 ---

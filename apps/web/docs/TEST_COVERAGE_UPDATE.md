@@ -15,14 +15,14 @@ Foram criados testes adicionais para aumentar a cobertura de testes do sistema, 
 
 ### 1. Rotas de Usuários (Users API)
 
-#### `__tests__/api/admin/users/update.test.ts`
+#### `__tests__/api/admin/usuarios/update.test.ts`
 - ✅ Teste de atualização de usuário com sucesso
 - ✅ Teste de validação de UUID
 - ✅ Teste de usuário não encontrado (404)
 - ✅ Teste de validação de email inválido
 - ✅ Teste de autorização (403 para não-admin)
 
-#### `__tests__/api/admin/users/change-role.test.ts`
+#### `__tests__/api/admin/usuarios/change-role.test.ts`
 - ✅ Teste de mudança de papel com sucesso
 - ✅ Teste de validação de UUID
 - ✅ Teste de validação de role inválido
@@ -30,14 +30,14 @@ Foram criados testes adicionais para aumentar a cobertura de testes do sistema, 
 - ✅ Teste de papel já é o mesmo (400)
 - ✅ Teste de autorização (403 para não-admin)
 
-#### `__tests__/api/admin/users/delete.test.ts`
+#### `__tests__/api/admin/usuarios/delete.test.ts`
 - ✅ Teste de deleção via query param
 - ✅ Teste de deleção via body
 - ✅ Teste de validação de userId obrigatório
 - ✅ Teste de erro ao deletar (500)
 - ✅ Teste de autorização (403 para não-admin)
 
-#### `__tests__/api/admin/users-list.test.ts`
+#### `__tests__/api/admin/usuarios-list.test.ts`
 - ✅ Teste de listagem de todos os usuários
 - ✅ Teste de filtro por role
 - ✅ Teste de filtro por status
@@ -90,13 +90,13 @@ Para aumentar ainda mais a cobertura:
    - `POST /api/admin/emergency/dispatch`
 
 3. **Rotas de Vehicles (Veículos)**
-   - `GET /api/admin/vehicles/[vehicleId]`
-   - `PUT /api/admin/vehicles/[vehicleId]`
-   - `DELETE /api/admin/vehicles/delete`
+   - `GET /api/admin/veiculos/[vehicleId]`
+   - `PUT /api/admin/veiculos/[vehicleId]`
+   - `DELETE /api/admin/veiculos/delete`
 
 4. **Rotas de Drivers (Motoristas)**
-   - `GET /api/admin/drivers/[driverId]`
-   - `PUT /api/admin/drivers/[driverId]`
+   - `GET /api/admin/motoristas/[driverId]`
+   - `PUT /api/admin/motoristas/[driverId]`
 
 5. **Componentes React**
    - Componentes de formulários

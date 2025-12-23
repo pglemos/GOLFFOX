@@ -4,7 +4,7 @@ export function useAdminVehicles() {
   return useQuery({
     queryKey: ['admin-veiculos'],
     queryFn: async () => {
-      const response = await fetch('/api/admin/vehicles-list', {
+      const response = await fetch('/api/admin/veiculos-list', {
         headers: { 'x-test-mode': 'true' }
       })
       if (!response.ok) {

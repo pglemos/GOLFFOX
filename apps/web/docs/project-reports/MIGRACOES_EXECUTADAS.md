@@ -33,26 +33,25 @@ Todas as migrações SQL necessárias foram executadas com sucesso no banco de d
 - `GRANT SELECT` na view `v_admin_dashboard_kpis` para usuários autenticados
 - `GRANT SELECT` na materialized view `mv_admin_kpis` para usuários autenticados
 
-## Testes Afetados
+## Correções Aplicadas
 
-As seguintes correções devem resolver os seguintes testes do TestSprite:
+As seguintes correções foram aplicadas via migrações:
 
-1. **TC008** - Cost Management Budget Creation
+1. **Cost Management**
    - ✅ Erro 500 no endpoint `/api/costs/categories` (já corrigido no código)
    - ✅ Erro `column companies.is_active does not exist` (resolvido com migração)
 
-2. **TC011** - motorista Mobile App Check-In
+2. **Mobile App Check-In**
    - ✅ Erro `Could not find the 'cpf' column of 'users'` (resolvido com migração)
 
-3. **TC004/TC005** - Admin/operador Creation
+3. **Admin/operador Creation**
    - ✅ Erros relacionados a `is_active` em `companies` (resolvido com migração)
    - ✅ Erros 404 nas views de KPIs (resolvido com migração)
 
 ## Próximos Passos
 
 1. ✅ Migrações executadas
-2. ⏭️ Reexecutar testes do TestSprite para validar correções
-3. ⏭️ Verificar se todos os problemas foram resolvidos
+2. ⏭️ Verificar se todos os problemas foram resolvidos
 
 ## Scripts Utilizados
 

@@ -1,4 +1,4 @@
-import { DELETE, POST } from '@/app/api/admin/companies/delete/route'
+import { DELETE, POST } from '@/app/api/admin/empresas/delete/route'
 import { createAdminRequest } from '../../../helpers/api-test-helpers'
 import { mockSupabaseClient } from '../../../helpers/mock-supabase'
 import { createTestCompany } from '../../../helpers/test-data'
@@ -18,7 +18,7 @@ jest.mock('@/lib/api-auth', () => ({
   }),
 }))
 
-describe('DELETE /api/admin/companies/delete', () => {
+describe('DELETE /api/admin/empresas/delete', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockSupabaseClient.clear()
@@ -43,7 +43,7 @@ describe('DELETE /api/admin/companies/delete', () => {
 
     const req = createAdminRequest({
       method: 'DELETE',
-      url: `http://localhost:3000/api/admin/companies/delete?id=${company.id}`,
+      url: `http://localhost:3000/api/admin/empresas/delete?id=${company.id}`,
     }) as NextRequest
 
     const response = await DELETE(req)
@@ -81,7 +81,7 @@ describe('DELETE /api/admin/companies/delete', () => {
 
     const req = createAdminRequest({
       method: 'DELETE',
-      url: `http://localhost:3000/api/admin/companies/delete?id=${company.id}`,
+      url: `http://localhost:3000/api/admin/empresas/delete?id=${company.id}`,
     }) as NextRequest
 
     const response = await DELETE(req)
@@ -94,7 +94,7 @@ describe('DELETE /api/admin/companies/delete', () => {
   it('deve rejeitar sem ID da empresa', async () => {
     const req = createAdminRequest({
       method: 'DELETE',
-      url: 'http://localhost:3000/api/admin/companies/delete',
+      url: 'http://localhost:3000/api/admin/empresas/delete',
     }) as NextRequest
 
     const response = await DELETE(req)
@@ -112,7 +112,7 @@ describe('DELETE /api/admin/companies/delete', () => {
 
     const req = createAdminRequest({
       method: 'DELETE',
-      url: `http://localhost:3000/api/admin/companies/delete?id=${company.id}`,
+      url: `http://localhost:3000/api/admin/empresas/delete?id=${company.id}`,
     }) as NextRequest
 
     const response = await DELETE(req)

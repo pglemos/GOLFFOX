@@ -22,19 +22,19 @@
 - ✅ `app/api/auth/csrf/route.ts` - 1 ocorrência
 
 ### Admin APIs - Listagem (6 arquivos)
-- ✅ `app/api/admin/alerts-list/route.ts` - 2 ocorrências
-- ✅ `app/api/admin/companies-list/route.ts` - 2 ocorrências
+- ✅ `app/api/admin/alertas-list/route.ts` - 2 ocorrências
+- ✅ `app/api/admin/empresas-list/route.ts` - 2 ocorrências
 - ✅ `app/api/admin/costs-options/route.ts` - 1 ocorrência
 - ✅ `app/api/admin/optimize-route/route.ts` - 1 ocorrência
 - ✅ `app/api/admin/assistance-requests-list/route.ts` - 2 ocorrências
 - ✅ `app/api/admin/audit-log/route.ts` - 2 ocorrências
 
 ### Admin APIs - Criação de Usuários (5 arquivos) ⭐
-- ✅ `app/api/admin/create-empresa-login/route.ts` - 12 ocorrências
-- ✅ `app/api/admin/create-empresa-user/route.ts` - 7 ocorrências
-- ✅ `app/api/admin/create-transportadora-login/route.ts` - 3 ocorrências
-- ✅ `app/api/admin/create-transportadora-login/route.ts` - 1 ocorrência
-- ✅ `app/api/admin/create-user/route.ts` - 2 ocorrências
+- ✅ `app/api/admin/criar-empresa-login/route.ts` - 12 ocorrências
+- ✅ `app/api/admin/criar-empresa-usuario/route.ts` - 7 ocorrências
+- ✅ `app/api/admin/criar-transportadora-login/route.ts` - 3 ocorrências
+- ✅ `app/api/admin/criar-transportadora-login/route.ts` - 1 ocorrência
+- ✅ `app/api/admin/criar-usuario/route.ts` - 2 ocorrências
 
 ### Cron Jobs (2 arquivos)
 - ✅ `app/api/cron/refresh-kpis/route.ts` - 2 ocorrências
@@ -58,10 +58,10 @@
 ## ⏳ Arquivos Restantes (~40 ocorrências)
 
 ### Prioridade Média
-- `app/api/admin/drivers/route.ts` - 5 ocorrências
-- `app/api/admin/routes/route.ts` - 4 ocorrências
-- `app/api/admin/drivers-list/route.ts` - 2 ocorrências
-- `app/api/admin/routes-list/route.ts` - 2 ocorrências
+- `app/api/admin/motoristas/route.ts` - 5 ocorrências
+- `app/api/admin/rotas/route.ts` - 4 ocorrências
+- `app/api/admin/motoristas-list/route.ts` - 2 ocorrências
+- `app/api/admin/rotas-list/route.ts` - 2 ocorrências
 - `app/api/admin/employees-list/route.ts` - 2 ocorrências
 - `app/api/admin/kpis/route.ts` - 1 ocorrência
 - `app/api/admin/fix-database/route.ts` - 1 ocorrência

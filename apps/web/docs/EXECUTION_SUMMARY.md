@@ -36,7 +36,7 @@
 - ✅ `lib/services/company.service.ts` - Lógica de empresas
 - ✅ `lib/services/user.service.ts` - Lógica de usuários
 - ✅ `lib/services/index.ts` - Exports centralizados
-- ✅ Exemplo de refatoração: `app/api/admin/companies/route.ts` usando serviços
+- ✅ Exemplo de refatoração: `app/api/admin/empresas/route.ts` usando serviços
 
 ### 2. Padronização de Erros ✅
 - ✅ `lib/api-response.ts` - Helpers para respostas padronizadas
@@ -111,7 +111,7 @@
 - `components/topbar.tsx`
 - `components/app-shell.tsx`
 - `app/transportadora/motoristas/page.tsx`
-- `app/api/admin/companies/route.ts`
+- `app/api/admin/empresas/route.ts`
 - `app/api/operador/create-employee/route.ts`
 - `app/api/operador/optimize-route/route.ts`
 - `lib/i18n.ts`

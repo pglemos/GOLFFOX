@@ -1,4 +1,4 @@
-import { GET, POST } from '@/app/api/transportadora/costs/route/route'
+import { GET, POST } from '@/app/api/transportadora/custos/route/route'
 import { createTransportadoraRequest } from '../../../helpers/api-test-helpers'
 import { mockSupabaseClient } from '../../../helpers/mock-supabase'
 import { createTestUser, createTestTransportadora, createTestRoute } from '../../../helpers/test-data'
@@ -28,7 +28,7 @@ jest.mock('@/lib/api-auth', () => ({
   }),
 }))
 
-describe('GET /api/transportadora/costs/route', () => {
+describe('GET /api/transportadora/custos/route', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockSupabaseClient.clear()
@@ -72,7 +72,7 @@ describe('GET /api/transportadora/costs/route', () => {
 
     const req = createTransportadoraRequest({
       method: 'GET',
-      url: `http://localhost:3000/api/transportadora/costs/route?route_id=${route.id}`,
+      url: `http://localhost:3000/api/transportadora/custos/route?route_id=${route.id}`,
     }) as NextRequest
 
     const response = await GET(req)
@@ -90,7 +90,7 @@ describe('GET /api/transportadora/costs/route', () => {
 
     const req = createTransportadoraRequest({
       method: 'GET',
-      url: 'http://localhost:3000/api/transportadora/costs/route?start_date=2024-01-01&end_date=2024-01-31',
+      url: 'http://localhost:3000/api/transportadora/custos/route?start_date=2024-01-01&end_date=2024-01-31',
     }) as NextRequest
 
     const response = await GET(req)
@@ -99,7 +99,7 @@ describe('GET /api/transportadora/costs/route', () => {
   })
 })
 
-describe('POST /api/transportadora/costs/route', () => {
+describe('POST /api/transportadora/custos/route', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockSupabaseClient.clear()

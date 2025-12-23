@@ -24,7 +24,7 @@ Event Sourcing foi implementado para rastrear todas as operações críticas do 
 - ✅ Integração preparada para outros services
 
 ### 3. Integração com APIs
-- ✅ **POST /api/admin/create-operador** - Publica eventos de criação de empresa e usuário
+- ✅ **POST /api/admin/criar-operador** - Publica eventos de criação de empresa e usuário
 - ✅ Preparado para outras rotas críticas
 
 ### 4. Event Handlers Registrados
@@ -115,10 +115,10 @@ await publishCreatedEvent(
 ## 📈 Próximos Passos
 
 1. **Integrar em mais rotas:**
-   - `POST /api/admin/vehicles` → `VehicleCreated`
-   - `POST /api/admin/drivers` → `DriverCreated`
-   - `PUT /api/admin/companies/[id]` → `CompanyUpdated`
-   - `DELETE /api/admin/companies/[id]` → `CompanyDeleted`
+   - `POST /api/admin/veiculos` → `VehicleCreated`
+   - `POST /api/admin/motoristas` → `DriverCreated`
+   - `PUT /api/admin/empresas/[id]` → `CompanyUpdated`
+   - `DELETE /api/admin/empresas/[id]` → `CompanyDeleted`
 
 2. **Criar handlers adicionais:**
    - Notificação handler (enviar emails)

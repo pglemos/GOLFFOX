@@ -132,7 +132,7 @@ export function EditCompanyModal({
 
     setLoading(true)
     try {
-      const response = await fetch(`/api/admin/companies/${company.id}`, {
+      const response = await fetch(`/api/admin/empresas/${company.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

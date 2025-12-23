@@ -87,7 +87,7 @@ export function AlertasPageClient({ initialAlertas }: AlertasPageClientProps) {
         params.append('status', filtersState.active.status)
       }
 
-      const response = await fetch(`/api/admin/alerts-list?${params.toString()}`)
+      const response = await fetch(`/api/admin/alertas-list?${params.toString()}`)
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
       }
@@ -142,7 +142,7 @@ export function AlertasPageClient({ initialAlertas }: AlertasPageClientProps) {
     }
 
     try {
-      const response = await fetch(`/api/admin/alerts/delete?id=${alertaId}`, {
+      const response = await fetch(`/api/admin/alertas/delete?id=${alertaId}`, {
         method: 'DELETE'
       })
 
@@ -173,7 +173,7 @@ export function AlertasPageClient({ initialAlertas }: AlertasPageClientProps) {
       const { data: { session } } = await supabase.auth.getSession()
       if (!session) throw new Error('Não autenticado')
 
-      const response = await fetch('/api/admin/alerts/update', {
+      const response = await fetch('/api/admin/alertas/update', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -199,7 +199,7 @@ export function AlertasPageClient({ initialAlertas }: AlertasPageClientProps) {
 
   const handleAssign = async (alertaId: string, userId: string) => {
     try {
-      const response = await fetch('/api/admin/alerts/update', {
+      const response = await fetch('/api/admin/alertas/update', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

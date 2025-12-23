@@ -44,8 +44,8 @@
 - ✅ `app/api/cron/refresh-kpis/route.ts`
 - ✅ `app/api/cron/refresh-costs-mv/route.ts`
 - ✅ `app/api/upload/route.ts`
-- ✅ `app/api/admin/alerts-list/route.ts`
-- ✅ `app/api/admin/companies-list/route.ts`
+- ✅ `app/api/admin/alertas-list/route.ts`
+- ✅ `app/api/admin/empresas-list/route.ts`
 - ✅ `app/api/admin/costs-options/route.ts`
 - ✅ `app/api/admin/optimize-route/route.ts`
 - ✅ `app/api/admin/assistance-requests-list/route.ts`
@@ -66,11 +66,11 @@
 - 📋 Documentação: `docs/LOGGER_REFACTORING_PROGRESS.md`
 
 **Próximos arquivos prioritários:**
-- `app/api/admin/create-empresa-login/route.ts` (10+ ocorrências)
-- `app/api/admin/create-empresa-user/route.ts` (8+ ocorrências)
-- `app/api/admin/create-transportadora-login/route.ts`
-- `app/api/admin/create-transportadora-login/route.ts`
-- `app/api/admin/create-user/route.ts`
+- `app/api/admin/criar-empresa-login/route.ts` (10+ ocorrências)
+- `app/api/admin/criar-empresa-usuario/route.ts` (8+ ocorrências)
+- `app/api/admin/criar-transportadora-login/route.ts`
+- `app/api/admin/criar-transportadora-login/route.ts`
+- `app/api/admin/criar-usuario/route.ts`
 
 ---
 

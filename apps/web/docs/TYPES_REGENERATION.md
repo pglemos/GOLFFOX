@@ -30,11 +30,11 @@ Algumas tabelas/views não estão nos tipos gerados (provavelmente views ou tabe
 
 ### Arquivos Modificados
 
-- `apps/web/app/api/admin/drivers/route.ts`
-- `apps/web/app/api/admin/drivers/[driverId]/route.ts`
+- `apps/web/app/api/admin/motoristas/route.ts`
+- `apps/web/app/api/admin/motoristas/[driverId]/route.ts`
 - `apps/web/app/api/admin/transportadoras/[transportadoraId]/drivers/[driverId]/route.ts`
 - `apps/web/app/api/admin/transportadoras/delete/route.ts`
-- `apps/web/app/api/admin/users/change-role/route.ts`
+- `apps/web/app/api/admin/usuarios/change-role/route.ts`
 - `apps/web/app/admin/rotas/use-route-create.ts`
 - `apps/web/app/operador/prestadores/page.tsx`
 - `apps/web/app/transportadora/page.tsx`

@@ -32,7 +32,7 @@ Se você não tem `DATABASE_URL` configurada ou prefere executar manualmente:
 
 **Quando usar:**
 - Após executar as migrations iniciais
-- Quando os testes do TestSprite falharem por falta de categorias de custo
+- Quando necessário criar categorias de custo para testes
 - Para ambiente de desenvolvimento/testes
 
 **Categorias criadas:**
@@ -102,5 +102,4 @@ DELETE FROM gf_cost_categories;
 Se encontrar problemas, consulte:
 - [Documentação do Supabase](https://supabase.com/docs)
 - [README principal do projeto](../../README.md)
-- Logs do TestSprite em `testsprite_tests/testsprite-mcp-test-report.md`
 

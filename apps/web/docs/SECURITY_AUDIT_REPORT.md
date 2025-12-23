@@ -36,14 +36,14 @@ Este relatório documenta a auditoria de segurança realizada em todas as rotas 
 ### ✅ Rotas com Autenticação Adequada
 
 **Admin:**
-- `/api/admin/companies` - ✅ `requireAuth('admin')`
-- `/api/admin/users/*` - ✅ `requireAuth('admin')`
-- `/api/admin/vehicles/*` - ✅ `requireAuth('admin')`
-- `/api/admin/drivers/*` - ✅ `requireAuth('admin')`
-- `/api/admin/routes/*` - ✅ `requireAuth('admin')`
+- `/api/admin/empresas` - ✅ `requireAuth('admin')`
+- `/api/admin/usuarios/*` - ✅ `requireAuth('admin')`
+- `/api/admin/veiculos/*` - ✅ `requireAuth('admin')`
+- `/api/admin/motoristas/*` - ✅ `requireAuth('admin')`
+- `/api/admin/rotas/*` - ✅ `requireAuth('admin')`
 - `/api/admin/trips/*` - ✅ `requireAuth('admin')`
 - `/api/admin/kpis` - ✅ `requireAuth('admin')`
-- `/api/admin/alerts/*` - ✅ `requireAuth('admin')`
+- `/api/admin/alertas/*` - ✅ `requireAuth('admin')`
 - `/api/admin/transportadoras/*` - ✅ `requireAuth('admin')`
 
 **Operador:**
@@ -84,7 +84,7 @@ Este relatório documenta a auditoria de segurança realizada em todas as rotas 
 
 - `/api/health` - ✅ `withRateLimit(..., 'public')`
 - `/api/cep` - ✅ `withRateLimit(..., 'public')`
-- `/api/admin/companies` - ✅ `withRateLimit(..., 'sensitive')`
+- `/api/admin/empresas` - ✅ `withRateLimit(..., 'sensitive')`
 - `/api/reports/run` - ✅ Rate limiting implementado
 - `/api/costs/*` - ✅ Rate limiting em rotas sensíveis
 

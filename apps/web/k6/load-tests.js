@@ -57,9 +57,9 @@ export default function () {
   apiResponseTime.add(healthCheck.timings.duration)
   sleep(1)
 
-  // Teste 2: Listar Usuários (GET /api/admin/users-list)
+  // Teste 2: Listar Usuários (GET /api/admin/usuarios-list)
   if (ADMIN_TOKEN) {
-    const usersList = http.get(`${BASE_URL}/api/admin/users-list`, {
+    const usersList = http.get(`${BASE_URL}/api/admin/usuarios-list`, {
       headers: createAuthHeaders(),
     })
     check(usersList, {
@@ -101,9 +101,9 @@ export default function () {
     sleep(1)
   }
 
-  // Teste 4: Listar Empresas (GET /api/admin/companies)
+  // Teste 4: Listar Empresas (GET /api/admin/empresas)
   if (ADMIN_TOKEN) {
-    const companies = http.get(`${BASE_URL}/api/admin/companies`, {
+    const companies = http.get(`${BASE_URL}/api/admin/empresas`, {
       headers: createAuthHeaders(),
     })
     check(companies, {

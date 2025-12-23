@@ -24,7 +24,7 @@
 - ✅ **Camada de Serviço Criada**
   - `lib/services/company.service.ts` - Lógica de negócio para empresas
   - `lib/services/user.service.ts` - Lógica de negócio para usuários
-  - Exemplo de refatoração: `app/api/admin/companies/route.ts`
+  - Exemplo de refatoração: `app/api/admin/empresas/route.ts`
 
 - ✅ **Padronização de Respostas API**
   - `lib/api-response.ts` - Helpers para respostas padronizadas
@@ -110,7 +110,7 @@
 - `components/app-shell.tsx`
 
 #### Rotas API
-- `app/api/admin/companies/route.ts`
+- `app/api/admin/empresas/route.ts`
 - `app/api/admin/seed-cost-categories/route.ts`
 - `app/api/admin/execute-sql-fix/route.ts`
 - `app/api/admin/fix-database/route.ts`

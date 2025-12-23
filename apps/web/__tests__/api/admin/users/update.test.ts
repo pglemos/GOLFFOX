@@ -1,4 +1,4 @@
-import { PUT } from '@/app/api/admin/users/[userId]/route'
+import { PUT } from '@/app/api/admin/usuarios/[userId]/route'
 import { createAdminRequest } from '../../../helpers/api-test-helpers'
 import { mockSupabaseClient } from '../../../helpers/mock-supabase'
 import { NextRequest } from 'next/server'
@@ -21,7 +21,7 @@ jest.mock('@/lib/next-cache', () => ({
   invalidateEntityCache: jest.fn(async () => {}),
 }))
 
-describe('PUT /api/admin/users/[userId]', () => {
+describe('PUT /api/admin/usuarios/[userId]', () => {
   const userId = '123e4567-e89b-12d3-a456-426614174000'
 
   beforeEach(() => {
@@ -65,7 +65,7 @@ describe('PUT /api/admin/users/[userId]', () => {
 
     const req = createAdminRequest({
       method: 'PUT',
-      url: `http://localhost:3000/api/admin/users/${userId}`,
+      url: `http://localhost:3000/api/admin/usuarios/${userId}`,
       body: updateData,
     })
 
@@ -84,7 +84,7 @@ describe('PUT /api/admin/users/[userId]', () => {
 
     const req = createAdminRequest({
       method: 'PUT',
-      url: `http://localhost:3000/api/admin/users/${invalidUserId}`,
+      url: `http://localhost:3000/api/admin/usuarios/${invalidUserId}`,
       body: { name: 'Test' },
     })
 
@@ -109,7 +109,7 @@ describe('PUT /api/admin/users/[userId]', () => {
 
     const req = createAdminRequest({
       method: 'PUT',
-      url: `http://localhost:3000/api/admin/users/${userId}`,
+      url: `http://localhost:3000/api/admin/usuarios/${userId}`,
       body: { name: 'Test' },
     })
 
@@ -139,7 +139,7 @@ describe('PUT /api/admin/users/[userId]', () => {
 
     const req = createAdminRequest({
       method: 'PUT',
-      url: `http://localhost:3000/api/admin/users/${userId}`,
+      url: `http://localhost:3000/api/admin/usuarios/${userId}`,
       body: { email: 'invalid-email' },
     })
 
@@ -155,7 +155,7 @@ describe('PUT /api/admin/users/[userId]', () => {
   it('deve retornar 403 se usuário não for admin', async () => {
     const req = createAdminRequest({
       method: 'PUT',
-      url: `http://localhost:3000/api/admin/users/${userId}`,
+      url: `http://localhost:3000/api/admin/usuarios/${userId}`,
       body: { name: 'Test' },
       headers: { 'x-user-role': 'empresa' },
     })

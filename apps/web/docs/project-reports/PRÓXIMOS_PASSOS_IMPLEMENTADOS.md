@@ -24,9 +24,9 @@
 - `web-app/scripts/fix-nextjs15-params.js`
 
 **Rotas já corrigidas manualmente:**
-- `app/api/admin/companies/[companyId]/route.ts`
+- `app/api/admin/empresas/[companyId]/route.ts`
 - `app/api/admin/trips/[tripId]/route.ts`
-- `app/api/admin/vehicles/[vehicleId]/route.ts`
+- `app/api/admin/veiculos/[vehicleId]/route.ts`
 
 ---
 

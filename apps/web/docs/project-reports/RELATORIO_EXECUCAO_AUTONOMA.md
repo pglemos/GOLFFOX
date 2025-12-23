@@ -37,12 +37,12 @@
 ## 🔧 Arquivos Criados/Modificados
 
 ### API Routes
-- ✅ `/api/admin/companies/delete`
-- ✅ `/api/admin/routes/delete`
-- ✅ `/api/admin/vehicles/delete`
-- ✅ `/api/admin/drivers/delete`
-- ✅ `/api/admin/users/delete`
-- ✅ `/api/admin/alerts/delete`
+- ✅ `/api/admin/empresas/delete`
+- ✅ `/api/admin/rotas/delete`
+- ✅ `/api/admin/veiculos/delete`
+- ✅ `/api/admin/motoristas/delete`
+- ✅ `/api/admin/usuarios/delete`
+- ✅ `/api/admin/alertas/delete`
 - ✅ `/api/admin/assistance-requests/delete`
 - ✅ `/api/admin/execute-sql-fix` (nova)
 

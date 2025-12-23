@@ -35,7 +35,7 @@
 ### API Routes
 1. `app/api/reports/run/route.ts` - **729 linhas** ⚠️
 2. `app/api/auth/login/route.ts` - **595 linhas** ⚠️
-3. `app/api/admin/create-empresa-user/route.ts` - **593 linhas** ⚠️
+3. `app/api/admin/criar-empresa-usuario/route.ts` - **593 linhas** ⚠️
 4. `app/api/costs/manual/route.ts` - **541 linhas** ⚠️
 
 ## Padrões de Import Identificados

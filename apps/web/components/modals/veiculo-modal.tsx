@@ -320,7 +320,7 @@ export function VeiculoModal({ veiculo, isOpen, onClose, onSave, carriers }: Vei
         const timeout = setTimeout(() => controller.abort(), 30000)
         let resp: Response
         try {
-          resp = await fetch(`/api/admin/vehicles/${vehicleId}`, {
+          resp = await fetch(`/api/admin/veiculos/${vehicleId}`, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(finalVehicleData),
@@ -363,7 +363,7 @@ export function VeiculoModal({ veiculo, isOpen, onClose, onSave, carriers }: Vei
         const timeout = setTimeout(() => controller.abort(), 30000)
         let resp: Response
         try {
-          resp = await fetch('/api/admin/vehicles', {
+          resp = await fetch('/api/admin/veiculos', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(finalVehicleData),
@@ -395,7 +395,7 @@ export function VeiculoModal({ veiculo, isOpen, onClose, onSave, carriers }: Vei
           const uploadedUrl = await uploadPhoto(vehicleId)
           if (uploadedUrl) {
             try {
-              const respPhoto = await fetch(`/api/admin/vehicles/${vehicleId}`, {
+              const respPhoto = await fetch(`/api/admin/veiculos/${vehicleId}`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ photo_url: uploadedUrl }),

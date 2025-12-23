@@ -45,7 +45,7 @@ Schemas disponíveis:
 
 ### 4. Rotas Migradas ✅
 
-- ✅ `app/api/admin/vehicles/route.ts` - Usa `createVehicleSchema` compartilhado
+- ✅ `app/api/admin/veiculos/route.ts` - Usa `createVehicleSchema` compartilhado
 
 ---
 
@@ -53,9 +53,9 @@ Schemas disponíveis:
 
 Estas rotas já usam Zod, mas precisam migrar para schemas compartilhados:
 
-1. `app/api/admin/create-transportadora-login/route.ts` - Usa `carrierLoginSchema` local
+1. `app/api/admin/criar-transportadora-login/route.ts` - Usa `carrierLoginSchema` local
 2. `app/api/costs/budgets/route.ts` - Usa `budgetSchema` local
-3. `app/api/admin/vehicles/route.ts` - ✅ **Migrado** para schema compartilhado
+3. `app/api/admin/veiculos/route.ts` - ✅ **Migrado** para schema compartilhado
 
 ---
 
@@ -68,15 +68,15 @@ Estas rotas já usam Zod, mas precisam migrar para schemas compartilhados:
    - `app/api/auth/set-session/route.ts` - Adicionar validação Zod
 
 2. **Criação de Usuários:**
-   - `app/api/admin/create-empresa-login/route.ts`
-   - `app/api/admin/create-empresa-user/route.ts`
-   - `app/api/admin/create-transportadora-login/route.ts` - Migrar para schema compartilhado
-   - `app/api/admin/create-user/route.ts`
+   - `app/api/admin/criar-empresa-login/route.ts`
+   - `app/api/admin/criar-empresa-usuario/route.ts`
+   - `app/api/admin/criar-transportadora-login/route.ts` - Migrar para schema compartilhado
+   - `app/api/admin/criar-usuario/route.ts`
 
 3. **CRUD Principal:**
-   - `app/api/admin/companies/route.ts`
-   - `app/api/admin/drivers/route.ts`
-   - `app/api/admin/routes/route.ts`
+   - `app/api/admin/empresas/route.ts`
+   - `app/api/admin/motoristas/route.ts`
+   - `app/api/admin/rotas/route.ts`
 
 ### Prioridade Média
 
@@ -88,7 +88,7 @@ Estas rotas já usam Zod, mas precisam migrar para schemas compartilhados:
 
 5. **Outras APIs Admin:**
    - `app/api/admin/transportadoras/*`
-   - `app/api/admin/alerts/*`
+   - `app/api/admin/alertas/*`
    - `app/api/admin/kpis/route.ts`
 
 ### Prioridade Baixa

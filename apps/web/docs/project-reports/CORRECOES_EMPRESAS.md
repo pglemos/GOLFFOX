@@ -49,7 +49,7 @@
   - Adicionados estados de loading e erro
   - Melhorado tratamento de funcionários
 
-- `web-app/app/api/admin/create-operador/route.ts`
+- `web-app/app/api/admin/criar-operador/route.ts`
   - Implementada lógica de fallback para colunas opcionais
   - Melhorado tratamento de erros
 

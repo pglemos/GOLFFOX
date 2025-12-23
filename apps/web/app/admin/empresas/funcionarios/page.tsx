@@ -108,7 +108,7 @@ export default function EmpresasFuncionariosPage() {
 
     const loadCompanies = useCallback(async () => {
         try {
-            const response = await fetch('/api/admin/companies-list')
+            const response = await fetch('/api/admin/empresas-list')
             if (!response.ok) return
             const data = await response.json()
             setCompanies(Array.isArray(data) ? data : data.companies || [])
@@ -170,8 +170,8 @@ export default function EmpresasFuncionariosPage() {
         setSaving(true)
         try {
             const url = selectedEmployee
-                ? `/api/admin/users/${selectedEmployee.id}`
-                : '/api/admin/create-user'
+                ? `/api/admin/usuarios/${selectedEmployee.id}`
+                : '/api/admin/criar-usuario'
             const method = selectedEmployee ? 'PUT' : 'POST'
 
             const response = await fetch(url, {
@@ -195,7 +195,7 @@ export default function EmpresasFuncionariosPage() {
         if (!confirm(`Excluir funcionário "${employeeName}"?`)) return
 
         try {
-            const response = await fetch(`/api/admin/users/delete?id=${employeeId}`, { method: 'DELETE' })
+            const response = await fetch(`/api/admin/usuarios/delete?id=${employeeId}`, { method: 'DELETE' })
             if (!response.ok) throw new Error('Erro ao excluir')
             notifySuccess('Funcionário excluído')
             loadEmployees()

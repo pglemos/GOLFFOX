@@ -68,12 +68,12 @@ python scripts/fix_companies_updated_at.py
 ## 📁 Arquivos Criados/Modificados
 
 ### ✅ API Routes (8 arquivos)
-1. `/api/admin/companies/delete` - Desativa empresa
-2. `/api/admin/routes/delete` - Exclui rota (com validação)
-3. `/api/admin/vehicles/delete` - Desativa veículo
-4. `/api/admin/drivers/delete` - Atualiza motorista
-5. `/api/admin/users/delete` - Atualiza usuário
-6. `/api/admin/alerts/delete` - Exclui alerta
+1. `/api/admin/empresas/delete` - Desativa empresa
+2. `/api/admin/rotas/delete` - Exclui rota (com validação)
+3. `/api/admin/veiculos/delete` - Desativa veículo
+4. `/api/admin/motoristas/delete` - Atualiza motorista
+5. `/api/admin/usuarios/delete` - Atualiza usuário
+6. `/api/admin/alertas/delete` - Exclui alerta
 7. `/api/admin/assistance-requests/delete` - Exclui solicitação
 8. `/api/admin/execute-sql-fix` - API para correção SQL
 

@@ -1,4 +1,4 @@
-import { DELETE } from '@/app/api/admin/routes/delete/route'
+import { DELETE } from '@/app/api/admin/rotas/delete/route'
 import { createAdminRequest } from '../../../helpers/api-test-helpers'
 import { mockSupabaseClient } from '../../../helpers/mock-supabase'
 import { createTestRoute } from '../../../helpers/test-data'
@@ -18,7 +18,7 @@ jest.mock('@/lib/api-auth', () => ({
   }),
 }))
 
-describe('DELETE /api/admin/routes/delete', () => {
+describe('DELETE /api/admin/rotas/delete', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockSupabaseClient.clear()
@@ -37,7 +37,7 @@ describe('DELETE /api/admin/routes/delete', () => {
 
     const req = createAdminRequest({
       method: 'DELETE',
-      url: `http://localhost:3000/api/admin/routes/delete?id=${route.id}`,
+      url: `http://localhost:3000/api/admin/rotas/delete?id=${route.id}`,
     }) as NextRequest
 
     const response = await DELETE(req)
@@ -65,7 +65,7 @@ describe('DELETE /api/admin/routes/delete', () => {
 
     const req = createAdminRequest({
       method: 'DELETE',
-      url: `http://localhost:3000/api/admin/routes/delete?id=${route.id}`,
+      url: `http://localhost:3000/api/admin/rotas/delete?id=${route.id}`,
     }) as NextRequest
 
     const response = await DELETE(req)
@@ -78,7 +78,7 @@ describe('DELETE /api/admin/routes/delete', () => {
   it('deve rejeitar sem ID da rota', async () => {
     const req = createAdminRequest({
       method: 'DELETE',
-      url: 'http://localhost:3000/api/admin/routes/delete',
+      url: 'http://localhost:3000/api/admin/rotas/delete',
     }) as NextRequest
 
     const response = await DELETE(req)
@@ -96,7 +96,7 @@ describe('DELETE /api/admin/routes/delete', () => {
 
     const req = createAdminRequest({
       method: 'DELETE',
-      url: `http://localhost:3000/api/admin/routes/delete?id=${route.id}`,
+      url: `http://localhost:3000/api/admin/rotas/delete?id=${route.id}`,
     }) as NextRequest
 
     const response = await DELETE(req)

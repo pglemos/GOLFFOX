@@ -50,7 +50,7 @@ export function TransportadoraUsersModal({ transportadora, isOpen, onClose, onSa
     setLoading(true)
 
     try {
-      const response = await fetch('/api/admin/create-transportadora-login', {
+      const response = await fetch('/api/admin/criar-transportadora-login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -88,7 +88,7 @@ export function TransportadoraUsersModal({ transportadora, isOpen, onClose, onSa
     }
 
     try {
-      const response = await fetch(`/api/admin/users/delete?id=${userId}`, {
+      const response = await fetch(`/api/admin/usuarios/delete?id=${userId}`, {
         method: 'DELETE'
       })
 

@@ -47,7 +47,7 @@ export function TransportadoraTenantProvider({ children }: TransportadoraTenantP
                 if (foundId) {
                     // Buscar dados da transportadora
                     const { data: transportadoraData } = await supabase
-                        .from('carriers')
+                        .from('transportadoras')
                         .select('id, name, logo_url')
                         .eq('id', foundId)
                         .single()

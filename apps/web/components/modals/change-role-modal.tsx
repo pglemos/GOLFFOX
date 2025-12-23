@@ -75,7 +75,7 @@ export function ChangeRoleModal({
         return
       }
 
-      const response = await fetch('/api/admin/users/change-role', {
+      const response = await fetch('/api/admin/usuarios/change-role', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

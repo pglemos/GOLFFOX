@@ -96,7 +96,7 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
   useEffect(() => {
     if (isVeiculoModalOpen && formData.company_id) {
       setLoadingVeiculos(true)
-      fetch(`/api/admin/vehicles-list?company_id=${formData.company_id}${formData.selected_employees?.length ? `&required_capacity=${formData.selected_employees.length}` : ''}`)
+      fetch(`/api/admin/veiculos-list?company_id=${formData.company_id}${formData.selected_employees?.length ? `&required_capacity=${formData.selected_employees.length}` : ''}`)
         .then(res => res.json())
         .then(result => {
           if (result.success) {

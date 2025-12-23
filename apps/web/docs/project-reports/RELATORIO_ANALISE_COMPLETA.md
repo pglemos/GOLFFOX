@@ -55,9 +55,9 @@ Foi realizada uma análise completa do Supabase e do repositório completo, iden
   - Tipos do `lucide-react` (warnings, não críticos)
 
 **Correções Aplicadas:**
-- `app/api/admin/companies/[companyId]/route.ts` - params como Promise
+- `app/api/admin/empresas/[companyId]/route.ts` - params como Promise
 - `app/api/admin/trips/[tripId]/route.ts` - params como Promise
-- `app/api/admin/vehicles/[vehicleId]/route.ts` - params como Promise
+- `app/api/admin/veiculos/[vehicleId]/route.ts` - params como Promise
 - `app/admin/alertas/page.tsx` - import Trash2 adicionado
 
 ### 2.2 API Routes
@@ -149,9 +149,9 @@ Foi realizada uma análise completa do Supabase e do repositório completo, iden
 ## Arquivos Modificados
 
 ### Correções Críticas
-- `app/api/admin/companies/[companyId]/route.ts` - params como Promise
+- `app/api/admin/empresas/[companyId]/route.ts` - params como Promise
 - `app/api/admin/trips/[tripId]/route.ts` - params como Promise
-- `app/api/admin/vehicles/[vehicleId]/route.ts` - params como Promise
+- `app/api/admin/veiculos/[vehicleId]/route.ts` - params como Promise
 - `app/api/auth/csrf/route.ts` - tratamento de erros
 - `app/admin/alertas/page.tsx` - import Trash2
 

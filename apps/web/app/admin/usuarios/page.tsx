@@ -69,7 +69,7 @@ function UsuariosPageContent() {
                 params.append('status', filterStatus)
             }
 
-            const response = await fetch(`/api/admin/users-list?${params.toString()}`)
+            const response = await fetch(`/api/admin/usuarios-list?${params.toString()}`)
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`)
             }
@@ -93,7 +93,7 @@ function UsuariosPageContent() {
         }
 
         try {
-            const response = await fetch(`/api/admin/users/delete?id=${usuarioId}`, {
+            const response = await fetch(`/api/admin/usuarios/delete?id=${usuarioId}`, {
                 method: 'DELETE'
             })
 

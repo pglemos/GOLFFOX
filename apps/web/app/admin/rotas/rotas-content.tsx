@@ -81,7 +81,7 @@ export function RotasPageContent() {
   const loadRotas = async () => {
     try {
       setRotasLoading(true)
-      const response = await fetch('/api/admin/routes-list', {
+      const response = await fetch('/api/admin/rotas-list', {
         credentials: 'include'
       })
       if (!response.ok) {
@@ -138,7 +138,7 @@ export function RotasPageContent() {
     try {
       const snapshot = [...rotas]
       setRotas((prev) => prev.filter((r) => r.id !== rotaId))
-      const response = await fetch(`/api/admin/routes/delete?id=${rotaId}`, {
+      const response = await fetch(`/api/admin/rotas/delete?id=${rotaId}`, {
         method: 'DELETE'
       })
 

@@ -86,7 +86,7 @@ export function useRouteCreate(isOpen: boolean) {
                 headers['Authorization'] = `Bearer ${session.access_token}`
             }
 
-            const response = await fetch('/api/admin/companies-list', {
+            const response = await fetch('/api/admin/empresas-list', {
                 headers,
                 credentials: 'include',
             })

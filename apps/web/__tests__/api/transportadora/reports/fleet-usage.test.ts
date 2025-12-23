@@ -1,4 +1,4 @@
-import { GET } from '@/app/api/transportadora/reports/fleet-usage/route'
+import { GET } from '@/app/api/transportadora/relatorios/fleet-usage/route'
 import { createTransportadoraRequest } from '../../../helpers/api-test-helpers'
 import { mockSupabaseClient } from '../../../helpers/mock-supabase'
 import { createTestTransportadora, createTestVehicle } from '../../../helpers/test-data'
@@ -8,7 +8,7 @@ jest.mock('@supabase/supabase-js', () => ({
   createClient: jest.fn(() => mockSupabaseClient),
 }))
 
-describe('GET /api/transportadora/reports/fleet-usage', () => {
+describe('GET /api/transportadora/relatorios/fleet-usage', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockSupabaseClient.clear()
@@ -29,7 +29,7 @@ describe('GET /api/transportadora/reports/fleet-usage', () => {
 
     const req = createTransportadoraRequest({
       method: 'GET',
-      url: `http://localhost:3000/api/transportadora/reports/fleet-usage?transportadora_id=${transportadora.id}`,
+      url: `http://localhost:3000/api/transportadora/relatorios/fleet-usage?transportadora_id=${transportadora.id}`,
     }) as NextRequest
 
     const response = await GET(req)
@@ -51,7 +51,7 @@ describe('GET /api/transportadora/reports/fleet-usage', () => {
 
     const req = createTransportadoraRequest({
       method: 'GET',
-      url: `http://localhost:3000/api/transportadora/reports/fleet-usage?transportadora_id=${transportadora.id}&start_date=2024-01-01&end_date=2024-01-31`,
+      url: `http://localhost:3000/api/transportadora/relatorios/fleet-usage?transportadora_id=${transportadora.id}&start_date=2024-01-01&end_date=2024-01-31`,
     }) as NextRequest
 
     const response = await GET(req)
@@ -64,7 +64,7 @@ describe('GET /api/transportadora/reports/fleet-usage', () => {
   it('deve rejeitar sem transportadora_id', async () => {
     const req = createTransportadoraRequest({
       method: 'GET',
-      url: 'http://localhost:3000/api/transportadora/reports/fleet-usage',
+      url: 'http://localhost:3000/api/transportadora/relatorios/fleet-usage',
     }) as NextRequest
 
     const response = await GET(req)
@@ -88,7 +88,7 @@ describe('GET /api/transportadora/reports/fleet-usage', () => {
 
     const req = createTransportadoraRequest({
       method: 'GET',
-      url: `http://localhost:3000/api/transportadora/reports/fleet-usage?transportadora_id=${transportadora.id}`,
+      url: `http://localhost:3000/api/transportadora/relatorios/fleet-usage?transportadora_id=${transportadora.id}`,
     }) as NextRequest
 
     const response = await GET(req)

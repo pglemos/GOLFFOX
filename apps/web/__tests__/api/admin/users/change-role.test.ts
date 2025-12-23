@@ -1,4 +1,4 @@
-import { POST } from '@/app/api/admin/users/change-role/route'
+import { POST } from '@/app/api/admin/usuarios/change-role/route'
 import { createAdminRequest } from '../../../helpers/api-test-helpers'
 import { mockSupabaseClient } from '../../../helpers/mock-supabase'
 import { NextRequest } from 'next/server'
@@ -42,7 +42,7 @@ jest.mock('@/lib/role-mapper', () => ({
   }),
 }))
 
-describe('POST /api/admin/users/change-role', () => {
+describe('POST /api/admin/usuarios/change-role', () => {
   const userId = '123e4567-e89b-12d3-a456-426614174000'
 
   beforeEach(() => {
@@ -81,7 +81,7 @@ describe('POST /api/admin/users/change-role', () => {
 
     const req = createAdminRequest({
       method: 'POST',
-      url: 'http://localhost:3000/api/admin/users/change-role',
+      url: 'http://localhost:3000/api/admin/usuarios/change-role',
       body: {
         userId,
         newRole: 'transportadora',
@@ -99,7 +99,7 @@ describe('POST /api/admin/users/change-role', () => {
   it('deve retornar 400 se userId não for UUID válido', async () => {
     const req = createAdminRequest({
       method: 'POST',
-      url: 'http://localhost:3000/api/admin/users/change-role',
+      url: 'http://localhost:3000/api/admin/usuarios/change-role',
       body: {
         userId: 'invalid-id',
         newRole: 'transportadora',
@@ -114,7 +114,7 @@ describe('POST /api/admin/users/change-role', () => {
   it('deve retornar 400 se newRole for inválido', async () => {
     const req = createAdminRequest({
       method: 'POST',
-      url: 'http://localhost:3000/api/admin/users/change-role',
+      url: 'http://localhost:3000/api/admin/usuarios/change-role',
       body: {
         userId,
         newRole: 'invalid-role',
@@ -138,7 +138,7 @@ describe('POST /api/admin/users/change-role', () => {
 
     const req = createAdminRequest({
       method: 'POST',
-      url: 'http://localhost:3000/api/admin/users/change-role',
+      url: 'http://localhost:3000/api/admin/usuarios/change-role',
       body: {
         userId,
         newRole: 'transportadora',
@@ -169,7 +169,7 @@ describe('POST /api/admin/users/change-role', () => {
 
     const req = createAdminRequest({
       method: 'POST',
-      url: 'http://localhost:3000/api/admin/users/change-role',
+      url: 'http://localhost:3000/api/admin/usuarios/change-role',
       body: {
         userId,
         newRole: 'transportadora',
@@ -186,7 +186,7 @@ describe('POST /api/admin/users/change-role', () => {
   it('deve retornar 403 se usuário não for admin', async () => {
     const req = createAdminRequest({
       method: 'POST',
-      url: 'http://localhost:3000/api/admin/users/change-role',
+      url: 'http://localhost:3000/api/admin/usuarios/change-role',
       body: {
         userId,
         newRole: 'transportadora',

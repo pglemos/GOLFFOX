@@ -75,7 +75,7 @@ const result = await withCache('key', async () => {
 
 **Cobertura:**
 - Endpoint `/api/health`
-- Endpoints `/api/admin/companies` (GET, POST, PUT, DELETE)
+- Endpoints `/api/admin/empresas` (GET, POST, PUT, DELETE)
 - Schemas de dados
 - Autenticação Bearer
 - Códigos de resposta
@@ -103,7 +103,7 @@ const result = await withCache('key', async () => {
 - `__tests__/lib/repositories/company.repository.test.ts` - Testes do repository
 - `__tests__/lib/services/company.service.test.ts` - Testes do service
 - `__tests__/lib/cache/cache.service.test.ts` - Testes do cache
-- `__tests__/integration/api/admin/companies.integration.test.ts` - Testes de integração
+- `__tests__/integration/api/admin/empresas.integration.test.ts` - Testes de integração
 
 **Cobertura:**
 - Testes unitários para repositories

@@ -53,24 +53,35 @@ export const AppShell = memo(function AppShell({ user, children, panel }: AppShe
   }, [panel, pathname, user?.role])
 
   // Configurações de branding por painel (memoizado)
-  const panelConfig = useMemo(() => ({
-    admin: {
-      branding: 'Administrativo',
-      homeUrl: '/admin'
-    },
-    operador: {
-      branding: 'Operador',
-      homeUrl: '/operador'
-    },
-    transportadora: {
-      branding: 'Transportadora',
-      homeUrl: '/transportadora'
-    },
-    empresa: {
-      branding: 'Corporativo',
-      homeUrl: '/empresa'
+  const panelConfig = useMemo(() => {
+    const configs: Record<string, { branding: string, homeUrl: string }> = {
+      admin: {
+        branding: 'Administrativo',
+        homeUrl: '/admin'
+      },
+      operador: {
+        branding: 'Operador',
+        homeUrl: '/operador'
+      },
+      transportadora: {
+        branding: 'Transportadora',
+        homeUrl: '/transportadora'
+      },
+      gestor_transportadora: {
+        branding: 'Transportadora',
+        homeUrl: '/transportadora'
+      },
+      empresa: {
+        branding: 'Corporativo',
+        homeUrl: '/empresa'
+      },
+      gestor_empresa: {
+        branding: 'Corporativo',
+        homeUrl: '/empresa'
+      }
     }
-  }[detectedPanel]), [detectedPanel])
+    return configs[detectedPanel] || configs.admin
+  }, [detectedPanel])
 
   // Em mobile, começar fechado - em desktop também começa colapsado
   useEffect(() => {

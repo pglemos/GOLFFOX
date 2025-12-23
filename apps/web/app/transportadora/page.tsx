@@ -52,7 +52,7 @@ export default function TransportadoraDashboard() {
   const router = useRouter()
   const isMobile = useMobile()
   const { user, loading } = useAuth()
-  
+
   // Redirecionar para login se não autenticado ou sem role adequada
   useEffect(() => {
     if (!loading && (!user || !['gestor_transportadora', 'transportadora', 'operador', 'admin'].includes(user.role || ''))) {
@@ -60,8 +60,8 @@ export default function TransportadoraDashboard() {
     }
   }, [loading, user, router])
 
-  // Obter transportadora_id do usuário
-  const transportadoraId = user?.companyId || user?.company_id || null
+  // Obter transportadora_id do usuário (pode vir em vários formatos dependendo da fonte/cookie/me api)
+  const transportadoraId = user?.transportadora_id || user?.transportadoraId || user?.companyId || user?.company_id || null
 
   const [fleet, setFleet] = useState<any[]>([])
   const [motoristas, setMotoristas] = useState<any[]>([])
@@ -175,13 +175,13 @@ export default function TransportadoraDashboard() {
       if (driversData?.length) {
         // Buscar dados de ranking/gamificação
         const driverIds = driversData.map((d: { id: string }) => d.id)
-        
+
         interface GamificationScore {
           motorista_id: string
           trips_completed?: number
           total_points?: number
         }
-        
+
         // @ts-expect-error - gf_gamification_scores não está no tipo do Supabase ainda
         const { data: rankings } = await supabase
           .from('gf_gamification_scores')
@@ -382,26 +382,26 @@ export default function TransportadoraDashboard() {
 
   // Calcular trends memoizadas
   const kpiTrends = useMemo(() => ({
-    totalFleet: previousKpis.totalFleet > 0 
-      ? Math.round(((kpis.totalFleet - previousKpis.totalFleet) / previousKpis.totalFleet) * 100) 
+    totalFleet: previousKpis.totalFleet > 0
+      ? Math.round(((kpis.totalFleet - previousKpis.totalFleet) / previousKpis.totalFleet) * 100)
       : 0,
-    onRoute: previousKpis.onRoute > 0 
-      ? Math.round(((kpis.onRoute - previousKpis.onRoute) / previousKpis.onRoute) * 100) 
+    onRoute: previousKpis.onRoute > 0
+      ? Math.round(((kpis.onRoute - previousKpis.onRoute) / previousKpis.onRoute) * 100)
       : 0,
-    activeDrivers: previousKpis.activeDrivers > 0 
-      ? Math.round(((kpis.activeDrivers - previousKpis.activeDrivers) / previousKpis.activeDrivers) * 100) 
+    activeDrivers: previousKpis.activeDrivers > 0
+      ? Math.round(((kpis.activeDrivers - previousKpis.activeDrivers) / previousKpis.activeDrivers) * 100)
       : 0,
-    criticalAlerts: previousKpis.criticalAlerts > 0 
-      ? Math.round(((kpis.criticalAlerts - previousKpis.criticalAlerts) / previousKpis.criticalAlerts) * 100) 
+    criticalAlerts: previousKpis.criticalAlerts > 0
+      ? Math.round(((kpis.criticalAlerts - previousKpis.criticalAlerts) / previousKpis.criticalAlerts) * 100)
       : 0,
-    totalCostsThisMonth: previousKpis.totalCostsThisMonth > 0 
-      ? Math.round(((kpis.totalCostsThisMonth - previousKpis.totalCostsThisMonth) / previousKpis.totalCostsThisMonth) * 100) 
+    totalCostsThisMonth: previousKpis.totalCostsThisMonth > 0
+      ? Math.round(((kpis.totalCostsThisMonth - previousKpis.totalCostsThisMonth) / previousKpis.totalCostsThisMonth) * 100)
       : 0,
-    totalTrips: previousKpis.totalTrips > 0 
-      ? Math.round(((kpis.totalTrips - previousKpis.totalTrips) / previousKpis.totalTrips) * 100) 
+    totalTrips: previousKpis.totalTrips > 0
+      ? Math.round(((kpis.totalTrips - previousKpis.totalTrips) / previousKpis.totalTrips) * 100)
       : 0,
-    delayed: previousKpis.delayed > 0 
-      ? Math.round(((kpis.delayed - previousKpis.delayed) / previousKpis.delayed) * 100) 
+    delayed: previousKpis.delayed > 0
+      ? Math.round(((kpis.delayed - previousKpis.delayed) / previousKpis.delayed) * 100)
       : 0,
   }), [kpis, previousKpis])
 

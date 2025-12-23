@@ -75,10 +75,10 @@ const company = await CompanyService.createCompany({
 - ⏳ Nenhuma ainda (estrutura preparada)
 
 ### Rotas que Podem Usar CQRS (Futuro)
-- `POST /api/admin/companies` → `CreateCompanyCommand`
-- `POST /api/admin/vehicles` → `CreateVehicleCommand`
-- `POST /api/admin/drivers` → `CreateDriverCommand`
-- `POST /api/admin/routes` → `CreateRouteCommand`
+- `POST /api/admin/empresas` → `CreateCompanyCommand`
+- `POST /api/admin/veiculos` → `CreateVehicleCommand`
+- `POST /api/admin/motoristas` → `CreateDriverCommand`
+- `POST /api/admin/rotas` → `CreateRouteCommand`
 - `POST /api/admin/transportadoras/create` → `CreateCarrierCommand`
 
 ---

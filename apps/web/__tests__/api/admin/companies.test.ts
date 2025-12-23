@@ -1,4 +1,4 @@
-import { GET, POST } from '@/app/api/admin/companies/route'
+import { GET, POST } from '@/app/api/admin/empresas/route'
 import { createAdminRequest } from '../../helpers/api-test-helpers'
 import { mockSupabaseClient } from '../../helpers/mock-supabase'
 import { createTestCompany } from '../../helpers/test-data'
@@ -22,7 +22,7 @@ jest.mock('@/lib/rate-limit', () => ({
   withRateLimit: jest.fn((handler) => handler),
 }))
 
-describe('GET /api/admin/companies', () => {
+describe('GET /api/admin/empresas', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockSupabaseClient.clear()
@@ -56,7 +56,7 @@ describe('GET /api/admin/companies', () => {
 
     const req = createAdminRequest({
       method: 'GET',
-      url: 'http://localhost:3000/api/admin/companies?is_active=true',
+      url: 'http://localhost:3000/api/admin/empresas?is_active=true',
     }) as NextRequest
 
     const response = await GET(req)
@@ -72,7 +72,7 @@ describe('GET /api/admin/companies', () => {
 
     const req = createAdminRequest({
       method: 'GET',
-      url: 'http://localhost:3000/api/admin/companies?search=Busca',
+      url: 'http://localhost:3000/api/admin/empresas?search=Busca',
     }) as NextRequest
 
     const response = await GET(req)
@@ -83,7 +83,7 @@ describe('GET /api/admin/companies', () => {
   })
 })
 
-describe('POST /api/admin/companies', () => {
+describe('POST /api/admin/empresas', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockSupabaseClient.clear()

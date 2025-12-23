@@ -124,12 +124,6 @@ Script Node.js para testar endpoints de relatórios.
 
 ## 🚀 Próximos Passos
 
-### Para Testes do TestSprite
-1. ✅ Endpoints estão prontos para testes
-2. ✅ Views estão criadas e funcionando
-3. ✅ Modo de teste implementado
-4. ⏭️ Executar testes do TestSprite para validar
-
 ### Para Produção
 1. ✅ Endpoints funcionando corretamente
 2. ✅ Views criadas e populadas com dados

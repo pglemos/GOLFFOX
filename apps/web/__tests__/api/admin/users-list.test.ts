@@ -1,4 +1,4 @@
-import { GET } from '@/app/api/admin/users-list/route'
+import { GET } from '@/app/api/admin/usuarios-list/route'
 import { createAdminRequest } from '../../helpers/api-test-helpers'
 import { mockSupabaseClient } from '../../helpers/mock-supabase'
 
@@ -20,7 +20,7 @@ jest.mock('@/lib/logger', () => ({
   logError: jest.fn(),
 }))
 
-describe('GET /api/admin/users-list', () => {
+describe('GET /api/admin/usuarios-list', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockSupabaseClient.clear()
@@ -46,7 +46,7 @@ describe('GET /api/admin/users-list', () => {
 
     const req = createAdminRequest({
       method: 'GET',
-      url: 'http://localhost:3000/api/admin/users-list',
+      url: 'http://localhost:3000/api/admin/usuarios-list',
     })
 
     const response = await GET(req)
@@ -70,7 +70,7 @@ describe('GET /api/admin/users-list', () => {
 
     const req = createAdminRequest({
       method: 'GET',
-      url: 'http://localhost:3000/api/admin/users-list?role=empresa',
+      url: 'http://localhost:3000/api/admin/usuarios-list?role=empresa',
     })
 
     const response = await GET(req)
@@ -93,7 +93,7 @@ describe('GET /api/admin/users-list', () => {
 
     const req = createAdminRequest({
       method: 'GET',
-      url: 'http://localhost:3000/api/admin/users-list?status=active',
+      url: 'http://localhost:3000/api/admin/usuarios-list?status=active',
     })
 
     const response = await GET(req)
@@ -116,7 +116,7 @@ describe('GET /api/admin/users-list', () => {
 
     const req = createAdminRequest({
       method: 'GET',
-      url: 'http://localhost:3000/api/admin/users-list?company_id=company-123',
+      url: 'http://localhost:3000/api/admin/usuarios-list?company_id=company-123',
     })
 
     const response = await GET(req)
@@ -129,7 +129,7 @@ describe('GET /api/admin/users-list', () => {
   it('deve retornar 403 se usuário não for admin', async () => {
     const req = createAdminRequest({
       method: 'GET',
-      url: 'http://localhost:3000/api/admin/users-list',
+      url: 'http://localhost:3000/api/admin/usuarios-list',
       headers: { 'x-user-role': 'empresa' },
     })
 
@@ -149,7 +149,7 @@ describe('GET /api/admin/users-list', () => {
 
     const req = createAdminRequest({
       method: 'GET',
-      url: 'http://localhost:3000/api/admin/users-list',
+      url: 'http://localhost:3000/api/admin/usuarios-list',
     })
 
     const response = await GET(req)

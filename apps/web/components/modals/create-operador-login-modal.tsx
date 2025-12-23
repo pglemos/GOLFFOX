@@ -69,7 +69,7 @@ export function CreateUserModal({
   const loadCompanies = async () => {
     try {
       setLoadingCompanies(true)
-      const response = await fetch('/api/admin/companies-list')
+      const response = await fetch('/api/admin/empresas-list')
       const result = await response.json()
       if (result.success) {
         setCompanies(result.companies || [])
@@ -134,7 +134,7 @@ export function CreateUserModal({
       }
 
       // Chamar API para criar usuário
-      const response = await fetch("/api/admin/create-user", {
+      const response = await fetch("/api/admin/criar-usuario", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

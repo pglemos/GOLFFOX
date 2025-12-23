@@ -1,4 +1,4 @@
-import { DELETE } from '@/app/api/admin/alerts/delete/route'
+import { DELETE } from '@/app/api/admin/alertas/delete/route'
 import { createAdminRequest } from '../../../helpers/api-test-helpers'
 import { mockSupabaseClient } from '../../../helpers/mock-supabase'
 import { NextRequest } from 'next/server'
@@ -17,7 +17,7 @@ jest.mock('@/lib/api-auth', () => ({
   }),
 }))
 
-describe('DELETE /api/admin/alerts/delete', () => {
+describe('DELETE /api/admin/alertas/delete', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockSupabaseClient.clear()
@@ -35,7 +35,7 @@ describe('DELETE /api/admin/alerts/delete', () => {
 
     const req = createAdminRequest({
       method: 'DELETE',
-      url: `http://localhost:3000/api/admin/alerts/delete?id=${alert.id}`,
+      url: `http://localhost:3000/api/admin/alertas/delete?id=${alert.id}`,
     }) as NextRequest
 
     const response = await DELETE(req)
@@ -49,7 +49,7 @@ describe('DELETE /api/admin/alerts/delete', () => {
   it('deve rejeitar sem ID do alerta', async () => {
     const req = createAdminRequest({
       method: 'DELETE',
-      url: 'http://localhost:3000/api/admin/alerts/delete',
+      url: 'http://localhost:3000/api/admin/alertas/delete',
     }) as NextRequest
 
     const response = await DELETE(req)
@@ -69,7 +69,7 @@ describe('DELETE /api/admin/alerts/delete', () => {
 
     const req = createAdminRequest({
       method: 'DELETE',
-      url: `http://localhost:3000/api/admin/alerts/delete?id=${alert.id}`,
+      url: `http://localhost:3000/api/admin/alertas/delete?id=${alert.id}`,
     }) as NextRequest
 
     const response = await DELETE(req)

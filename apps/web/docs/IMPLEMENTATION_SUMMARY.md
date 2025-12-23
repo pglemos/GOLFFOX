@@ -34,7 +34,7 @@
 **Implementado:**
 - `lib/cache/redis-cache.service.ts` - Serviço de cache Redis
 - Integrado em `app/api/admin/kpis/route.ts`
-- Integrado em `app/api/admin/alerts-list/route.ts`
+- Integrado em `app/api/admin/alertas-list/route.ts`
 - Invalidação automática no cron job `refresh-kpis`
 
 **Benefícios:**
@@ -136,8 +136,8 @@
 
 **Próximos passos:**
 1. Criar handlers para commands/queries existentes
-2. Migrar `POST /api/admin/companies` para `CreateCompanyCommand`
-3. Migrar `POST /api/admin/vehicles` para `CreateVehicleCommand`
+2. Migrar `POST /api/admin/empresas` para `CreateCompanyCommand`
+3. Migrar `POST /api/admin/veiculos` para `CreateVehicleCommand`
 4. Migrar outras rotas gradualmente
 
 **Nota:** Estrutura está pronta, migração pode ser feita gradualmente

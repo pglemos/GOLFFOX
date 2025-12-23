@@ -10,11 +10,20 @@ import { Badge } from '@/components/ui/badge'
 import { AlertCircle } from 'lucide-react'
 import { getUnresolvedAlerts, hasCriticalAlerts } from '@/lib/operational-alerts'
 import { supabase } from '@/lib/supabase'
+import { usePathname } from '@/lib/next-navigation'
 
 export function OperationalAlertsBadge() {
   const [alertCount, setAlertCount] = useState(0)
   const [hasCritical, setHasCritical] = useState(false)
   const [loading, setLoading] = useState(true)
+  const pathname = usePathname()
+
+  const getAlertsUrl = () => {
+    if (pathname?.startsWith('/transportadora')) return '/transportadora/alertas'
+    if (pathname?.startsWith('/empresa')) return '/empresa/alertas'
+    if (pathname?.startsWith('/operador')) return '/operador/alertas'
+    return '/admin/alertas'
+  }
 
   useEffect(() => {
     loadAlerts()
@@ -23,8 +32,8 @@ export function OperationalAlertsBadge() {
     const interval = setInterval(loadAlerts, 30000)
 
     // Escutar mudanças em tempo real
-  const channel = (supabase as any)
-    .channel('operational_alerts')
+    const channel = (supabase as any)
+      .channel('operational_alerts')
       .on(
         'postgres_changes',
         {
@@ -65,8 +74,8 @@ export function OperationalAlertsBadge() {
       variant={hasCritical ? 'destructive' : 'secondary'}
       className="flex items-center gap-1 cursor-pointer hover:opacity-80"
       onClick={() => {
-        // Navegar para página de alertas ou abrir modal
-        window.location.href = '/admin/alertas'
+        // Navegar para página de alertas dinamicamente
+        window.location.href = getAlertsUrl()
       }}
     >
       <AlertCircle className="h-3 w-3" />
@@ -74,4 +83,3 @@ export function OperationalAlertsBadge() {
     </Badge>
   )
 }
-

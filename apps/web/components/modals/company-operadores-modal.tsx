@@ -65,7 +65,7 @@ export function CompanyUsersModal({
     setLoading(true)
     try {
       // Fetch all users for the company (no role filter)
-      const response = await fetch(`/api/admin/users-list?company_id=${company.id}`)
+      const response = await fetch(`/api/admin/usuarios-list?company_id=${company.id}`)
       if (!response.ok) {
         throw new Error('Erro ao carregar usuários')
       }
@@ -89,7 +89,7 @@ export function CompanyUsersModal({
     }
 
     try {
-      const response = await fetch(`/api/admin/users/delete?id=${operatorId}`, {
+      const response = await fetch(`/api/admin/usuarios/delete?id=${operatorId}`, {
         method: 'DELETE'
       })
 

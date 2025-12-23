@@ -78,7 +78,7 @@ export default function MotoristasPage() {
       let todayTripsCount = 0
       try {
         const tripsResponse = await fetch(
-          `/api/transportadora/reports/trips?startDate=${todayStart}&endDate=${todayEnd}`
+          `/api/transportadora/relatorios/trips?startDate=${todayStart}&endDate=${todayEnd}`
         )
         if (tripsResponse.ok) {
           const tripsData = await tripsResponse.json()

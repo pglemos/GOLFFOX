@@ -113,16 +113,16 @@
 - `RESUMO_FINAL_COMPLETO.md` - Este arquivo
 
 ### Arquivos Modificados
-- `app/api/admin/create-operador/route.ts` - Removidos campos obrigatórios
-- `app/api/admin/companies-list/route.ts` - Retorno padronizado
-- `app/api/admin/routes-list/route.ts` - Retorno padronizado
-- `app/api/admin/vehicles-list/route.ts` - Retorno padronizado
-- `app/api/admin/drivers-list/route.ts` - Retorno padronizado
-- `app/api/admin/alerts-list/route.ts` - Retorno padronizado
-- `app/api/admin/users-list/route.ts` - Retorno padronizado
+- `app/api/admin/criar-operador/route.ts` - Removidos campos obrigatórios
+- `app/api/admin/empresas-list/route.ts` - Retorno padronizado
+- `app/api/admin/rotas-list/route.ts` - Retorno padronizado
+- `app/api/admin/veiculos-list/route.ts` - Retorno padronizado
+- `app/api/admin/motoristas-list/route.ts` - Retorno padronizado
+- `app/api/admin/alertas-list/route.ts` - Retorno padronizado
+- `app/api/admin/usuarios-list/route.ts` - Retorno padronizado
 - `app/api/admin/assistance-requests-list/route.ts` - Retorno padronizado
-- `app/api/admin/companies/[companyId]/route.ts` - Bypass auth em dev, campos corrigidos
-- `app/api/admin/companies/delete/route.ts` - Suporte POST, código duplicado removido
+- `app/api/admin/empresas/[companyId]/route.ts` - Bypass auth em dev, campos corrigidos
+- `app/api/admin/empresas/delete/route.ts` - Suporte POST, código duplicado removido
 
 ## 🚀 Commits Realizados
 

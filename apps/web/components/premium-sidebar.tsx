@@ -411,13 +411,15 @@ export function PremiumSidebar({
   const router = useRouter()
   const pathname = usePathname()
 
+  // Mapear grupos de menu por painel
   const menuGroups = useMemo(() => {
     switch (panel) {
       case 'gestor_empresa':
       case 'empresa':
         return empresaMenuGroups
-      case 'gestor_transportadora':
       case 'operador':
+        return operadorMenuGroups
+      case 'gestor_transportadora':
       case 'transportadora':
         return transportadoraMenuGroups
       default:
@@ -425,10 +427,16 @@ export function PremiumSidebar({
     }
   }, [panel])
 
+  // Normalizar painel para rotas (ex: gestor_transportadora -> transportadora)
+  const normalizedPanel = useMemo(() => {
+    if (panel === 'gestor_transportadora' || panel === 'transportadora') return 'transportadora'
+    if (panel === 'gestor_empresa' || panel === 'empresa' || panel === 'operador') return 'empresa'
+    return panel
+  }, [panel])
 
   // Verificar se um item está ativo
   const isItemActive = (href: string) => {
-    if (href === `/${panel}` || href === '/admin') {
+    if (href === `/${normalizedPanel}` || href === '/admin') {
       return pathname === href
     }
     return pathname?.startsWith(href) ?? false

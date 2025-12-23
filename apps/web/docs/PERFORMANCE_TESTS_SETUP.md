@@ -102,14 +102,14 @@ npm run test:performance
 
 ### Load Tests
 - `GET /api/health` - Health check
-- `GET /api/admin/users-list` - Listar usuários
+- `GET /api/admin/usuarios-list` - Listar usuários
 - `GET /api/admin/kpis` - KPIs administrativos
-- `GET /api/admin/companies` - Listar empresas
+- `GET /api/admin/empresas` - Listar empresas
 
 ### Stress Tests
 - `GET /api/health` - Health check
 - `GET /api/admin/kpis` - KPIs (endpoint mais pesado)
-- `GET /api/admin/users-list` - Listar usuários
+- `GET /api/admin/usuarios-list` - Listar usuários
 
 ### Spike Tests
 - `GET /api/health` - Health check

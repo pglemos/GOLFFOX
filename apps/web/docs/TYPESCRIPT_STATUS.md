@@ -25,7 +25,7 @@
 
 2. **Validação Zod**
    - ✅ Removido `errorMap` de `z.enum()` (incompatível com Zod v3.25.76)
-   - ✅ Corrigidos: `lib/costs/validation.ts`, `lib/importers/employee-csv.ts`, `app/api/admin/users/change-role/route.ts`
+   - ✅ Corrigidos: `lib/costs/validation.ts`, `lib/importers/employee-csv.ts`, `app/api/admin/usuarios/change-role/route.ts`
 
 3. **Imports Next.js**
    - ✅ Corrigido `import { Link }` para `import Link` em 5 arquivos

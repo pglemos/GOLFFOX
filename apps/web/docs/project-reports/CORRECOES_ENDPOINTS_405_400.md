@@ -29,7 +29,7 @@
 - **Problema:** Alguns endpoints podem retornar 405 se acessados com métodos HTTP não suportados
 - **Solução:** Adicionados handlers OPTIONS para CORS em todos os endpoints de API
 - **Arquivos:**
-  - `web-app/app/api/admin/create-operador/route.ts`
+  - `web-app/app/api/admin/criar-operador/route.ts`
   - `web-app/app/api/operador/create-employee/route.ts`
   - `web-app/app/api/reports/run/route.ts`
   - `web-app/app/api/reports/schedule/route.ts`
@@ -191,9 +191,8 @@ curl -X POST http://localhost:3000/api/reports/schedule \
 1. ✅ Endpoint web-vitals corrigido (GET e OPTIONS adicionados)
 2. ✅ Endpoints de relatórios corrigidos (mapeamento de aliases, bypass de autenticação)
 3. ✅ Handlers OPTIONS adicionados para CORS
-4. ⏭️ Executar testes do TestSprite para validar correções
-5. ⏭️ Verificar se views de relatórios existem no banco de dados
-6. ⏭️ Popular views com dados de teste se necessário
+4. ⏭️ Verificar se views de relatórios existem no banco de dados
+5. ⏭️ Popular views com dados de teste se necessário
 
 ## Notas Técnicas
 
@@ -204,8 +203,6 @@ curl -X POST http://localhost:3000/api/reports/schedule \
 
 ## Referências
 
-- Testes: `testsprite_tests/TC007_verify_report_execution.py`
-- Testes: `testsprite_tests/TC008_verify_report_scheduling.py`
-- Testes: `testsprite_tests/TC019_API_for_Web_Vitals_Analytics_Data_Ingestion.py`
-- Relatório: `testsprite_tests/testsprite-mcp-test-report.md`
+- Endpoints de relatórios: `/api/reports/run` e `/api/reports/schedule`
+- Endpoint web-vitals: `/api/web-vitals`
 

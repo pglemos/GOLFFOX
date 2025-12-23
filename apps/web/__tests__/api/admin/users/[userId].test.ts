@@ -1,4 +1,4 @@
-import { PUT } from '@/app/api/admin/users/[userId]/route'
+import { PUT } from '@/app/api/admin/usuarios/[userId]/route'
 import { createAdminRequest } from '../../../helpers/api-test-helpers'
 import { mockSupabaseClient } from '../../../helpers/mock-supabase'
 import { createTestUser } from '../../../helpers/test-data'
@@ -18,7 +18,7 @@ jest.mock('@/lib/api-auth', () => ({
   }),
 }))
 
-describe('PUT /api/admin/users/[userId]', () => {
+describe('PUT /api/admin/usuarios/[userId]', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockSupabaseClient.clear()

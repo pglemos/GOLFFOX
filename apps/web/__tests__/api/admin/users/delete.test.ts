@@ -1,4 +1,4 @@
-import { DELETE, POST } from '@/app/api/admin/users/delete/route'
+import { DELETE, POST } from '@/app/api/admin/usuarios/delete/route'
 import { createAdminRequest } from '../../../helpers/api-test-helpers'
 import { mockSupabaseClient } from '../../../helpers/mock-supabase'
 import { NextRequest } from 'next/server'
@@ -25,7 +25,7 @@ jest.mock('@/lib/next-cache', () => ({
   invalidateEntityCache: jest.fn(async () => {}),
 }))
 
-describe('DELETE /api/admin/users/delete', () => {
+describe('DELETE /api/admin/usuarios/delete', () => {
   const userId = '123e4567-e89b-12d3-a456-426614174000'
 
   beforeEach(() => {
@@ -46,7 +46,7 @@ describe('DELETE /api/admin/users/delete', () => {
 
     const req = createAdminRequest({
       method: 'DELETE',
-      url: `http://localhost:3000/api/admin/users/delete?id=${userId}`,
+      url: `http://localhost:3000/api/admin/usuarios/delete?id=${userId}`,
     })
 
     const response = await DELETE(req)
@@ -69,7 +69,7 @@ describe('DELETE /api/admin/users/delete', () => {
 
     const req = createAdminRequest({
       method: 'POST',
-      url: 'http://localhost:3000/api/admin/users/delete',
+      url: 'http://localhost:3000/api/admin/usuarios/delete',
       body: { id: userId },
     })
 
@@ -83,7 +83,7 @@ describe('DELETE /api/admin/users/delete', () => {
   it('deve retornar 400 se userId não for fornecido', async () => {
     const req = createAdminRequest({
       method: 'DELETE',
-      url: 'http://localhost:3000/api/admin/users/delete',
+      url: 'http://localhost:3000/api/admin/usuarios/delete',
     })
 
     const response = await DELETE(req)
@@ -106,7 +106,7 @@ describe('DELETE /api/admin/users/delete', () => {
 
     const req = createAdminRequest({
       method: 'DELETE',
-      url: `http://localhost:3000/api/admin/users/delete?id=${userId}`,
+      url: `http://localhost:3000/api/admin/usuarios/delete?id=${userId}`,
     })
 
     const response = await DELETE(req)
@@ -117,7 +117,7 @@ describe('DELETE /api/admin/users/delete', () => {
   it('deve retornar 403 se usuário não for admin', async () => {
     const req = createAdminRequest({
       method: 'DELETE',
-      url: `http://localhost:3000/api/admin/users/delete?id=${userId}`,
+      url: `http://localhost:3000/api/admin/usuarios/delete?id=${userId}`,
       headers: { 'x-user-role': 'empresa' },
     })
 

@@ -173,7 +173,7 @@ export function MotoristaModal({ motorista, isOpen, onClose, onSave, carriers = 
         await auditLogs.update('motorista', motorista.id, { name: motoristaData.name, email: motoristaData.email })
       } else {
         // Criar motorista via API com Service Role (respeita RLS e políticas)
-        const resp = await fetch('/api/admin/drivers', {
+        const resp = await fetch('/api/admin/motoristas', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({

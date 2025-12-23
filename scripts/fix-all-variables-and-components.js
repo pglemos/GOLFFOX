@@ -41,7 +41,6 @@ const IGNORE_PATTERNS = [
   /docs\//, // Documentação
   /supabase\/migrations\//, // Migrations SQL
   /scripts\//, // Scripts de migração
-  /testsprite_tests/, // Testes automatizados
 ]
 
 // Extensões de arquivo

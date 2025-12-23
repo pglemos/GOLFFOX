@@ -1,4 +1,4 @@
-import { GET, POST } from '@/app/api/transportadora/costs/veiculo/route'
+import { GET, POST } from '@/app/api/transportadora/custos/veiculo/route'
 import { createTransportadoraRequest } from '../../../helpers/api-test-helpers'
 import { mockSupabaseClient } from '../../../helpers/mock-supabase'
 import { createTestUser, createTestTransportadora, createTestVehicle } from '../../../helpers/test-data'
@@ -28,7 +28,7 @@ jest.mock('@/lib/api-auth', () => ({
   }),
 }))
 
-describe('GET /api/transportadora/costs/veiculo', () => {
+describe('GET /api/transportadora/custos/veiculo', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockSupabaseClient.clear()
@@ -72,7 +72,7 @@ describe('GET /api/transportadora/costs/veiculo', () => {
 
     const req = createTransportadoraRequest({
       method: 'GET',
-      url: `http://localhost:3000/api/transportadora/costs/veiculo?veiculo_id=${veiculo.id}`,
+      url: `http://localhost:3000/api/transportadora/custos/veiculo?veiculo_id=${veiculo.id}`,
     }) as NextRequest
 
     const response = await GET(req)
@@ -90,7 +90,7 @@ describe('GET /api/transportadora/costs/veiculo', () => {
 
     const req = createTransportadoraRequest({
       method: 'GET',
-      url: 'http://localhost:3000/api/transportadora/costs/veiculo?start_date=2024-01-01&end_date=2024-01-31',
+      url: 'http://localhost:3000/api/transportadora/custos/veiculo?start_date=2024-01-01&end_date=2024-01-31',
     }) as NextRequest
 
     const response = await GET(req)
@@ -99,7 +99,7 @@ describe('GET /api/transportadora/costs/veiculo', () => {
   })
 })
 
-describe('POST /api/transportadora/costs/veiculo', () => {
+describe('POST /api/transportadora/custos/veiculo', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockSupabaseClient.clear()

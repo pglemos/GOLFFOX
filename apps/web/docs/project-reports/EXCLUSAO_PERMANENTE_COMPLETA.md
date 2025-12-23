@@ -7,7 +7,7 @@ Todas as exclusões no sistema agora são **permanentes** (hard delete), removen
 
 ## 📋 Rotas de Exclusão Atualizadas
 
-### ✅ 1. Empresas (`/api/admin/companies/delete`)
+### ✅ 1. Empresas (`/api/admin/empresas/delete`)
 - **Antes:** Soft delete (desativava `is_active: false`)
 - **Agora:** Hard delete permanente
 - **Cascade automático:**
@@ -20,7 +20,7 @@ Todas as exclusões no sistema agora são **permanentes** (hard delete), removen
   - `gf_budgets` (orçamentos)
 - **SET NULL:** `users.company_id` (usuários não são excluídos)
 
-### ✅ 2. Rotas (`/api/admin/routes/delete`)
+### ✅ 2. Rotas (`/api/admin/rotas/delete`)
 - **Antes:** Soft delete condicional (desativava se houvesse trips)
 - **Agora:** Hard delete permanente
 - **Cascade automático:**
@@ -29,12 +29,12 @@ Todas as exclusões no sistema agora são **permanentes** (hard delete), removen
   - `gf_route_plan` (planos)
   - `gf_route_optimization_cache` (cache)
 
-### ✅ 3. Veículos (`/api/admin/vehicles/delete`)
+### ✅ 3. Veículos (`/api/admin/veiculos/delete`)
 - **Antes:** Soft delete (desativava `is_active: false`)
 - **Agora:** Hard delete permanente
 - **SET NULL:** `trips.vehicle_id` (viagens não são excluídas)
 
-### ✅ 4. Motoristas (`/api/admin/drivers/delete`)
+### ✅ 4. Motoristas (`/api/admin/motoristas/delete`)
 - **Antes:** Soft delete (apenas atualizava `updated_at`)
 - **Agora:** Hard delete permanente
 - **Cascade automático:**
@@ -43,14 +43,14 @@ Todas as exclusões no sistema agora são **permanentes** (hard delete), removen
   - `auth.users` (conta de autenticação)
 - **SET NULL:** `trips.driver_id` (viagens não são excluídas)
 
-### ✅ 5. Usuários (`/api/admin/users/delete`)
+### ✅ 5. Usuários (`/api/admin/usuarios/delete`)
 - **Antes:** Soft delete (apenas atualizava `updated_at`)
 - **Agora:** Hard delete permanente
 - **Cascade automático:**
   - `auth.users` (conta de autenticação)
   - Dados relacionados com `ON DELETE CASCADE`
 
-### ✅ 6. Alertas (`/api/admin/alerts/delete`)
+### ✅ 6. Alertas (`/api/admin/alertas/delete`)
 - **Status:** Já estava implementado como hard delete
 - **Tabela:** `gf_incidents`
 
@@ -80,12 +80,12 @@ Os seguintes relacionamentos apenas setam para NULL:
 
 ## 📝 Arquivos Modificados
 
-1. `web-app/app/api/admin/companies/delete/route.ts`
-2. `web-app/app/api/admin/routes/delete/route.ts`
-3. `web-app/app/api/admin/vehicles/delete/route.ts`
-4. `web-app/app/api/admin/drivers/delete/route.ts`
-5. `web-app/app/api/admin/users/delete/route.ts`
-6. `web-app/app/api/admin/alerts/delete/route.ts` (já estava correto)
+1. `web-app/app/api/admin/empresas/delete/route.ts`
+2. `web-app/app/api/admin/rotas/delete/route.ts`
+3. `web-app/app/api/admin/veiculos/delete/route.ts`
+4. `web-app/app/api/admin/motoristas/delete/route.ts`
+5. `web-app/app/api/admin/usuarios/delete/route.ts`
+6. `web-app/app/api/admin/alertas/delete/route.ts` (já estava correto)
 7. `web-app/app/api/admin/assistance-requests/delete/route.ts` (já estava correto)
 
 ---

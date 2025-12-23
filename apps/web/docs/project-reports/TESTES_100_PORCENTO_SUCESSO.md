@@ -97,7 +97,7 @@ Todos os testes autônomos estão passando:
 
 ## 📁 Arquivos Modificados Nesta Iteração
 
-- `app/api/admin/users/delete/route.ts` - Adicionado suporte POST e leitura do body
+- `app/api/admin/usuarios/delete/route.ts` - Adicionado suporte POST e leitura do body
 - `scripts/execute-migration-v48-autonomous.js` - Script de verificação autônoma
 - `scripts/test-complete-autonomous.js` - Script de teste completo
 

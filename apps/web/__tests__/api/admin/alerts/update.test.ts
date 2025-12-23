@@ -1,4 +1,4 @@
-import { POST } from '@/app/api/admin/alerts/update/route'
+import { POST } from '@/app/api/admin/alertas/update/route'
 import { createAdminRequest } from '../../../helpers/api-test-helpers'
 import { mockSupabaseClient } from '../../../helpers/mock-supabase'
 import { NextRequest } from 'next/server'
@@ -21,7 +21,7 @@ jest.mock('@/lib/rate-limit', () => ({
   applyRateLimit: jest.fn(async () => null),
 }))
 
-describe('POST /api/admin/alerts/update', () => {
+describe('POST /api/admin/alertas/update', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockSupabaseClient.clear()

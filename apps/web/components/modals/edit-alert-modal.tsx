@@ -62,7 +62,7 @@ export function EditAlertModal({
 
     setLoading(true)
     try {
-      const response = await fetch(`/api/admin/alerts/${alert.id}`, {
+      const response = await fetch(`/api/admin/alertas/${alert.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
