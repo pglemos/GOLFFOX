@@ -48,9 +48,9 @@ interface SupabasePosition {
  */
 export async function loadVehicles(companyId?: string): Promise<Veiculo[]> {
   try {
-    debug('Carregando veículos ativos', { companyId }, 'VehicleLoader')
+    debug('Carregando veículos ativos', { companyId, hasCompanyId: !!companyId }, 'VehicleLoader')
 
-    // Buscar veículos ativos
+    // Buscar veículos ativos - SEMPRE retornar todos os veículos ativos, mesmo sem trips ou posições
     let vehiclesQuery = supabase
       .from('veiculos')
       .select(`
@@ -68,8 +68,12 @@ export async function loadVehicles(companyId?: string): Promise<Veiculo[]> {
       `)
       .eq('is_active', true)
 
-    if (companyId) {
+    // Aplicar filtro de empresa apenas se fornecido e não vazio
+    if (companyId && companyId.trim() !== '' && companyId !== 'null' && companyId !== 'undefined') {
       vehiclesQuery = vehiclesQuery.eq('company_id', companyId)
+      debug('Aplicando filtro de empresa', { companyId }, 'VehicleLoader')
+    } else {
+      debug('Sem filtro de empresa - carregando todos os veículos ativos', {}, 'VehicleLoader')
     }
 
     const { data: veiculosData, error: vehiclesError } = await vehiclesQuery
@@ -78,21 +82,53 @@ export async function loadVehicles(companyId?: string): Promise<Veiculo[]> {
 
     if (vehiclesError) {
       logError('Erro na query de veículos', getErrorMeta(vehiclesError))
+      debug('Detalhes do erro', { 
+        error: vehiclesError.message, 
+        code: vehiclesError.code,
+        details: vehiclesError.details,
+        hint: vehiclesError.hint
+      }, 'VehicleLoader')
 
       // Tentar query alternativa se erro for de coluna inexistente
       if (
         vehiclesError.message?.includes('column') ||
-        vehiclesError.message?.includes('does not exist')
+        vehiclesError.message?.includes('does not exist') ||
+        vehiclesError.message?.includes('permission denied') ||
+        vehiclesError.code === 'PGRST116' // Schema cache error
       ) {
         warn('Tentando query alternativa sem colunas problemáticas', {}, 'VehicleLoader')
         try {
-          const { data: fallbackData, error: fallbackError } = await supabase
+          let fallbackQuery = supabase
             .from('veiculos')
             .select('id, plate, model, is_active, company_id')
             .eq('is_active', true)
 
+          if (companyId && companyId.trim() !== '' && companyId !== 'null' && companyId !== 'undefined') {
+            fallbackQuery = fallbackQuery.eq('company_id', companyId)
+          }
+
+          const { data: fallbackData, error: fallbackError } = await fallbackQuery
+
           if (!fallbackError && fallbackData) {
             finalVeiculosData = fallbackData as SupabaseVeiculo[]
+            debug(`Query alternativa retornou ${finalVeiculosData.length} veículos`, { companyId }, 'VehicleLoader')
+          } else if (fallbackError) {
+            logError('Query alternativa também falhou', { error: fallbackError }, 'VehicleLoader')
+            // Se ainda falhar, tentar query mínima
+            try {
+              const { data: minimalData } = await supabase
+                .from('veiculos')
+                .select('id, plate, is_active')
+                .eq('is_active', true)
+                .limit(100)
+              
+              if (minimalData) {
+                finalVeiculosData = minimalData as SupabaseVeiculo[]
+                debug(`Query mínima retornou ${finalVeiculosData.length} veículos`, {}, 'VehicleLoader')
+              }
+            } catch (minimalErr) {
+              logError('Query mínima também falhou', { error: minimalErr }, 'VehicleLoader')
+            }
           }
         } catch (fallbackErr) {
           logError('Query alternativa também falhou', { error: fallbackErr }, 'VehicleLoader')
@@ -100,14 +136,43 @@ export async function loadVehicles(companyId?: string): Promise<Veiculo[]> {
       }
     } else {
       finalVeiculosData = veiculosData || []
+      debug(`Query principal retornou ${finalVeiculosData.length} veículos`, { 
+        companyId,
+        total: finalVeiculosData.length,
+        sample: finalVeiculosData.slice(0, 3).map(v => ({ id: v.id, plate: v.plate }))
+      }, 'VehicleLoader')
     }
 
     if (!finalVeiculosData || finalVeiculosData.length === 0) {
-      debug('Nenhum veículo ativo encontrado', {}, 'VehicleLoader')
+      warn('Nenhum veículo ativo encontrado', { 
+        companyId, 
+        hasError: !!vehiclesError,
+        errorMessage: vehiclesError?.message 
+      }, 'VehicleLoader')
+      
+      // Tentar uma última vez com query simples para diagnóstico
+      try {
+        const { data: testData, error: testError } = await supabase
+          .from('veiculos')
+          .select('id, plate, is_active')
+          .eq('is_active', true)
+          .limit(5)
+        
+        if (testData && testData.length > 0) {
+          warn(`Query de teste encontrou ${testData.length} veículos, mas query principal não`, {
+            testData: testData.map(v => ({ id: v.id, plate: v.plate }))
+          }, 'VehicleLoader')
+        } else if (testError) {
+          logError('Query de teste também falhou', { error: testError }, 'VehicleLoader')
+        }
+      } catch (testErr) {
+        logError('Erro na query de teste', { error: testErr }, 'VehicleLoader')
+      }
+      
       return []
     }
 
-    // Buscar trips ativas
+    // Buscar trips ativas (mas não restringir veículos apenas a esses)
     const vehicleIds = finalVeiculosData.map((v) => v.id)
     const { data: activeTrips } = await supabase
       .from('trips')
@@ -132,8 +197,17 @@ export async function loadVehicles(companyId?: string): Promise<Veiculo[]> {
       })
     }
 
-    // Buscar últimas posições
-    const tripIds = activeTrips?.map((t: SupabaseTrip) => t.id) || []
+    // Buscar últimas posições de TODAS as trips (não apenas inProgress)
+    // Primeiro, buscar trips recentes (últimas 24h) para ter mais chances de encontrar posições
+    const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
+    const { data: recentTrips } = await supabase
+      .from('trips')
+      .select('id, veiculo_id')
+      .in('veiculo_id', vehicleIds)
+      .gte('created_at', oneDayAgo)
+      .order('created_at', { ascending: false })
+
+    const tripIds = recentTrips?.map((t: { id: string }) => t.id) || []
     let lastPositions: SupabasePosition[] = []
 
     if (tripIds.length > 0) {
@@ -147,7 +221,7 @@ export async function loadVehicles(companyId?: string): Promise<Veiculo[]> {
 
       if (recentPositions && recentPositions.length > 0) {
         const tripToVehicle = new Map(
-          activeTrips?.map((t: SupabaseTrip) => [t.id, t.veiculo_id]) || []
+          recentTrips?.map((t: { id: string; veiculo_id: string }) => [t.id, t.veiculo_id]) || []
         )
         lastPositions = (recentPositions || []).map((pos: SupabasePosition) => ({
           ...pos,
@@ -164,7 +238,7 @@ export async function loadVehicles(companyId?: string): Promise<Veiculo[]> {
 
         if (allPositions) {
           const tripToVehicle = new Map(
-            activeTrips?.map((t: SupabaseTrip) => [t.id, t.veiculo_id]) || []
+            recentTrips?.map((t: { id: string; veiculo_id: string }) => [t.id, t.veiculo_id]) || []
           )
           lastPositions = (allPositions || []).map((pos: SupabasePosition) => ({
             ...pos,
@@ -182,7 +256,7 @@ export async function loadVehicles(companyId?: string): Promise<Veiculo[]> {
       }
     })
 
-    // Processar veículos
+    // Processar veículos - INCLUIR TODOS os veículos ativos, mesmo sem trips ou posições
     const processedVehicles = finalVeiculosData.map((v: SupabaseVeiculo) => {
       const trip = tripsByVehicle.get(v.id)
       const lastPos = positionsByVehicle.get(v.id)
@@ -200,6 +274,9 @@ export async function loadVehicles(companyId?: string): Promise<Veiculo[]> {
         } else {
           vehicleStatus = 'stopped_short'
         }
+      } else if (trip) {
+        // Se tem trip mas não tem posição, considerar como "garage" ou "stopped_long"
+        vehicleStatus = 'stopped_long'
       }
 
       const lat = lastPos?.lat || null
@@ -242,7 +319,13 @@ export async function loadVehicles(companyId?: string): Promise<Veiculo[]> {
       }
     })
 
-    debug(`Carregados ${normalizedVehicles.length} veículos`, { count: normalizedVehicles.length }, 'VehicleLoader')
+    debug(`Carregados ${normalizedVehicles.length} veículos`, { 
+      count: normalizedVehicles.length,
+      withCoords: normalizedVehicles.filter(v => v.lat && v.lng).length,
+      withoutCoords: normalizedVehicles.filter(v => !v.lat || !v.lng).length,
+      withTrips: normalizedVehicles.filter(v => v.trip_id).length,
+      withoutTrips: normalizedVehicles.filter(v => !v.trip_id).length
+    }, 'VehicleLoader')
 
     return normalizedVehicles as Veiculo[]
   } catch (error) {

@@ -36,7 +36,7 @@ export default function AjudaSuportePage() {
             whileHover={{ y: -4 }}
             className="group"
           >
-          <Card className="p-6 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-border hover:border-text-brand/30">
+          <Card variant="premium" className="p-6">
             <div className="p-2 rounded-lg bg-gradient-to-br from-bg-brand-light to-bg-brand-soft w-fit mb-4 group-hover:scale-110 transition-transform duration-300">
               <HelpCircle className="h-6 w-6 text-brand" />
             </div>
@@ -55,7 +55,7 @@ export default function AjudaSuportePage() {
             whileHover={{ y: -4 }}
             className="group"
           >
-          <Card className="p-6 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-border hover:border-text-brand/30">
+          <Card variant="premium" className="p-6">
             <div className="p-2 rounded-lg bg-gradient-to-br from-bg-brand-light to-bg-brand-soft w-fit mb-4 group-hover:scale-110 transition-transform duration-300">
               <MessageCircle className="h-6 w-6 text-brand" />
             </div>
@@ -78,7 +78,7 @@ export default function AjudaSuportePage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
         >
-        <Card className="p-6 bg-card/50 backdrop-blur-sm border-border">
+        <Card variant="premium" className="p-6">
           <div className="flex items-center gap-2 mb-4">
             <div className={`p-2 rounded-lg ${statusSistema.status === 'online' ? 'bg-success-light' : 'bg-error-light'}`}>
               <CheckCircle className={`h-5 w-5 ${statusSistema.status === 'online' ? 'text-success' : 'text-error'}`} />

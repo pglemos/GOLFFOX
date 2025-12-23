@@ -98,6 +98,7 @@ export const AppShell = memo(function AppShell({ user, children, panel }: AppShe
       defaultOpen={false} // Sempre inicia colapsado
       open={isSidebarOpen}
       onOpenChange={setIsSidebarOpen}
+      className="bg-transparent min-h-screen"
     >
       {/* Banner de Variáveis de Ambiente */}
       <EnvVarsBanner />
@@ -124,7 +125,7 @@ export const AppShell = memo(function AppShell({ user, children, panel }: AppShe
       />
 
       {/* Content Area - flex-1 para ocupar resto do espaço */}
-      <div className="flex flex-1 flex-col">
+      <div className="flex flex-1 flex-col bg-transparent">
         {/* Topbar já retorna seu próprio header com os estilos corretos */}
         <Topbar
           user={user ? { id: user.id, name: user.name || '', email: user.email, role: user.role, avatar_url: user.avatar_url } : { id: '', name: '', email: '', role: 'operador' }}

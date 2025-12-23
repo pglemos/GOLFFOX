@@ -70,7 +70,7 @@ const VehicleCard = React.memo(function VehicleCard({
             transition={{ duration: 0.3 }}
             whileHover={{ y: -4 }}
         >
-            <Card className="p-3 sm:p-4 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-border hover:border-text-brand/30 group">
+            <Card variant="premium" className="p-3 sm:p-4 group">
                 <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
                     <div className="flex-1 flex gap-3 sm:gap-4 min-w-0">
                         {veiculo.photo_url && (
@@ -357,7 +357,7 @@ export default function TransportadoraVeiculosPage() {
                     <SkeletonList count={5} />
                 ) : (
                     filteredVehicles.length === 0 ? (
-                        <Card className="p-8 text-center">
+                        <Card variant="premium" className="p-8 text-center">
                             <Truck className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
                             <p className="text-muted-foreground">Nenhum veículo encontrado</p>
                         </Card>

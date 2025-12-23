@@ -27,7 +27,7 @@ export default function AnalyticsPage() {
                     </div>
                 </div>
 
-                <Card className="p-8 sm:p-12 text-center">
+                <Card variant="premium" className="p-8 sm:p-12 text-center">
                     <Construction className="h-16 w-16 mx-auto mb-4 text-brand opacity-50" />
                     <h2 className="text-xl font-semibold mb-2">Em Construção</h2>
                     <p className="text-ink-muted max-w-md mx-auto">

@@ -221,7 +221,7 @@ function CustosPageContent() {
         <div className="p-4 sm:p-6 lg:p-8 space-y-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {[...Array(4)].map((_, i) => (
-              <Card key={i}>
+              <Card key={i} variant="premium">
                 <CardHeader className="pb-2">
                   <Skeleton className="h-4 w-24" />
                 </CardHeader>
@@ -231,7 +231,7 @@ function CustosPageContent() {
               </Card>
             ))}
           </div>
-          <Card>
+          <Card variant="premium">
             <CardContent className="pt-6">
               <Skeleton className="h-[300px] w-full" />
             </CardContent>
@@ -271,7 +271,7 @@ function CustosPageContent() {
 
             <Sheet open={showCostForm} onOpenChange={setShowCostForm}>
               <SheetTrigger asChild>
-                <Button className="bg-brand hover:bg-brand-hover">
+                <Button variant="default" className="bg-brand/90 backdrop-blur-md border border-brand/30 hover:bg-brand hover:border-brand/50 hover:shadow-lg">
                   <Plus className="h-4 w-4 mr-2" />
                   Novo Lançamento
                 </Button>
@@ -306,7 +306,7 @@ function CustosPageContent() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0 }}
           >
-            <Card className="relative overflow-hidden bg-gradient-to-br from-brand-light to-brand-light border-brand-soft dark:from-brand dark:to-brand dark:border-brand">
+            <Card variant="premium" className="relative overflow-hidden">
               <div className="absolute top-0 right-0 w-32 h-32 bg-brand/10 rounded-bl-full" />
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-brand dark:text-brand flex items-center gap-2">
@@ -330,7 +330,7 @@ function CustosPageContent() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
           >
-            <Card className="relative overflow-hidden bg-gradient-to-br from-success-light to-success-light border-success-light dark:from-success dark:to-success dark:border-success">
+            <Card variant="premium" className="relative overflow-hidden">
               <div className="absolute top-0 right-0 w-32 h-32 bg-success-light0/10 rounded-bl-full" />
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-success dark:text-success flex items-center gap-2">
@@ -354,7 +354,7 @@ function CustosPageContent() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
           >
-            <Card className={`relative overflow-hidden ${kpis.margin >= 0
+            <Card variant="premium" className={`relative overflow-hidden ${kpis.margin >= 0
                 ? 'bg-gradient-to-br from-info-light to-info-light border-info-light dark:from-info dark:to-info dark:border-info'
                 : 'bg-gradient-to-br from-error-light to-error-light border-error-light dark:from-error dark:to-error dark:border-error'
               }`}>
@@ -382,7 +382,7 @@ function CustosPageContent() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
           >
-            <Card className="relative overflow-hidden bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 dark:from-purple-950 dark:to-purple-900 dark:border-purple-800">
+            <Card variant="premium" className="relative overflow-hidden">
               <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 rounded-bl-full" />
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-purple-700 dark:text-purple-300 flex items-center gap-2">
@@ -414,7 +414,7 @@ function CustosPageContent() {
           <TabsContent value="overview" className="space-y-4">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               {/* Gráfico de tendência - usa dados legados se disponíveis */}
-              <Card>
+              <Card variant="premium">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <BarChart3 className="h-5 w-5" />
@@ -477,7 +477,7 @@ function CustosPageContent() {
               </Card>
 
               {/* Gráfico de pizza por categoria */}
-              <Card>
+              <Card variant="premium">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <PieChartIcon className="h-5 w-5" />
@@ -530,7 +530,7 @@ function CustosPageContent() {
           </TabsContent>
 
           <TabsContent value="costs" className="space-y-4">
-            <Card>
+            <Card variant="premium">
               <CardHeader>
                 <div className="flex justify-between items-center">
                   <CardTitle>Custos do Período</CardTitle>
@@ -598,7 +598,7 @@ function CustosPageContent() {
           </TabsContent>
 
           <TabsContent value="revenues" className="space-y-4">
-            <Card>
+            <Card variant="premium">
               <CardHeader>
                 <div className="flex justify-between items-center">
                   <CardTitle>Receitas do Período</CardTitle>
@@ -649,7 +649,7 @@ function CustosPageContent() {
           </TabsContent>
 
           <TabsContent value="budget" className="space-y-4">
-            <Card>
+            <Card variant="premium">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <BarChart3 className="h-5 w-5" />

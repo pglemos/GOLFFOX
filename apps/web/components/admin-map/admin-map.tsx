@@ -90,9 +90,13 @@ export function AdminMap({
   const routeFilter = useMapFilters(state => state.route)
   const veiculoFilter = useMapFilters(state => state.veiculo)
   const motoristaFilter = useMapFilters(state => state.motorista)
+  const statusFilter = useMapFilters(state => state.status)
+  const shiftFilter = useMapFilters(state => state.shift)
+  const searchFilter = useMapFilters(state => state.search)
   const setCompanyFilter = useMapFilters(state => state.setCompany)
   const setRouteFilter = useMapFilters(state => state.setRoute)
   const setVeiculoFilter = useMapFilters(state => state.setVeiculo)
+  const setFilters = useMapFilters(state => state.setFilters)
   
   const selection = useMapSelection()
   const playback = useMapPlayback()
@@ -107,6 +111,7 @@ export function AdminMap({
   const [listMode, setListMode] = useState(false) // Fallback modo lista
   const [trajectoryAnalysis, setTrajectoryAnalysis] = useState<TrajectoryAnalysis | null>(null)
   const [notifiedDeviations, setNotifiedDeviations] = useState<Set<string>>(new Set())
+  const [dataLoaded, setDataLoaded] = useState(false) // Flag para indicar que os dados foram carregados pelo menos uma vez
 
   // Inicializar filtros com props iniciais
   useEffect(() => {
@@ -303,7 +308,7 @@ export function AdminMap({
         
         // Inicializar realtime ou playback baseado no modo
         if (!abortController.signal.aborted && isMounted) {
-          if (mode === 'live') {
+          if (playback.mode === 'live') {
             debug('Inicializando modo realtime', {}, 'AdminMap')
             initRealtime()
           } else {
@@ -318,7 +323,7 @@ export function AdminMap({
             veiculos: veiculos.length,
             routes: routes.length,
             alerts: alerts.length,
-            mode
+            mode: playback.mode
           }, 'AdminMap')
         }
         
@@ -477,15 +482,26 @@ export function AdminMap({
         logError('Erro ao carregar rotas visíveis', { error }, 'AdminMap')
       }
     }, 300) // Debounce de 300ms
-  }, [filters.company])
+  }, [companyFilter])
 
   // Carregar dados iniciais
   const loadInitialData = useCallback(async (signal?: AbortSignal) => {
     try {
-      debug('Carregando dados iniciais com filtros', { company: companyFilter }, 'AdminMap')
+      // Normalizar companyFilter - remover strings vazias, null, undefined
+      const normalizedCompanyId = companyFilter && 
+        companyFilter.trim() !== '' && 
+        companyFilter !== 'null' && 
+        companyFilter !== 'undefined' 
+        ? companyFilter 
+        : undefined
+      
+      debug('Carregando dados iniciais com filtros', { 
+        company: normalizedCompanyId,
+        originalCompanyFilter: companyFilter 
+      }, 'AdminMap')
       
       // Carregar veículos usando o serviço extraído
-      const vehicles = await loadVehicles(companyFilter || undefined)
+      const vehicles = await loadVehicles(normalizedCompanyId)
       
       // Verificar se foi abortado antes de atualizar estado
       if (signal?.aborted) return
@@ -507,6 +523,7 @@ export function AdminMap({
       })
       
       setVeiculos(normalizedVehicles)
+      setDataLoaded(true) // Marcar que os dados foram carregados
       
       const withCoords = normalizedVehicles.filter((v: Veiculo) => v.lat !== null && v.lng !== null).length
       const withoutCoords = normalizedVehicles.length - withCoords
@@ -514,13 +531,34 @@ export function AdminMap({
       debug(`Carregados ${normalizedVehicles.length} veículos ativos`, { 
         total: normalizedVehicles.length,
         withCoords,
-        withoutCoords
+        withoutCoords,
+        companyFilter: normalizedCompanyId,
+        sample: normalizedVehicles.slice(0, 3).map(v => ({ plate: v.plate, hasCoords: !!(v.lat && v.lng) }))
       }, 'AdminMap')
       
+      if (normalizedVehicles.length === 0) {
+        warn('Nenhum veículo carregado após loadVehicles', {
+          companyFilter: normalizedCompanyId,
+          originalCompanyFilter: companyFilter
+        }, 'AdminMap')
+      }
+      
+      // Notificar apenas se houver veículos mas sem coordenadas GPS
+      // Mas NÃO mostrar mensagem de "Sem veículos" se houver veículos carregados
       if (withCoords === 0 && normalizedVehicles.length > 0) {
+        debug(`Notificando: ${normalizedVehicles.length} veículos sem GPS`, {
+          total: normalizedVehicles.length,
+          withCoords: 0
+        }, 'AdminMap')
         notifySuccess(t('common','success.noRecentGpsPositions', { count: normalizedVehicles.length }), {
           duration: 5000
         })
+      } else if (normalizedVehicles.length > 0) {
+        debug(`Veículos carregados com sucesso`, {
+          total: normalizedVehicles.length,
+          withCoords,
+          withoutCoords
+        }, 'AdminMap')
       }
 
       // Carregar rotas (lazy loading será aplicado via loadVisibleRoutes)
@@ -1073,7 +1111,7 @@ export function AdminMap({
       // Analisar trajeto
       const analysis = analyzeTrajectory(plannedRoute, actualPositions, 200)
       setTrajectoryAnalysis(analysis)
-      setShowTrajectoryAnalysis(true)
+      playback.setShowTrajectoryAnalysis(true)
       
       // Mostrar trajeto no mapa
       const trajectory = {
@@ -1087,7 +1125,7 @@ export function AdminMap({
         color: '#F59E0B',
       }
       setHistoricalTrajectories([trajectory])
-      setShowTrajectories(true)
+      playback.setShowTrajectories(true)
 
       notifySuccess(t('common','success.trajectoryAnalysisLoaded'))
     } catch (error: unknown) {
@@ -1145,7 +1183,7 @@ export function AdminMap({
           color: '#F59E0B',
         }
         setHistoricalTrajectories([trajectory])
-        setShowTrajectories(true)
+        playback.setShowTrajectories(true)
       } else {
         setHistoricalTrajectories([])
       }
@@ -1159,14 +1197,34 @@ export function AdminMap({
   useEffect(() => {
     if (!mapInstanceRef.current) return
     
-    if (mode === 'live') {
+    if (playback.mode === 'live') {
       initRealtime()
       setHistoricalTrajectories([])
-      setShowTrajectories(false)
+      playback.setShowTrajectories(false)
     } else {
       initPlayback()
     }
-  }, [mode, initRealtime, initPlayback])
+  }, [playback.mode, playback.setShowTrajectories, initRealtime, initPlayback])
+
+  // Recarregar dados quando filtro de empresa mudar
+  useEffect(() => {
+    if (!mapInstanceRef.current) return
+    
+    // Normalizar companyFilter
+    const normalizedCompanyId = companyFilter && 
+      companyFilter.trim() !== '' && 
+      companyFilter !== 'null' && 
+      companyFilter !== 'undefined' 
+      ? companyFilter 
+      : undefined
+    
+    debug('Filtro de empresa mudou, recarregando dados', { 
+      original: companyFilter,
+      normalized: normalizedCompanyId 
+    }, 'AdminMap')
+    
+    loadInitialData()
+  }, [companyFilter, loadInitialData])
 
   // Carregar trajeto quando veículo selecionado
   useEffect(() => {
@@ -1355,7 +1413,7 @@ export function AdminMap({
     }
 
     // Modo (ao vivo/histórico)
-    if (mode === 'history') {
+    if (playback.mode === 'history') {
       params.set('mode', 'history')
       // Adicionar from/to quando implementado
     }
@@ -1369,7 +1427,7 @@ export function AdminMap({
     if (newUrl !== current) {
       window.history.replaceState(null, '', newUrl)
     }
-  }, [filters, mode, router])
+  }, [companyFilter, routeFilter, veiculoFilter, motoristaFilter, statusFilter, shiftFilter, playback.mode, router])
 
   return (
     <div className="relative w-full h-[calc(100vh-200px)] min-h-[600px]">
@@ -1385,7 +1443,7 @@ export function AdminMap({
             shift: shiftFilter,
             search: searchFilter,
           }}
-          onFiltersChange={(newFilters) => filters.setFilters(newFilters)}
+          onFiltersChange={(newFilters) => setFilters(newFilters)}
           vehiclesCount={veiculos.length}
           routesCount={routes.length}
           alertsCount={alerts.length}
@@ -1396,10 +1454,8 @@ export function AdminMap({
           onPlaybackPeriodChange={(from, to) => {
             playback.setPlaybackFrom(from)
             playback.setPlaybackTo(to)
-            setPlaybackFrom(from)
-            setPlaybackTo(to)
             // Recarregar posições se estiver em modo histórico
-            if (mode === 'history' && playbackServiceRef.current) {
+            if (playback.mode === 'history' && playbackServiceRef.current) {
               initPlayback()
             }
           }}
@@ -1427,7 +1483,7 @@ export function AdminMap({
       )}
 
       {/* Controles de Playback (quando em modo histórico) */}
-      {mode === 'history' && (
+      {playback.mode === 'history' && (
         <div className="absolute bottom-4 left-4 right-4 z-20">
         <PlaybackControls
           isPlaying={playback.isPlaying}
@@ -1607,13 +1663,13 @@ export function AdminMap({
             onClose={() => selection.setSelectedAlert(null)}
           />
         )}
-        {showTrajectoryAnalysis && trajectoryAnalysis && selectedVeiculo && (
+        {playback.showTrajectoryAnalysis && trajectoryAnalysis && selection.selectedVeiculo && (
           <TrajectoryPanel
             analysis={trajectoryAnalysis}
-            vehiclePlate={selectedVeiculo.plate}
-            routeName={selectedVeiculo.route_name}
+            vehiclePlate={selection.selectedVeiculo.plate}
+            routeName={selection.selectedVeiculo.route_name}
             onClose={() => {
-              setShowTrajectoryAnalysis(false)
+              playback.setShowTrajectoryAnalysis(false)
               setTrajectoryAnalysis(null)
             }}
           />
@@ -1753,8 +1809,8 @@ export function AdminMap({
         </div>
       ) : null}
 
-      {/* Estados Vazios */}
-      {!loading && !mapError && veiculos.length === 0 && (
+      {/* Estados Vazios - Só mostrar se realmente não houver veículos após carregamento completo */}
+      {!loading && !mapError && dataLoaded && veiculos.length === 0 && (
         <div className="absolute inset-0 z-30 flex items-center justify-center bg-white/50 backdrop-blur-sm">
           <div className="text-center max-w-md p-6 bg-white rounded-lg shadow-lg">
             <MapIcon className="h-16 w-16 text-ink-muted mx-auto mb-4" />
@@ -1762,6 +1818,10 @@ export function AdminMap({
             <p className="text-sm text-ink-muted mb-4">
               Nenhum veículo encontrado com os filtros selecionados.
             </p>
+            <div className="text-xs text-ink-light mb-4 p-2 bg-bg-soft rounded">
+              <p>Debug: loading={String(loading)}, mapError={mapError || 'null'}, veiculos.length={veiculos.length}</p>
+              <p>Filtros: company={companyFilter || 'nenhum'}, route={routeFilter || 'nenhum'}</p>
+            </div>
             <details className="text-left text-sm text-ink-muted bg-bg-soft p-4 rounded mb-4">
               <summary className="cursor-pointer font-medium mb-2">Possíveis causas:</summary>
               <ul className="list-disc list-inside space-y-1 mt-2">

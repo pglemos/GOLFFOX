@@ -54,7 +54,7 @@ function GerarPontosContent() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
         >
-          <Card className="p-6 bg-card/50 backdrop-blur-sm border-border">
+          <Card variant="premium" className="p-6">
             <StopGenerator routeId={routeId} />
           </Card>
         </motion.div>

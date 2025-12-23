@@ -47,7 +47,7 @@ export default function AdminMin() {
                 className="group"
               >
                 <Link href={link.href}>
-                  <Card className="p-6 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-border hover:border-text-brand/30 cursor-pointer">
+                  <Card variant="premium" className="p-6 cursor-pointer">
                     <div className={`p-3 rounded-lg bg-gradient-to-br ${link.color} w-fit mb-4 group-hover:scale-110 transition-transform duration-300`}>
                       <Icon className="h-6 w-6 text-white" />
                     </div>

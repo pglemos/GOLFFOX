@@ -210,7 +210,7 @@ export default function RelatoriosPage() {
         </div>
 
         {/* Filtros */}
-        <Card className="bg-card/50 backdrop-blur-sm border-border">
+        <Card variant="premium">
           <CardHeader>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -307,7 +307,7 @@ export default function RelatoriosPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.1 }}
               >
-                <Card className="p-6 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-border hover:border-text-brand/30 group">
+                <Card variant="premium" className="p-6 group">
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
                       <div className="p-2 rounded-lg bg-gradient-to-br from-bg-brand-light to-bg-brand-soft w-fit mb-2 group-hover:scale-110 transition-transform duration-300">
@@ -361,7 +361,7 @@ export default function RelatoriosPage() {
 
         {/* Agendamentos Existentes */}
         {schedules.length > 0 && (
-          <Card>
+          <Card variant="premium">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Mail className="h-5 w-5 text-brand" />

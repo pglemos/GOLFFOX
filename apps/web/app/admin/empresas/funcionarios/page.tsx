@@ -91,28 +91,6 @@ export default function EmpresasFuncionariosPage() {
         setIsModalOpen(true)
     }
 
-    useEffect(() => {
-        if (user && !authLoading) {
-            loadEmployees()
-            loadCompanies()
-        }
-    }, [user, authLoading])
-
-    useEffect(() => {
-        if (selectedEmployee) {
-            setFormData({
-                name: selectedEmployee.name || "",
-                email: selectedEmployee.email || "",
-                phone: selectedEmployee.phone || "",
-                cpf: selectedEmployee.cpf || "",
-                role: selectedEmployee.role || "operador",
-                company_id: selectedEmployee.company_id || "",
-            })
-        } else {
-            setFormData({ name: "", email: "", phone: "", cpf: "", role: "operador", company_id: "" })
-        }
-    }, [selectedEmployee])
-
     const loadEmployees = useCallback(async () => {
         try {
             setDataLoading(true)
@@ -138,6 +116,28 @@ export default function EmpresasFuncionariosPage() {
             setCompanies([])
         }
     }, [])
+
+    useEffect(() => {
+        if (user && !authLoading) {
+            loadEmployees()
+            loadCompanies()
+        }
+    }, [user, authLoading, loadEmployees, loadCompanies])
+
+    useEffect(() => {
+        if (selectedEmployee) {
+            setFormData({
+                name: selectedEmployee.name || "",
+                email: selectedEmployee.email || "",
+                phone: selectedEmployee.phone || "",
+                cpf: selectedEmployee.cpf || "",
+                role: selectedEmployee.role || "operador",
+                company_id: selectedEmployee.company_id || "",
+            })
+        } else {
+            setFormData({ name: "", email: "", phone: "", cpf: "", role: "operador", company_id: "" })
+        }
+    }, [selectedEmployee])
 
     const filteredEmployees = useMemo(() => {
         let result = employees
@@ -267,7 +267,7 @@ export default function EmpresasFuncionariosPage() {
                 ) : (
                     <div className="grid gap-3 sm:gap-4 w-full">
                         {filteredEmployees.length === 0 ? (
-                            <Card className="p-8 text-center">
+                            <Card variant="premium" className="p-8 text-center">
                                 <Users className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
                                 <p className="text-muted-foreground">Nenhum funcionário encontrado</p>
                             </Card>
@@ -282,7 +282,7 @@ export default function EmpresasFuncionariosPage() {
                                         transition={{ duration: 0.3 }}
                                         whileHover={{ y: -4 }}
                                     >
-                                        <Card className="p-3 sm:p-4 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-border hover:border-text-brand/30 group">
+                                        <Card variant="premium" className="p-3 sm:p-4 group">
                                             <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
                                                 <div className="flex-1 min-w-0">
                                                     <div className="flex flex-wrap items-center gap-2 mb-2">

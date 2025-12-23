@@ -267,7 +267,7 @@ export default function TransportadorasPage() {
           )}
 
           {!loadingCarriers && !errorCarriers && Array.isArray(filteredCarriers) && filteredCarriers.length === 0 && (
-            <Card className="p-4 sm:p-6 md:p-8 text-center w-full max-w-full overflow-hidden">
+            <Card variant="premium" className="p-4 sm:p-6 md:p-8 text-center w-full max-w-full overflow-hidden">
               <Truck className="h-10 w-10 sm:h-12 sm:w-12 text-ink-muted mx-auto mb-3 sm:mb-4 flex-shrink-0" />
               <h3 className="text-sm sm:text-base md:text-lg font-semibold mb-2 break-words px-2">
                 {debouncedSearchQuery ? "Nenhuma transportadora encontrada" : "Nenhuma transportadora cadastrada"}
@@ -288,7 +288,7 @@ export default function TransportadorasPage() {
                   transition={{ delay: index * 0.05 }}
                   whileHover={{ y: -4 }}
                 >
-                  <Card className="p-3 sm:p-4 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-border hover:border-text-brand/30 group">
+                  <Card variant="premium" className="p-3 sm:p-4 group">
                     <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
                       <div className="flex-1 flex gap-3 sm:gap-4 min-w-0">
                         <div className="flex-1 min-w-0">

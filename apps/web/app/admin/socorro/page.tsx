@@ -218,7 +218,7 @@ export default function SocorroPage() {
         </div>
 
         {/* Formulário de Despacho de Socorro */}
-        <Card className="border-2 bg-card/50 backdrop-blur-sm border-border shadow-lg">
+        <Card variant="premium" className="border-2 shadow-lg">
           <CardContent className="pt-6">
             <div className="space-y-6">
               {/* 1. Selecione a Rota com Problema */}
@@ -373,7 +373,7 @@ export default function SocorroPage() {
                   />
                 </div>
                 <select
-                  className="px-3 py-2 rounded-lg border border-border bg-white text-sm"
+                  className="px-3 py-2 rounded-lg border border-white/10 bg-white/5 backdrop-blur-md text-sm"
                   value={tempFilterStatus}
                   onChange={(e) => setTempFilterStatus(e.target.value)}
                 >
@@ -424,7 +424,7 @@ export default function SocorroPage() {
                 whileHover={{ y: -4 }}
                 className="group"
               >
-                <Card className="p-4 hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm border-border hover:border-text-error/30">
+                <Card variant="premium" className="p-4">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">

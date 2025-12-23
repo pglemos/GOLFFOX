@@ -101,7 +101,7 @@ export default function EscalonamentoPage() {
 
                 {/* Summary */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <Card className={criticalCount > 0 ? "border-error bg-error-light" : ""}>
+                    <Card variant="premium" className={criticalCount > 0 ? "border-error bg-error-light" : ""}>
                         <CardContent className="pt-6">
                             <div className="flex items-center gap-3">
                                 <AlertTriangle className={`h-8 w-8 ${criticalCount > 0 ? 'text-error' : 'text-muted-foreground'}`} />
@@ -112,7 +112,7 @@ export default function EscalonamentoPage() {
                             </div>
                         </CardContent>
                     </Card>
-                    <Card>
+                    <Card variant="premium">
                         <CardContent className="pt-6">
                             <div className="flex items-center gap-3">
                                 <Clock className="h-8 w-8 text-warning" />
@@ -123,7 +123,7 @@ export default function EscalonamentoPage() {
                             </div>
                         </CardContent>
                     </Card>
-                    <Card>
+                    <Card variant="premium">
                         <CardContent className="pt-6">
                             <div className="flex items-center gap-3">
                                 <CheckCircle className="h-8 w-8 text-success" />

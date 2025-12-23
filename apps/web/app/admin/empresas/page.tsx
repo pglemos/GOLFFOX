@@ -187,7 +187,7 @@ export default function EmpresasPage() {
         )}
 
         {!loadingEmpresas && !errorEmpresas && Array.isArray(empresas) && empresas.length === 0 && (
-          <Card className="p-4 sm:p-6 md:p-8 text-center w-full max-w-full overflow-hidden">
+          <Card variant="premium" className="p-4 sm:p-6 md:p-8 text-center w-full max-w-full overflow-hidden">
             <Briefcase className="h-10 w-10 sm:h-12 sm:w-12 text-ink-muted mx-auto mb-3 sm:mb-4 flex-shrink-0" />
             <h3 className="text-sm sm:text-base md:text-lg font-semibold mb-2 break-words px-2">Nenhuma empresa cadastrada</h3>
             <p className="text-xs sm:text-sm md:text-base text-ink-muted mb-4 break-words px-2">Clique em &quot;Criar Empresa&quot; para criar uma nova empresa e operador.</p>
@@ -205,7 +205,7 @@ export default function EmpresasPage() {
                 whileHover={{ y: -4 }}
                 className="group"
               >
-                <Card key={empresa.id} className="p-4 sm:p-5 overflow-hidden w-full border border-border hover:shadow-xl transition-all duration-300 bg-card/50 backdrop-blur-sm hover:border-text-brand/30 flex flex-col">
+                <Card key={empresa.id} variant="premium" className="p-4 sm:p-5 overflow-hidden w-full flex flex-col">
                   <div className="flex-1 flex flex-col gap-3 w-full">
                     {/* Header com ícone e nome */}
                     <div className="flex items-start gap-3 mb-1">

@@ -68,7 +68,7 @@ export default function MonitoramentoPage() {
                 </div>
 
                 {/* Main Status Card */}
-                <Card className="border-2" style={{ borderColor: health.status === 'ok' ? '#22C55E' : health.status === 'error' ? '#EF4444' : '#9CA3AF' }}>
+                <Card variant="premium" className="border-2" style={{ borderColor: health.status === 'ok' ? '#22C55E' : health.status === 'error' ? '#EF4444' : '#9CA3AF' }}>
                     <CardHeader className="flex flex-row items-center justify-between pb-2">
                         <CardTitle className="text-lg">Status Geral</CardTitle>
                         {health.timestamp && (
@@ -93,7 +93,7 @@ export default function MonitoramentoPage() {
                 {/* Services Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {/* Database */}
-                    <Card>
+                    <Card variant="premium">
                         <CardHeader className="flex flex-row items-center justify-between pb-2">
                             <CardTitle className="text-sm font-medium flex items-center gap-2">
                                 <Database className="h-4 w-4" />
@@ -113,7 +113,7 @@ export default function MonitoramentoPage() {
                     </Card>
 
                     {/* API Server */}
-                    <Card>
+                    <Card variant="premium">
                         <CardHeader className="flex flex-row items-center justify-between pb-2">
                             <CardTitle className="text-sm font-medium flex items-center gap-2">
                                 <Server className="h-4 w-4" />
@@ -130,7 +130,7 @@ export default function MonitoramentoPage() {
                     </Card>
 
                     {/* Realtime */}
-                    <Card>
+                    <Card variant="premium">
                         <CardHeader className="flex flex-row items-center justify-between pb-2">
                             <CardTitle className="text-sm font-medium flex items-center gap-2">
                                 <Zap className="h-4 w-4" />

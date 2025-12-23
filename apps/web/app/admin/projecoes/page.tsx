@@ -66,7 +66,7 @@ export default function ProjecoesFinanceirasPage() {
 
                 {/* Summary Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <Card>
+                    <Card variant="premium">
                         <CardHeader className="flex flex-row items-center justify-between pb-2">
                             <CardTitle className="text-sm font-medium">Receita Projetada (6m)</CardTitle>
                             <ArrowUpRight className="h-4 w-4 text-success" />
@@ -75,7 +75,7 @@ export default function ProjecoesFinanceirasPage() {
                             <p className="text-2xl font-bold text-success">{formatCurrency(totalProjectedRevenue)}</p>
                         </CardContent>
                     </Card>
-                    <Card>
+                    <Card variant="premium">
                         <CardHeader className="flex flex-row items-center justify-between pb-2">
                             <CardTitle className="text-sm font-medium">Custos Projetados (6m)</CardTitle>
                             <ArrowDownRight className="h-4 w-4 text-error" />
@@ -84,7 +84,7 @@ export default function ProjecoesFinanceirasPage() {
                             <p className="text-2xl font-bold text-error">{formatCurrency(totalProjectedCosts)}</p>
                         </CardContent>
                     </Card>
-                    <Card>
+                    <Card variant="premium">
                         <CardHeader className="flex flex-row items-center justify-between pb-2">
                             <CardTitle className="text-sm font-medium">Margem Projetada (6m)</CardTitle>
                             <BarChart3 className="h-4 w-4 text-info" />
@@ -96,15 +96,15 @@ export default function ProjecoesFinanceirasPage() {
                 </div>
 
                 {/* Forecast Table */}
-                <Card>
+                <Card variant="premium">
                     <CardHeader>
                         <CardTitle>Projeção Mensal</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-sm">
-                                <thead>
-                                    <tr className="border-b">
+                        <div className="overflow-x-auto rounded-lg border border-white/10 bg-white/5 backdrop-blur-md">
+                            <table className="w-full text-sm bg-transparent">
+                                <thead className="bg-white/5 backdrop-blur-md">
+                                    <tr className="border-b border-white/10">
                                         <th className="text-left p-3 font-medium">Mês</th>
                                         <th className="text-right p-3 font-medium">Receita</th>
                                         <th className="text-right p-3 font-medium">Custos</th>
@@ -112,9 +112,9 @@ export default function ProjecoesFinanceirasPage() {
                                         <th className="text-right p-3 font-medium">%</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody className="bg-transparent">
                                     {forecasts.map((f) => (
-                                        <tr key={f.month} className="border-b hover:bg-muted/50">
+                                        <tr key={f.month} className="border-b border-white/10 hover:bg-white/5 transition-colors">
                                             <td className="p-3 flex items-center gap-2">
                                                 <Calendar className="h-4 w-4 text-muted-foreground" />
                                                 {formatMonth(f.month)}

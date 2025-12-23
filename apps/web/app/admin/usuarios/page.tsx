@@ -211,7 +211,7 @@ function UsuariosPageContent() {
                         description="Filtre os usuários por papel e status"
                     />
                 ) : (
-                    <Card className="overflow-hidden bg-card border-border">
+                    <Card variant="premium" className="overflow-hidden">
                         <CardHeader className="p-3 sm:p-6">
                             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
                                 <div className="flex items-center gap-2 min-w-0">
@@ -292,7 +292,7 @@ function UsuariosPageContent() {
                 )}
 
                 {/* Tabela de Usuários - Mobile: Cards, Desktop: Tabela */}
-                <Card className="overflow-hidden bg-card border-border">
+                <Card variant="premium" className="overflow-hidden">
                     {isMobile ? (
                         /* Mobile: Cards Layout */
                         <div className="p-3 space-y-3">
@@ -375,22 +375,22 @@ function UsuariosPageContent() {
                         </div>
                     ) : (
                         /* Desktop: Table Layout */
-                        <div className="overflow-x-auto -webkit-overflow-scrolling-touch rounded-lg border bg-card">
-                            <table className="w-full min-w-[640px] bg-card">
-                            <thead className="bg-card">
-                                <tr className="border-b border-border">
-                                    <th className="text-left p-2 sm:p-4 font-semibold text-xs sm:text-sm bg-card">Nome</th>
-                                    <th className="text-left p-2 sm:p-4 font-semibold text-xs sm:text-sm bg-card">Email</th>
-                                    <th className="text-left p-2 sm:p-4 font-semibold text-xs sm:text-sm bg-card">CPF</th>
-                                    <th className="text-left p-2 sm:p-4 font-semibold text-xs sm:text-sm bg-card">Papel</th>
-                                    <th className="text-left p-2 sm:p-4 font-semibold text-xs sm:text-sm bg-card">Status</th>
-                                    <th className="text-left p-2 sm:p-4 font-semibold text-xs sm:text-sm bg-card">Ações</th>
+                        <div className="overflow-x-auto -webkit-overflow-scrolling-touch rounded-lg border bg-white/5 backdrop-blur-xl">
+                            <table className="w-full min-w-[640px] bg-transparent">
+                            <thead className="bg-white/5 backdrop-blur-md">
+                                <tr className="border-b border-white/10">
+                                    <th className="text-left p-2 sm:p-4 font-semibold text-xs sm:text-sm">Nome</th>
+                                    <th className="text-left p-2 sm:p-4 font-semibold text-xs sm:text-sm">Email</th>
+                                    <th className="text-left p-2 sm:p-4 font-semibold text-xs sm:text-sm">CPF</th>
+                                    <th className="text-left p-2 sm:p-4 font-semibold text-xs sm:text-sm">Papel</th>
+                                    <th className="text-left p-2 sm:p-4 font-semibold text-xs sm:text-sm">Status</th>
+                                    <th className="text-left p-2 sm:p-4 font-semibold text-xs sm:text-sm">Ações</th>
                                 </tr>
                             </thead>
-                            <tbody className="bg-card">
+                            <tbody className="bg-transparent">
                                 {filteredUsers.length === 0 ? (
-                                    <tr className="bg-card">
-                                        <td colSpan={6} className="p-6 sm:p-8 text-center text-muted-foreground text-sm sm:text-base bg-card">
+                                    <tr className="bg-transparent">
+                                        <td colSpan={6} className="p-6 sm:p-8 text-center text-muted-foreground text-sm sm:text-base">
                                             Nenhum usuário encontrado
                                         </td>
                                     </tr>
@@ -401,20 +401,20 @@ function UsuariosPageContent() {
                                             initial={{ opacity: 0, x: -20 }}
                                             animate={{ opacity: 1, x: 0 }}
                                             transition={{ delay: index * 0.02 }}
-                                            className="border-b border-border/50 hover:bg-muted/50 transition-colors bg-card"
+                                            className="border-b border-white/10 hover:bg-white/5 transition-colors bg-transparent"
                                         >
-                                            <td className="p-2 sm:p-4 text-xs sm:text-sm break-words bg-card">{usuario.name || "N/A"}</td>
-                                            <td className="p-2 sm:p-4 text-xs sm:text-sm break-words bg-card">{usuario.email}</td>
-                                            <td className="p-2 sm:p-4 text-xs sm:text-sm break-words bg-card">{usuario.cpf || "-"}</td>
-                                            <td className="p-2 sm:p-4 bg-card">
+                                            <td className="p-2 sm:p-4 text-xs sm:text-sm break-words">{usuario.name || "N/A"}</td>
+                                            <td className="p-2 sm:p-4 text-xs sm:text-sm break-words">{usuario.email}</td>
+                                            <td className="p-2 sm:p-4 text-xs sm:text-sm break-words">{usuario.cpf || "-"}</td>
+                                            <td className="p-2 sm:p-4">
                                                 <Badge variant="outline" className="text-xs whitespace-nowrap">{usuario.role || "N/A"}</Badge>
                                             </td>
-                                            <td className="p-2 sm:p-4 bg-card">
+                                            <td className="p-2 sm:p-4">
                                                 <Badge variant={usuario.is_active ? "default" : "secondary"} className="text-xs whitespace-nowrap">
                                                     {usuario.is_active ? "Ativo" : "Inativo"}
                                                 </Badge>
                                             </td>
-                                            <td className="p-2 sm:p-4 bg-card">
+                                            <td className="p-2 sm:p-4">
                                                 <div className="flex flex-col sm:flex-row gap-1 sm:gap-2">
                                                     <Button
                                                         variant="outline"

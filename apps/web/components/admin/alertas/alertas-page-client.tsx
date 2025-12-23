@@ -266,7 +266,7 @@ export function AlertasPageClient({ initialAlertas }: AlertasPageClientProps) {
       </div>
 
       {/* Filtros */}
-      <Card className="overflow-hidden bg-card/50 backdrop-blur-sm border-border">
+      <Card variant="premium" className="overflow-hidden">
         <CardHeader className="p-3 sm:p-6">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
             <div className="flex items-center gap-2 min-w-0">
@@ -308,7 +308,7 @@ export function AlertasPageClient({ initialAlertas }: AlertasPageClientProps) {
                 />
               </div>
               <select
-                className="px-3 py-2 rounded-lg border border-border bg-white text-sm w-full sm:w-auto min-h-[44px] touch-manipulation"
+                className="px-3 py-2 rounded-lg border border-white/10 bg-white/5 backdrop-blur-md text-sm w-full sm:w-auto min-h-[44px] touch-manipulation hover:bg-white/10 hover:border-white/20 transition-all duration-300"
                 value={tempFilterSeverity}
                 onChange={(e) => setTempFilterSeverity(e.target.value)}
               >
@@ -318,7 +318,7 @@ export function AlertasPageClient({ initialAlertas }: AlertasPageClientProps) {
                 <option value="info">Info</option>
               </select>
               <select
-                className="px-3 py-2 rounded-lg border border-border bg-white text-sm w-full sm:w-auto min-h-[44px] touch-manipulation"
+                className="px-3 py-2 rounded-lg border border-white/10 bg-white/5 backdrop-blur-md text-sm w-full sm:w-auto min-h-[44px] touch-manipulation hover:bg-white/10 hover:border-white/20 transition-all duration-300"
                 value={filtersState.temp.status}
                 onChange={(e) => filtersDispatch({ type: 'UPDATE_TEMP_STATUS', payload: e.target.value })}
               >
@@ -354,12 +354,12 @@ export function AlertasPageClient({ initialAlertas }: AlertasPageClientProps) {
       {/* Lista de Alertas */}
       <div className="grid gap-3 sm:gap-4 w-full">
         {dataLoading ? (
-          <Card className="p-12 text-center">
+          <Card variant="premium" className="p-12 text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand mx-auto"></div>
             <p className="mt-4 text-ink-muted">Carregando alertas...</p>
           </Card>
         ) : filteredAlertas.length === 0 ? (
-          <Card className="p-12 text-center">
+          <Card variant="premium" className="p-12 text-center">
             <AlertTriangle className="h-12 w-12 text-ink-light mx-auto mb-4" />
             <h3 className="text-lg font-medium mb-2">Nenhum alerta encontrado</h3>
             <p className="text-sm text-ink-muted">
@@ -376,7 +376,7 @@ export function AlertasPageClient({ initialAlertas }: AlertasPageClientProps) {
               whileHover={{ y: -4 }}
               className="group"
             >
-              <Card className="p-3 sm:p-4 hover:shadow-xl transition-all duration-300 overflow-hidden bg-card/50 backdrop-blur-sm border-border hover:border-brand/30">
+              <Card variant="premium" className="p-3 sm:p-4 overflow-hidden">
                 <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
                   <div className="flex gap-3 sm:gap-4 flex-1 min-w-0">
                     <div className={`p-1.5 rounded-lg flex-shrink-0 ${alerta.severity === 'critical' ? 'bg-error-light' :
