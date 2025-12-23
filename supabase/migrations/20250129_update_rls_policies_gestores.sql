@@ -86,10 +86,10 @@ BEGIN
     ) THEN
         CREATE POLICY "costs_gestor_transportadora_access" ON public.gf_manual_costs_v2
         FOR ALL USING (
-            transportadora_id IN (
+            carrier_id IN (
                 SELECT transportadora_id FROM users WHERE id = auth.uid()
             )
-            OR transportadora_id IN (
+            OR carrier_id IN (
                 SELECT transportadora_id FROM profiles WHERE id = auth.uid()
             )
         );
@@ -140,10 +140,10 @@ BEGIN
     ) THEN
         CREATE POLICY "revenues_gestor_transportadora_access" ON public.gf_manual_revenues
         FOR ALL USING (
-            transportadora_id IN (
+            carrier_id IN (
                 SELECT transportadora_id FROM users WHERE id = auth.uid()
             )
-            OR transportadora_id IN (
+            OR carrier_id IN (
                 SELECT transportadora_id FROM profiles WHERE id = auth.uid()
             )
         );

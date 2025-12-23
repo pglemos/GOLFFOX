@@ -135,10 +135,10 @@ async function createOperatorHandler(request: NextRequest) {
     const company = await CompanyService.createCompany(companyData)
 
     // 2. Atualizar campos adicionais da empresa se fornecidos
-    if (stateRegistration || municipalRegistration || companyWebsite || 
-        address_zip_code || address_street || address_number || address_neighborhood || 
-        address_complement || address_city || address_state) {
-      
+    if (stateRegistration || municipalRegistration || companyWebsite ||
+      address_zip_code || address_street || address_number || address_neighborhood ||
+      address_complement || address_city || address_state) {
+
       const updateData: any = {}
       if (stateRegistration) updateData.state_registration = stateRegistration.trim()
       if (municipalRegistration) updateData.municipal_registration = municipalRegistration.trim()
@@ -182,7 +182,7 @@ async function createOperatorHandler(request: NextRequest) {
             email: operatorEmail.toLowerCase().trim(),
             name: operatorName?.trim() || operatorEmail.split('@')[0],
             phone: operatorPhone?.trim() || null,
-            role: 'empresa', // Role normalizado: empresa (antigo operador)
+            role: 'gestor_empresa', // Role normalizado: gestor_empresa (antigo operador/empresa)
             company_id: company.id,
             is_active: true
           }, {
@@ -193,7 +193,7 @@ async function createOperatorHandler(request: NextRequest) {
           id: existingUser.id,
           email: operatorEmail,
           name: operatorName || operatorEmail.split('@')[0],
-          role: 'empresa',
+          role: 'gestor_empresa',
           company_id: company.id
         }
         userId = existingUser.id
@@ -205,7 +205,7 @@ async function createOperatorHandler(request: NextRequest) {
           email_confirm: true,
           user_metadata: {
             name: operatorName?.trim() || operatorEmail.split('@')[0],
-            role: 'empresa',
+            role: 'gestor_empresa',
           }
         })
 
@@ -223,7 +223,7 @@ async function createOperatorHandler(request: NextRequest) {
               email: operatorEmail.toLowerCase().trim(),
               name: operatorName?.trim() || operatorEmail.split('@')[0],
               phone: operatorPhone?.trim() || null,
-              role: 'empresa', // Role normalizado: empresa (antigo operador)
+              role: 'gestor_empresa', // Role normalizado: gestor_empresa (antigo operador/empresa)
               company_id: company.id,
               is_active: true
             }, {
@@ -234,13 +234,13 @@ async function createOperatorHandler(request: NextRequest) {
             id: newUserId,
             email: operatorEmail,
             name: operatorName || operatorEmail.split('@')[0],
-            role: 'empresa',
+            role: 'gestor_empresa',
             company_id: company.id
           }
           userId = newUserId
 
           debug('Operador criado com sucesso', { userId: newUserId }, 'CreateOperatorAPI')
-          
+
           // Publicar evento de criação de usuário
           try {
             const currentUser = await validateAuth(request)
@@ -249,7 +249,7 @@ async function createOperatorHandler(request: NextRequest) {
               newUserId,
               {
                 email: operatorEmail,
-                role: normalizeRole('empresa'),
+                role: 'gestor_empresa',
                 companyId: company.id,
               },
               currentUser?.id
@@ -282,14 +282,14 @@ async function createOperatorHandler(request: NextRequest) {
 
   } catch (err) {
     const errorMessage = formatError(err, 'Erro ao criar empresa')
-    const status = errorMessage.includes('obrigatório') || 
-                   errorMessage.includes('já existe') || 
-                   errorMessage.includes('inválido') ? 400 : 500
-    
+    const status = errorMessage.includes('obrigatório') ||
+      errorMessage.includes('já existe') ||
+      errorMessage.includes('inválido') ? 400 : 500
+
     logError('Erro ao criar empresa/operador', { error: err }, 'CreateOperatorAPI')
-    
+
     return NextResponse.json(
-      { 
+      {
         error: 'Erro ao criar empresa',
         message: errorMessage,
         details: process.env.NODE_ENV === 'development' ? (err instanceof Error ? err.stack : String(err)) : undefined

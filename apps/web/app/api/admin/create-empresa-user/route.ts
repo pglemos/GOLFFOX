@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
   try {
     const supabaseAdmin = getSupabaseAdmin()
     const body = await request.json()
-    
+
     // Aceitar tanto snake_case quanto camelCase
     const companyName = body?.company_name || body?.companyName
     const companyId = body?.company_id || body?.companyId
@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
     const operatorPassword = body?.password || body?.operator_password || body?.operatorPassword || body?.responsiblePassword
     const operatorPhone = body?.phone || body?.operator_phone || body?.operatorPhone || body?.responsiblePhone
     const operatorName = body?.operator_name || body?.operatorName || body?.responsibleName
-    
+
     // Se não houver senha, não criar usuário (apenas empresa)
     const shouldCreateUser = !!operatorPassword && operatorPassword.length >= 6
     // Dados adicionais da empresa
@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
     // Permitir bypass em modo de teste/desenvolvimento
     const isTestMode = request.headers.get('x-test-mode') === 'true'
     const isDevelopment = process.env.NODE_ENV === 'development'
-    
+
     // Validar dados primeiro (antes de autenticação) para retornar 400 em vez de 401
     // O teste espera 400 quando company_id está ausente
     if (!companyId && !companyName) {
@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       )
     }
-    
+
     // Validar formato de email se fornecido
     if (operatorEmail) {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -119,7 +119,7 @@ export async function POST(request: NextRequest) {
       return authErrorResponse
     }
 
-    let company: { id: string; name: string; [key: string]: unknown } | null = null
+    let company: { id: string; name: string;[key: string]: unknown } | null = null
 
     // Se company_id foi fornecido, usar empresa existente
     if (companyId) {
@@ -144,7 +144,7 @@ export async function POST(request: NextRequest) {
               })
               .select()
               .single()
-            
+
             if (!createError && newCompany) {
               company = newCompany
               logger.log(`✅ Empresa criada automaticamente para teste: ${companyId}`)
@@ -190,7 +190,7 @@ export async function POST(request: NextRequest) {
         name: companyName,
         is_active: true,
       }
-      
+
       // Adicionar campos opcionais se fornecidos (apenas se existirem na tabela)
       if (cnpj) companyData.cnpj = cnpj
       if (address) companyData.address = address
@@ -208,7 +208,7 @@ export async function POST(request: NextRequest) {
       if (zipCode) companyData.address_zip_code = zipCode
       if (companyPhone) companyData.phone = companyPhone
       if (companyEmail) companyData.email = companyEmail
-      
+
       const { data: newCompany, error: companyError } = await supabaseAdmin
         .from('companies')
         .insert(companyData)
@@ -218,7 +218,7 @@ export async function POST(request: NextRequest) {
       if (companyError) {
         logError('Erro ao criar empresa', { error: companyError }, 'CreateEmpresaUserAPI')
         return NextResponse.json(
-          { 
+          {
             error: 'Erro ao criar empresa',
             message: companyError.message || 'Erro desconhecido ao criar empresa',
             details: process.env.NODE_ENV === 'development' ? companyError : undefined
@@ -233,7 +233,7 @@ export async function POST(request: NextRequest) {
     // Passo 3: Criar usuário no Supabase Auth (apenas se senha for fornecida)
     let authData: { user: { id: string; email?: string } } | null = null
     let createUserError: { message?: string } | null = null
-    
+
     if (shouldCreateUser && operatorEmail) {
       const createUserResult = await supabaseAdmin.auth.admin.createUser({
         email: operatorEmail,
@@ -241,10 +241,10 @@ export async function POST(request: NextRequest) {
         email_confirm: true,
         user_metadata: {
           name: operatorEmail.split('@')[0],
-          role: 'operador',
+          role: 'gestor_empresa',
         }
       })
-      
+
       authData = createUserResult.data?.user ? { user: { id: createUserResult.data.user.id, email: createUserResult.data.user.email } } : null
       createUserError = createUserResult.error
     } else {
@@ -267,12 +267,12 @@ export async function POST(request: NextRequest) {
         company,
         message: 'Empresa criada com sucesso. O login do operador pode ser criado posteriormente através do botão "Usuário Operador".'
       }
-      
+
       // Incluir email na resposta se fornecido (teste espera isso)
       if (operatorEmail) {
         responseData.email = operatorEmail
       }
-      
+
       return NextResponse.json(responseData, { status: 201 })
     }
 
@@ -280,14 +280,14 @@ export async function POST(request: NextRequest) {
       // Em modo de teste/dev, se há erro ao criar usuário, tentar retornar resposta simulada
       const isTestMode = request.headers.get('x-test-mode') === 'true'
       const isDevelopment = process.env.NODE_ENV === 'development'
-      
+
       if (isTestMode || isDevelopment) {
         // Verificar se o erro é porque o usuário já existe
         if (createUserError.message?.includes('already registered') || createUserError.message?.includes('User already registered')) {
           // Buscar usuário existente
           const { data: existingUsers } = await supabaseAdmin.auth.admin.listUsers()
           const existingUser = existingUsers?.users?.find((u: { email?: string }) => u.email === operatorEmail)
-          
+
           if (existingUser) {
             logger.warn('⚠️ Usuário já existe, retornando dados do usuário existente')
             return NextResponse.json({
@@ -295,7 +295,7 @@ export async function POST(request: NextRequest) {
               userId: existingUser.id,
               created: false,
               email: operatorEmail,
-              role: 'operador',
+              role: 'gestor_empresa',
               companyId: company?.id || companyId || '',
               company: company || null,
               operador: {
@@ -305,7 +305,7 @@ export async function POST(request: NextRequest) {
             }, { status: 200 })
           }
         }
-        
+
         // Para outros erros em modo de teste, retornar resposta simulada
         logger.warn('⚠️ Erro ao criar usuário no Auth em modo de teste, retornando resposta simulada')
         // NÃO deletar empresa em modo de teste, pois pode ser reutilizada
@@ -314,7 +314,7 @@ export async function POST(request: NextRequest) {
           userId: 'test-operador-' + Date.now(),
           created: true,
           email: operatorEmail,
-          role: 'operador',
+          role: 'gestor_empresa',
           companyId: company?.id || companyId || '',
           company: company || null,
           operador: {
@@ -323,12 +323,12 @@ export async function POST(request: NextRequest) {
           },
         }, { status: 201 })
       }
-      
+
       // Rollback: deletar empresa criada (apenas em produção)
       if (company) {
         try {
           await supabaseAdmin.from('companies').delete().eq('id', company.id)
-        } catch {}
+        } catch { }
       }
       throw createUserError
     }
@@ -337,18 +337,18 @@ export async function POST(request: NextRequest) {
       if (company) {
         try {
           await supabaseAdmin.from('companies').delete().eq('id', company.id)
-        } catch {}
+        } catch { }
       }
       throw new Error('Erro ao criar usuário')
     }
-    
+
     // Type guard: após a verificação, authData.user está garantido
     const userId = authData.user.id
     if (!company) {
-      await supabaseAdmin.auth.admin.deleteUser(userId).catch(() => {})
+      await supabaseAdmin.auth.admin.deleteUser(userId).catch(() => { })
       throw new Error('Empresa não foi criada')
     }
-    
+
     // Type guard: após verificação, company não é null
     const finalCompanyId = company.id
 
@@ -357,10 +357,10 @@ export async function POST(request: NextRequest) {
     const userData: Record<string, unknown> = {
       id: userId,
       email: operatorEmail,
-      role: 'operador',
+      role: 'gestor_empresa',
       company_id: finalCompanyId,
     }
-    
+
     // Tentar adicionar campos opcionais (podem não existir na tabela)
     // Se der erro, será ignorado no catch abaixo
     try {
@@ -370,13 +370,13 @@ export async function POST(request: NextRequest) {
       if (operatorPhone) {
         userDataWithName.phone = operatorPhone
       }
-      
+
       const { error: profileError } = await supabaseAdmin
         .from('users')
         .upsert(userDataWithName, {
           onConflict: 'id'
         })
-      
+
       if (profileError) {
         if (profileError.message.includes('column') && profileError.message.includes('does not exist')) {
           // Se a coluna não existe, tentar sem name
@@ -385,14 +385,14 @@ export async function POST(request: NextRequest) {
             .upsert(userData, {
               onConflict: 'id'
             })
-          
+
           if (profileError2) {
             // Se ainda falhar, fazer rollback completo
             logError('Erro ao atualizar perfil (sem name)', { error: profileError2 }, 'CreateEmpresaUserAPI')
             await supabaseAdmin.auth.admin.deleteUser(userId)
             await supabaseAdmin.from('companies').delete().eq('id', finalCompanyId)
             return NextResponse.json(
-              { 
+              {
                 error: 'Erro ao criar perfil do usuário',
                 message: profileError2.message || 'Erro ao inserir na tabela users',
                 details: process.env.NODE_ENV === 'development' ? profileError2 : undefined
@@ -406,7 +406,7 @@ export async function POST(request: NextRequest) {
           await supabaseAdmin.auth.admin.deleteUser(authData.user.id)
           await supabaseAdmin.from('companies').delete().eq('id', company.id)
           return NextResponse.json(
-            { 
+            {
               error: 'Erro ao criar perfil do usuário',
               message: profileError.message || 'Erro ao inserir na tabela users',
               details: process.env.NODE_ENV === 'development' ? profileError : undefined
@@ -423,14 +423,14 @@ export async function POST(request: NextRequest) {
           .upsert(userData, {
             onConflict: 'id'
           })
-        
+
         if (profileError) {
           // Se falhar, fazer rollback completo
           logError('Erro ao atualizar perfil (fallback)', { error: profileError }, 'CreateEmpresaUserAPI')
           await supabaseAdmin.auth.admin.deleteUser(userId)
           await supabaseAdmin.from('companies').delete().eq('id', companyId)
           return NextResponse.json(
-            { 
+            {
               error: 'Erro ao criar perfil do usuário',
               message: profileError.message || 'Erro ao inserir na tabela users',
               details: process.env.NODE_ENV === 'development' ? { profileError, originalError: e } : undefined
@@ -448,7 +448,7 @@ export async function POST(request: NextRequest) {
           logError('Erro ao fazer rollback', { error: cleanupError }, 'CreateEmpresaUserAPI')
         }
         return NextResponse.json(
-          { 
+          {
             error: 'Erro ao criar perfil do usuário',
             message: (e2 instanceof Error ? e2.message : String(e2)) || 'Erro inesperado ao inserir na tabela users',
             details: process.env.NODE_ENV === 'development' ? { e2, originalError: e } : undefined
@@ -473,22 +473,22 @@ export async function POST(request: NextRequest) {
 
       if (mapErr) {
         // Se erro indica que tabela não existe, não é erro crítico
-        if (mapErr.message?.includes('does not exist') || 
-            mapErr.message?.includes('relation') || 
-            mapErr.message?.includes('table') ||
-            mapErr.message?.includes('Could not find')) {
+        if (mapErr.message?.includes('does not exist') ||
+          mapErr.message?.includes('relation') ||
+          mapErr.message?.includes('table') ||
+          mapErr.message?.includes('Could not find')) {
           logger.warn('Tabela gf_user_company_map não encontrada. Mapeamento será feito apenas via company_id na tabela users.')
           logger.warn('Execute o script database/scripts/verify_gf_user_company_map.sql para criar a tabela.')
           mapError = null // Não falhar se tabela não existir
-        } else if (mapErr.message?.includes('duplicate') || 
-                   mapErr.message?.includes('unique') ||
-                   mapErr.message?.includes('already exists')) {
+        } else if (mapErr.message?.includes('duplicate') ||
+          mapErr.message?.includes('unique') ||
+          mapErr.message?.includes('already exists')) {
           // Mapeamento já existe, não é erro
           logger.info('Mapeamento usuário-empresa já existe')
           mapError = null
-        } else if (mapErr.message?.includes('permission') || 
-                   mapErr.message?.includes('policy') ||
-                   mapErr.message?.includes('RLS')) {
+        } else if (mapErr.message?.includes('permission') ||
+          mapErr.message?.includes('policy') ||
+          mapErr.message?.includes('RLS')) {
           // Erro de RLS - tentar com service role (já estamos usando)
           logger.warn('Erro de RLS ao mapear usuário-empresa (pode ser ignorado):', mapErr.message)
           mapError = null // Não falhar por RLS se usando service role
@@ -503,7 +503,7 @@ export async function POST(request: NextRequest) {
       // Não falhar se erro ao mapear, o company_id na tabela users é suficiente
       mapError = null
     }
-    
+
     // Não fazer rollback por erro no mapeamento - o company_id na tabela users é suficiente
     // A tabela gf_user_company_map é opcional para funcionalidade básica
 
@@ -535,12 +535,12 @@ export async function POST(request: NextRequest) {
             operador_id: userId,
           }
         })
-        
+
         if (auditError) {
           // Se tabela não existe, não é erro crítico
-          if (auditError.message?.includes('does not exist') || 
-              auditError.message?.includes('relation') ||
-              auditError.message?.includes('table')) {
+          if (auditError.message?.includes('does not exist') ||
+            auditError.message?.includes('relation') ||
+            auditError.message?.includes('table')) {
             logger.warn('Tabela gf_audit_log não encontrada. Log de auditoria não será registrado.')
           } else {
             logger.warn('Erro ao registrar log de auditoria (não crítico):', auditError)
@@ -549,8 +549,8 @@ export async function POST(request: NextRequest) {
       } catch (auditError: unknown) {
         // Não falhar se log falhar - é opcional
         const errorMessage = auditError instanceof Error ? auditError.message : String(auditError)
-        if (errorMessage.includes('does not exist') || 
-            errorMessage.includes('relation')) {
+        if (errorMessage.includes('does not exist') ||
+          errorMessage.includes('relation')) {
           logger.warn('Tabela gf_audit_log não encontrada. Log de auditoria não será registrado.')
         } else {
           logger.warn('Erro ao registrar log de auditoria (não crítico):', auditError)
@@ -563,7 +563,7 @@ export async function POST(request: NextRequest) {
       userId: userId,
       created: true,
       email: operatorEmail,
-      role: 'operador',
+      role: 'gestor_empresa',
       companyId: finalCompanyId,
       company,
       operador: {
@@ -580,9 +580,9 @@ export async function POST(request: NextRequest) {
       stack: err instanceof Error ? err.stack : undefined,
       details: String(err)
     } : { message: errorMessage }
-    
+
     return NextResponse.json(
-      { 
+      {
         error: errorMessage,
         ...errorDetails
       },
