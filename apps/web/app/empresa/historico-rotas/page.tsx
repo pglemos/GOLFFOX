@@ -104,7 +104,7 @@ export default function HistoricoRotasPage() {
     }
 
     return (
-        <AppShell panel="operador" user={user ? { id: user.id, name: user.name, email: user.email || '', role: user.role || 'operador', avatar_url: (user as any).avatar_url } : { id: 'mock', name: 'Operador', email: 'op@golffox.com', role: 'operador' }}>
+        <AppShell panel="gestor_empresa" user={user ? { id: user.id, name: user.name, email: user.email || '', role: user.role || 'gestor_empresa', avatar_url: (user as any).avatar_url } : { id: 'mock', name: 'Gestor da Empresa', email: 'empresa@golffox.com', role: 'gestor_empresa' }}>
             <div className="space-y-4 sm:space-y-6 w-full overflow-x-hidden">
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">

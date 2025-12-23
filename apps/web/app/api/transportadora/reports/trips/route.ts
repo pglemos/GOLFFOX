@@ -5,7 +5,7 @@ import { requireAuth } from '@/lib/api-auth'
 
 export async function GET(req: NextRequest) {
   // Verificar autenticação (transportadora)
-  const authError = await requireAuth(req, ['admin', 'transportadora', 'operador', 'transportadora'])
+  const authError = await requireAuth(req, ['admin', 'gestor_transportadora', 'operador', 'transportadora'])
   if (authError) return authError
 
   try {

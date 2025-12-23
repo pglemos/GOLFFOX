@@ -337,7 +337,7 @@ export default function TransportadoraConfiguracoesPage() {
   }
 
   return (
-    <AppShell user={{ id: user.id, name: user.name || "Transportadora", email: user.email, role: user.role || "transportadora", avatar_url: user.avatar_url }} panel="transportadora">
+    <AppShell user={{ id: user.id, name: user.name || "Gestor da Transportadora", email: user.email, role: user.role || "gestor_transportadora", avatar_url: user.avatar_url }} panel="gestor_transportadora">
       <div className="space-y-4 sm:space-y-6 w-full overflow-x-hidden">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">

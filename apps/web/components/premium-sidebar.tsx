@@ -61,7 +61,7 @@ interface MenuGroup {
 interface PremiumSidebarProps {
   isOpen?: boolean
   isMobile?: boolean
-  panel?: 'admin' | 'operador' | 'transportadora' | 'empresa'
+  panel?: 'admin' | 'gestor_empresa' | 'gestor_transportadora' | 'operador' | 'transportadora' | 'empresa'
   user?: {
     id: string
     name: string
@@ -413,12 +413,13 @@ export function PremiumSidebar({
 
   const menuGroups = useMemo(() => {
     switch (panel) {
-      case 'operador':
-        return operadorMenuGroups
-      case 'transportadora':
-        return transportadoraMenuGroups
+      case 'gestor_empresa':
       case 'empresa':
         return empresaMenuGroups
+      case 'gestor_transportadora':
+      case 'operador':
+      case 'transportadora':
+        return transportadoraMenuGroups
       default:
         return adminMenuGroups
     }

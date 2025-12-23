@@ -682,9 +682,9 @@ Todas as tabelas possuem políticas RLS configuradas:
 
 **Credenciais padrão**: `golffox@admin.com` / `senha123`
 
-### 🏢 Empresa Contratante
+### 🏢 Gestor da Empresa
 
-**Role**: `empresa`
+**Role**: `gestor_empresa` (anteriormente `empresa`)
 
 **Acesso**: Painel `/empresa`
 
@@ -699,9 +699,9 @@ Todas as tabelas possuem políticas RLS configuradas:
 
 **⚠️ IMPORTANTE**: O usuário precisa estar associado a uma empresa na tabela `gf_user_company_map`.
 
-### 🚛 Transportadora (Operador)
+### 🚛 Gestor da Transportadora
 
-**Role**: `operador`
+**Role**: `gestor_transportadora` (anteriormente `operador` e `transportadora`)
 
 **Acesso**: Painel `/transportadora`
 

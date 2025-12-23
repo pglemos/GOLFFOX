@@ -162,9 +162,9 @@ function UsuariosPageContent() {
                                     label: "Papel",
                                     type: "select",
                                     options: [
-                                        { label: "Administrador", value: "admin" },
-                                        { label: "Operador", value: "operador" },
-                                        { label: "Transportadora", value: "transportadora" },
+                                        { label: "Admin", value: "admin" },
+                                        { label: "Gestor da Empresa", value: "gestor_empresa" },
+                                        { label: "Gestor da Transportadora", value: "gestor_transportadora" },
                                         { label: "Motorista", value: "motorista" },
                                         { label: "Passageiro", value: "passageiro" }
                                     ]
@@ -206,9 +206,9 @@ function UsuariosPageContent() {
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="all">Todos os papéis</SelectItem>
-                                    <SelectItem value="admin">Administrador</SelectItem>
-                                    <SelectItem value="operador">Operador</SelectItem>
-                                    <SelectItem value="transportadora">Transportadora</SelectItem>
+                                    <SelectItem value="admin">Admin</SelectItem>
+                                    <SelectItem value="gestor_empresa">Gestor da Empresa</SelectItem>
+                                    <SelectItem value="gestor_transportadora">Gestor da Transportadora</SelectItem>
                                     <SelectItem value="motorista">Motorista</SelectItem>
                                     <SelectItem value="passageiro">Passageiro</SelectItem>
                                 </SelectContent>

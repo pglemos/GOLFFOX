@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
         const sanitizedPassword = password?.toString()
         const sanitizedName = name?.toString().trim()
         const sanitizedPhone = phone?.toString().trim() || null
-        const targetRole = role || 'operador'
+        const targetRole = role || 'gestor_empresa'
         const sanitizedCpf = cpf?.toString().replace(/\D/g, '') || null
 
         // Determinar email para Auth (login)

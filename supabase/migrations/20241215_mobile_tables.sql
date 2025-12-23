@@ -256,10 +256,13 @@ BEGIN
     END IF;
     
     -- Adicionar nova constraint com roles em PT e EN
+    -- NOTA: Atualizado em 2025-01-29 - roles foram renomeados para gestores
+    -- Ver migration 20250129_rename_roles_gestores.sql
     ALTER TABLE public.users ADD CONSTRAINT users_role_check 
         CHECK (role IN (
-            'admin', 'operador', 'transportadora', 'motorista', 'passageiro',
-            'empresa', 'operador', 'motorista', 'passageiro'
+            'admin', 'gestor_empresa', 'gestor_transportadora', 'motorista', 'passageiro',
+            -- Compatibilidade temporária (remover após migração completa):
+            'empresa', 'operador', 'transportadora'
         ));
 EXCEPTION
     WHEN others THEN

@@ -4,24 +4,23 @@ export interface RoleMapping {
 }
 
 const ROLE_MAP: RoleMapping[] = [
-  // Conjunto principal (PT-BR) - Novo modelo de domínio
+  // Conjunto principal - Atualizado em 2025-01-29
   { email: 'golffox@admin.com', role: 'admin' },
-  { email: 'teste@empresa.com', role: 'empresa' },       // Gestor/Admin da Empresa Contratante
-  { email: 'operador@empresa.com', role: 'empresa' },    // Antigo role operador → agora empresa
-  { email: 'transportadora@trans.com', role: 'operador' }, // Antigo transportadora → agora operador
-  { email: 'teste@transportadora.com', role: 'operador' },
-  { email: 'motorista@trans.com', role: 'motorista' },   // Antigo motorista → agora motorista
-  { email: 'passageiro@empresa.com', role: 'passageiro' }, // Antigo passageiro → agora passageiro
+  { email: 'teste@empresa.com', role: 'gestor_empresa' },       // Gestor da Empresa Contratante
+  { email: 'operador@empresa.com', role: 'gestor_empresa' },    // Compatibilidade: antigo operador → gestor_empresa
+  { email: 'transportadora@trans.com', role: 'gestor_transportadora' }, // Gestor da Transportadora
+  { email: 'teste@transportadora.com', role: 'gestor_transportadora' },
+  { email: 'motorista@trans.com', role: 'motorista' },
+  { email: 'passageiro@empresa.com', role: 'passageiro' },
 
-  // Conjunto alternativo (inglês) - Mapeamento para novas roles PT-BR
+  // Conjunto alternativo - Atualizado
   { email: 'admin@golffox.com', role: 'admin' },
-  { email: 'operador@golffox.com', role: 'empresa' },    // operador → empresa
-  { email: 'transportadora@golffox.com', role: 'operador' },    // transportadora → operador
-  { email: 'motorista@golffox.com', role: 'motorista' },    // motorista → motorista
+  { email: 'operador@golffox.com', role: 'gestor_transportadora' },    // operador → gestor_transportadora
+  { email: 'transportadora@golffox.com', role: 'gestor_transportadora' },    // transportadora → gestor_transportadora
+  { email: 'motorista@golffox.com', role: 'motorista' },
 
-  // Variantes antigas (compatibilidade)
-  { email: 'transportadora@golffox.com', role: 'operador' },
-  { email: 'operador@golffox.com', role: 'empresa' },
+  // Variantes antigas (compatibilidade temporária)
+  { email: 'empresa@test.com', role: 'gestor_empresa' },
 ]
 
 export function getUserRoleByEmail(email: string): string {

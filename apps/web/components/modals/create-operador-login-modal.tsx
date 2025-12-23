@@ -218,11 +218,11 @@ export function CreateUserModal({
                   disabled={loading}
                   required
                 >
-                  <option value="operador">Operador</option>
-                  <option value="passageiro">Passageiro</option>
-                  <option value="admin">Administrador</option>
-                  <option value="transportadora">Transportadora</option>
+                  <option value="admin">Admin</option>
+                  <option value="gestor_empresa">Gestor da Empresa</option>
+                  <option value="gestor_transportadora">Gestor da Transportadora</option>
                   <option value="motorista">Motorista</option>
+                  <option value="passageiro">Passageiro</option>
                 </select>
               </div>
 

@@ -21,15 +21,15 @@ export default function CustosTransportadoraPage() {
     <AppShell
       user={{
         id: user?.id || "",
-        name: user?.name || "Transportadora",
+        name: user?.name || "Gestor da Transportadora",
         email: user?.email || "",
-        role: "transportadora",
+        role: user?.role || "gestor_transportadora",
         avatar_url: user?.avatar_url
       }}
     >
       <div className="space-y-4 sm:space-y-6 w-full overflow-x-hidden">
         <FinancialDashboardExpanded
-          profileType="transportadora"
+          profileType="gestor_transportadora"
         />
       </div>
     </AppShell>

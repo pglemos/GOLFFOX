@@ -31,11 +31,13 @@ O sistema GOLF FOX possui 3 painéis web independentes, todos hospedados no mesm
 
 12 itens de navegação com animações premium.
 
-### 2. Painel do Operador (`/operador`)
+### 2. Painel do Gestor da Empresa (`/empresa`)
 
-**Acesso**: Usuários com role `operador` ou `admin`
+**Acesso**: Usuários com role `gestor_empresa` (anteriormente `empresa`) ou `admin`
 
-**URL**: https://golffox.vercel.app/operador
+**URL**: https://golffox.vercel.app/empresa
+
+**Nota**: Este painel era anteriormente chamado "Painel do Operador" e acessado via `/operador`. Foi renomeado para refletir melhor sua função.
 
 #### Funcionalidades
 
@@ -67,11 +69,13 @@ O sistema GOLF FOX possui 3 painéis web independentes, todos hospedados no mesm
 
 5 itens focados nas necessidades do operador.
 
-### 3. Painel da Transportadora (`/transportadora`)
+### 3. Painel do Gestor da Transportadora (`/transportadora`)
 
-**Acesso**: Usuários com role `transportadora` ou `admin`
+**Acesso**: Usuários com role `gestor_transportadora` (anteriormente `operador` ou `transportadora`) ou `admin`
 
 **URL**: https://golffox.vercel.app/transportadora
+
+**Nota**: Os roles `operador` e `transportadora` foram consolidados em `gestor_transportadora`.
 
 #### Funcionalidades
 
@@ -125,19 +129,19 @@ O sistema GOLF FOX possui 3 painéis web independentes, todos hospedados no mesm
 - ✅ Todas as funcionalidades administrativas
 - ✅ Gerenciamento de usuários e permissões
 
-### operador
-- ✅ Acesso ao painel `/operador`
+### gestor_empresa (anteriormente operador/empresa)
+- ✅ Acesso ao painel `/empresa`
 - ✅ Visualização de dados da empresa
 - ✅ Gerenciamento de funcionários
 - ❌ Bloqueado em `/admin`
 - ❌ Bloqueado em `/transportadora`
 
-### transportadora
+### gestor_transportadora (anteriormente operador/transportadora)
 - ✅ Acesso ao painel `/transportadora`
 - ✅ Gestão da própria frota
 - ✅ Relatórios da transportadora
 - ❌ Bloqueado em `/admin`
-- ❌ Bloqueado em `/operador`
+- ❌ Bloqueado em `/empresa`
 
 ### motorista (Motorista)
 - ❌ Sem acesso aos painéis web (usa app mobile)

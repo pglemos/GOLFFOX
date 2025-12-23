@@ -79,9 +79,9 @@ export async function GET(request: NextRequest) {
       `, { count: 'exact' })
 
         // Aplicar filtro de tenant baseado no papel
-        if (profile?.role === 'empresa' && profile.company_id) {
+        if ((profile?.role === 'gestor_empresa' || profile?.role === 'empresa') && profile.company_id) {
             query = query.eq('company_id', profile.company_id)
-        } else if ((profile?.role === 'transportadora' || profile?.role === 'operador') && profile.transportadora_id) {
+        } else if ((profile?.role === 'gestor_transportadora' || profile?.role === 'transportadora' || profile?.role === 'operador') && profile.transportadora_id) {
             query = query.eq('transportadora_id', profile.transportadora_id)
         }
 
@@ -241,10 +241,10 @@ export async function POST(request: NextRequest) {
         let companyId = body.companyId
         let carrierId = body.carrierId
 
-        if (profile?.role === 'empresa') {
+        if (profile?.role === 'gestor_empresa' || profile?.role === 'empresa') {
             companyId = profile.company_id
             carrierId = null
-        } else if (profile?.role === 'transportadora' || profile?.role === 'operador') {
+        } else if (profile?.role === 'gestor_transportadora' || profile?.role === 'transportadora' || profile?.role === 'operador') {
             carrierId = profile.transportadora_id
             companyId = null
         }

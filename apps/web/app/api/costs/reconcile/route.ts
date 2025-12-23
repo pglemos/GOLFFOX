@@ -17,7 +17,7 @@ const reconcileSchema = z.object({
 async function reconcileHandler(request: NextRequest) {
   try {
     // ✅ Validar autenticação (operador ou admin)
-    const authError = await requireAuth(request, ['operador', 'admin'])
+    const authError = await requireAuth(request, ['gestor_transportadora', 'operador', 'admin'])
     if (authError) {
       return authError
     }

@@ -108,7 +108,7 @@ export default function TransportadoraAjudaPage() {
   })
 
   return (
-    <AppShell user={{ id: user?.id || "", name: user?.name || "Transportadora", email: user?.email || "", role: "transportadora", avatar_url: user?.avatar_url }}>
+    <AppShell user={{ id: user?.id || "", name: user?.name || "Gestor da Transportadora", email: user?.email || "", role: user?.role || "gestor_transportadora", avatar_url: user?.avatar_url }}>
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold mb-2">Ajuda & Suporte</h1>

@@ -79,7 +79,7 @@ export default function EmpresaDashboard() {
 
   if (loading || tenantLoading || kpisLoading || controlTowerLoading) {
     return (
-      <AppShell user={{ id: user?.id || "", name: user?.name || "Empresa", email: user?.email || "", role: user?.role || "empresa", avatar_url: user?.avatar_url }}>
+      <AppShell user={{ id: user?.id || "", name: user?.name || "Gestor da Empresa", email: user?.email || "", role: user?.role || "gestor_empresa", avatar_url: user?.avatar_url }}>
         <DashboardSkeleton />
       </AppShell>
     )
@@ -87,7 +87,7 @@ export default function EmpresaDashboard() {
 
   if (tenantError) {
     return (
-      <AppShell user={{ id: user?.id || "", name: user?.name || "Empresa", email: user?.email || "", role: user?.role || "empresa", avatar_url: user?.avatar_url }}>
+      <AppShell user={{ id: user?.id || "", name: user?.name || "Gestor da Empresa", email: user?.email || "", role: user?.role || "gestor_empresa", avatar_url: user?.avatar_url }}>
         <div className="min-h-screen flex items-center justify-center p-4">
           <Card className="p-8 max-w-md w-full text-center">
             <h2 className="text-xl font-bold mb-2 text-error">Erro ao carregar</h2>
@@ -103,7 +103,7 @@ export default function EmpresaDashboard() {
 
   if (!tenantCompanyId) {
     return (
-      <AppShell user={{ id: user?.id || "", name: user?.name || "Empresa", email: user?.email || "", role: user?.role || "empresa", avatar_url: user?.avatar_url }}>
+      <AppShell user={{ id: user?.id || "", name: user?.name || "Gestor da Empresa", email: user?.email || "", role: user?.role || "gestor_empresa", avatar_url: user?.avatar_url }}>
         <div className="min-h-screen flex items-center justify-center p-4">
           <Card className="p-8 max-w-md w-full text-center">
             <h2 className="text-xl font-bold mb-2">Nenhuma empresa selecionada</h2>

@@ -400,7 +400,7 @@ BEGIN
             EXISTS (
                 SELECT 1 FROM users 
                 WHERE id = auth.uid() 
-                AND role = 'transportadora'
+                AND (role = 'gestor_transportadora' OR role = 'transportadora')
             )
         );
     END IF;
@@ -418,7 +418,7 @@ BEGIN
             EXISTS (
                 SELECT 1 FROM users 
                 WHERE id = auth.uid() 
-                AND role = 'transportadora'
+                AND (role = 'gestor_transportadora' OR role = 'transportadora')
             )
         );
     END IF;
@@ -436,7 +436,7 @@ BEGIN
             EXISTS (
                 SELECT 1 FROM users 
                 WHERE id = auth.uid() 
-                AND role = 'transportadora'
+                AND (role = 'gestor_transportadora' OR role = 'transportadora')
             )
         );
     END IF;

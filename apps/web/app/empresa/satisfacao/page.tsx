@@ -59,7 +59,7 @@ export default function SatisfacaoPage() {
     if (loading || !data) return null
 
     return (
-        <AppShell panel="empresa" user={user ? { id: user.id, name: user.name || 'Empresa', email: user.email || '', role: user.role || 'empresa' } : { id: 'mock', name: 'Empresa', email: 'empresa@golffox.com', role: 'empresa' }}>
+        <AppShell panel="gestor_empresa" user={user ? { id: user.id, name: user.name || 'Gestor da Empresa', email: user.email || '', role: user.role || 'gestor_empresa' } : { id: 'mock', name: 'Gestor da Empresa', email: 'empresa@golffox.com', role: 'gestor_empresa' }}>
             <div className="space-y-4 sm:space-y-6 w-full overflow-x-hidden">
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">

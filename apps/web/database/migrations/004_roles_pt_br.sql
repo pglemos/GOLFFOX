@@ -26,6 +26,12 @@ UPDATE users SET role = 'passageiro' WHERE role = 'passageiro';
 -- ============================================
 -- 3. Adicionar nova constraint com roles PT-BR
 -- ============================================
+-- NOTA: Esta migration foi atualizada em 2025-01-29
+-- Os roles foram renomeados para:
+-- - empresa → gestor_empresa
+-- - operador → gestor_transportadora
+-- - transportadora → gestor_transportadora (consolidado)
+-- Ver migration 20250129_rename_roles_gestores.sql para migração completa
 ALTER TABLE users ADD CONSTRAINT users_role_check 
   CHECK (role IN ('admin', 'empresa', 'operador', 'motorista', 'passageiro'));
 

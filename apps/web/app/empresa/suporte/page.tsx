@@ -43,12 +43,12 @@ export default function EmpresaSuportePage() {
 
     return (
         <AppShell
-            panel="empresa"
-            user={user ? {
+            panel="gestor_empresa"
+            user={            user ? {
                 id: user.id,
-                name: user.name || "Empresa",
+                name: user.name || "Gestor da Empresa",
                 email: user.email,
-                role: "empresa",
+                role: user.role || "gestor_empresa",
                 avatar_url: user.avatar_url
             } : {
                 id: '',

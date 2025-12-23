@@ -89,7 +89,7 @@ export default function MensagensPage() {
     }
 
     return (
-        <AppShell panel="transportadora" user={user ? { id: user.id, name: user.name || 'Operador', email: user.email || '', role: user.role || 'operador' } : { id: 'mock', name: 'Operador', email: 'op@golffox.com', role: 'operador' }}>
+        <AppShell panel="gestor_transportadora" user={user ? { id: user.id, name: user.name || 'Gestor da Transportadora', email: user.email || '', role: user.role || 'gestor_transportadora' } : { id: 'mock', name: 'Gestor da Transportadora', email: 'transp@golffox.com', role: 'gestor_transportadora' }}>
             <div className="flex h-[calc(100vh-120px)]">
                 {/* motorista List */}
                 <div className="w-80 border-r">

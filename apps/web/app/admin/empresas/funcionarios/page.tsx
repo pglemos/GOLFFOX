@@ -64,7 +64,7 @@ export default function EmpresasFuncionariosPage() {
         email: "",
         phone: "",
         cpf: "",
-        role: "operador",
+        role: "gestor_empresa",
         company_id: "",
     })
 
@@ -84,7 +84,7 @@ export default function EmpresasFuncionariosPage() {
             email: "",
             phone: "",
             cpf: "",
-            role: "operador",
+            role: "gestor_empresa",
             company_id: newEmployeeCompanyId,
         })
         setIsSelectCompanyOpen(false)
@@ -207,8 +207,10 @@ export default function EmpresasFuncionariosPage() {
     const getRoleBadge = (role: string) => {
         const roles: Record<string, { label: string; variant: "default" | "secondary" | "outline" }> = {
             admin: { label: "Admin", variant: "default" },
-            operador: { label: "Operador", variant: "secondary" },
-            funcionario: { label: "Funcionário", variant: "outline" },
+            gestor_empresa: { label: "Gestor da Empresa", variant: "secondary" },
+            gestor_transportadora: { label: "Gestor da Transportadora", variant: "secondary" },
+            motorista: { label: "Motorista", variant: "outline" },
+            passageiro: { label: "Passageiro", variant: "outline" },
         }
         return roles[role] || { label: role, variant: "outline" }
     }
@@ -438,8 +440,10 @@ export default function EmpresasFuncionariosPage() {
                                         <SelectValue />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="operador">Operador</SelectItem>
-                                        <SelectItem value="funcionario">Funcionário</SelectItem>
+                                        <SelectItem value="gestor_empresa">Gestor da Empresa</SelectItem>
+                                        <SelectItem value="gestor_transportadora">Gestor da Transportadora</SelectItem>
+                                        <SelectItem value="motorista">Motorista</SelectItem>
+                                        <SelectItem value="passageiro">Passageiro</SelectItem>
                                         <SelectItem value="admin">Administrador</SelectItem>
                                     </SelectContent>
                                 </Select>

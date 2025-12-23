@@ -229,9 +229,9 @@ export function EditUserModal({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="admin">Administrador</SelectItem>
-                  <SelectItem value="operador">Operador</SelectItem>
-                  <SelectItem value="transportadora">Transportadora</SelectItem>
+                  <SelectItem value="admin">Admin</SelectItem>
+                  <SelectItem value="gestor_empresa">Gestor da Empresa</SelectItem>
+                  <SelectItem value="gestor_transportadora">Gestor da Transportadora</SelectItem>
                   <SelectItem value="motorista">Motorista</SelectItem>
                   <SelectItem value="passageiro">Passageiro</SelectItem>
                 </SelectContent>

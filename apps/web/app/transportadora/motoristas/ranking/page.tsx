@@ -123,7 +123,7 @@ export default function MotoristasPage() {
   }
 
   return (
-    <AppShell panel="transportadora" user={user ? { id: user.id, name: user.name || 'Transportadora', email: user.email || 'transp@golffox.com', role: user.role || 'transportadora', avatar_url: (user as any).avatar_url } : { id: 'mock', name: 'Transportadora', email: 'transp@golffox.com', role: 'transportadora' }}>
+    <AppShell panel="gestor_transportadora" user={user ? { id: user.id, name: user.name || 'Gestor da Transportadora', email: user.email || 'transp@golffox.com', role: user.role || 'gestor_transportadora', avatar_url: (user as any).avatar_url } : { id: 'mock', name: 'Gestor da Transportadora', email: 'transp@golffox.com', role: 'gestor_transportadora' }}>
       <div className="space-y-4 sm:space-y-6 w-full overflow-x-hidden">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">

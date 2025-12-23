@@ -7,7 +7,7 @@
 // ENUMS
 // ============================================================
 
-export type ProfileType = 'admin' | 'empresa' | 'transportadora' | 'all';
+export type ProfileType = 'admin' | 'gestor_empresa' | 'gestor_transportadora' | 'all';
 
 export type CostStatus = 'pending' | 'confirmed' | 'cancelled';
 

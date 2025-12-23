@@ -1,12 +1,14 @@
-# Painel do Operador - Multi-tenant
+# Painel do Gestor da Empresa - Multi-tenant
 
-Documentação completa do painel do operador multi-tenant do GOLFFOX.
+Documentação completa do painel do gestor da empresa multi-tenant do GOLFFOX.
 
 ## Visão Geral
 
-O painel do operador (`/operador`) é uma aplicação 100% multi-tenant que permite que operadores gerenciem a operação de transporte de uma ou mais empresas clientes. Todos os dados são isolados por `company_id` através de Row Level Security (RLS) e views seguras.
+O painel do gestor da empresa (`/empresa`, anteriormente `/operador`) é uma aplicação 100% multi-tenant que permite que gestores gerenciem a operação de transporte de uma ou mais empresas clientes. Todos os dados são isolados por `company_id` através de Row Level Security (RLS) e views seguras.
 
-Nota de links: todas as URLs absolutas devem apontar para `https://golffox.vercel.app/operador` sem o parâmetro `company`. Qualquer acesso com `?company=` é automaticamente normalizado (middleware) preservando demais parâmetros de query.
+**Nota**: O role foi renomeado de `operador` para `gestor_empresa` em 2025-01-29 para melhor refletir a função do papel.
+
+Nota de links: todas as URLs absolutas devem apontar para `https://golffox.vercel.app/empresa` sem o parâmetro `company`. Qualquer acesso com `?company=` é automaticamente normalizado (middleware) preservando demais parâmetros de query.
 
 ## Arquitetura Multi-tenant
 

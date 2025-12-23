@@ -20,7 +20,7 @@ interface AppShellProps {
     avatar_url?: string
   }
   children: React.ReactNode
-  panel?: 'admin' | 'operador' | 'transportadora' | 'empresa'
+  panel?: 'admin' | 'gestor_empresa' | 'gestor_transportadora' | 'operador' | 'transportadora' | 'empresa'
 }
 
 // Named export for AppShell component - Application Shell 08 Style
@@ -37,13 +37,20 @@ export const AppShell = memo(function AppShell({ user, children, panel }: AppShe
   }, [user])
 
   // Detectar painel automaticamente se não fornecido (memoizado)
-  const detectedPanel: 'admin' | 'operador' | 'transportadora' | 'empresa' = useMemo(() =>
-    panel ||
-    ((pathname?.startsWith('/operador') || pathname?.startsWith('/operador')) ? 'operador' :
-      (pathname?.startsWith('/transportadora') || pathname?.startsWith('/transportadora')) ? 'transportadora' :
-        (pathname?.startsWith('/empresa') || pathname?.startsWith('/company')) ? 'empresa' : 'admin'),
-    [panel, pathname]
-  )
+  // Atualizado em 2025-01-29: suporta novos painéis mas mantém compatibilidade
+  const detectedPanel: 'admin' | 'gestor_empresa' | 'gestor_transportadora' | 'operador' | 'transportadora' | 'empresa' = useMemo(() => {
+    if (panel) return panel
+    if (pathname?.startsWith('/transportadora')) {
+      // Mapear role do usuário para painel correto
+      if (user?.role === 'gestor_transportadora') return 'gestor_transportadora'
+      return 'transportadora' // Compatibilidade
+    }
+    if (pathname?.startsWith('/empresa') || pathname?.startsWith('/company')) {
+      if (user?.role === 'gestor_empresa') return 'gestor_empresa'
+      return 'empresa' // Compatibilidade
+    }
+    return 'admin'
+  }, [panel, pathname, user?.role])
 
   // Configurações de branding por painel (memoizado)
   const panelConfig = useMemo(() => ({

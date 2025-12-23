@@ -214,13 +214,13 @@ export function useVehicleForm(options: UseVehicleFormOptions = {}) {
       if (formData.transportadora_id) {
         vehicleData.transportadora_id = formData.transportadora_id
       }
-    } else if (userInfo.role === 'operador') {
+    } else if (userInfo.role === 'gestor_transportadora' || userInfo.role === 'operador') {
       if (userInfo.company_id) {
         vehicleData.company_id = userInfo.company_id
       } else if (formData.company_id) {
         vehicleData.company_id = formData.company_id
       }
-    } else if (userInfo.role === 'transportadora') {
+    } else if (userInfo.role === 'gestor_transportadora' || userInfo.role === 'transportadora') {
       if (userInfo.transportadora_id) {
         vehicleData.transportadora_id = userInfo.transportadora_id
       }

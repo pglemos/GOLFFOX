@@ -1,13 +1,18 @@
 /**
  * Mapeamento de roles para unificação de nomenclatura
  * 
- * Mapeia roles antigas (EN) para novas (PT-BR) mantendo compatibilidade
+ * Mapeia roles antigas para novas mantendo compatibilidade temporária
+ * Atualizado em 2025-01-29: empresa → gestor_empresa, operador → gestor_transportadora
  */
 
 export const ROLE_ALIASES: Record<string, string> = {
-  // Mapeamento EN → PT-BR
-  'operador': 'empresa',
-  'transportadora': 'operador', // transportadora → operador (gestor da transportadora)
+  // Compatibilidade: roles antigas → novas
+  'empresa': 'gestor_empresa',
+  'operador': 'gestor_transportadora',
+  'transportadora': 'gestor_transportadora', // transportadora consolidada em gestor_transportadora
+  // Novos roles (sem mapeamento necessário)
+  'gestor_empresa': 'gestor_empresa',
+  'gestor_transportadora': 'gestor_transportadora',
   'motorista': 'motorista',
   'passageiro': 'passageiro',
 }
@@ -23,16 +28,20 @@ export function normalizeRole(role: string): string {
 }
 
 /**
- * Verifica se role é válida (suporta ambas nomenclaturas)
+ * Verifica se role é válida (suporta novas e antigas nomenclaturas durante transição)
  */
 export function isValidRole(role: string): boolean {
   const validRoles = [
     'admin',
-    'empresa',
-    'transportadora',
-    'operador',
+    // Novos roles
+    'gestor_empresa',
+    'gestor_transportadora',
     'motorista',
     'passageiro',
+    // Compatibilidade temporária (remover após período de transição)
+    'empresa',
+    'operador',
+    'transportadora',
   ]
 
   return validRoles.includes(role.toLowerCase().trim())

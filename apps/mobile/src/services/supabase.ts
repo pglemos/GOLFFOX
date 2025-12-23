@@ -68,23 +68,23 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     },
 });
 
-// Roles em PT-BR (mobile) e EN (schema)
-export type UserRole = 'admin' | 'empresa' | 'operador' | 'motorista' | 'passageiro';
-type SchemaRole = 'admin' | 'operador' | 'transportadora' | 'motorista' | 'passageiro';
+// Roles em PT-BR (mobile) - Atualizado em 2025-01-29
+export type UserRole = 'admin' | 'gestor_empresa' | 'gestor_transportadora' | 'motorista' | 'passageiro';
+type SchemaRole = 'admin' | 'gestor_empresa' | 'gestor_transportadora' | 'motorista' | 'passageiro';
 
-// Mapeamento PT-BR ↔ EN
+// Mapeamento PT-BR ↔ Schema (agora ambos usam mesma nomenclatura)
 const roleToSchema: Record<UserRole, SchemaRole> = {
     admin: 'admin',
-    empresa: 'operador',
-    operador: 'transportadora',
+    gestor_empresa: 'gestor_empresa',
+    gestor_transportadora: 'gestor_transportadora',
     motorista: 'motorista',
     passageiro: 'passageiro',
 };
 
 const schemaToRole: Record<SchemaRole, UserRole> = {
     admin: 'admin',
-    operador: 'empresa',
-    transportadora: 'operador',
+    gestor_empresa: 'gestor_empresa',
+    gestor_transportadora: 'gestor_transportadora',
     motorista: 'motorista',
     passageiro: 'passageiro',
 };

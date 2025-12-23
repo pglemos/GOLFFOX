@@ -43,7 +43,7 @@ export default function PreferenciasOperatorPage() {
   }
 
   return (
-    <AppShell user={{ id: user.id, name: user.name || "Operador", email: user.email, role: user.role || "operador", avatar_url: user.avatar_url }} panel="operador">
+    <AppShell user={{ id: user.id, name: user.name || "Gestor da Empresa", email: user.email, role: user.role || "gestor_empresa", avatar_url: user.avatar_url }} panel="gestor_empresa">
       <div className="space-y-4 sm:space-y-6 w-full overflow-x-hidden">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">

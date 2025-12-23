@@ -34,11 +34,11 @@ function isAllowedForRole(role: string, path: string): boolean {
   const normalizedRole = normalizeRole(role)
 
   if (path.startsWith('/admin')) return normalizedRole === 'admin'
-  // empresa = empresa contratante (antigo operador)
-  if (path.startsWith('/empresa')) return ['admin', 'empresa'].includes(normalizedRole)
-  // operador = gestor da transportadora (antigo transportadora)
-  // Nota: operador e transportadora são sinônimos neste contexto
-  if (path.startsWith('/transportadora')) return ['admin', 'operador', 'transportadora'].includes(normalizedRole)
+  // gestor_empresa = Gestor da Empresa Contratante
+  if (path.startsWith('/empresa')) return ['admin', 'gestor_empresa', 'empresa'].includes(normalizedRole)
+  // gestor_transportadora = Gestor da Transportadora
+  // Compatibilidade temporária: operador e transportadora também permitidos
+  if (path.startsWith('/transportadora')) return ['admin', 'gestor_transportadora', 'operador', 'transportadora'].includes(normalizedRole)
   return true
 }
 
@@ -49,11 +49,15 @@ function getRedirectPath(role: string): string {
   switch (normalizedRole) {
     case 'admin':
       return '/admin'
+    case 'gestor_empresa':
+      return '/empresa'
+    case 'gestor_transportadora':
+      return '/transportadora'
+    // Compatibilidade temporária com roles antigas
     case 'empresa':
       return '/empresa'
     case 'operador':
     case 'transportadora':
-      // operador e transportadora são sinônimos - ambos vão para /transportadora
       return '/transportadora'
     default:
       return '/'
@@ -457,7 +461,8 @@ async function loginHandler(req: NextRequest) {
     const refreshToken = data.session.refresh_token
 
     let companyId: string | null = finalUser.company_id || null
-    if (role === 'operador') {
+    // Verificar se é gestor_transportadora (ou operador legado) que precisa de empresa associada
+    if (role === 'gestor_transportadora' || role === 'operador') {
       try {
         // ✅ Usar supabaseAdmin para bypassar RLS
         let supabaseAdminForCheck
@@ -479,7 +484,7 @@ async function loginHandler(req: NextRequest) {
           .maybeSingle()
         companyId = mapping?.company_id || companyId || null
         if (!companyId) {
-          return NextResponse.json({ error: 'Usuário operador sem empresa associada', code: 'no_company_mapping' }, { status: 403 })
+          return NextResponse.json({ error: 'Usuário gestor da transportadora sem empresa associada', code: 'no_company_mapping' }, { status: 403 })
         }
         const { data: company } = await supabaseAdminForCheck
           .from('companies')
@@ -490,8 +495,8 @@ async function loginHandler(req: NextRequest) {
           return NextResponse.json({ error: 'Empresa associada inativa', code: 'company_inactive' }, { status: 403 })
         }
       } catch (checkErr) {
-        logError('Erro ao validar empresa do operador', { error: checkErr, userId: data.user.id }, 'AuthAPI')
-        return NextResponse.json({ error: 'Falha ao validar empresa do operador', code: 'company_check_failed' }, { status: 500 })
+        logError('Erro ao validar empresa do gestor da transportadora', { error: checkErr, userId: data.user.id }, 'AuthAPI')
+        return NextResponse.json({ error: 'Falha ao validar empresa do gestor da transportadora', code: 'company_check_failed' }, { status: 500 })
       }
     }
 
@@ -505,7 +510,7 @@ async function loginHandler(req: NextRequest) {
       role,
       companyId: companyId || undefined,
       company_id: companyId || undefined, // Adicionar snake_case para compatibilidade com testes
-      transportadoraId: role === 'transportadora' ? transportadoraId : undefined,
+      transportadoraId: (role === 'gestor_transportadora' || role === 'transportadora') ? transportadoraId : undefined,
       avatar_url: finalUser?.avatar_url || null,
     }
 

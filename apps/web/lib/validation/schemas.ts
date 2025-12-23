@@ -23,7 +23,7 @@ export const createUserSchema = z.object({
   email: emailSchema,
   password: passwordSchema,
   name: nameSchema,
-  role: z.enum(['admin', 'empresa', 'transportadora', 'motorista', 'passageiro']),
+  role: z.enum(['admin', 'gestor_empresa', 'gestor_transportadora', 'motorista', 'passageiro']),
   company_id: uuidSchema.optional().nullable(),
   transportadora_id: uuidSchema.optional().nullable(),
   phone: z.string().optional().nullable(),

@@ -26,7 +26,8 @@ Usuários do sistema (integrado com Supabase Auth)
 - `id` (UUID, PK) - ID do usuário (mesmo do Supabase Auth)
 - `email` (TEXT)
 - `name` (TEXT)
-- `role` (TEXT) - admin, empresa, transportadora, motorista, passageiro
+- `role` (TEXT) - admin, gestor_empresa, gestor_transportadora, motorista, passageiro
+  - **Nota**: Atualizado em 2025-01-29. Roles antigas (`empresa`, `operador`, `transportadora`) foram renomeadas para melhor refletir suas funções.
 - `company_id` (UUID, FK → companies.id)
 - `transportadora_id` (UUID, FK → carriers.id)
 - `is_active` (BOOLEAN)

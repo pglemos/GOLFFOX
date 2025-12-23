@@ -88,7 +88,7 @@ export default function AlertasPage() {
 
   return (
     <AppShell
-      panel="transportadora"
+      panel="gestor_transportadora"
       user={user ? {
         id: user.id,
         name: transportadoraName,

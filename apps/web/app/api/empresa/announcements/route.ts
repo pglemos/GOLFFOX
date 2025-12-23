@@ -6,7 +6,7 @@ import { requireAuth } from '@/lib/api-auth';
 // GET /api/empresa/announcements - Listar avisos
 export async function GET(request: NextRequest) {
     // Verificar autenticação (empresa ou admin)
-    const authError = await requireAuth(request, ['admin', 'empresa', 'operador'])
+    const authError = await requireAuth(request, ['admin', 'gestor_empresa', 'empresa', 'operador'])
     if (authError) return authError
 
     try {
@@ -57,7 +57,7 @@ export async function GET(request: NextRequest) {
 // POST /api/empresa/announcements - Criar aviso
 export async function POST(request: NextRequest) {
     // Verificar autenticação (empresa ou admin)
-    const authError = await requireAuth(request, ['admin', 'empresa', 'operador'])
+    const authError = await requireAuth(request, ['admin', 'gestor_empresa', 'empresa', 'operador'])
     if (authError) return authError
 
     try {
@@ -106,7 +106,7 @@ export async function POST(request: NextRequest) {
 // PUT /api/empresa/announcements - Atualizar aviso
 export async function PUT(request: NextRequest) {
     // Verificar autenticação (empresa ou admin)
-    const authError = await requireAuth(request, ['admin', 'empresa', 'operador'])
+    const authError = await requireAuth(request, ['admin', 'gestor_empresa', 'empresa', 'operador'])
     if (authError) return authError
 
     try {
@@ -146,7 +146,7 @@ export async function PUT(request: NextRequest) {
 // DELETE /api/empresa/announcements - Desativar aviso
 export async function DELETE(request: NextRequest) {
     // Verificar autenticação (empresa ou admin)
-    const authError = await requireAuth(request, ['admin', 'empresa', 'operador'])
+    const authError = await requireAuth(request, ['admin', 'gestor_empresa', 'empresa', 'operador'])
     if (authError) return authError
 
     try {

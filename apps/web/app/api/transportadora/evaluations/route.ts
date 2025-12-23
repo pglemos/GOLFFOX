@@ -6,7 +6,7 @@ import { requireAuth } from '@/lib/api-auth';
 // GET /api/transportadora/evaluations - Avaliações NPS das viagens
 export async function GET(request: NextRequest) {
     // Verificar autenticação (transportadora)
-    const authError = await requireAuth(request, ['admin', 'transportadora', 'operador', 'transportadora'])
+    const authError = await requireAuth(request, ['admin', 'gestor_transportadora', 'operador', 'transportadora'])
     if (authError) return authError
 
     try {

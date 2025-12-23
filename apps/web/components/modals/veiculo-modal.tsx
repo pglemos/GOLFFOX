@@ -234,14 +234,14 @@ export function VeiculoModal({ veiculo, isOpen, onClose, onSave, carriers }: Vei
         if (formData.transportadora_id) {
           vehicleDataRaw.transportadora_id = formData.transportadora_id
         }
-      } else if (userInfo.role === 'operador') {
+      } else if (userInfo.role === 'gestor_transportadora' || userInfo.role === 'operador') {
         // operador deve usar seu próprio company_id
         if (userInfo.company_id) {
           vehicleDataRaw.company_id = userInfo.company_id
         } else if (formData.company_id) {
           vehicleDataRaw.company_id = formData.company_id
         }
-      } else if (userInfo.role === 'transportadora') {
+      } else if (userInfo.role === 'gestor_transportadora' || userInfo.role === 'transportadora') {
         // Transportadora deve usar seu próprio transportadora_id
         if (userInfo.transportadora_id) {
           vehicleDataRaw.transportadora_id = userInfo.transportadora_id

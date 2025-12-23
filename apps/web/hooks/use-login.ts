@@ -181,15 +181,15 @@ export function useLogin(): UseLoginReturn {
 
         let redirectUrl =
           normalizedRole === 'admin' ? '/admin' :
-            normalizedRole === 'empresa' ? '/empresa' :
-              normalizedRole === 'operador' ? '/transportadora' :
+            normalizedRole === 'gestor_empresa' || normalizedRole === 'empresa' ? '/empresa' :
+              normalizedRole === 'gestor_transportadora' || normalizedRole === 'operador' || normalizedRole === 'transportadora' ? '/transportadora' :
                 '/empresa'
 
         const checkPermission = (role: string, path: string): boolean => {
           const norm = normalizeRole(role)
           if (path.startsWith('/admin')) return norm === 'admin'
-          if (path.startsWith('/empresa')) return ['admin', 'empresa'].includes(norm)
-          if (path.startsWith('/transportadora')) return ['admin', 'operador'].includes(norm)
+          if (path.startsWith('/empresa')) return ['admin', 'gestor_empresa', 'empresa'].includes(norm)
+          if (path.startsWith('/transportadora')) return ['admin', 'gestor_transportadora', 'operador', 'transportadora'].includes(norm)
           return true
         }
 

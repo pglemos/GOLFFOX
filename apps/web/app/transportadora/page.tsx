@@ -55,7 +55,7 @@ export default function TransportadoraDashboard() {
   
   // Redirecionar para login se não autenticado ou sem role adequada
   useEffect(() => {
-    if (!loading && (!user || !['transportadora', 'operador', 'admin'].includes(user.role || ''))) {
+    if (!loading && (!user || !['gestor_transportadora', 'transportadora', 'operador', 'admin'].includes(user.role || ''))) {
       router.push("/")
     }
   }, [loading, user, router])

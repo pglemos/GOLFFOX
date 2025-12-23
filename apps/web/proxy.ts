@@ -52,22 +52,27 @@ const ROUTE_REDIRECTS: Record<string, string> = {
 /**
  * Roles permitidas para cada rota protegida
  * Nota: Roles são normalizadas antes da verificação, então aceitamos ambos os formatos
+ * Atualizado em 2025-01-29: suporta novos roles
  */
 const ROUTE_ROLES: Record<string, string[]> = {
   '/admin': ['admin'],
-  '/empresa': ['admin', 'empresa'], // operador será normalizado para empresa
-  '/transportadora': ['admin', 'operador', 'transportadora'], // transportadora será normalizado para operador
+  '/empresa': ['admin', 'gestor_empresa', 'empresa'], // gestor_empresa (compatibilidade: empresa)
+  '/transportadora': ['admin', 'gestor_transportadora', 'operador', 'transportadora'], // gestor_transportadora (compatibilidade: operador, transportadora)
 }
 
 /**
  * Mapeamento de role para rota padrão de redirecionamento
  * Nota: Roles são normalizadas antes do redirecionamento
+ * Atualizado em 2025-01-29: suporta novos roles
  */
 const ROLE_DEFAULT_ROUTES: Record<string, string> = {
   admin: '/admin',
+  gestor_empresa: '/empresa',
+  gestor_transportadora: '/transportadora',
+  // Compatibilidade temporária
   empresa: '/empresa',
   operador: '/transportadora',
-  transportadora: '/transportadora', // sinônimo de operador
+  transportadora: '/transportadora',
 }
 
 /**

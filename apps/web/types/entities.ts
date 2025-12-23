@@ -148,8 +148,9 @@ export interface MotoristaMessage {
 
 /**
  * Roles disponíveis no sistema
+ * Atualizado em 2025-01-29: empresa → gestor_empresa, operador → gestor_transportadora, transportadora removido
  */
-export type UserRole = 'admin' | 'empresa' | 'operador' | 'transportadora' | 'motorista' | 'passageiro'
+export type UserRole = 'admin' | 'gestor_empresa' | 'gestor_transportadora' | 'motorista' | 'passageiro'
 
 /**
  * Usuário base
