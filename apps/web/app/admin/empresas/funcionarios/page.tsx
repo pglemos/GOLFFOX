@@ -223,7 +223,7 @@ export default function EmpresasFuncionariosPage() {
 
     return (
         <AppShell user={{ id: user.id, name: user.name || "Admin", email: user.email, role: user.role || "admin", avatar_url: user.avatar_url }}>
-            <div className="space-y-4 sm:space-y-6 w-full overflow-x-hidden">
+            <div className="space-y-4 sm:space-y-6 w-full overflow-x-hidden pb-12 sm:pb-16">
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
                     <div className="min-w-0 flex-1">
@@ -271,7 +271,7 @@ export default function EmpresasFuncionariosPage() {
                 ) : (
                     <div className="grid gap-3 sm:gap-4 w-full">
                         {filteredEmployees.length === 0 ? (
-                            <Card variant="premium" className="p-8 text-center">
+                            <Card variant="premium" className="p-3 text-center">
                                 <Users className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
                                 <p className="text-muted-foreground">Nenhum funcionário encontrado</p>
                             </Card>

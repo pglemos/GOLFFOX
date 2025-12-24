@@ -189,7 +189,7 @@ export default function EmpresasPage() {
           background: 'var(--bg)'
         } as React.CSSProperties}
       >
-        <div className="space-y-4 sm:space-y-6 w-full overflow-x-hidden">
+        <div className="space-y-4 sm:space-y-6 w-full overflow-x-hidden pb-12 sm:pb-16">
           {/* Header */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
             <div className="min-w-0 flex-1">
@@ -240,7 +240,7 @@ export default function EmpresasPage() {
           )}
 
           {!loadingEmpresas && !errorEmpresas && Array.isArray(filteredEmpresas) && filteredEmpresas.length === 0 && (
-            <Card variant="premium" className="p-4 sm:p-6 md:p-8 text-center w-full max-w-full overflow-hidden">
+            <Card variant="premium" className="p-3 text-center w-full max-w-full overflow-hidden">
               <Briefcase className="h-10 w-10 sm:h-12 sm:w-12 text-ink-muted mx-auto mb-3 sm:mb-4 flex-shrink-0" />
               <h3 className="text-sm sm:text-base md:text-lg font-semibold mb-2 break-words px-2">
                 {debouncedSearchQuery ? "Nenhuma empresa encontrada" : "Nenhuma empresa cadastrada"}

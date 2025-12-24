@@ -229,7 +229,7 @@ function Sidebar({
         <div
           data-sidebar="sidebar"
           data-slot="sidebar-inner"
-          className="bg-sidebar group-data-[variant=floating]:bg-white/5 group-data-[variant=floating]:backdrop-blur-xl group-data-[variant=floating]:border-white/10 flex h-full w-full flex-col group-data-[variant=floating]:rounded-2xl group-data-[variant=floating]:border group-data-[variant=floating]:shadow-sm group-data-[variant=floating]:hover:bg-white/10 group-data-[variant=floating]:hover:border-white/20 group-data-[variant=floating]:hover:shadow-2xl group-data-[variant=floating]:hover:shadow-black/5 group-data-[variant=floating]:transition-all group-data-[variant=floating]:duration-500"
+          className="bg-sidebar group-data-[variant=floating]:bg-white/5 group-data-[variant=floating]:backdrop-blur-xl group-data-[variant=floating]:border-white/10 flex h-full w-full flex-col group-data-[variant=floating]:rounded-2xl group-data-[variant=floating]:border group-data-[variant=floating]:shadow-sm group-data-[variant=floating]:hover:bg-white/10 group-data-[variant=floating]:hover:border-white/20 group-data-[variant=floating]:hover:shadow-2xl  group-data-[variant=floating]:transition-all group-data-[variant=floating]:duration-500"
         >
           {children}
         </div>

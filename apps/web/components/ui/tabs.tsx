@@ -17,7 +17,7 @@ const TabsList = React.forwardRef<
     className={cn(
       "inline-flex h-auto items-center justify-start gap-2 p-2",
       "w-full rounded-2xl bg-white/30 backdrop-blur-xl border-2 border-white/40",
-      "shadow-xl shadow-black/10",
+      "shadow-xl",
       className
     )}
     {...props}
@@ -56,7 +56,7 @@ const TabsContent = React.forwardRef<
     className={cn(
       "mt-8 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50 focus-visible:ring-offset-2",
       "rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 p-8",
-      "shadow-lg shadow-black/5",
+      "shadow-lg",
       className
     )}
     {...props}

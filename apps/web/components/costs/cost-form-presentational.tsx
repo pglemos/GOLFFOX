@@ -113,7 +113,7 @@ export function CostFormPresentational({
                             profileType={profileType}
                             placeholder="Selecione uma categoria..."
                         />
-                        {selectedCategory?.isOperational && (
+                        {selectedCategory?.is_operational && (
                             <p className="text-xs text-muted-foreground">
                                 💡 Categoria operacional - pode vincular a veículo/rota
                             </p>
@@ -184,7 +184,7 @@ export function CostFormPresentational({
                     </div>
 
                     {/* Veículo e Rota (se operacional) */}
-                    {(selectedCategory?.isOperational || veiculos.length > 0 || routes.length > 0) && (
+                    {(selectedCategory?.is_operational || veiculos.length > 0 || routes.length > 0) && (
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             {veiculos.length > 0 && (
                                 <div className="space-y-2">

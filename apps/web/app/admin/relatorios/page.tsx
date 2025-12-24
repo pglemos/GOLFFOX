@@ -206,7 +206,7 @@ export default function RelatoriosPage() {
 
   return (
     <AppShell user={{ id: user.id, name: user.name || "Admin", email: user.email, role: user.role || "admin", avatar_url: user.avatar_url }}>
-      <div className="space-y-4 sm:space-y-6 w-full overflow-x-hidden">
+      <div className="space-y-4 sm:space-y-6 w-full overflow-x-hidden pb-12 sm:pb-16">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
           <div className="min-w-0 flex-1">
@@ -279,7 +279,7 @@ export default function RelatoriosPage() {
                   />
                 </div>
               </div>
-              <div className="flex items-center justify-end gap-2 pt-4 border-t border-border">
+              <div className="flex items-center justify-end gap-2 pt-4 border-t border-white/10">
                 <Button
                   variant="outline"
                   size="sm"
@@ -313,7 +313,7 @@ export default function RelatoriosPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.1 }}
               >
-                <Card variant="premium" className="p-6 group">
+                <Card variant="premium" className="p-3 group">
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
                       <div className="p-2 rounded-lg bg-gradient-to-br from-bg-brand-light to-bg-brand-soft w-fit mb-2 group-hover:scale-110 transition-transform duration-300">

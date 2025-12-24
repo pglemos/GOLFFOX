@@ -171,7 +171,7 @@ export function RotasPageContent() {
   if (loading || rotasLoading) {
     return (
       <AppShell user={{ id: user?.id || "", name: user?.name || "Admin", email: user?.email || "", role: user?.role || "admin", avatar_url: user?.avatar_url }}>
-        <div className="p-6 space-y-6">
+        <div className="p-3 space-y-4">
           <LoadingSkeleton type="card" count={6} />
         </div>
       </AppShell>
@@ -207,7 +207,7 @@ export function RotasPageContent() {
   return (
     <AppShell user={{ id: user.id, name: user.name || "Admin", email: user.email, role: user.role || "admin", avatar_url: user.avatar_url }}>
       <TransitionOverlay>
-        <div className="space-y-4 sm:space-y-6 w-full overflow-x-hidden">
+        <div className="space-y-4 sm:space-y-6 w-full overflow-x-hidden pb-12 sm:pb-16">
           {/* Header */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
             <div className="min-w-0 flex-1">

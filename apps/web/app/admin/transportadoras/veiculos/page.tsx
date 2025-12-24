@@ -79,7 +79,7 @@ const VehicleCard = React.memo(function VehicleCard({
                 <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
                     <div className="flex-1 flex gap-3 sm:gap-4 min-w-0">
                         {veiculo.photo_url && (
-                            <div className="relative w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0 rounded-lg overflow-hidden border-2 border-border bg-muted">
+                            <div className="relative w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0 rounded-lg overflow-hidden border border-white/10 bg-muted">
                                 <Image
                                     src={veiculo.photo_url}
                                     alt={veiculo.plate}
@@ -315,7 +315,7 @@ export default function TransportadoraVeiculosPage() {
 
     return (
         <AppShell user={{ id: user.id, name: user.name || "Admin", email: user.email, role: user.role || "admin", avatar_url: user.avatar_url }}>
-            <div className="space-y-4 sm:space-y-6 w-full overflow-x-hidden">
+            <div className="space-y-4 sm:space-y-6 w-full overflow-x-hidden pb-12 sm:pb-16">
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
                     <div className="min-w-0 flex-1">
@@ -362,7 +362,7 @@ export default function TransportadoraVeiculosPage() {
                     <SkeletonList count={5} />
                 ) : (
                     filteredVehicles.length === 0 ? (
-                        <Card variant="premium" className="p-8 text-center">
+                        <Card variant="premium" className="p-3 text-center">
                             <Truck className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
                             <p className="text-muted-foreground">Nenhum veículo encontrado</p>
                         </Card>

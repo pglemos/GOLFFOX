@@ -27,7 +27,7 @@ function GerarPontosContent() {
 
   return (
     <AppShell user={{ id: user?.id || "", name: user?.name || "Admin", email: user?.email || "", role: user?.role || "admin", avatar_url: user?.avatar_url }} panel="admin">
-      <div className="space-y-6">
+      <div className="space-y-6 pb-12 sm:pb-16">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -43,7 +43,7 @@ function GerarPontosContent() {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.2 }}
           >
-            <Card className="p-6 bg-warning-light border-warning-light">
+            <Card className="p-3 bg-warning-light border-warning-light">
               <div className="flex items-center gap-3">
                 <AlertCircle className="h-5 w-5 text-warning" />
                 <p className="text-sm text-warning">Passe ?routeId=... na URL para carregar a rota.</p>
@@ -57,7 +57,7 @@ function GerarPontosContent() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
         >
-          <Card variant="premium" className="p-6">
+          <Card variant="premium" className="p-3">
             <StopGenerator routeId={routeId} />
           </Card>
         </motion.div>

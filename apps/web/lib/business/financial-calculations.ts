@@ -29,14 +29,14 @@ export function calculateFinancialKPIs(
   const totalRevenues = revenues.reduce((sum, r) => sum + r.amount, 0)
 
   return {
-    totalCosts30d: totalCosts,
-    totalRevenues30d: totalRevenues,
-    margin30d: totalRevenues - totalCosts,
-    costEntries30d: costs.length,
-    revenueEntries30d: revenues.length,
-    criticalAlerts: 0,
-    warningAlerts: 0,
-    recurringCostsCount: costs.filter((c) => c.is_recurring).length,
+    total_costs_30d: totalCosts,
+    total_revenues_30d: totalRevenues,
+    margin_30d: totalRevenues - totalCosts,
+    cost_entries_30d: costs.length,
+    revenue_entries_30d: revenues.length,
+    critical_alerts: 0,
+    warning_alerts: 0,
+    recurring_costs_count: costs.filter((c) => c.is_recurring).length,
   }
 }
 
@@ -72,14 +72,14 @@ export function calculateBudgetVariance(
 ): BudgetVariance[] {
   return budgets.map((budget) => {
     const actual = costs
-      .filter((c) => c.category_id === budget.categoryId)
+      .filter((c) => c.category_id === budget.category_id)
       .reduce((sum, c) => sum + c.amount, 0)
 
     return {
-      name: budget.category?.name || budget.categoryName || 'Categoria',
-      budgeted: budget.budgetedAmount,
+      name: budget.category?.name || budget.category_name || 'Categoria',
+      budgeted: budget.budgeted_amount,
       actual,
-      variance: actual - budget.budgetedAmount,
+      variance: actual - budget.budgeted_amount,
     }
   })
 }
@@ -106,6 +106,6 @@ export function calculateRecurringCostsCount(costs: ManualCost[]): number {
  * Calcular total de receitas recorrentes
  */
 export function calculateRecurringRevenuesCount(revenues: ManualRevenue[]): number {
-  return revenues.filter((r) => r.isRecurring).length
+  return revenues.filter((r) => r.is_recurring).length
 }
 

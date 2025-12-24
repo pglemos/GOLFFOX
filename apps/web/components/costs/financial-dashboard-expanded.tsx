@@ -174,34 +174,34 @@ export function FinancialDashboardExpanded({
                 const totalRevenues = (revenuesData.data || []).reduce((sum: number, r: ManualRevenue) => sum + r.amount, 0)
 
                 setKpis({
-                    totalCosts30d: totalCosts,
-                    totalRevenues30d: totalRevenues,
-                    margin30d: totalRevenues - totalCosts,
-                    costEntries30d: (costsData.data || []).length,
-                    revenueEntries30d: (revenuesData.data || []).length,
-                    criticalAlerts: 0,
-                    warningAlerts: 0,
-                    recurringCostsCount: (costsData.data || []).filter((c: ManualCost) => c.isRecurring).length,
+                    total_costs_30d: totalCosts,
+                    total_revenues_30d: totalRevenues,
+                    margin_30d: totalRevenues - totalCosts,
+                    cost_entries_30d: (costsData.data || []).length,
+                    revenue_entries_30d: (revenuesData.data || []).length,
+                    critical_alerts: 0,
+                    warning_alerts: 0,
+                    recurring_costs_count: (costsData.data || []).filter((c: ManualCost) => c.is_recurring).length,
                 })
             } catch (error) {
                 console.error('Erro ao carregar dados financeiros:', error)
                 // Feedback ao usuário
                 const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido'
                 setKpis({
-                    totalCosts30d: 0,
-                    totalRevenues30d: 0,
-                    margin30d: 0,
-                    costEntries30d: 0,
-                    revenueEntries30d: 0,
-                    criticalAlerts: 0,
-                    warningAlerts: 0,
-                    recurringCostsCount: 0,
+                    total_costs_30d: 0,
+                    total_revenues_30d: 0,
+                    margin_30d: 0,
+                    cost_entries_30d: 0,
+                    revenue_entries_30d: 0,
+                    critical_alerts: 0,
+                    warning_alerts: 0,
+                    recurring_costs_count: 0,
                 })
                 // Toast de erro se disponível
                 if (typeof window !== 'undefined') {
                     import('@/lib/toast').then(({ notifyError }) => {
                         notifyError(`Erro ao carregar dados financeiros: ${errorMessage}`)
-                    }).catch(() => {})
+                    }).catch(() => { })
                 }
             } finally {
                 setLoading(false)
@@ -231,14 +231,14 @@ export function FinancialDashboardExpanded({
     const budgetVsActualData = useMemo(() => {
         return budgets.map(budget => {
             const actual = costs
-                .filter(c => c.categoryId === budget.categoryId)
+                .filter(c => c.category_id === budget.category_id)
                 .reduce((sum, c) => sum + c.amount, 0)
 
             return {
-                name: budget.category?.name || budget.categoryName || 'Categoria',
-                budgeted: budget.budgetedAmount,
+                name: budget.category?.name || budget.category_name || 'Categoria',
+                budgeted: budget.budgeted_amount,
                 actual,
-                variance: actual - budget.budgetedAmount,
+                variance: actual - budget.budgeted_amount,
             }
         })
     }, [budgets, costs])
@@ -256,8 +256,8 @@ export function FinancialDashboardExpanded({
     }, [])
 
     // Variação percentual
-    const marginPercent = kpis && kpis.totalRevenues30d > 0
-        ? ((kpis.margin30d / kpis.totalRevenues30d) * 100).toFixed(1)
+    const marginPercent = kpis && kpis.total_revenues_30d > 0
+        ? ((kpis.margin_30d / kpis.total_revenues_30d) * 100).toFixed(1)
         : '0'
 
     if (loading) {
@@ -359,10 +359,10 @@ export function FinancialDashboardExpanded({
                         </CardHeader>
                         <CardContent>
                             <div className="text-2xl font-bold text-brand">
-                                <CountUp value={kpis?.totalCosts30d || 0} />
+                                <CountUp value={kpis?.total_costs_30d || 0} />
                             </div>
                             <p className="text-xs text-muted-foreground mt-1">
-                                {kpis?.costEntries30d || 0} lançamentos no mês
+                                {kpis?.cost_entries_30d || 0} lançamentos no mês
                             </p>
                         </CardContent>
                     </Card>
@@ -383,10 +383,10 @@ export function FinancialDashboardExpanded({
                         </CardHeader>
                         <CardContent>
                             <div className="text-2xl font-bold text-success">
-                                <CountUp value={kpis?.totalRevenues30d || 0} />
+                                <CountUp value={kpis?.total_revenues_30d || 0} />
                             </div>
                             <p className="text-xs text-muted-foreground mt-1">
-                                {kpis?.revenueEntries30d || 0} lançamentos no mês
+                                {kpis?.revenue_entries_30d || 0} lançamentos no mês
                             </p>
                         </CardContent>
                     </Card>
@@ -398,10 +398,10 @@ export function FinancialDashboardExpanded({
                     transition={{ delay: 0.2 }}
                 >
                     <Card className="relative overflow-hidden">
-                        <div className={`absolute top-0 right-0 w-32 h-32 ${(kpis?.margin30d || 0) >= 0 ? 'bg-info-light0/10' : 'bg-error-light0/10'} rounded-bl-full`} />
+                        <div className={`absolute top-0 right-0 w-32 h-32 ${(kpis?.margin_30d || 0) >= 0 ? 'bg-info-light0/10' : 'bg-error-light0/10'} rounded-bl-full`} />
                         <CardHeader className="pb-2">
                             <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                                {(kpis?.margin30d || 0) >= 0 ? (
+                                {(kpis?.margin_30d || 0) >= 0 ? (
                                     <TrendingUp className="h-4 w-4 text-info" />
                                 ) : (
                                     <TrendingDown className="h-4 w-4 text-error" />
@@ -410,8 +410,8 @@ export function FinancialDashboardExpanded({
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <div className={`text-2xl font-bold ${(kpis?.margin30d || 0) >= 0 ? 'text-info' : 'text-error'}`}>
-                                <CountUp value={Math.abs(kpis?.margin30d || 0)} prefix={(kpis?.margin30d || 0) < 0 ? '-' : ''} />
+                            <div className={`text-2xl font-bold ${(kpis?.margin_30d || 0) >= 0 ? 'text-info' : 'text-error'}`}>
+                                <CountUp value={Math.abs(kpis?.margin_30d || 0)} prefix={(kpis?.margin_30d || 0) < 0 ? '-' : ''} />
                             </div>
                             <p className="text-xs text-muted-foreground mt-1">
                                 {marginPercent}% da receita
@@ -435,7 +435,7 @@ export function FinancialDashboardExpanded({
                         </CardHeader>
                         <CardContent>
                             <div className="text-2xl font-bold text-purple-500">
-                                {kpis?.recurringCostsCount || 0}
+                                {kpis?.recurring_costs_count || 0}
                             </div>
                             <p className="text-xs text-muted-foreground mt-1">
                                 lançamentos automáticos ativos
@@ -572,7 +572,7 @@ export function FinancialDashboardExpanded({
                                                 <div>
                                                     <p className="font-medium">{cost.description}</p>
                                                     <p className="text-xs text-muted-foreground">
-                                                        {cost.category?.name || 'Sem categoria'} • {new Date(cost.costDate).toLocaleDateString('pt-BR')}
+                                                        {cost.category?.name || 'Sem categoria'} • {new Date(cost.cost_date).toLocaleDateString('pt-BR')}
                                                     </p>
                                                 </div>
                                             </div>
@@ -623,7 +623,7 @@ export function FinancialDashboardExpanded({
                                             <div>
                                                 <p className="font-medium">{revenue.description}</p>
                                                 <p className="text-xs text-muted-foreground">
-                                                    {revenue.category} • {new Date(revenue.revenueDate).toLocaleDateString('pt-BR')}
+                                                    {revenue.category} • {new Date(revenue.revenue_date).toLocaleDateString('pt-BR')}
                                                 </p>
                                             </div>
                                             <div className="flex items-center gap-2">

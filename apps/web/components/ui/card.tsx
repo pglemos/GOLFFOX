@@ -12,7 +12,7 @@ const cardVariants = cva(
         default: "border bg-card",
         glass: "bg-white/5 backdrop-blur-xl border-white/10 hover:bg-white/10 hover:border-white/20",
         gradient: "bg-gradient-to-br from-brand/10 to-accent-custom/10 border-border",
-        premium: "bg-white/5 backdrop-blur-xl border-white/10 hover:bg-white/10 hover:border-white/20 hover:shadow-2xl hover:shadow-black/5 rounded-2xl",
+        premium: "bg-white/5 backdrop-blur-xl border-white/10 hover:bg-white/10 hover:border-white/20 hover:shadow-2xl rounded-2xl",
       },
       hover: {
         true: "lg:hover:shadow-lg lg:hover:scale-[1.02] cursor-pointer active:scale-[0.98]",
@@ -47,7 +47,7 @@ const CardHeader = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("flex flex-col space-y-1.5 p-4 sm:p-6", className)}
+    className={cn("flex flex-col space-y-1.5 p-3", className)}
     {...props}
   />
 ))
@@ -84,7 +84,7 @@ const CardContent = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => (
-  <div ref={ref} className={cn("p-4 pt-0 sm:p-6 sm:pt-0", className)} {...props} />
+  <div ref={ref} className={cn("p-3", className)} {...props} />
 ))
 CardContent.displayName = "CardContent"
 
@@ -94,7 +94,7 @@ const CardFooter = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("flex items-center p-4 pt-0 sm:p-6 sm:pt-0", className)}
+    className={cn("flex items-center p-3", className)}
     {...props}
   />
 ))

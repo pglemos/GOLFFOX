@@ -200,13 +200,13 @@ export async function POST(request: NextRequest) {
             .upsert({
                 company_id: companyId,
                 transportadora_id: transportadoraId,
-                category_id: body.categoryId,
-                category_name: body.categoryName,
-                period_year: body.periodYear,
-                period_month: body.periodMonth,
-                budgeted_amount: body.budgetedAmount,
-                alert_threshold_percent: body.alertThresholdPercent ?? 80,
-                notes: body.notes,
+                category_id: validated.category_id,
+                category_name: body.categoryName || body.category_name,
+                period_year: validated.period_year,
+                period_month: validated.period_month,
+                budgeted_amount: validated.budgeted_amount,
+                alert_threshold_percent: validated.alert_threshold_percent ?? 80,
+                notes: validated.notes,
                 created_by: userId,
             }, {
                 onConflict: 'company_id,transportadora_id,category_id,period_year,period_month'

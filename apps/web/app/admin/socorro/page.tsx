@@ -220,8 +220,8 @@ export default function SocorroPage() {
         </div>
 
         {/* Formulário de Despacho de Socorro */}
-        <Card variant="premium" className="border-2 shadow-lg">
-          <CardContent className="pt-6">
+        <Card variant="premium">
+          <CardContent className="p-3">
             <div className="space-y-6">
               {/* 1. Selecione a Rota com Problema */}
               <div className="space-y-2">
@@ -330,7 +330,7 @@ export default function SocorroPage() {
         </Card>
 
         {/* Separador */}
-        <div className="border-t border-border pt-6">
+        <div className="border-t border-white/10 pt-3">
           <h2 className="text-2xl font-bold mb-4">Ocorrências de Socorro</h2>
         </div>
 
@@ -386,7 +386,7 @@ export default function SocorroPage() {
                   <option value="cancelled">Canceladas</option>
                 </select>
               </div>
-              <div className="flex items-center justify-end gap-2 pt-4 border-t border-border">
+              <div className="flex items-center justify-end gap-2 pt-4 border-t border-white/10">
                 <Button
                   variant="outline"
                   size="sm"

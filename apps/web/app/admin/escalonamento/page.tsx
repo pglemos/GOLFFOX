@@ -21,7 +21,6 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { useAuth } from "@/hooks/use-auth"
 import { notifySuccess, notifyError } from "@/lib/toast"
-import { getSupabaseClient } from "@/lib/supabase-client"
 
 interface EscalatedAlert {
     id: string
@@ -33,6 +32,8 @@ interface EscalatedAlert {
     source_name: string
     created_at: string
     status: 'pending' | 'in_progress' | 'resolved' | 'dismissed'
+    resolved_at?: string
+    resolution?: string | null
 }
 
 export default function EscalonamentoPage() {
@@ -46,28 +47,25 @@ export default function EscalonamentoPage() {
         try {
             setLoading(true)
             
-            // Primeiro, tenta carregar do localStorage
-            const storedAlerts = localStorage.getItem('escalated_alerts')
-            if (storedAlerts) {
-                const parsedAlerts = JSON.parse(storedAlerts)
-                setAlerts(parsedAlerts)
-                setLoading(false)
-                return
+            const response = await fetch('/api/admin/escalated-alerts', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+            })
+
+            if (!response.ok) {
+                throw new Error('Erro ao carregar alertas')
             }
 
-            // Se não houver dados salvos, inicializa com os dados mockados
-            const mockAlerts: EscalatedAlert[] = [
-                { id: '1', type: 'sla_violation', title: 'Violação de SLA - Rota Centro', message: 'Motorista com 3 atrasos consecutivos esta semana.', severity: 'high', source: 'transportadora', source_name: 'TransLog LTDA', created_at: '2024-12-12T08:00:00', status: 'pending' },
-                { id: '2', type: 'document_expired', title: 'CNH Vencida - João Silva', message: 'CNH venceu há 5 dias sem atualização.', severity: 'critical', source: 'transportadora', source_name: 'RápidoTrans', created_at: '2024-12-11T14:30:00', status: 'pending' },
-                { id: '3', type: 'maintenance_overdue', title: 'Manutenção Atrasada - Veículo ABC-1234', message: 'Manutenção preventiva atrasada em 15 dias.', severity: 'medium', source: 'transportadora', source_name: 'TransLog LTDA', created_at: '2024-12-10T10:00:00', status: 'in_progress' },
-                { id: '4', type: 'complaint', title: 'Reclamação Grave - Empresa XYZ', message: 'Cliente reportou comportamento inadequado do motorista.', severity: 'high', source: 'empresa', source_name: 'Empresa XYZ', created_at: '2024-12-09T16:45:00', status: 'pending' },
-            ]
-            setAlerts(mockAlerts)
-            // Salva os dados iniciais no localStorage
-            localStorage.setItem('escalated_alerts', JSON.stringify(mockAlerts))
+            const data = await response.json()
+            setAlerts(data.alerts || [])
         } catch (error) {
             console.error('Erro ao carregar alertas:', error)
-            notifyError('Erro ao carregar alertas')
+            notifyError('Erro ao carregar alertas escalados')
+            // Em caso de erro, inicializa com array vazio
+            setAlerts([])
         } finally {
             setLoading(false)
         }
@@ -96,15 +94,50 @@ export default function EscalonamentoPage() {
     }
 
     const handleResolve = async () => {
-        if (!selectedAlert) return
+        if (!selectedAlert) {
+            notifyError('Nenhum alerta selecionado')
+            return
+        }
 
-        // In production: update in Supabase
-        setAlerts(prev => prev.map(a =>
-            a.id === selectedAlert.id ? { ...a, status: 'resolved' as const } : a
-        ))
-        notifySuccess('Alerta resolvido com sucesso!')
-        setSelectedAlert(null)
-        setResolution("")
+        if (!selectedAlert.id) {
+            notifyError('ID do alerta não encontrado')
+            console.error('selectedAlert:', selectedAlert)
+            return
+        }
+
+        try {
+            const alertId = selectedAlert.id
+            const response = await fetch(`/api/admin/escalated-alerts/${alertId}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+                body: JSON.stringify({
+                    status: 'resolved',
+                    resolution: resolution || null
+                }),
+            })
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({ error: 'Erro desconhecido' }))
+                throw new Error(errorData.error || 'Erro ao resolver alerta')
+            }
+
+            const data = await response.json()
+            
+            // Atualiza o estado local com os dados retornados do servidor
+            setAlerts(prev => prev.map(a =>
+                a.id === alertId ? data.alert : a
+            ))
+            
+            notifySuccess('Alerta resolvido com sucesso!')
+            setSelectedAlert(null)
+            setResolution("")
+        } catch (error: any) {
+            console.error('Erro ao resolver alerta:', error)
+            notifyError(error.message || 'Erro ao resolver alerta')
+        }
     }
 
     // Considera pendentes: 'pending' e 'in_progress'
@@ -120,7 +153,7 @@ export default function EscalonamentoPage() {
                     background: 'var(--bg)'
                 } as React.CSSProperties}
             >
-                <div className="space-y-4 sm:space-y-6 w-full overflow-x-hidden">
+                <div className="space-y-4 sm:space-y-6 w-full overflow-x-hidden pb-12 sm:pb-16">
                     {/* Header */}
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
                         <div className="min-w-0 flex-1">
@@ -141,7 +174,7 @@ export default function EscalonamentoPage() {
                     {/* Summary */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4">
                         <Card variant="premium" className={criticalCount > 0 ? "border-error" : ""}>
-                            <CardContent className="p-4 sm:p-6">
+                            <CardContent className="p-3">
                                 <div className="flex items-center gap-3">
                                     <AlertTriangle className={`h-8 w-8 flex-shrink-0 ${criticalCount > 0 ? 'text-error' : 'text-muted-foreground'}`} />
                                     <div className="min-w-0">
@@ -152,7 +185,7 @@ export default function EscalonamentoPage() {
                             </CardContent>
                         </Card>
                         <Card variant="premium">
-                            <CardContent className="p-4 sm:p-6">
+                            <CardContent className="p-3">
                                 <div className="flex items-center gap-3">
                                     <Clock className="h-8 w-8 flex-shrink-0 text-warning" />
                                     <div className="min-w-0">
@@ -163,7 +196,7 @@ export default function EscalonamentoPage() {
                             </CardContent>
                         </Card>
                         <Card variant="premium">
-                            <CardContent className="p-4 sm:p-6">
+                            <CardContent className="p-3">
                                 <div className="flex items-center gap-3">
                                     <CheckCircle className="h-8 w-8 flex-shrink-0 text-success" />
                                     <div className="min-w-0">
@@ -234,7 +267,7 @@ export default function EscalonamentoPage() {
 
                     {/* Empty State */}
                     {!loading && alerts.length === 0 && (
-                        <Card variant="premium" className="p-4 sm:p-6 md:p-8 text-center w-full max-w-full overflow-hidden">
+                        <Card variant="premium" className="p-3 text-center w-full max-w-full overflow-hidden">
                             <AlertTriangle className="h-10 w-10 sm:h-12 sm:w-12 text-ink-muted mx-auto mb-3 sm:mb-4 flex-shrink-0" />
                             <h3 className="text-sm sm:text-base md:text-lg font-semibold mb-2 break-words px-2">
                                 Nenhum alerta escalado

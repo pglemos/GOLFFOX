@@ -168,7 +168,8 @@ export const AppShell = memo(function AppShell({ user, children, panel }: AppShe
           className={cn(
             "flex-1 size-full",
             // Padding exato do Application Shell 08
-            "px-4 py-6 sm:px-6"
+            "px-4 py-6 sm:px-6",
+            "overflow-y-auto overflow-x-hidden"
           )}
         >
           {children}

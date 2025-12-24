@@ -46,7 +46,7 @@ export default function AdminPreferencesPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
         >
-          <Card variant="premium" className="p-4 sm:p-6 space-y-4">
+          <Card variant="premium" className="p-3 space-y-3">
             <div className="min-w-0">
               <h2 className="text-lg sm:text-xl font-semibold break-words">Tema</h2>
               <p className="text-xs sm:text-sm text-ink-muted break-words">Ajuste o tema e aparência da interface.</p>
@@ -64,7 +64,7 @@ export default function AdminPreferencesPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
         >
-          <Card variant="premium" className="p-4 sm:p-6 space-y-4">
+          <Card variant="premium" className="p-3 space-y-3">
             <div className="min-w-0">
               <h2 className="text-lg sm:text-xl font-semibold break-words">Notificações</h2>
               <p className="text-xs sm:text-sm text-ink-muted break-words">Habilite alertas críticos e emails de sistema.</p>

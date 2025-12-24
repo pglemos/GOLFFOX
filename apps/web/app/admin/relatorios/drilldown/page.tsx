@@ -107,7 +107,7 @@ export default function DrilldownRelatoriosPage() {
 
     return (
         <AppShell panel="admin" user={user ? { id: user.id, name: user.name || 'Admin', email: user.email || '', role: user.role || 'admin' } : { id: 'mock', name: 'Admin', email: 'admin@golffox.com', role: 'admin' }}>
-            <div className="p-4 sm:p-6 lg:p-8 space-y-6">
+            <div className="p-3 space-y-4">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div>
                         <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-2">
@@ -139,7 +139,7 @@ export default function DrilldownRelatoriosPage() {
                             className="cursor-pointer hover:shadow-md transition-all hover:border-primary"
                             onClick={() => setSelectedCategory(cat)}
                         >
-                            <CardContent className="pt-6">
+                            <CardContent className="p-3">
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-3">
                                         <div className="p-2 bg-primary/10 rounded-lg text-primary">

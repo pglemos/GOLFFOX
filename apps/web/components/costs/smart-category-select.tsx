@@ -100,13 +100,13 @@ export function SmartCategorySelect({
                     setCategories(result.map((cat: any) => ({
                         id: cat.id,
                         name: cat.category || cat.name || cat.group_name,
-                        profileType: 'all',
+                        profile_type: 'all',
                         keywords: [],
-                        isOperational: false,
-                        isActive: true,
-                        displayOrder: 0,
-                        createdAt: cat.created_at,
-                        updatedAt: cat.updated_at,
+                        is_operational: false,
+                        is_active: true,
+                        display_order: 0,
+                        created_at: cat.created_at,
+                        updated_at: cat.updated_at,
                     })))
                 }
             } catch (error) {
@@ -140,8 +140,8 @@ export function SmartCategorySelect({
 
     // Agrupar por tipo (operacional vs geral)
     const groupedCategories = useMemo(() => {
-        const operational = filteredCategories.filter(cat => cat.isOperational)
-        const general = filteredCategories.filter(cat => !cat.isOperational)
+        const operational = filteredCategories.filter(cat => cat.is_operational)
+        const general = filteredCategories.filter(cat => !cat.is_operational)
         return { operational, general }
     }, [filteredCategories])
 

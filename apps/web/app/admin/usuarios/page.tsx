@@ -99,7 +99,7 @@ function UsuariosPageContent() {
 
     return (
         <AppShell user={{ id: user.id, name: user.name || "Admin", email: user.email, role: user.role || "admin", avatar_url: user.avatar_url }}>
-            <div className="space-y-4 sm:space-y-6 w-full overflow-x-hidden">
+            <div className="space-y-4 sm:space-y-6 w-full overflow-x-hidden pb-12 sm:pb-16">
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
                     <div className="min-w-0 flex-1">
@@ -120,95 +120,95 @@ function UsuariosPageContent() {
                 <div className="flex flex-col sm:flex-row gap-2">
                     <div className="relative flex-1">
                         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                        <Input
-                            placeholder="Buscar por nome, email ou CPF..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
+                    <Input
+                        placeholder="Buscar por nome, email ou CPF..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
                             className="pl-10"
-                        />
-                    </div>
+                    />
+                </div>
 
-                    {isMobile ? (
-                        <FilterDrawer
-                            filters={[
-                                {
-                                    key: "role",
-                                    label: "Papel",
-                                    type: "select",
-                                    options: [
+                {isMobile ? (
+                    <FilterDrawer
+                        filters={[
+                            {
+                                key: "role",
+                                label: "Papel",
+                                type: "select",
+                                options: [
                                         { label: "Admin", value: "admin" },
                                         { label: "Gestor da Empresa", value: "gestor_empresa" },
                                         { label: "Gestor da Transportadora", value: "gestor_transportadora" },
-                                        { label: "Motorista", value: "motorista" },
-                                        { label: "Passageiro", value: "passageiro" }
-                                    ]
-                                },
-                                {
-                                    key: "status",
-                                    label: "Status",
-                                    type: "select",
-                                    options: [
-                                        { label: "Ativo", value: "active" },
-                                        { label: "Inativo", value: "inactive" }
-                                    ]
-                                }
-                            ]}
-                            values={{
+                                    { label: "Motorista", value: "motorista" },
+                                    { label: "Passageiro", value: "passageiro" }
+                                ]
+                            },
+                            {
+                                key: "status",
+                                label: "Status",
+                                type: "select",
+                                options: [
+                                    { label: "Ativo", value: "active" },
+                                    { label: "Inativo", value: "inactive" }
+                                ]
+                            }
+                        ]}
+                        values={{
                                 role: filterRole,
                                 status: filterStatus
-                            }}
-                            onFilterChange={(key, value) => {
-                                if (key === "role") {
+                        }}
+                        onFilterChange={(key, value) => {
+                            if (key === "role") {
                                     setFilterRole(value)
-                                } else if (key === "status") {
+                            } else if (key === "status") {
                                     setFilterStatus(value)
-                                }
-                            }}
+                            }
+                        }}
                             onReset={() => {
                                 setFilterRole("all")
                                 setFilterStatus("all")
                             }}
-                            title="Filtros"
-                            description="Filtre os usuários por papel e status"
-                        />
-                    ) : (
+                        title="Filtros"
+                        description="Filtre os usuários por papel e status"
+                    />
+                ) : (
                         <>
                             <Select value={filterRole} onValueChange={setFilterRole}>
                                 <SelectTrigger className="w-full sm:w-[220px]">
                                     <Shield className="h-4 w-4 mr-2" />
                                     <SelectValue placeholder="Papel" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="all">Todos os papéis</SelectItem>
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="all">Todos os papéis</SelectItem>
                                     <SelectItem value="admin">Admin</SelectItem>
                                     <SelectItem value="gestor_empresa">Gestor da Empresa</SelectItem>
                                     <SelectItem value="gestor_transportadora">Gestor da Transportadora</SelectItem>
-                                    <SelectItem value="motorista">Motorista</SelectItem>
-                                    <SelectItem value="passageiro">Passageiro</SelectItem>
-                                </SelectContent>
-                            </Select>
+                                            <SelectItem value="motorista">Motorista</SelectItem>
+                                            <SelectItem value="passageiro">Passageiro</SelectItem>
+                                        </SelectContent>
+                                    </Select>
                             <Select value={filterStatus} onValueChange={setFilterStatus}>
                                 <SelectTrigger className="w-full sm:w-[220px]">
                                     <Filter className="h-4 w-4 mr-2" />
                                     <SelectValue placeholder="Status" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="all">Todos os status</SelectItem>
-                                    <SelectItem value="active">Ativo</SelectItem>
-                                    <SelectItem value="inactive">Inativo</SelectItem>
-                                </SelectContent>
-                            </Select>
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="all">Todos os status</SelectItem>
+                                            <SelectItem value="active">Ativo</SelectItem>
+                                            <SelectItem value="inactive">Inativo</SelectItem>
+                                        </SelectContent>
+                                    </Select>
                         </>
                     )}
-                </div>
+                                </div>
 
                 {/* Lista de Usuários - Cards em Grid */}
                 {dataLoading && usuarios.length === 0 ? (
                     <div className="text-center py-12">
                         <div className="w-16 h-16 border-4 border-brand border-t-transparent rounded-full animate-spin mx-auto"></div>
-                    </div>
+                                </div>
                 ) : filteredUsers.length === 0 ? (
-                    <Card variant="premium" className="p-8 text-center">
+                    <Card variant="premium" className="p-3 text-center">
                         <User className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
                         <p className="text-muted-foreground">Nenhum usuário encontrado</p>
                     </Card>
@@ -216,22 +216,22 @@ function UsuariosPageContent() {
                     <div className="grid gap-2 sm:gap-3 w-full">
                         {filteredUsers.map((usuario, index) => (
                             <UserCard
-                                key={usuario.id}
+                                        key={usuario.id}
                                 user={usuario}
                                 index={index}
                                 onEdit={(u) => {
                                     setSelectedUserForEdit(u)
-                                    setIsEditModalOpen(true)
-                                }}
+                                                            setIsEditModalOpen(true)
+                                                        }}
                                 onRoleChange={(u) => {
                                     setSelectedUserForRoleChange(u)
-                                    setIsChangeRoleModalOpen(true)
-                                }}
+                                                            setIsChangeRoleModalOpen(true)
+                                                        }}
                                 onDelete={handleDeleteUsuario}
                             />
                         ))}
                     </div>
-                )}
+                    )}
 
                 {/* Modal Trocar Papel */}
                 {selectedUserForRoleChange && (

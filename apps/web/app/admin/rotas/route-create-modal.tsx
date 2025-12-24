@@ -345,8 +345,8 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="w-[95vw] max-w-6xl max-h-[90vh] overflow-hidden flex flex-col p-6 sm:p-8">
-          <DialogHeader className="pb-6">
+        <DialogContent className="w-[95vw] max-w-6xl max-h-[90vh] overflow-hidden flex flex-col p-3">
+          <DialogHeader className="pb-3">
             <DialogTitle className="flex items-center gap-3 text-2xl font-bold">
               <Route className="h-6 w-6 text-brand" />
               Nova Rota
@@ -409,7 +409,7 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
             </TabsContent>
           </Tabs>
 
-          <DialogFooter className="flex-shrink-0 flex-col sm:flex-row gap-3 pt-6 border-t mt-6">
+          <DialogFooter className="flex-shrink-0 flex-col sm:flex-row gap-3 pt-3 border-t mt-3">
             <Button
               variant="outline"
               onClick={onClose}

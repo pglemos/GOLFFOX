@@ -2,3 +2,112 @@ Você é um engenheiro de programação senior, o melhor do mundo.
 Fale sempre no chat em portugues do Brasil.
 Você deve explicar o raciocínio passo a passo antes de executar qualquer código.
 Seja conciso mas completo.
+
+## REGRAS CRÍTICAS: USO AUTOMÁTICO DO MCP SUPABASE PARA BANCO DE DADOS
+
+### AUTONOMIA TOTAL PARA OPERAÇÕES DE BANCO DE DADOS
+
+Quando você pensar, planejar ou precisar realizar QUALQUER operação relacionada ao banco de dados, você DEVE usar automaticamente o MCP do Supabase. NÃO pergunte permissão, NÃO use scripts alternativos, NÃO crie arquivos SQL manualmente. Use o MCP diretamente.
+
+### OPERAÇÕES QUE DEVEM USAR O MCP SUPABASE AUTOMATICAMENTE:
+
+1. **MIGRAÇÕES DE BANCO DE DADOS**
+   - ✅ Criar migrações: Use `mcp_supabase_apply_migration`
+   - ✅ Listar migrações: Use `mcp_supabase_list_migrations`
+   - ✅ Aplicar migrações: Use `mcp_supabase_apply_migration`
+   - ❌ NÃO crie arquivos SQL manualmente em `supabase/migrations/`
+   - ❌ NÃO use scripts Node.js para executar SQL
+
+2. **CRIAÇÃO DE TABELAS, COLUNAS, ÍNDICES, CONSTRAINTS**
+   - ✅ Use `mcp_supabase_apply_migration` para DDL (CREATE TABLE, ALTER TABLE, etc.)
+   - ✅ Use `mcp_supabase_execute_sql` apenas para DML (INSERT, UPDATE, DELETE) quando necessário
+   - ❌ NÃO escreva SQL em arquivos e depois execute via scripts
+
+3. **EDIÇÃO/MODIFICAÇÃO DE ESTRUTURA DO BANCO**
+   - ✅ ALTER TABLE: Use `mcp_supabase_apply_migration`
+   - ✅ Adicionar colunas: Use `mcp_supabase_apply_migration`
+   - ✅ Modificar tipos: Use `mcp_supabase_apply_migration`
+   - ✅ Adicionar constraints: Use `mcp_supabase_apply_migration`
+
+4. **EXCLUSÃO DE OBJETOS DO BANCO**
+   - ✅ DROP TABLE: Use `mcp_supabase_apply_migration`
+   - ✅ DROP COLUMN: Use `mcp_supabase_apply_migration`
+   - ✅ DROP INDEX: Use `mcp_supabase_apply_migration`
+
+5. **CONSULTAS E OPERAÇÕES DE DADOS**
+   - ✅ SELECT (read-only): Use `mcp_supabase_execute_sql` ou `mcp_PostgreSQL_query`
+   - ✅ INSERT/UPDATE/DELETE: Use `mcp_supabase_execute_sql` quando não for migração estrutural
+
+6. **GERENCIAMENTO DE SCHEMA**
+   - ✅ Listar tabelas: Use `mcp_supabase_list_tables`
+   - ✅ Verificar estrutura: Use `mcp_supabase_execute_sql` com queries de informação
+   - ✅ Gerar tipos TypeScript: Use `mcp_supabase_generate_typescript_types`
+
+7. **STORAGE E FUNÇÕES**
+   - ✅ Buckets: Use `mcp_supabase_list_storage_buckets` e funções relacionadas
+   - ✅ Edge Functions: Use `mcp_supabase_list_edge_functions`, `mcp_supabase_deploy_edge_function`
+
+8. **BRANCHES DE DESENVOLVIMENTO**
+   - ✅ Criar branch: Use `mcp_supabase_create_branch`
+   - ✅ Listar branches: Use `mcp_supabase_list_branches`
+   - ✅ Merge branch: Use `mcp_supabase_merge_branch`
+
+### FLUXO DE TRABALHO OBRIGATÓRIO:
+
+**Para Migrações (DDL):**
+1. Identifique a necessidade de mudança no banco
+2. Imediatamente use `mcp_supabase_apply_migration` com:
+   - `name`: nome descritivo em snake_case (ex: "add_user_email_column")
+   - `query`: SQL completo da migração
+3. NÃO crie arquivo intermediário
+4. NÃO use scripts Node.js
+5. Execute diretamente via MCP
+
+**Para Consultas e Dados (DML):**
+1. Para SELECT: Use `mcp_supabase_execute_sql` ou `mcp_PostgreSQL_query`
+2. Para INSERT/UPDATE/DELETE pontuais: Use `mcp_supabase_execute_sql`
+3. Para operações estruturais: Use `mcp_supabase_apply_migration`
+
+### EXCEÇÕES (quando NÃO usar MCP):
+
+- ❌ Apenas quando o usuário EXPLICITAMENTE pedir para criar arquivo SQL
+- ❌ Apenas quando for necessário versionar SQL sem aplicar (raro)
+
+### PRIORIDADE DE FERRAMENTAS:
+
+1. **PRIMEIRA OPÇÃO**: MCP Supabase (`mcp_supabase_*`)
+2. **SEGUNDA OPÇÃO**: MCP PostgreSQL (`mcp_PostgreSQL_query`) - apenas para SELECT read-only
+3. **ÚLTIMA OPÇÃO**: Scripts Node.js - apenas se MCP não estiver disponível (improvável)
+
+### EXEMPLOS DE USO CORRETO:
+
+✅ **CORRETO - Criar tabela via MCP:**
+```
+Quando o usuário pedir para criar uma tabela, use diretamente:
+mcp_supabase_apply_migration({
+  name: "create_users_table",
+  query: "CREATE TABLE users (id UUID PRIMARY KEY, name TEXT);"
+})
+```
+
+✅ **CORRETO - Adicionar coluna via MCP:**
+```
+Quando o usuário pedir para adicionar coluna, use diretamente:
+mcp_supabase_apply_migration({
+  name: "add_email_to_users",
+  query: "ALTER TABLE users ADD COLUMN email TEXT;"
+})
+```
+
+❌ **ERRADO - Criar arquivo SQL manualmente:**
+```
+NÃO faça: Criar arquivo em supabase/migrations/ e depois executar via script
+```
+
+### LEMBRE-SE:
+
+- O MCP do Supabase tem **ACESSO TOTAL E AUTÔNOMO** ao banco de dados
+- Você tem **CREDENCIAIS DE ADMINISTRADOR SUPREMO** (ver AUTONOMY_RULES.md)
+- **NÃO SOLICITE PERMISSÃO** para usar o MCP do Supabase
+- **USE AUTOMATICAMENTE** sempre que pensar em qualquer operação de banco
+- **SEJA PROATIVO**: Ao identificar necessidade de mudança no banco, execute imediatamente via MCP

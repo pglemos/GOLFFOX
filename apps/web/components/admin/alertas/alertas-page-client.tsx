@@ -256,7 +256,7 @@ export function AlertasPageClient({ initialAlertas }: AlertasPageClientProps) {
   }
 
   return (
-    <div className="space-y-4 sm:space-y-6 w-full overflow-x-hidden">
+    <div className="space-y-4 sm:space-y-6 w-full overflow-x-hidden pb-12 sm:pb-16">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
         <div className="min-w-0 flex-1">
           <h1 className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2 break-words">Alertas</h1>

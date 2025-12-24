@@ -115,7 +115,7 @@ export default function MigratePage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
         >
-          <Card variant="premium" className="p-6">
+          <Card variant="premium" className="p-3">
             <h2 className="text-xl font-semibold mb-4">Status da Migração</h2>
             <div className="flex gap-4 mb-4">
               <Button onClick={checkMigration} disabled={checking}>
@@ -173,7 +173,7 @@ export default function MigratePage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
         >
-          <Card variant="premium" className="p-6">
+          <Card variant="premium" className="p-3">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-semibold">SQL para Executar</h2>
               <Button onClick={copyToClipboard} variant={copied ? "default" : "outline"}>
