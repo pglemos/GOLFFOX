@@ -193,7 +193,7 @@ export function useMapData({ companyFilter }: UseMapDataOptions = {}) {
         const routeIds = routes?.map((r: RoutePolyline) => r.route_id) || []
         if (routeIds.length > 0) {
           const { data: stopsData, error: stopsError } = await supabase
-            .from('v_route_stops' as any)
+            .from('v_route_stops')
             .select(
               `id, rota_id, stop_order, stop_name, latitude, longitude, route_name`
             )

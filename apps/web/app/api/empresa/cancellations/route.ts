@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
         const limit = parseInt(searchParams.get('limit') || '100');
 
         let query = supabase
-            .from('passageiro_cancellations' as any)
+            .from('passageiro_cancellations')
             .select(`
                 *,
                 passageiro:users!passageiro_id(id, name, email, phone)
@@ -51,13 +51,13 @@ export async function GET(request: NextRequest) {
         const stats = {
             total: data?.length || 0,
             byReason: {
-                home_office: data?.filter((c: any) => c.reason === 'home_office').length || 0,
-                folga: data?.filter((c: any) => c.reason === 'folga').length || 0,
-                ferias: data?.filter((c: any) => c.reason === 'ferias').length || 0,
-                medico: data?.filter((c: any) => c.reason === 'medico').length || 0,
-                outro: data?.filter((c: any) => c.reason === 'outro').length || 0,
+                home_office: data?.filter((c: { reason?: string }) => c.reason === 'home_office').length || 0,
+                folga: data?.filter((c: { reason?: string }) => c.reason === 'folga').length || 0,
+                ferias: data?.filter((c: { reason?: string }) => c.reason === 'ferias').length || 0,
+                medico: data?.filter((c: { reason?: string }) => c.reason === 'medico').length || 0,
+                outro: data?.filter((c: { reason?: string }) => c.reason === 'outro').length || 0,
             },
-            pausedNotifications: data?.filter((c: any) => c.pause_notifications).length || 0,
+            pausedNotifications: data?.filter((c: { pause_notifications?: boolean }) => c.pause_notifications).length || 0,
         };
 
         return NextResponse.json({ data, stats });

@@ -36,13 +36,13 @@ export async function GET(req: NextRequest) {
     }
 
     const activeVehicleIds = new Set(
-      (activeTrips || []).map((t: any) => t.veiculo_id).filter(Boolean)
+      (activeTrips || []).map((t: { veiculo_id?: string | null }) => t.veiculo_id).filter(Boolean)
     )
 
     // Filtrar veículos disponíveis (não estão em viagem)
-    const availableVehicles = ((veiculos || []) as any[])
-      .filter((veiculo: any) => !activeVehicleIds.has(veiculo.id))
-      .map((veiculo: any) => ({
+    const availableVehicles = (veiculos || [])
+      .filter((veiculo: { id: string }) => !activeVehicleIds.has(veiculo.id))
+      .map((veiculo: { id: string; plate: string; model?: string | null; brand?: string | null }) => ({
         id: veiculo.id,
         plate: veiculo.plate,
         model: veiculo.model || 'Sem modelo',
@@ -54,7 +54,7 @@ export async function GET(req: NextRequest) {
       success: true,
       vehicles: availableVehicles
     })
-  } catch (error: any) {
+  } catch (error: unknown) {
     logError('Erro ao buscar veículos disponíveis', { error }, 'AvailableVehiclesAPI')
     return NextResponse.json(
       {

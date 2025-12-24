@@ -4,6 +4,9 @@ import { requireAuth } from '@/lib/api-auth'
 import { logError } from '@/lib/logger'
 import { invalidateEntityCache } from '@/lib/next-cache'
 import { getSupabaseAdmin } from '@/lib/supabase-client'
+import type { Database } from '@/types/supabase'
+
+type VeiculosUpdate = Database['public']['Tables']['veiculos']['Update']
 
 // PUT /api/admin/transportadoras/[transportadoraId]/veiculos/[vehicleId]
 export async function PUT(
@@ -61,7 +64,7 @@ export async function PUT(
         veiculo_type: veiculo_type || 'bus',
         renavam: renavam || null,
         chassis: chassis || null
-      } as any)
+      } as VeiculosUpdate)
       .eq('id', vehicleId)
       .eq('transportadora_id', transportadoraId)
       .select()
@@ -79,7 +82,7 @@ export async function PUT(
     await invalidateEntityCache('veiculo', vehicleId)
 
     return NextResponse.json({ success: true, veiculo })
-  } catch (error: any) {
+  } catch (error: unknown) {
     logError('Erro na API de atualizar veículo', { error, vehicleId: (await context.params).vehicleId }, 'TransportadoraVehicleUpdateAPI')
     return NextResponse.json(
       { success: false, error: error.message || 'Erro desconhecido' },
@@ -128,7 +131,7 @@ export async function DELETE(
     await invalidateEntityCache('veiculo', vehicleId)
 
     return NextResponse.json({ success: true })
-  } catch (error: any) {
+  } catch (error: unknown) {
     logError('Erro na API de excluir veículo', { error, vehicleId: (await context.params).vehicleId }, 'TransportadoraVehicleDeleteAPI')
     return NextResponse.json(
       { success: false, error: error.message || 'Erro desconhecido' },

@@ -102,7 +102,7 @@ export async function PUT(req: NextRequest) {
     })
 
     const { data, error } = await (supabaseServiceRole
-      .from('transportadoras' as any)
+      .from('transportadoras')
       .update(updateData)
       .eq('id', carrierId)
       .select()

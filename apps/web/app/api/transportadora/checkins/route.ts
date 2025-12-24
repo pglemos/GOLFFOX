@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
         const limit = parseInt(searchParams.get('limit') || '100');
 
         let query = supabase
-            .from('passageiro_checkins' as any)
+            .from('passageiro_checkins')
             .select(`
                 *,
                 passageiro:users!passageiro_id(id, name, email, phone),
@@ -59,12 +59,12 @@ export async function GET(request: NextRequest) {
         // Calcular estatísticas
         const stats = {
             total: data?.length || 0,
-            boardings: data?.filter((c: any) => c.type === 'boarding').length || 0,
-            dropoffs: data?.filter((c: any) => c.type === 'dropoff').length || 0,
+            boardings: data?.filter((c: { type?: string }) => c.type === 'boarding').length || 0,
+            dropoffs: data?.filter((c: { type?: string }) => c.type === 'dropoff').length || 0,
             byMethod: {
-                qr: data?.filter((c: any) => c.method === 'qr').length || 0,
-                nfc: data?.filter((c: any) => c.method === 'nfc').length || 0,
-                manual: data?.filter((c: any) => c.method === 'manual').length || 0,
+                qr: data?.filter((c: { method?: string }) => c.method === 'qr').length || 0,
+                nfc: data?.filter((c: { method?: string }) => c.method === 'nfc').length || 0,
+                manual: data?.filter((c: { method?: string }) => c.method === 'manual').length || 0,
             },
         };
 

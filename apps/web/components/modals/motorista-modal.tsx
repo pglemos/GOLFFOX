@@ -138,7 +138,7 @@ export function MotoristaModal({ motorista, isOpen, onClose, onSave, carriers = 
         .eq("driver_id", motoristaId)
         .order("created_at", { ascending: false })
 
-      if (docs) setDocuments(docs as any)
+      if (docs) setDocuments(docs)
 
 
     } catch (error) {
@@ -272,8 +272,8 @@ export function MotoristaModal({ motorista, isOpen, onClose, onSave, carriers = 
       const result = await response.json()
       const publicUrl = result.url
 
-      const { error: docError } = await (supabase as any)
-        .from("gf_driver_documents" as any)
+      const { error: docError } = await supabase
+        .from("gf_driver_documents")
         .insert({
           driver_id: motorista.id,
           document_type: type,

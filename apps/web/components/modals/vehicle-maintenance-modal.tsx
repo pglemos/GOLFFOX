@@ -26,6 +26,11 @@ import { logError } from "@/lib/logger"
 import { useSupabaseSync } from "@/hooks/use-supabase-sync"
 import { supabase } from "@/lib/supabase"
 import { notifySuccess, notifyError } from "@/lib/toast"
+import type { Database } from "@/types/supabase"
+
+type GfVehicleMaintenanceUpdate = Database['public']['Tables']['gf_vehicle_maintenance']['Update']
+type GfVehicleMaintenanceInsert = Database['public']['Tables']['gf_vehicle_maintenance']['Insert']
+type GfAuditLogInsert = Database['public']['Tables']['gf_audit_log']['Insert']
 
 interface VeiculoMaintenance {
   id?: string
@@ -129,9 +134,9 @@ export function VehicleMaintenanceModal({
         notifySuccess('', { i18n: { ns: 'common', key: 'success.maintenanceUpdated' } })
       } else {
         // Criar
-        const { data, error } = await (supabase as any)
+        const { data, error } = await supabase
           .from("gf_vehicle_maintenance")
-          .insert(maintenanceData)
+          .insert(maintenanceData as GfVehicleMaintenanceInsert)
           .select()
           .single()
 
@@ -154,7 +159,7 @@ export function VehicleMaintenanceModal({
       try {
         const { data: { session } } = await supabase.auth.getSession()
         if (session) {
-          await (supabase as any).from('gf_audit_log').insert({
+          await supabase.from('gf_audit_log').insert({
             actor_id: session.user.id,
             action_type: maintenance?.id ? 'update' : 'create',
             resource_type: 'veiculo_maintenance',

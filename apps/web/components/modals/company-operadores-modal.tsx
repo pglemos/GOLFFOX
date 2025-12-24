@@ -264,7 +264,7 @@ export function CompanyUsersModal({
 
       {/* Modal Editar Usuário */}
       <EditUserModal
-        user={selectedOperatorForEdit as any}
+        user={selectedOperatorForEdit}
         isOpen={isEditModalOpen}
         onClose={() => {
           setIsEditModalOpen(false)

@@ -6,6 +6,11 @@ import { useRouter, useSearchParams, usePathname } from '@/lib/next-navigation'
 import { supabase } from '@/lib/supabase'
 import { ensureSupabaseSession } from '@/lib/supabase-session'
 import { debug, warn } from '@/lib/logger'
+import type { Database } from '@/types/supabase'
+
+type UserRow = Database['public']['Tables']['users']['Row']
+type EmpresasRow = Database['public']['Tables']['empresas']['Row']
+type GfCompanyBrandingRow = Database['public']['Tables']['gf_company_branding']['Row']
 
 interface TenantContextType {
   tenantCompanyId: string | null
@@ -120,21 +125,22 @@ function OperatorTenantProviderInner({ children }: { children: ReactNode }) {
                 .eq('id', authUser.id)
                 .maybeSingle()
 
-              if (!userError && userData && (userData as any).company_id) {
+              if (!userError && userData && (userData as UserRow).empresa_id) {
                 // Buscar dados da empresa
                 const { data: companyData, error: companyError } = await supabase
                   .from('empresas')
                   .select('id, name, logo_url')
-                  .eq('id', (userData as any).company_id)
+                  .eq('id', (userData as UserRow).empresa_id)
                   .maybeSingle()
 
                 if (!companyError && companyData) {
+                  const empresa = companyData as EmpresasRow
                   data = [{
-                    id: (companyData as any).id,
-                    name: (companyData as any).name || 'Empresa',
-                    logo_url: (companyData as any).logo_url || null
+                    id: empresa.id,
+                    name: empresa.name || 'Empresa',
+                    logo_url: empresa.logo_url || null
                   }]
-                  debug(`Empresa encontrada via users.company_id: ${(companyData as any).name}`, { companyName: (companyData as any).name }, 'EmpresaTenantProvider')
+                  debug(`Empresa encontrada via users.empresa_id: ${empresa.name}`, { companyName: empresa.name }, 'EmpresaTenantProvider')
                   queryError = null
                 }
               }
@@ -152,7 +158,7 @@ function OperatorTenantProviderInner({ children }: { children: ReactNode }) {
         return
       }
 
-      const formattedCompanies = ((data || []) as Array<any>).map((c: any) => ({
+      const formattedCompanies = ((data || []) as Array<{ id: string; name?: string; branding_name?: string; logo_url?: string | null }>).map((c) => ({
         id: c.id,
         name: c.name || c.branding_name || 'Empresa',
         logoUrl: c.logo_url || null
@@ -188,9 +194,10 @@ function OperatorTenantProviderInner({ children }: { children: ReactNode }) {
             .maybeSingle()
 
           if (brandingData) {
+            const branding = brandingData as GfCompanyBrandingRow
             setBrandTokens({
-              primaryHex: (brandingData as any).primary_hex || '#F97316',
-              accentHex: (brandingData as any).accent_hex || '#2E7D32'
+              primaryHex: branding.primary_hex || '#F97316',
+              accentHex: branding.accent_hex || '#2E7D32'
             })
           }
 
@@ -209,11 +216,12 @@ function OperatorTenantProviderInner({ children }: { children: ReactNode }) {
             .maybeSingle()
 
           if (anyCompany) {
-            debug(`Usando empresa fallback: ${(anyCompany as any).name}`, { companyName: (anyCompany as any).name }, 'EmpresaTenantProvider')
+            const empresa = anyCompany as EmpresasRow
+            debug(`Usando empresa fallback: ${empresa.name}`, { companyName: empresa.name }, 'EmpresaTenantProvider')
             const fallbackCompany = {
-              id: (anyCompany as any).id,
-              name: (anyCompany as any).name || 'Empresa',
-              logoUrl: (anyCompany as any).logo_url || null
+              id: empresa.id,
+              name: empresa.name || 'Empresa',
+              logoUrl: empresa.logo_url || null
             }
             setCompanies([fallbackCompany])
             setTenantCompanyId(fallbackCompany.id)

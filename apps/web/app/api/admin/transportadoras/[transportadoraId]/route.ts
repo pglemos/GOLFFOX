@@ -24,7 +24,7 @@ export async function GET(
 
         const supabase = getSupabaseAdmin()
         const { data, error } = await supabase
-            .from('transportadoras' as any)
+            .from('transportadoras')
             .select('*')
             .eq('id', transportadoraId)
             .single()
@@ -39,7 +39,7 @@ export async function GET(
         }
 
         return successResponse(data)
-    } catch (error: any) {
+    } catch (error: unknown) {
         logError('Erro inesperado na API de detalhe da transportadora', { error }, 'TransportadoraDetailAPI')
         return errorResponse(error, 500, 'Erro interno do servidor')
     }

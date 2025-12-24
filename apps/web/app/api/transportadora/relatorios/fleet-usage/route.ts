@@ -81,7 +81,7 @@ export async function GET(req: NextRequest) {
 
       // Filtrar posições deste veículo (via trip)
       // O cast é necessário pois o tipo retornado pelo join pode ser complexo para inferência
-      const vehiclePositions = (positions as any[])?.filter(p => p.viagens?.veiculo_id === veiculo.id) || []
+      const vehiclePositions = (positions as Array<{ viagens?: { veiculo_id?: string } | null }>)?.filter(p => p.viagens?.veiculo_id === veiculo.id) || []
 
       return {
         veiculo_id: veiculo.id,

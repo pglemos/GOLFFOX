@@ -64,7 +64,7 @@ export async function GET(req: NextRequest) {
 
         return successResponse(data || [], 200, {
             count: stats.totalCount,
-            ...stats as any
+            ...stats
         })
     } catch (err) {
         return errorResponse(err, 500, 'Erro ao processar requisição')

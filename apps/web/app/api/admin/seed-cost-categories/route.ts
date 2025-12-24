@@ -4,6 +4,9 @@ import { requireAuth } from '@/lib/api-auth'
 import { logger, logError } from '@/lib/logger'
 import { withRateLimit } from '@/lib/rate-limit'
 import { getSupabaseAdmin } from '@/lib/supabase-server'
+import type { Database } from '@/types/supabase'
+
+type GfCostCategoriesInsert = Database['public']['Tables']['gf_cost_categories']['Insert']
 
 /**
  * Endpoint para popular categorias de custo essenciais
@@ -76,7 +79,7 @@ async function seedCostCategoriesHandler(request: NextRequest) {
     for (const category of ESSENTIAL_CATEGORIES) {
       const { data, error } = await supabase
         .from('gf_cost_categories')
-        .upsert(category as any, { onConflict: 'id' })
+        .upsert(category as GfCostCategoriesInsert, { onConflict: 'id' })
         .select()
 
       if (error) {

@@ -73,22 +73,21 @@ export async function POST(req: NextRequest) {
 
         // Log de auditoria (opcional - se falhar não impede a operação)
         try {
-            await ((supabase
-                // @ts-ignore - Supabase type inference issue
-                .from('audit_logs' as any)) as any)
+            await supabase
+                .from('gf_audit_logs')
                 .insert({
                     user_id: validated.userId,
                     action: 'change_role',
                     resource_type: 'user',
                     resource_id: validated.userId,
                     details: {
-                        old_role: (targetUser as any).role,
+                        old_role: targetUser.role,
                         new_role: normalizedRole,
                         original_requested_role: validated.newRole,
-                        user_email: (targetUser as any).email,
+                        user_email: targetUser.email,
                         changed_by: req.headers.get('user-email') || 'admin'
                     }
-                } as any)
+                })
         } catch (auditError) {
             logger.warn('⚠️ Erro ao registrar log de auditoria:', auditError)
             // Não falhar a operação por causa de log
@@ -99,7 +98,7 @@ export async function POST(req: NextRequest) {
             200,
             { message: `Papel alterado de "${targetUser.role}" para "${normalizedRole}" com sucesso` }
         )
-    } catch (error: any) {
+    } catch (error: unknown) {
         logger.error('Erro ao processar mudança de papel', { error }, 'ChangeRoleAPI')
 
         if (error instanceof z.ZodError) {

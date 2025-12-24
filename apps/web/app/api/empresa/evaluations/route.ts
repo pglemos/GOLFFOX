@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
         const limit = parseInt(searchParams.get('limit') || '100');
 
         let query = supabase
-            .from('trip_evaluations' as any)
+            .from('trip_evaluations')
             .select(`
                 *,
                 passageiro:users!passageiro_id(id, name, email, company_id),
@@ -43,11 +43,11 @@ export async function GET(request: NextRequest) {
         // Filtrar por company_id se fornecido
         let filteredData = data;
         if (companyId && data) {
-            filteredData = data.filter((e: any) => (e.passageiro as any)?.company_id === companyId);
+            filteredData = data.filter((e: { passageiro?: { company_id?: string } | null }) => e.passageiro?.company_id === companyId);
         }
 
         // Calcular estatísticas
-        const scores: number[] = filteredData?.map((e: any) => e.nps_score as number) || [];
+        const scores: number[] = filteredData?.map((e: { nps_score?: number }) => e.nps_score ?? 0).filter(s => s > 0) || [];
         const totalResponses = scores.length;
 
         const promoters = scores.filter((s: number) => s >= 9).length;

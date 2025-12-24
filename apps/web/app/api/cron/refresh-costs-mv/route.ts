@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
 
   try {
     // Executar refresh da materialized view
-    const { error } = await (supabaseServiceRole.rpc as any)('refresh_mv_costs_monthly')
+    const { error } = await supabaseServiceRole.rpc('refresh_mv_costs_monthly')
     
     if (error) {
       logError('Erro ao atualizar MV de custos', { error }, 'CronRefreshCostsMV')
@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
       success: true, 
       refreshed_at: new Date().toISOString() 
     })
-  } catch (error: any) {
+  } catch (error: unknown) {
     logError('Erro ao executar refresh_mv_costs_monthly', { error }, 'CronRefreshCostsMV')
     return NextResponse.json(
       { error: error.message || 'Erro desconhecido' },

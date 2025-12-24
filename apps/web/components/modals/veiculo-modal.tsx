@@ -33,6 +33,9 @@ import { t } from "@/lib/i18n"
 import { supabase } from "@/lib/supabase"
 import { notifySuccess, notifyError } from "@/lib/toast"
 import { warn, logError } from "@/lib/logger"
+import type { Database } from "@/types/supabase"
+
+type UserRow = Database['public']['Tables']['users']['Row']
 
 // Lazy load seção de documentos
 const VeiculoDocumentsSection = dynamic(() => import("@/components/veiculo/veiculo-documents-section"), { ssr: false })
@@ -80,17 +83,18 @@ export function VeiculoModal({ veiculo, isOpen, onClose, onSave, carriers }: Vei
       try {
         const { data: { session } } = await supabase.auth.getSession()
         if (session?.user) {
-          const { data: userData, error } = await (supabase as any)
+          const { data: userData, error } = await supabase
             .from('users')
-            .select('role, company_id, transportadora_id')
+            .select('role, empresa_id, transportadora_id')
             .eq('id', session.user.id)
-            .single()
+            .maybeSingle()
 
           if (!error && userData) {
+            const user = userData as UserRow
             setUserInfo({
-              role: (userData as any).role,
-              company_id: (userData as any).company_id,
-              transportadora_id: (userData as any).transportadora_id
+              role: user.role,
+              company_id: user.empresa_id || undefined,
+              transportadora_id: user.transportadora_id || undefined
             })
           }
         }

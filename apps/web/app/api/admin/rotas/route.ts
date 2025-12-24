@@ -5,10 +5,13 @@ import { createClient } from '@supabase/supabase-js'
 import { requireAuth } from '@/lib/api-auth'
 import { logger, logError } from '@/lib/logger'
 import { createRouteSchema } from '@/lib/validation/schemas'
+import type { Database } from '@/types/supabase'
 
 export const runtime = 'nodejs'
 
 import { getSupabaseUrl, getSupabaseServiceKey } from '@/lib/env'
+
+type EmpresasInsert = Database['public']['Tables']['empresas']['Insert']
 
 function getSupabaseAdmin() {
   const url = getSupabaseUrl()
@@ -93,7 +96,7 @@ export async function POST(request: NextRequest) {
               id: testCompanyId,
               name: 'Empresa Teste Padrão',
               is_active: true
-            } as any)
+            } as EmpresasInsert)
             .select('id')
             .single()
 

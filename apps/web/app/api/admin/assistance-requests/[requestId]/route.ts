@@ -59,7 +59,7 @@ export async function PUT(
 
     // Atualizar ocorrência
     const { data: updatedRequest, error: updateError } = await (supabaseAdmin
-      .from('gf_service_requests') as any)
+      .from('gf_service_requests'))
       .update(updateData)
       .eq('id', requestId)
       .select()

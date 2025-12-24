@@ -36,7 +36,7 @@ export function BroadcastModal({ isOpen, onClose, onSave, empresaId }: Broadcast
 
     setLoading(true)
     try {
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from("gf_announcements")
         .insert({
           empresa_id: empresaId,

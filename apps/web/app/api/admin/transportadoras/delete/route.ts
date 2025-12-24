@@ -79,7 +79,7 @@ export async function DELETE(req: NextRequest) {
     // 4. Verificar se há outras tabelas com referências
     try {
       const { data: costsData, error: costsCheckError } = await (supabase
-        .from('costs' as any)
+        .from('gf_costs')
         .select('id')
         .eq('transportadora_id', carrierId)
         .limit(1))
@@ -90,7 +90,7 @@ export async function DELETE(req: NextRequest) {
           .update({ transportadora_id: null })
           .eq('transportadora_id', carrierId)
       }
-    } catch (costsError: any) {
+    } catch (costsError: unknown) {
       logger.warn('Tabela costs não encontrada ou sem coluna transportadora_id, continuando...')
     }
 
@@ -109,7 +109,7 @@ export async function DELETE(req: NextRequest) {
     await invalidateEntityCache('gestor_transportadora', carrierId)
 
     return successResponse({ message: 'Transportadora excluída com sucesso' })
-  } catch (error: any) {
+  } catch (error: unknown) {
     logError('Erro ao processar exclusão de transportadora', { error, carrierId }, 'TransportadorasDeleteAPI')
     return errorResponse(error, 500, 'Erro ao processar requisição')
   }

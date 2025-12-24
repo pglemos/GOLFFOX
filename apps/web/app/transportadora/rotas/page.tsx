@@ -61,14 +61,14 @@ export default function TransportadoraRotasPage() {
     const loadRoutes = useCallback(async () => {
         try {
             setDataLoading(true)
-            const { data, error } = await (supabase as any)
-                .from('gf_routes')
+            const { data, error } = await supabase
+                .from('rotas')
                 .select(`
           *,
-          motorista:users!gf_routes_driver_id_fkey(name),
-          veiculo:gf_vehicles(plate)
+          motorista:users!rotas_motorista_id_fkey(name),
+          veiculo:veiculos(plate)
         `)
-                .eq('transportadora_id', (user as any)?.transportadora_id)
+                .eq('transportadora_id', user?.transportadora_id || '')
                 .order('scheduled_date', { ascending: false })
 
             if (error) throw error

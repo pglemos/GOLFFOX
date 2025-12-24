@@ -36,6 +36,10 @@ import { globalSyncManager } from "@/lib/global-sync"
 import { t } from "@/lib/i18n"
 import { supabase } from "@/lib/supabase"
 import { notifySuccess, notifyError } from "@/lib/toast"
+import type { Database } from "@/types/supabase"
+
+type RotasUpdate = Database['public']['Tables']['rotas']['Update']
+type RotasInsert = Database['public']['Tables']['rotas']['Insert']
 
 interface RouteData {
   id?: string
@@ -185,7 +189,7 @@ export function RouteModal({
         // Atualizar
         const { error } = await supabase
           .from('rotas')
-          .update(payload as any)
+          .update(payload as RotasUpdate)
           .eq('id', route.id)
 
         if (error) throw error
@@ -206,7 +210,7 @@ export function RouteModal({
         // Criar
         const { data, error } = await supabase
           .from('rotas')
-          .insert(payload as any)
+          .insert(payload as RotasInsert)
           .select("*")
           .single()
 
@@ -369,7 +373,7 @@ export function RouteModal({
 
     const subscribe = () => {
       attempts++
-      unsub = (supabase as any)
+      unsub = supabase
         .channel(`rt_gf_route_plan_${routeId}`)
         .on('postgres_changes', { event: '*', schema: 'public', table: 'gf_route_plan', filter: `route_id=eq.${routeId}` }, trigger)
         .subscribe((status: string) => {
@@ -387,7 +391,7 @@ export function RouteModal({
     return () => {
       if (timeoutRef) clearTimeout(timeoutRef)
       if (scheduled) clearTimeout(scheduled)
-      if (unsub) (supabase as any).removeChannel(unsub)
+      if (unsub) supabase.removeChannel(unsub)
     }
   }, [isOpen, route?.id, formData.id, debounceMs, realtimeRetries])
 

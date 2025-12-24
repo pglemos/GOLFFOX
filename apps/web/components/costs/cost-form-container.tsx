@@ -179,7 +179,7 @@ export function CostFormContainer({
     }, [form, attachment, companyId, transportadoraId, createCostMutation, onSuccess])
 
     const handleSaveAndAdd = useCallback(async () => {
-        await onSubmit(new Event('submit') as any)
+        await onSubmit(new Event('submit') as React.FormEvent<HTMLFormElement>)
         // Manter formulário aberto para novo lançamento
     }, [onSubmit])
 

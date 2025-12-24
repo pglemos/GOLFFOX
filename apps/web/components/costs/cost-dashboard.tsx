@@ -66,10 +66,10 @@ export function CostDashboard({ companyId, period = '30' }: CostDashboardProps) 
     total_passengers: 0,
     total_cost_30d: 0,
     total_cost_90d: 0,
-    budget_variance: null as any,
+    budget_variance: null as number | null,
   })
-  const [breakdown, setBreakdown] = useState<any[]>([])
-  const [monthlyTrend, setMonthlyTrend] = useState<any[]>([])
+  const [breakdown, setBreakdown] = useState<Record<string, unknown>[]>([])
+  const [monthlyTrend, setMonthlyTrend] = useState<Record<string, unknown>[]>([])
   const [loading, setLoading] = useState(true)
   const [chartsLoading, setChartsLoading] = useState(true)
 

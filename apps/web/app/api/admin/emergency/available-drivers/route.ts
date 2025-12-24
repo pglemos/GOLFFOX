@@ -37,13 +37,13 @@ export async function GET(req: NextRequest) {
     }
 
     const activeDriverIds = new Set(
-      (activeTrips || []).map((t: any) => t.motorista_id).filter(Boolean)
+      (activeTrips || []).map((t: { motorista_id?: string | null }) => t.motorista_id).filter(Boolean)
     )
 
     // Filtrar motoristas disponíveis (não estão em viagem)
-    const availableDrivers = ((motoristas || []) as any[])
-      .filter((motorista: any) => !activeDriverIds.has(motorista.id))
-      .map((motorista: any) => ({
+    const availableDrivers = (motoristas || [])
+      .filter((motorista: { id: string }) => !activeDriverIds.has(motorista.id))
+      .map((motorista: { id: string; name?: string | null; email?: string | null }) => ({
         id: motorista.id,
         name: motorista.name || motorista.email?.split('@')[0] || 'Motorista',
         email: motorista.email,
@@ -55,7 +55,7 @@ export async function GET(req: NextRequest) {
       success: true,
       drivers: availableDrivers
     })
-  } catch (error: any) {
+  } catch (error: unknown) {
     logError('Erro ao buscar motoristas disponíveis', { error }, 'AvailableDriversAPI')
     return NextResponse.json(
       {

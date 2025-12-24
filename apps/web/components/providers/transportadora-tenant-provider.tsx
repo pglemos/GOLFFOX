@@ -48,11 +48,11 @@ export function TransportadoraTenantProvider({ children }: TransportadoraTenantP
 
                 if (foundId) {
                     // Buscar dados da transportadora
-                    const { data: transportadoraData } = await (supabase
+                    const { data: transportadoraData } = await supabase
                         .from('transportadoras')
                         .select('id, name, logo_url')
                         .eq('id', foundId)
-                        .single() as any)
+                        .maybeSingle()
 
                     if (transportadoraData) {
                         setTransportadoraId(transportadoraData.id)

@@ -14,7 +14,9 @@ import { SkeletonList } from "@/components/ui/skeleton"
 import { formatCurrency } from "@/lib/kpi-utils"
 import { supabase } from "@/lib/supabase"
 import { logError } from "@/lib/logger"
+import type { Database } from "@/types/supabase"
 
+type GfContractsRow = Database['public']['Tables']['gf_contracts']['Row']
 
 interface Contract {
     id: string
@@ -38,13 +40,13 @@ export function ContractsList({ companyId }: ContractsListProps) {
         const loadContracts = async () => {
             try {
                 const { data, error } = await supabase
-                    .from('gf_contracts' as any)
+                    .from('gf_contracts')
                     .select('*')
-                    .eq('company_id', companyId)
+                    .eq('empresa_id', companyId)
                     .order('created_at', { ascending: false })
 
                 if (error) throw error
-                setContracts(data as any as Contract[])
+                setContracts((data || []) as Contract[])
             } catch (error) {
                 logError('Erro ao carregar contratos', { error }, 'ContractsList')
             } finally {

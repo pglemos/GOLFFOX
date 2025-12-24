@@ -212,7 +212,7 @@ async function dispatchPostHandler(request: NextRequest) {
 
     // Buscar dados da view segura (view materializada - selecionar todas as colunas)
     const { data, error } = await supabase
-      .from(viewName as any)
+      .from(viewName as 'v_reports_delays_secure' | 'v_reports_occupancy_secure' | 'v_reports_not_boarded_secure' | 'v_reports_efficiency_secure' | 'v_reports_roi_sla_secure')
       .select('*')
       .eq('empresa_id', companyId)
       .limit(1000)
@@ -246,7 +246,7 @@ async function dispatchPostHandler(request: NextRequest) {
     const filename = `${reportKey}_${companyId}_${new Date().toISOString().split('T')[0]}.csv`
 
     // Determinar destinatários
-    const recipients = (schedule as any)?.recipients || []
+    const recipients = Array.isArray(schedule?.recipients) ? schedule.recipients as string[] : (schedule?.recipients ? [schedule.recipients as string] : [])
 
     // Enviar email se houver destinatários
     if (recipients.length > 0) {

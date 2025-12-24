@@ -12,11 +12,15 @@ import { Label } from "@/components/ui/label"
 import { error as logError } from "@/lib/logger"
 import { supabase } from "@/lib/supabase"
 import { notifySuccess, notifyError } from "@/lib/toast"
+import type { Database } from "@/types/supabase"
+
+type GfEmployeeCompanyUpdate = Database['public']['Tables']['gf_employee_company']['Update']
+type UsersUpdate = Database['public']['Tables']['users']['Update']
 
 
 
 interface FuncionarioModalProps {
-  funcionario: any | null
+  funcionario: { id?: string; employee_id?: string; [key: string]: unknown } | null
   isOpen: boolean
   onClose: () => void
   onSave: () => void
@@ -130,7 +134,7 @@ export function FuncionarioModal({ funcionario, isOpen, onClose, onSave, empresa
 
       if (funcionario?.id) {
         // Update
-        const { error } = await (supabase as any)
+        const { error } = await supabase
           .from("gf_employee_company")
           .update({
             cpf: formData.cpf,
@@ -147,13 +151,13 @@ export function FuncionarioModal({ funcionario, isOpen, onClose, onSave, empresa
             address_city: formData.addressData.city || null,
             address_state: formData.addressData.state || null
           })
-          .eq("id", funcionario.id)
+          .eq("id", funcionario.id) as { error: unknown }
 
         if (error) throw error
 
         // Update user if exists
         if (funcionario.employee_id) {
-          await (supabase as any)
+          await supabase
             .from("users")
             .update({
               name: formData.name,

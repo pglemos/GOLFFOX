@@ -4,6 +4,9 @@ import { requireAuth } from '@/lib/api-auth'
 import { logError, logger } from '@/lib/logger'
 import { getSupabaseAdmin } from '@/lib/supabase-client'
 import { createTripSchema } from '@/lib/validation/schemas'
+import type { Database } from '@/types/supabase'
+
+type RotasInsert = Database['public']['Tables']['rotas']['Insert']
 
 export const runtime = 'nodejs'
 
@@ -228,7 +231,7 @@ export async function POST(request: NextRequest) {
               origin: 'Origem',
               destination: 'Destino',
               is_active: true
-            } as any)
+            } as RotasInsert)
             .select('id, empresa_id')
             .single()
 

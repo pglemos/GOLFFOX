@@ -26,6 +26,11 @@ import { useSupabaseSync } from "@/hooks/use-supabase-sync"
 import { logError } from "@/lib/logger"
 import { supabase } from "@/lib/supabase"
 import { notifySuccess, notifyError } from "@/lib/toast"
+import type { Database } from "@/types/supabase"
+
+type GfVeiculoChecklistsUpdate = Database['public']['Tables']['gf_veiculo_checklists']['Update']
+type GfVeiculoChecklistsInsert = Database['public']['Tables']['gf_veiculo_checklists']['Insert']
+type GfAuditLogInsert = Database['public']['Tables']['gf_audit_log']['Insert']
 
 interface VeiculoChecklist {
   id?: string
@@ -149,9 +154,9 @@ export function VehicleChecklistModal({
 
       if (checklist?.id) {
         // Atualizar
-        const { error } = await (supabase as any)
+        const { error } = await supabase
           .from("gf_veiculo_checklists")
-          .update(checklistData)
+          .update(checklistData as GfVeiculoChecklistsUpdate)
           .eq("id", checklist.id)
 
         if (error) throw error
@@ -167,9 +172,9 @@ export function VehicleChecklistModal({
         notifySuccess('', { i18n: { ns: 'common', key: 'success.checklistUpdated' } })
       } else {
         // Criar
-        const { data, error } = await (supabase as any)
+        const { data, error } = await supabase
           .from("gf_veiculo_checklists")
-          .insert(checklistData)
+          .insert(checklistData as GfVeiculoChecklistsInsert)
           .select()
           .single()
 
@@ -192,7 +197,7 @@ export function VehicleChecklistModal({
       try {
         const { data: { session } } = await supabase.auth.getSession()
         if (session) {
-          await (supabase as any).from('gf_audit_log').insert({
+          await supabase.from('gf_audit_log').insert({
             actor_id: session.user.id,
             action_type: checklist?.id ? 'update' : 'create',
             resource_type: 'veiculo_checklist',

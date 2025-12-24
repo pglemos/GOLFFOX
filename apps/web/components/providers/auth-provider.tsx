@@ -82,7 +82,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           .eq('id', session.user.id)
           .maybeSingle()
 
-        const p = profile as any
+        const p = profile
         setUser({
           id: session.user.id,
           email: session.user.email || '',

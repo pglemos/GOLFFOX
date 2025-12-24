@@ -62,7 +62,7 @@ async function postHandler(request: NextRequest) {
         // Verificar métricas com rating 'poor' e gerar alertas
         const poorMetrics = metrics?.filter((m: { rating?: string; name?: string }) => m.rating === 'poor') || []
         if (poorMetrics.length > 0) {
-          await (supabase.from('gf_operational_alerts') as any).insert({
+          await supabase.from('gf_operational_alerts').insert({
             type: 'performance',
             severity: 'warning',
             title: 'Métricas de Performance Degradadas',
