@@ -77,10 +77,10 @@ export interface DocumentConfig {
 export const DOCUMENTS_CONFIG: Record<EntityType, DocumentConfig> = {
     transportadora: {
         bucket: "documentos-transportadora",
-        endpoint: "/api/admin/carriers",
+        endpoint: "/api/admin/transportadoras",
         table: "gf_transportadora_documents",
         foreignKey: "transportadora_id",
-        paramName: "carrierId",
+        paramName: "transportadoraId",
         documentTypes: Object.keys(TRANSPORTADORA_DOCUMENT_LABELS) as TransportadoraDocumentType[],
         documentLabels: TRANSPORTADORA_DOCUMENT_LABELS as Record<string, string>,
         requiredDocuments: REQUIRED_TRANSPORTADORA_DOCUMENTS as string[],

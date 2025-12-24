@@ -60,7 +60,7 @@ export function TransportadoraLegalRepSection({
         setLoading(true)
         try {
             // Carregar dados do representante legal
-            const response = await fetch(`/api/admin/carriers/${carrierId}`)
+            const response = await fetch(`/api/admin/transportadoras/${carrierId}`)
             if (response.ok) {
                 const data = await response.json()
                 if (data) {
@@ -75,7 +75,7 @@ export function TransportadoraLegalRepSection({
             }
 
             // Carregar CNH do representante legal
-            const docsResponse = await fetch(`/api/admin/carriers/${carrierId}/documents`)
+            const docsResponse = await fetch(`/api/admin/transportadoras/${carrierId}/documents`)
             if (docsResponse.ok) {
                 const docs = await docsResponse.json()
                 const cnhDoc = docs?.find((d: { document_type: string }) => d.document_type === "legal_rep_cnh")
@@ -110,7 +110,7 @@ export function TransportadoraLegalRepSection({
             const result = await upload(fileToUpload, carrierId, "legal_rep_cnh")
             if (!result) return false
 
-            const response = await fetch(`/api/admin/carriers/${carrierId}/documents`, {
+            const response = await fetch(`/api/admin/transportadoras/${carrierId}/documents`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({

@@ -60,7 +60,7 @@ export function TransportadoraBankingSection({
 
         setLoading(true)
         try {
-            const response = await fetch(`/api/admin/carriers/${carrierId}`)
+            const response = await fetch(`/api/admin/transportadoras/${carrierId}`)
             if (response.ok) {
                 const data = await response.json()
                 if (data) {
