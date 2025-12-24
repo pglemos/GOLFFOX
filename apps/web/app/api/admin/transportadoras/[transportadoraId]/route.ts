@@ -25,7 +25,7 @@ export async function GET(
         const supabase = getSupabaseAdmin()
         const { data, error } = await supabase
             .from('transportadoras')
-            .select('*')
+            .select('id, name, cnpj, email, phone, contact_person, address, address_city, address_state, address_zip_code, bank_account, bank_name, pix_key, is_active, created_at, updated_at')
             .eq('id', transportadoraId)
             .single()
 

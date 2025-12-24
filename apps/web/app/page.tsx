@@ -74,8 +74,8 @@ function LoginContent() {
         // Usar window.location para garantir um redirecionamento limpo com a nova sessão
         window.location.href = next
       }
-    } catch (err: any) {
-      setError(err.message)
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Erro desconhecido')
       notifyError(err, "Falha na autenticação")
     } finally {
       setLoading(false)

@@ -57,7 +57,7 @@ export async function PUT(
     // Verificar se viagem existe
     const { data: existingTrip, error: fetchError } = await supabaseAdmin
       .from('viagens')
-      .select('*')
+      .select('id, rota_id, motorista_id, veiculo_id, status, scheduled_date, scheduled_start_time, start_time, end_time, actual_start_time, actual_end_time, distance_km, notes, created_at, updated_at')
       .eq('id', tripId)
       .single()
 

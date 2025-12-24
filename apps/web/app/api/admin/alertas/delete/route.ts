@@ -71,7 +71,7 @@ export async function DELETE(request: NextRequest) {
       success: true,
       message: 'Alerta excluído com sucesso'
     })
-  } catch (error: any) {
+  } catch (error: unknown) {
     logError('Erro ao excluir alerta', { error, alertId: request.nextUrl.searchParams.get('id') }, 'AlertsDeleteAPI')
     return NextResponse.json(
       { error: 'Erro ao excluir alerta', message: error.message },

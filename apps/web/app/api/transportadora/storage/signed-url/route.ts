@@ -97,7 +97,7 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json({ signed_url: data?.signedUrl })
-  } catch (error: any) {
+  } catch (error: unknown) {
     return NextResponse.json(
       { error: 'Erro ao processar requisição', message: error.message },
       { status: 500 }

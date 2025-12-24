@@ -256,7 +256,7 @@ export function CostFormPresentational({
                                     <Label>Intervalo</Label>
                                     <Select
                                         value={form.watch("recurringInterval") || ""}
-                                        onValueChange={(value: any) => form.setValue("recurringInterval", value)}
+                                        onValueChange={(value: string) => form.setValue("recurringInterval", value as 'daily' | 'weekly' | 'monthly' | 'yearly' | null)}
                                     >
                                         <SelectTrigger>
                                             <SelectValue placeholder="Selecione..." />

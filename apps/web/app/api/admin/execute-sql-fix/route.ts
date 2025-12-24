@@ -113,13 +113,13 @@ async function executeSqlFixHandler(request: NextRequest, auditContext: AuditCon
         '3. Depois execute: SELECT fix_companies_updated_at();'
       ]
     })
-  } catch (error: any) {
+  } catch (error: unknown) {
     logError('Erro ao executar correção', { 
-      error: error.message,
+      error: error instanceof Error ? error.message : 'Erro desconhecido',
       userId: auditContext.userId 
     }, 'ExecuteSQLFixAPI')
     return NextResponse.json(
-      { error: 'Erro ao executar correção', message: error.message },
+      { error: 'Erro ao executar correção', message: error instanceof Error ? error.message : 'Erro desconhecido' },
       { status: 500 }
     )
   }

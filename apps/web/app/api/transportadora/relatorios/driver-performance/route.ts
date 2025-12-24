@@ -106,7 +106,7 @@ export async function GET(req: NextRequest) {
         top_performer: driverPerformance[0] || null
       }
     })
-  } catch (err: any) {
+  } catch (err: unknown) {
     logError('Erro ao gerar relatório de performance', { error: err }, 'DriverPerformanceReportAPI')
     const errorMessage = err?.message || 'Erro ao gerar relatório'
     return NextResponse.json(

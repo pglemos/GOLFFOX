@@ -36,7 +36,7 @@ interface MapFiltersProps {
     shift: string
     search: string
   }
-  onFiltersChange: (filters: any) => void
+  onFiltersChange: (filters: { company: string; route: string; status: string; shift: string; search: string }) => void
   vehiclesCount: number
   routesCount: number
   alertsCount: number

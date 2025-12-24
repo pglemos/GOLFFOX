@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
 
     let query = supabaseAdmin
       .from('gf_escalated_alerts')
-      .select('*')
+      .select('id, type, severity, title, message, source, source_id, source_name, status, resolution, resolved_at, resolved_by, created_at, updated_at')
       .order('created_at', { ascending: false })
 
     // Filtrar por status se fornecido

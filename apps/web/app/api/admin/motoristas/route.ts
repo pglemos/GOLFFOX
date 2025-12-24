@@ -158,7 +158,7 @@ export async function POST(request: NextRequest) {
     })
 
     return successResponse({ motorista: newDriver })
-  } catch (error: any) {
+  } catch (error: unknown) {
     logError('Erro na API de criar motorista', { error }, 'DriversAPI')
     return errorResponse(error, 500, 'Erro ao criar motorista')
   }

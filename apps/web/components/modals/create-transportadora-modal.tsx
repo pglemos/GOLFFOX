@@ -116,7 +116,7 @@ export function CreateTransportadoraModal({ isOpen, onClose, onSave }: CreateTra
       } else {
         throw new Error(result.error || 'Erro ao criar transportadora')
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       logError('Exceção ao criar transportadora', { error: err }, 'CreateTransportadoraModal')
       notifyError(err, err.message || 'Erro ao criar transportadora')
     } finally {

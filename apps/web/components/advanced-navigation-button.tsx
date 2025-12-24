@@ -57,7 +57,9 @@ export function AdvancedNavigationButton({
 
       if (error) throw error
 
-      return data?.map((point: any) => ({
+      import type { Database } from '@/types/supabase'
+      type GfRotaPlanoRow = Database['public']['Tables']['gf_rota_plano']['Row']
+      return data?.map((point: GfRotaPlanoRow) => ({
         lat: point.latitude,
         lng: point.longitude,
         address: point.address || '',

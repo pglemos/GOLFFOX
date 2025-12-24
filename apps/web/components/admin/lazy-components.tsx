@@ -50,17 +50,17 @@ export const LazyCostDashboard = lazy(() =>
  * Componentes com HOC de lazy loading (incluem Error Boundary e Suspense)
  */
 export const AdminMapWithSkeleton = withLazyLoading(
-  () => import('@/components/admin-map/admin-map').then(mod => ({ default: mod.AdminMap })) as Promise<{ default: ComponentType<any> }>,
+  () => import('@/components/admin-map/admin-map').then(mod => ({ default: mod.AdminMap })) as Promise<{ default: ComponentType<Record<string, never>> }>,
   MapPageSkeleton
 )
 
 export const FinancialDashboardWithSkeleton = withLazyLoading(
-  () => import('@/components/costs/financial-dashboard-expanded').then(mod => ({ default: mod.FinancialDashboardExpanded })) as Promise<{ default: ComponentType<any> }>,
+  () => import('@/components/costs/financial-dashboard-expanded').then(mod => ({ default: mod.FinancialDashboardExpanded })) as Promise<{ default: ComponentType<Record<string, never>> }>,
   DashboardPageSkeleton
 )
 
 export const CostDashboardWithSkeleton = withLazyLoading(
-  () => import('@/components/costs/cost-dashboard').then(mod => ({ default: mod.CostDashboard })) as Promise<{ default: ComponentType<any> }>,
+  () => import('@/components/costs/cost-dashboard').then(mod => ({ default: mod.CostDashboard })) as Promise<{ default: ComponentType<Record<string, never>> }>,
   DashboardPageSkeleton
 )
 

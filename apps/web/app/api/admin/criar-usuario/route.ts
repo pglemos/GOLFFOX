@@ -58,10 +58,10 @@ export async function POST(request: NextRequest) {
             user: createdUser
         })
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         logError('Erro ao criar usuário', { error }, 'CreateUserAPI')
         // Mapear erros conhecidos para status 400
-        const message = error.message
+        const message = error instanceof Error ? error.message : 'Erro desconhecido'
         const status = message.includes('obrigatório') || message.includes('já está cadastrado') || message.includes('inválido') ? 400 : 500
 
         return NextResponse.json({ error: 'Erro ao criar usuário', message }, { status })

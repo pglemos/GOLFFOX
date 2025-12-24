@@ -111,7 +111,7 @@ export async function POST(req: NextRequest) {
       file_type: file.type,
       storage_path: filePath
     })
-  } catch (error: any) {
+  } catch (error: unknown) {
     return NextResponse.json(
       { error: 'Erro ao processar upload', message: error.message },
       { status: 500 }

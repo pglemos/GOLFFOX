@@ -132,7 +132,7 @@ export function EditUserModal({
 
       onSave()
       onClose()
-    } catch (error: any) {
+    } catch (error: unknown) {
       logError("Erro ao atualizar usuário", { error }, 'EditUserModal')
       notifyError(error, error.message || "Erro ao atualizar usuário")
     } finally {

@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
       // sent: true,
       // messageId: 'email-message-id'
     })
-  } catch (error: any) {
+  } catch (error: unknown) {
     return NextResponse.json(
       { error: 'Erro ao enviar email', message: error.message },
       { status: 500 }

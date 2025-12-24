@@ -21,7 +21,7 @@ export interface Column<T> {
   key: string
   label: string
   sortable?: boolean
-  render?: (value: any, row: T, index: number) => React.ReactNode
+  render?: (value: unknown, row: T, index: number) => React.ReactNode
   filterable?: boolean
   filterType?: "text" | "select" | "date"
   filterOptions?: { label: string; value: string }[]

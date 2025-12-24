@@ -211,7 +211,7 @@ export function VehicleChecklistModal({
 
       onSave()
       onClose()
-    } catch (error: any) {
+    } catch (error: unknown) {
       logError("Erro ao salvar checklist", { error }, 'VehicleChecklistModal')
       notifyError(error, 'Erro ao salvar checklist', { i18n: { ns: 'common', key: 'errors.saveChecklist' } })
     } finally {

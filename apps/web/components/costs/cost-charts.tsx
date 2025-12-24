@@ -109,9 +109,9 @@ export function CostCharts({ companyId, period = 'month' }: CostChartProps) {
         .limit(20)
 
       if (companies) {
-        setByCompanyData(companies.map((c: any) => ({
+        setByCompanyData(companies.map((c: { company_id?: string; company_name?: string; by_company?: number | string }) => ({
           name: c.company_name || 'Empresa',
-          cost: parseFloat(c.by_company || 0)
+          cost: parseFloat(String(c.by_company || 0))
         })))
       }
     } catch (error) {

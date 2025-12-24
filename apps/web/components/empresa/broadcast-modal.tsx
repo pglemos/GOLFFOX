@@ -54,7 +54,7 @@ export function BroadcastModal({ isOpen, onClose, onSave, empresaId }: Broadcast
       setTitle("")
       setMessage("")
       setTarget("empresa")
-    } catch (error: any) {
+    } catch (error: unknown) {
       logError("Erro ao enviar broadcast", { error }, 'BroadcastModal')
       notifyError(error, `Erro ao enviar broadcast: ${error.message}`, { i18n: { ns: 'operador', key: 'broadcast.errors.send', params: { message: error.message } } })
     } finally {

@@ -188,7 +188,7 @@ export async function DELETE(request: NextRequest) {
     logger.log(`✅ Rota excluída com sucesso: ${routeId}`, data)
 
     return NextResponse.json({ success: true, message: 'Rota excluída com sucesso' })
-  } catch (error: any) {
+  } catch (error: unknown) {
     logError('Erro ao excluir rota', { error, routeId: request.nextUrl.searchParams.get('id') }, 'RoutesDeleteAPI')
     return NextResponse.json(
       { error: 'Erro ao excluir rota', message: error.message },

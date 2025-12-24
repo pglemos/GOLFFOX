@@ -231,7 +231,7 @@ export function Topbar({
       } else {
         router.push('/')
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       logError('Erro no logout', { error }, 'Topbar')
       // Mesmo com erro, tentar limpar e redirecionar
       if (typeof window !== 'undefined') {

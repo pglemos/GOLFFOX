@@ -21,14 +21,16 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    function tryDecode(cookieValue: string): any | null {
+    function tryDecode(cookieValue: string): Record<string, unknown> | null {
       try {
         const b64 = Buffer.from(cookieValue, 'base64').toString('utf-8')
-        return JSON.parse(b64)
+        const parsed = JSON.parse(b64)
+        return typeof parsed === 'object' && parsed !== null ? parsed as Record<string, unknown> : null
       } catch (_) {
         try {
           const uri = decodeURIComponent(cookieValue)
-          return JSON.parse(uri)
+          const parsed = JSON.parse(uri)
+          return typeof parsed === 'object' && parsed !== null ? parsed as Record<string, unknown> : null
         } catch {
           return null
         }
@@ -81,7 +83,7 @@ export async function POST(req: NextRequest) {
     })
 
     return response
-  } catch (error: any) {
+  } catch (error: unknown) {
     logError('Erro ao atualizar perfil', { error }, 'UpdateProfileAPI')
     return NextResponse.json(
       {

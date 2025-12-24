@@ -49,9 +49,9 @@ export async function PUT(
       success: true,
       user: updatedUser
     })
-  } catch (err: any) {
+  } catch (err: unknown) {
     // Mapear erros conhecidos
-    const message = err.message
+    const message = err instanceof Error ? err.message : 'Erro desconhecido'
     const status = message.includes('inválido') || message.includes('obrigatório') || message.includes('encontrado') ? 400 : 500
 
     // Se for erro de validação do serviço, retornar 400; se 'não encontrado' talvez 404

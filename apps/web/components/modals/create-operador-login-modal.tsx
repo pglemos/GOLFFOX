@@ -185,8 +185,8 @@ export function CreateUserModal({
       } else {
         throw new Error(result.error || "Erro ao criar usuário")
       }
-    } catch (err: any) {
-      const errorMessage = err.message || "Erro ao criar usuário"
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : "Erro ao criar usuário"
       setError(errorMessage)
       notifyError(err, errorMessage)
     } finally {

@@ -247,7 +247,7 @@ export function GenericPickerModal<T extends PickerItem>({
   // Renderizar valor de coluna
   const renderColumnValue = (column: PickerColumn<T>, item: T): ReactNode => {
     const key = String(column.key)
-    let value: any = item
+    let value: T | Record<string, unknown> = item
 
     if (key.includes(".")) {
       const parts = key.split(".")

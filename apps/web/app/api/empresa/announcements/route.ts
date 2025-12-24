@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
 
         let query = supabase
             .from('announcements')
-            .select('*')
+            .select('id, title, message, type, target_role, empresa_id, transportadora_id, is_active, published_at, expires_at, created_at')
             .order('published_at', { ascending: false })
             .limit(limit);
 

@@ -32,7 +32,7 @@ export async function DELETE(request: NextRequest) {
     logger.log(`✅ Motorista excluído com sucesso: ${driverId}`)
 
     return successResponse(null, 200, { message: 'Motorista excluído com sucesso' })
-  } catch (error: any) {
+  } catch (error: unknown) {
     logError('Erro ao excluir motorista', { error, driverId: request.nextUrl.searchParams.get('id') }, 'DriversDeleteAPI')
     return errorResponse(error, 500, 'Erro ao excluir motorista')
   }

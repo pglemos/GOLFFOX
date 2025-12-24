@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
       // Nova estrutura com profile_type
       let query = supabaseAdmin
         .from('gf_cost_categories')
-        .select('*')
+        .select('id, name, profile_type, parent_id, icon, color, keywords, is_operational, is_active, display_order, created_at, updated_at')
         .order('display_order', { ascending: true })
 
       // Filtrar por perfil
@@ -76,7 +76,9 @@ export async function GET(request: NextRequest) {
       }
 
       // Transformar para o tipo CostCategory (snake_case)
-      const categories: CostCategory[] = (data || []).map((row: any) => ({
+      import type { Database } from '@/types/supabase'
+      type GfCostCategoriesRow = Database['public']['Tables']['gf_cost_categories']['Row']
+      const categories: CostCategory[] = (data || []).map((row: GfCostCategoriesRow) => ({
         id: row.id,
         name: row.name,
         profile_type: row.profile_type,

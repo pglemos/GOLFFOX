@@ -26,7 +26,7 @@ export async function GET(
     // Buscar motoristas na tabela users
     const { data: motoristas, error } = await supabase
       .from('users')
-      .select('*')
+      .select('id, name, email, cpf, phone, cnh, cnh_category, avatar_url, is_active, transportadora_id, empresa_id, role, created_at, updated_at')
       .eq('role', 'motorista')
       .eq('transportadora_id', transportadoraId)
       .order('name', { ascending: true })

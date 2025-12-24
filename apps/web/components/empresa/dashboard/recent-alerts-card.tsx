@@ -59,7 +59,7 @@ export function RecentAlertsCard({ companyId }: RecentAlertsCardProps) {
                     </div>
                 ) : (
                     <div className="space-y-3">
-                        {alerts.map((alert: any) => (
+                        {alerts.map((alert: GfAlertsRow) => (
                             <div key={alert.id} className="p-3 bg-white rounded-lg border border-bg-soft shadow-sm flex items-start gap-3">
                                 <div className={`mt-0.5 p-1.5 rounded-full flex-shrink-0 ${alert.severity === 'critical' ? 'bg-error-light text-error' :
                                         alert.severity === 'warning' ? 'bg-brand-light text-brand' : 'bg-info-light text-info'

@@ -56,10 +56,10 @@ export async function DELETE(request: NextRequest) {
       success: true,
       message: 'Solicitação de socorro excluída com sucesso'
     })
-  } catch (error: any) {
+  } catch (error: unknown) {
     logError('Erro ao excluir solicitação de socorro', { error, requestId: request.nextUrl.searchParams.get('id') }, 'AssistanceRequestsDeleteAPI')
     return NextResponse.json(
-      { error: 'Erro ao excluir solicitação de socorro', message: error.message },
+      { error: 'Erro ao excluir solicitação de socorro', message: error instanceof Error ? error.message : 'Erro desconhecido' },
       { status: 500 }
     )
   }

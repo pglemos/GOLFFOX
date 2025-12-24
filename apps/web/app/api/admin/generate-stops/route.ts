@@ -156,8 +156,8 @@ export async function POST(req: NextRequest) {
           if (error) throw error
           log('info', 'Plano de rota salvo em banco', { tableName, count: json.gfRoutePlan.length })
         }
-      } catch (e: any) {
-        log('error', 'Falha ao salvar stops no banco', { message: e?.message })
+      } catch (e: unknown) {
+        log('error', 'Falha ao salvar stops no banco', { message: e instanceof Error ? e.message : 'Erro desconhecido' })
       }
     }
   }

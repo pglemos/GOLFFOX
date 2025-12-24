@@ -132,7 +132,7 @@ export async function POST(req: NextRequest) {
       message: 'Socorro despachado com sucesso!',
       assistanceRequestId
     })
-  } catch (error: any) {
+  } catch (error: unknown) {
     logError('Erro ao despachar socorro', { error }, 'EmergencyDispatchAPI')
     return NextResponse.json(
       {

@@ -55,7 +55,7 @@ async function handleDelete(request: NextRequest) {
     logger.log(`✅ Usuário excluído com sucesso: ${userId}`)
 
     return successResponse(null, 200, { message: 'Usuário excluído com sucesso' })
-  } catch (error: any) {
+  } catch (error: unknown) {
     const userId = request.nextUrl.searchParams.get('id')
     logError('Erro ao excluir usuário', { error, userId }, 'UsersDeleteAPI')
     return errorResponse(error, 500, 'Erro ao excluir usuário')

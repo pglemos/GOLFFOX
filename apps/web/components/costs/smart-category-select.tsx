@@ -97,16 +97,24 @@ export function SmartCategorySelect({
                     setCategories(result.data)
                 } else if (Array.isArray(result)) {
                     // Compatibilidade com estrutura legada
-                    setCategories(result.map((cat: any) => ({
+                    interface LegacyCategory {
+                        id: string
+                        category?: string
+                        name?: string
+                        group_name?: string
+                        created_at?: string
+                        updated_at?: string
+                    }
+                    setCategories(result.map((cat: LegacyCategory) => ({
                         id: cat.id,
-                        name: cat.category || cat.name || cat.group_name,
-                        profile_type: 'all',
+                        name: cat.category || cat.name || cat.group_name || '',
+                        profile_type: 'all' as const,
                         keywords: [],
                         is_operational: false,
                         is_active: true,
                         display_order: 0,
-                        created_at: cat.created_at,
-                        updated_at: cat.updated_at,
+                        created_at: cat.created_at || '',
+                        updated_at: cat.updated_at || '',
                     })))
                 }
             } catch (error) {

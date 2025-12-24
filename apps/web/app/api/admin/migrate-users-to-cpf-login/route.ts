@@ -104,8 +104,8 @@ export async function POST(request: NextRequest) {
                 results.migrated++
                 debug('Usuário migrado', { name: user.name, email: newAuthEmail.replace(/^(.{2}).+(@.*)$/, '$1***$2') }, 'MigrateUsersToCPFAPI')
 
-            } catch (err: any) {
-                results.errors.push(`${user.name}: ${err.message}`)
+            } catch (err: unknown) {
+                results.errors.push(`${user.name}: ${err instanceof Error ? err.message : 'Erro desconhecido'}`)
             }
         }
 

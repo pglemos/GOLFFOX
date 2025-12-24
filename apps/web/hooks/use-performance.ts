@@ -32,7 +32,7 @@ const defaultConfig: PerformanceConfig = {
 export function usePerformance(config: Partial<PerformanceConfig> = {}): {
   metrics: PerformanceMetrics
   isPerformanceGood: boolean
-  measureOperation: (name: string, operation: () => Promise<any>) => Promise<any>
+  measureOperation: <T>(name: string, operation: () => Promise<T>) => Promise<T>
   clearMetrics: () => void
 } {
   const finalConfig = { ...defaultConfig, ...config }
@@ -95,7 +95,7 @@ export function usePerformance(config: Partial<PerformanceConfig> = {}): {
   }, [finalConfig.enableNetworkMonitoring])
 
   // Operation Measurement
-  const measureOperation = useCallback(async (name: string, operation: () => Promise<any>) => {
+  const measureOperation = useCallback(async <T>(name: string, operation: () => Promise<T>): Promise<T> => {
     const start = performance.now()
     
     try {

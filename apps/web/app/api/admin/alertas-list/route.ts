@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
     // Query principal sem join para evitar erros de relacionamento
     let query = supabaseAdmin
       .from('gf_alerts')
-      .select('*')
+      .select('id, message, title, alert_type, type, severity, is_resolved, assigned_to, empresa_id, company_id, details, metadata, created_at, resolved_at')
       .order('created_at', { ascending: false })
       .limit(100)
 
@@ -73,7 +73,7 @@ export async function GET(request: NextRequest) {
       if (error.code === '42703') { // Undefined column
         const { data: fallbackData, error: fallbackError } = await supabaseAdmin
           .from('gf_alerts')
-          .select('*')
+          .select('id, message, title, alert_type, type, severity, is_resolved, assigned_to, empresa_id, company_id, details, metadata, created_at, resolved_at')
           .order('created_at', { ascending: false })
           .limit(100)
 

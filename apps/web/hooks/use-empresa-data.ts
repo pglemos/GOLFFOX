@@ -38,7 +38,7 @@ export function useOperatorKPIs(companyId: string | null) {
       // A view segura já tem RLS configurado e funciona corretamente
       const { data, error: kpiError } = await supabase
         .from("v_operador_dashboard_kpis_secure")
-        .select("*")
+        .select("trips_today, trips_in_progress, trips_completed, delays_over_5min, avg_occupancy, daily_cost, sla_d0, company_id")
         .eq("company_id", companyId)
         .single()
 
@@ -174,7 +174,7 @@ export function useRoutes(companyId: string | null) {
 
       const { data, error } = await supabase
         .from("v_operador_routes_secure")
-        .select("*")
+        .select("id, name, description, empresa_id, transportadora_id, is_active, created_at, updated_at")
         .order("name", { ascending: true })
 
       if (error) throw error
@@ -202,7 +202,7 @@ export function useAlerts(
 
       let query = supabase
         .from("v_operador_alerts_secure")
-        .select("*", { count: "exact" })
+        .select("id, message, title, alert_type, type, severity, is_resolved, assigned_to, empresa_id, company_id, details, metadata, created_at, resolved_at", { count: "exact" })
         .order("created_at", { ascending: false })
         .range((pageParam - 1) * pageSize, pageParam * pageSize - 1)
 
@@ -268,7 +268,7 @@ export function useActiveTrips(companyId: string | null) {
 
       const { data, error } = await supabase
         .from("v_active_trips")
-        .select("*")
+        .select("id, rota_id, motorista_id, veiculo_id, status, started_at, estimated_arrival, company_id, created_at")
         .eq("company_id", companyId)
         // We ensure we only get truly active statuses
         .in("status", ["in_progress", "delayed"])

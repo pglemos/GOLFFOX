@@ -92,7 +92,7 @@ export async function GET() {
             success: true,
             results
         })
-    } catch (error: any) {
+    } catch (error: unknown) {
         return NextResponse.json({
             success: false,
             error: error.message

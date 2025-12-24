@@ -30,7 +30,7 @@ export async function GET(req: NextRequest) {
         // Buscar motoristas da transportadora
         const { data, error } = await supabaseServiceRole
             .from('users')
-            .select('*')
+            .select('id, name, email, cpf, phone, cnh, cnh_category, avatar_url, is_active, transportadora_id, empresa_id, role, created_at, updated_at')
             .eq('transportadora_id', userData.transportadora_id)
             .eq('role', 'motorista')
             .order('name', { ascending: true })

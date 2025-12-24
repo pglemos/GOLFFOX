@@ -210,7 +210,9 @@ async function dispatchPostHandler(request: NextRequest) {
       )
     }
 
-    // Buscar dados da view segura (view materializada - selecionar todas as colunas)
+    // Buscar dados da view segura (view materializada - selecionar todas as colunas dinamicamente)
+    // Para views de relatórios, selecionamos todas as colunas pois são agregadas e variam por tipo
+    // Mas podemos otimizar limitando a quantidade de dados retornados
     const { data, error } = await supabase
       .from(viewName as 'v_reports_delays_secure' | 'v_reports_occupancy_secure' | 'v_reports_not_boarded_secure' | 'v_reports_efficiency_secure' | 'v_reports_roi_sla_secure')
       .select('*')

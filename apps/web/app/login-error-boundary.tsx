@@ -27,7 +27,7 @@ export class LoginErrorBoundary extends Component<Props, State> {
     return { hasError: true, error }
   }
 
-  componentDidCatch(error: Error, errorInfo: any) {
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     logError('Erro capturado na página de login', {
       error: error.message,
       stack: error.stack,

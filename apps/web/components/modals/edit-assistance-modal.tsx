@@ -92,7 +92,7 @@ export function EditAssistanceModal({
 
       onSave()
       onClose()
-    } catch (error: any) {
+    } catch (error: unknown) {
       logError("Erro ao atualizar ocorrência", { error }, 'EditAssistanceModal')
       notifyError(error, error.message || "Erro ao atualizar ocorrência")
     } finally {

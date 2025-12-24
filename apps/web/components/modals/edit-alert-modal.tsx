@@ -91,7 +91,7 @@ export function EditAlertModal({
 
       onSave()
       onClose()
-    } catch (error: any) {
+    } catch (error: unknown) {
       logError("Erro ao atualizar alerta", { error }, 'EditAlertModal')
       notifyError(error, error.message || "Erro ao atualizar alerta")
     } finally {

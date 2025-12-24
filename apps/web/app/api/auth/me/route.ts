@@ -5,16 +5,18 @@ import { successResponse, unauthorizedResponse, errorResponse } from '@/lib/api-
 import { logError, debug, logger } from '@/lib/logger'
 import { withRateLimit } from '@/lib/rate-limit'
 
-function tryDecode(cookieValue: string): any | null {
+function tryDecode(cookieValue: string): Record<string, unknown> | null {
   try {
     // Base64
     const b64 = Buffer.from(cookieValue, 'base64').toString('utf-8')
-    return JSON.parse(b64)
+    const parsed = JSON.parse(b64)
+    return typeof parsed === 'object' && parsed !== null ? parsed as Record<string, unknown> : null
   } catch (_) {
     try {
       // URI encoded JSON
       const uri = decodeURIComponent(cookieValue)
-      return JSON.parse(uri)
+      const parsed = JSON.parse(uri)
+      return typeof parsed === 'object' && parsed !== null ? parsed as Record<string, unknown> : null
     } catch {
       return null
     }
@@ -29,7 +31,7 @@ async function meHandler(request: NextRequest) {
 
   // Obter dados do cookie golffox-session primeiro (método mais rápido e confiável)
   const cookie = request.cookies.get('golffox-session')?.value
-  let userData: any = null
+  let userData: Record<string, unknown> | null = null
 
   if (cookie) {
     debug('[AuthMeAPI] Cookie golffox-session encontrado, tentando decodificar...', {

@@ -21,7 +21,7 @@ interface DataTableMobileProps<T> {
   columns: Array<{
     key: string
     label: string
-    render?: (value: any, row: T) => React.ReactNode
+    render?: (value: unknown, row: T) => React.ReactNode
   }>
   onRowClick?: (row: T) => void
   className?: string
@@ -29,7 +29,7 @@ interface DataTableMobileProps<T> {
 }
 
 // Componente memoizado para cada card
-const TableRowCard = React.memo(function TableRowCard<T extends Record<string, any>>({
+const TableRowCard = React.memo(function TableRowCard<T extends Record<string, unknown>>({
   row,
   columns,
   onRowClick
@@ -38,7 +38,7 @@ const TableRowCard = React.memo(function TableRowCard<T extends Record<string, a
   columns: Array<{
     key: string
     label: string
-    render?: (value: any, row: T) => React.ReactNode
+    render?: (value: unknown, row: T) => React.ReactNode
   }>
   onRowClick?: (row: T) => void
 }) {
@@ -77,12 +77,12 @@ const TableRowCard = React.memo(function TableRowCard<T extends Record<string, a
       </CardContent>
     </Card>
   )
-}) as <T extends Record<string, any>>(props: {
+}) as <T extends Record<string, unknown>>(props: {
   row: T
   columns: Array<{
     key: string
     label: string
-    render?: (value: any, row: T) => React.ReactNode
+    render?: (value: unknown, row: T) => React.ReactNode
   }>
   onRowClick?: (row: T) => void
 }) => React.ReactElement

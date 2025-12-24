@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
 
         return NextResponse.json({ success: true, alert: data })
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         logError('Erro ao criar alerta (catch)', { error }, 'AlertsCreateAPI')
         return NextResponse.json(
             { error: 'Erro interno ao criar alerta', message: error.message },

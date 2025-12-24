@@ -65,7 +65,14 @@ export function MotoristaPickerModal({
         throw new Error(result.error || 'Erro ao carregar motoristas')
       }
 
-      const motoristasData: motorista[] = (result.motoristas || []).map((d: any) => ({
+      interface MotoristaApiResponse {
+        id: string
+        name?: string
+        cpf?: string
+        documents_valid?: boolean
+        rating?: number
+      }
+      const motoristasData: motorista[] = (result.motoristas || []).map((d: MotoristaApiResponse) => ({
         id: d.id,
         name: d.name || "Sem nome",
         cpf: d.cpf || "",

@@ -7,6 +7,9 @@ import { successResponse, errorResponse, validationErrorResponse } from '@/lib/a
 import { invalidateEntityCache } from '@/lib/next-cache'
 import { supabaseServiceRole } from '@/lib/supabase-server'
 import { CarrierUpdate } from '@/types/carrier'
+import type { Database } from '@/types/supabase'
+
+type TransportadorasUpdate = Database['public']['Tables']['transportadoras']['Update']
 
 export const runtime = 'nodejs'
 
@@ -70,8 +73,8 @@ export async function PUT(req: NextRequest) {
     const body = await req.json()
     const validated = carrierUpdateSchema.parse(body)
 
-    // Tipagem explícita 'any' para permitir campos dinâmicos
-    const updateData: any = {
+    // Construir objeto de atualização com tipos corretos
+    const updateData: Partial<TransportadorasUpdate> = {
       updated_at: new Date().toISOString(),
     }
 

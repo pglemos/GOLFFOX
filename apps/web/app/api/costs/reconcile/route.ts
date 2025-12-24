@@ -32,10 +32,10 @@ async function reconcileHandler(request: NextRequest) {
 
     const supabase = getSupabaseAdmin()
 
-    // Buscar dados de conciliação (view materializada - selecionar todas as colunas)
+    // Buscar dados de conciliação (view materializada - selecionar apenas colunas usadas)
     const { data: conciliation, error: conciliationError } = await supabase
       .from('v_costs_conciliation')
-      .select('*')
+      .select('invoice_id, invoice_line_id, invoice_number, empresa_id, company_name, rota_id, route_name, vehicle_id, vehicle_plate, invoiced_amount, invoiced_km, invoiced_trips, measured_amount, measured_km, measured_trips, discrepancy_amount, discrepancy_percent, notes')
       .eq('invoice_id', validated.invoice_id)
       .eq('route_id', validated.route_id || '')
       .single()
@@ -44,7 +44,7 @@ async function reconcileHandler(request: NextRequest) {
       // Tentar sem route_id
       const { data: conciliation2 } = await supabase
         .from('v_costs_conciliation')
-        .select('*')
+        .select('invoice_id, invoice_line_id, invoice_number, empresa_id, company_name, rota_id, route_name, vehicle_id, vehicle_plate, invoiced_amount, invoiced_km, invoiced_trips, measured_amount, measured_km, measured_trips, discrepancy_amount, discrepancy_percent, notes')
         .eq('invoice_id', validated.invoice_id)
         .limit(1)
         .single()
@@ -59,7 +59,7 @@ async function reconcileHandler(request: NextRequest) {
 
     const conciliationData = conciliation || await supabase
       .from('v_costs_conciliation')
-      .select('*')
+      .select('invoice_id, invoice_line_id, invoice_number, empresa_id, company_name, rota_id, route_name, vehicle_id, vehicle_plate, invoiced_amount, invoiced_km, invoiced_trips, measured_amount, measured_km, measured_trips, discrepancy_amount, discrepancy_percent, notes')
       .eq('invoice_id', validated.invoice_id)
       .limit(1)
       .single()

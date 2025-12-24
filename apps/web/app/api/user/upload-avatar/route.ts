@@ -139,7 +139,7 @@ export async function POST(req: NextRequest) {
       avatar_url: publicUrl, // URL sem cache para salvar no banco
       message: 'Foto de perfil atualizada com sucesso'
     })
-  } catch (error: any) {
+  } catch (error: unknown) {
     logError('Erro ao fazer upload', { error, userId: req.formData ? (await req.formData()).get('userId') : null }, 'UploadAvatarAPI')
     return NextResponse.json(
       { 

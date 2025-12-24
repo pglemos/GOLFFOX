@@ -32,7 +32,7 @@ export class ModalErrorBoundary extends Component<Props, State> {
     return { hasError: true, error }
   }
 
-  componentDidCatch(error: Error, errorInfo: any) {
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     logError('ModalErrorBoundary capturou um erro', {
       error: error.message,
       stack: error.stack,

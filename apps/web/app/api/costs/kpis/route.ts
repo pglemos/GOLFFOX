@@ -61,11 +61,11 @@ async function getCostsKpisHandler(request: NextRequest) {
       userCtx = user as { role: string; id?: string; companyId?: string }
     }
 
-    // Buscar KPIs da view (view materializada - selecionar todas as colunas)
+    // Buscar KPIs da view (view materializada - selecionar apenas colunas usadas)
     const supabase = getSupabaseAdmin()
     const { data, error } = await supabase
       .from('v_costs_kpis')
-      .select('*')
+      .select('company_id, totalCosts, budget, variance, period_days')
       .eq('company_id', companyId)
       .maybeSingle()
 

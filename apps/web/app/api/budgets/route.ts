@@ -101,7 +101,9 @@ export async function GET(request: NextRequest) {
         }
 
         // Transformar para o tipo Budget (snake_case)
-        const budgets: Budget[] = (data || []).map((row: any) => ({
+        import type { Database } from '@/types/supabase'
+        type GfBudgetsRow = Database['public']['Tables']['gf_budgets']['Row']
+        const budgets: Budget[] = (data || []).map((row: GfBudgetsRow) => ({
             id: row.id,
             company_id: row.company_id,
             transportadora_id: row.transportadora_id,

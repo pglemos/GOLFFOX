@@ -100,7 +100,7 @@ export function ManualCostForm({
       onSave()
       onClose()
       resetForm()
-    } catch (error: any) {
+    } catch (error: unknown) {
       logError('Erro ao salvar custo', { error }, 'ManualCostForm')
       notifyError(error, 'Erro ao salvar custo')
     } finally {

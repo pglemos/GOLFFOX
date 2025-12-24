@@ -15,7 +15,7 @@ export function useTransportadoraAlerts() {
 
             const { data, error } = await supabase
                 .from("gf_alerts")
-                .select("*")
+                .select("id, message, title, alert_type, type, severity, is_resolved, assigned_to, transportadora_id, details, metadata, created_at, resolved_at")
                 .eq("transportadora_id", transportadoraId)
                 .order("created_at", { ascending: false })
 

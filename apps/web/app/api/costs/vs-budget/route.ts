@@ -18,11 +18,11 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // Buscar dados da view v_costs_vs_budget (view materializada - selecionar todas as colunas)
+    // Buscar dados da view v_costs_vs_budget (view materializada - selecionar apenas colunas usadas)
     const supabase = getSupabaseAdmin()
     const { data, error } = await supabase
       .from('v_costs_vs_budget')
-      .select('*')
+      .select('company_id, period_year, period_month, budgeted_amount, actual_amount, variance_percent, variance_absolute')
       .eq('company_id', companyId)
       .order('period_year', { ascending: false })
       .order('period_month', { ascending: false })

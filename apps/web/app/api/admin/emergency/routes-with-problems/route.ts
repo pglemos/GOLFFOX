@@ -142,7 +142,7 @@ export async function GET(req: NextRequest) {
       success: true,
       routes: formattedRoutes
     })
-  } catch (error: any) {
+  } catch (error: unknown) {
     logError('Erro ao buscar rotas com problemas', { error }, 'RoutesWithProblemsAPI')
     return NextResponse.json(
       {

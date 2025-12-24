@@ -113,7 +113,7 @@ export async function GET(req: NextRequest) {
           : 0
       }
     })
-  } catch (err: any) {
+  } catch (err: unknown) {
     logError('Erro ao gerar relatório de frota', { error: err }, 'FleetUsageReportAPI')
     return NextResponse.json(
       { error: err?.message || 'Erro ao gerar relatório' },

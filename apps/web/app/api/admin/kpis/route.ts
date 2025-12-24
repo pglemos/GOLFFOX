@@ -48,9 +48,10 @@ export async function GET(request: NextRequest) {
       try {
         // Views de KPIs geralmente têm colunas específicas, mas como são views materializadas,
         // selecionar todas as colunas é aceitável (já são agregadas)
+        // Otimização: selecionar apenas colunas usadas
         const { data, error } = await supabaseAdmin
           .from(viewName)
-          .select('*')
+          .select('active_trips, active_vehicles, total_passengers, total_companies, total_operators, total_drivers')
 
         if (error) {
           const code = (error as { code?: string })?.code
@@ -86,7 +87,13 @@ export async function GET(request: NextRequest) {
     // Mapear campos da view para a interface esperada pelo componente AdminDashboardClient
     // A view v_admin_dashboard_kpis retorna: total_companies, total_operators, total_drivers, total_passengers, active_trips, active_vehicles
     // O componente espera: company_id, company_name, trips_today, vehicles_active, employees_in_transit, critical_alerts, routes_today, trips_completed, trips_in_progress
-    const mappedKpis = kpisData.map((viewData: any) => ({
+    interface ViewKpiData {
+      active_trips?: number
+      active_vehicles?: number
+      total_passengers?: number
+      [key: string]: unknown
+    }
+    const mappedKpis = kpisData.map((viewData: ViewKpiData) => ({
       company_id: 'all',
       company_name: 'Todas as Empresas',
       trips_today: viewData.active_trips || 0,

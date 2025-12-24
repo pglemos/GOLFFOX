@@ -147,7 +147,7 @@ export function ChangeRoleModal({
       } else {
         throw new Error(result.error || 'Erro ao alterar papel')
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       logError("Exceção ao alterar papel", { error }, 'ChangeRoleModal')
       notifyError(error, error.message || "Erro ao alterar papel")
     } finally {

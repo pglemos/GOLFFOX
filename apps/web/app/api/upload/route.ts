@@ -115,7 +115,7 @@ export async function POST(request: NextRequest) {
             name: file.name,
             type: file.type,
         })
-    } catch (error: any) {
+    } catch (error: unknown) {
         logError('Erro no upload', { error }, 'UploadAPI')
         return NextResponse.json({
             error: 'Erro interno',

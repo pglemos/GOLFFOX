@@ -48,7 +48,7 @@ export async function GET(request: NextRequest) {
         }
 
         return NextResponse.json(data, { headers: corsHeaders })
-    } catch (error: any) {
+    } catch (error: unknown) {
         logError('Exception ao buscar perfil', { error, userId: request.nextUrl.searchParams.get('userId') }, 'MobileProfileAPI')
         return NextResponse.json({ error: error.message }, { status: 500, headers: corsHeaders })
     }

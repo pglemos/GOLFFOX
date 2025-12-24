@@ -70,7 +70,15 @@ export function VeiculoPickerModal({
       }
 
       // Mapear dados da API para o formato veiculo (adicionar status padrão se não existir)
-      const veiculosData: veiculo[] = (result.veiculos || []).map((v: any) => ({
+      interface VeiculoApiResponse {
+        id: string
+        plate?: string
+        model?: string
+        capacity?: number
+        status?: string
+        is_active?: boolean
+      }
+      const veiculosData: veiculo[] = (result.veiculos || []).map((v: VeiculoApiResponse) => ({
         id: v.id,
         plate: v.plate,
         model: v.model,

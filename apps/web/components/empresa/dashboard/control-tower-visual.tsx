@@ -5,7 +5,7 @@ import { LucideIcon, AlertCircle, Truck, Route, HelpCircle } from "lucide-react"
 
 import { Card, CardContent } from "@/components/ui/card"
 
-const Link: any = require("next/link")
+import Link from "next/link"
 
 interface ControlTowerItem {
   label: string

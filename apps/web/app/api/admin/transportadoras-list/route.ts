@@ -23,10 +23,10 @@ export async function GET(req: NextRequest) {
     const authErrorResponse = await requireAuth(req, 'admin')
     if (authErrorResponse) return authErrorResponse
 
-    // Selecionar todas as colunas para evitar erros de colunas inexistentes
+    // Selecionar apenas colunas principais usadas
     const { data, error } = await (supabaseServiceRole
       .from('transportadoras')
-      .select('*')
+      .select('id, name, cnpj, email, phone, contact_person, address, address_city, address_state, address_zip_code, is_active, created_at, updated_at')
       .order('name', { ascending: true }))
 
     if (error) {

@@ -214,7 +214,7 @@ export function FuncionarioModal({ funcionario, isOpen, onClose, onSave, empresa
 
       onSave()
       onClose()
-    } catch (error: any) {
+    } catch (error: unknown) {
       logError("Erro ao salvar funcionário", { error }, 'FuncionarioModal')
       notifyError(`Erro ao salvar funcionário: ${error?.message || 'Erro desconhecido'}`, undefined, {
         i18n: { ns: 'operador', key: 'employees.saveError' }

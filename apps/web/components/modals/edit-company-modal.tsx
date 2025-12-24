@@ -172,7 +172,7 @@ export function EditCompanyModal({
 
       onSave()
       onClose()
-    } catch (error: any) {
+    } catch (error: unknown) {
       logError("Erro ao atualizar empresa", { error }, 'EditCompanyModal')
       notifyError(error, error.message || "Erro ao atualizar empresa")
     } finally {
