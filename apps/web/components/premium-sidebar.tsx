@@ -136,8 +136,7 @@ const adminMenuGroups: MenuGroup[] = [
       {
         icon: AlertTriangle,
         label: "Alertas",
-        href: "/admin/alertas",
-        showOperationalAlerts: true
+        href: "/admin/alertas"
       }
     ]
   },
@@ -215,8 +214,7 @@ const operadorMenuGroups: MenuGroup[] = [
       {
         icon: AlertTriangle,
         label: "Alertas",
-        href: "/operador/alertas",
-        showOperationalAlerts: true
+        href: "/operador/alertas"
       }
     ]
   },
@@ -293,8 +291,7 @@ const transportadoraMenuGroups: MenuGroup[] = [
       {
         icon: AlertTriangle,
         label: "Alertas",
-        href: "/transportadora/alertas",
-        showOperationalAlerts: true
+        href: "/transportadora/alertas"
       }
     ]
   },

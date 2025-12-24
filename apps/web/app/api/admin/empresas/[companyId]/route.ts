@@ -134,7 +134,7 @@ export async function DELETE(
 
     // Verificar se empresa existe (selecionar apenas id para verificação)
     const { data: existingCompany, error: fetchError } = await supabaseAdmin
-      .from('companies')
+      .from('empresas')
       .select('id')
       .eq('id', companyId)
       .single()
@@ -158,7 +158,7 @@ export async function DELETE(
       .eq('company_id', companyId)
 
     const { count: routesCount } = await supabaseAdmin
-      .from('routes')
+      .from('rotas')
       .select('id', { head: true, count: 'exact' })
       .eq('company_id', companyId)
 

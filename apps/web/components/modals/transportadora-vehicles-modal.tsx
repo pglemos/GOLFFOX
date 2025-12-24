@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { logError } from "@/lib/logger"
 import { notifySuccess, notifyError } from "@/lib/toast"
 
 interface TransportadoraVehiclesModalProps {
@@ -57,7 +58,7 @@ export function TransportadoraVehiclesModal({ transportadora, isOpen, onClose }:
         setVeiculos(result.data || [])
       }
     } catch (error) {
-      console.error('Erro ao carregar veículos:', error)
+      logError('Erro ao carregar veículos', { error }, 'TransportadoraVehiclesModal')
       notifyError(error, 'Erro ao carregar veículos')
     } finally {
       setLoading(false)

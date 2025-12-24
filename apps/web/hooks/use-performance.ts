@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 
+import { warn } from '@/lib/logger'
+
 export interface PerformanceMetrics {
   fps: number
   memoryUsage: number
@@ -113,7 +115,7 @@ export function usePerformance(config: Partial<PerformanceConfig> = {}): {
       return result
     } catch (error) {
       const duration = performance.now() - start
-      console.warn(`Performance: Operation "${name}" failed after ${duration}ms`, error)
+      warn(`Performance: Operation "${name}" failed after ${duration}ms`, { error, duration, name }, 'UsePerformance')
       throw error
     }
   }, [])

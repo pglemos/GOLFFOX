@@ -21,6 +21,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { useAuth } from "@/hooks/use-auth"
 import { notifySuccess, notifyError } from "@/lib/toast"
+import { logError, debug } from "@/lib/logger"
 
 interface EscalatedAlert {
     id: string
@@ -62,7 +63,7 @@ export default function EscalonamentoPage() {
             const data = await response.json()
             setAlerts(data.alerts || [])
         } catch (error) {
-            console.error('Erro ao carregar alertas:', error)
+            logError('Erro ao carregar alertas', { error }, 'EscalonamentoPage')
             notifyError('Erro ao carregar alertas escalados')
             // Em caso de erro, inicializa com array vazio
             setAlerts([])
@@ -101,7 +102,7 @@ export default function EscalonamentoPage() {
 
         if (!selectedAlert.id) {
             notifyError('ID do alerta não encontrado')
-            console.error('selectedAlert:', selectedAlert)
+            debug('selectedAlert', { selectedAlert }, 'EscalonamentoPage')
             return
         }
 
@@ -135,7 +136,7 @@ export default function EscalonamentoPage() {
             setSelectedAlert(null)
             setResolution("")
         } catch (error: any) {
-            console.error('Erro ao resolver alerta:', error)
+            logError('Erro ao resolver alerta', { error }, 'EscalonamentoPage')
             notifyError(error.message || 'Erro ao resolver alerta')
         }
     }

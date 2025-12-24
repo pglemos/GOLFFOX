@@ -56,7 +56,7 @@ async function exportHandler(request: NextRequest) {
       'date', 'group_name', 'category', 'subcategory', 'route_name', 'vehicle_plate', 'driver_email', 'amount', 'qty', 'unit', 'source', 'notes', 'company_id', 'route_id', 'veiculo_id', 'motorista_id', 'cost_category_id'
     ]
     let query = getSupabaseAdmin()
-      .from('v_costs_secure')
+      .from('v_costs_secure' as any)
       .select(columns.join(','))
       .eq('company_id', companyId)
 
@@ -92,7 +92,7 @@ async function exportHandler(request: NextRequest) {
 
     // Buscar nome da empresa
     const { data: company } = await getSupabaseAdmin()
-      .from('companies')
+      .from('empresas')
       .select('name')
       .eq('id', companyId)
       .single()
@@ -153,7 +153,7 @@ async function exportHandler(request: NextRequest) {
           const pageLimit = limit
           while (true) {
             const { data: page, error: pageError } = await getSupabaseAdmin()
-              .from('v_costs_secure')
+              .from('v_costs_secure' as any)
               .select(columns.join(','))
               .eq('company_id', companyId)
               .order('date', { ascending: false })

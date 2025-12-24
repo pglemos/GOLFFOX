@@ -17,6 +17,7 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
+import { logError } from "@/lib/logger"
 import { notifySuccess, notifyError } from "@/lib/toast"
 import {
     MotoristaCompensation,
@@ -98,7 +99,7 @@ export function MotoristaCompensationSection({
                 }
             }
         } catch (error) {
-            console.error("Erro ao carregar compensação:", error)
+            logError("Erro ao carregar compensação", { error }, 'MotoristaCompensationSection')
         } finally {
             setLoading(false)
         }

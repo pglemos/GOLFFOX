@@ -51,7 +51,7 @@ export function useTransportadoraRealtime({
     try {
       await onDataUpdate()
     } catch (error) {
-      console.error('Erro ao atualizar dados:', error)
+      logError('Erro ao atualizar dados', { error }, 'UseTransportadoraRealtime')
     }
   }, [onDataUpdate])
 

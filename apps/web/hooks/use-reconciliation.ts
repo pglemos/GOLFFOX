@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react"
 
 import { getDiscrepancyStatus } from "@/lib/cost-utils/discrepancy-calculator"
+import { logError } from "@/lib/logger"
 import { supabase } from "@/lib/supabase"
 import { notifyError, notifySuccess } from "@/lib/toast"
 
@@ -80,7 +81,7 @@ export function useReconciliation(invoiceId: string | null, isOpen: boolean) {
 
       setInvoiceLines(enrichedLines)
     } catch (error: any) {
-      console.error('Erro ao carregar dados da fatura:', error)
+      logError('Erro ao carregar dados da fatura', { error }, 'UseReconciliation')
       notifyError(error, 'Erro inesperado')
     } finally {
       setLoading(false)
@@ -143,7 +144,7 @@ export function useReconciliation(invoiceId: string | null, isOpen: boolean) {
       onSuccess?.()
       onClose?.()
     } catch (error: any) {
-      console.error('Erro ao aprovar fatura:', error)
+      logError('Erro ao aprovar fatura', { error }, 'UseReconciliation')
       notifyError(error, 'Erro inesperado')
     } finally {
       setProcessing(false)
@@ -179,7 +180,7 @@ export function useReconciliation(invoiceId: string | null, isOpen: boolean) {
       onSuccess?.()
       onClose?.()
     } catch (error: any) {
-      console.error('Erro ao rejeitar fatura:', error)
+      logError('Erro ao rejeitar fatura', { error }, 'UseReconciliation')
       notifyError(error, 'Erro inesperado')
     } finally {
       setProcessing(false)
@@ -209,7 +210,7 @@ export function useReconciliation(invoiceId: string | null, isOpen: boolean) {
       notifySuccess('Revisão solicitada')
       onClose?.()
     } catch (error: any) {
-      console.error('Erro ao solicitar revisão:', error)
+      logError('Erro ao solicitar revisão', { error }, 'UseReconciliation')
       notifyError(error, 'Erro ao solicitar revisão')
     } finally {
       setProcessing(false)

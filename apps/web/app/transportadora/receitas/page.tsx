@@ -27,6 +27,7 @@ import {
 import { useAuth } from "@/hooks/use-auth"
 import { supabase } from "@/lib/supabase"
 import { notifySuccess, notifyError } from "@/lib/toast"
+import { logError } from "@/lib/logger"
 
 interface Revenue {
     id: string
@@ -70,7 +71,7 @@ export default function ReceitasPage() {
             if (error) throw error
             setRevenues(data || [])
         } catch (err) {
-            console.error('Erro ao carregar receitas:', err)
+            logError('Erro ao carregar receitas', { error: err }, 'ReceitasPage')
         } finally {
             setLoading(false)
         }
@@ -94,7 +95,7 @@ export default function ReceitasPage() {
             loadRevenues()
         } catch (err) {
             notifyError('Erro ao cadastrar receita')
-            console.error(err)
+            logError('Erro ao processar receitas', { error: err }, 'ReceitasPage')
         }
     }
 

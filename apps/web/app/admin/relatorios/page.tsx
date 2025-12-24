@@ -28,6 +28,7 @@ import {
 } from "@/lib/export-utils"
 import { t } from "@/lib/i18n"
 import { useRouter } from "@/lib/next-navigation"
+import { logError } from "@/lib/logger"
 import { withToast, notifySuccess, notifyError } from "@/lib/toast"
 
 // Lazy load modal pesado
@@ -135,7 +136,7 @@ export default function RelatoriosPage() {
       const data = await response.json()
       setSchedules(data.schedules || [])
     } catch (error) {
-      console.error('Erro ao carregar agendamentos:', error)
+      logError('Erro ao carregar agendamentos', { error }, 'AdminRelatoriosPage')
     }
   }
 

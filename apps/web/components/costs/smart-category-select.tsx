@@ -110,7 +110,7 @@ export function SmartCategorySelect({
                     })))
                 }
             } catch (error) {
-                console.error('Erro ao carregar categorias:', error)
+                logError('Erro ao carregar categorias', { error }, 'SmartCategorySelect')
             } finally {
                 setLoading(false)
             }

@@ -46,7 +46,7 @@ export async function GET(
     // Selecionar apenas colunas necessárias para listagem (otimização de performance)
     const maintenanceColumns = 'id,veiculo_id,maintenance_type,scheduled_date,completed_date,next_maintenance_date,odometer_km,description,cost_parts_brl,cost_labor_brl,workshop_name,mechanic_name,status,notes,created_at,updated_at'
     const { data, error } = await supabaseServiceRole
-      .from('vehicle_maintenances')
+      .from('vehicle_maintenances' as any)
       .select(maintenanceColumns)
       .eq('veiculo_id', params.vehicleId)
       .order('created_at', { ascending: false })
@@ -82,7 +82,7 @@ export async function POST(
     const validated = maintenanceSchema.parse(body)
 
     const { data, error } = await supabaseServiceRole
-      .from('vehicle_maintenances')
+      .from('vehicle_maintenances' as any)
       .insert({
         veiculo_id: params.vehicleId,
         ...validated,

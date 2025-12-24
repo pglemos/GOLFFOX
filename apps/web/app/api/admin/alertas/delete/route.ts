@@ -5,6 +5,7 @@ import { createClient } from '@supabase/supabase-js'
 import { requireAuth } from '@/lib/api-auth'
 import { logger, logError } from '@/lib/logger'
 import { invalidateEntityCache } from '@/lib/next-cache'
+import { redisCacheService, createCacheKey } from '@/lib/cache/redis-cache.service'
 
 export const runtime = 'nodejs'
 
@@ -37,9 +38,10 @@ export async function DELETE(request: NextRequest) {
     const supabaseAdmin = getSupabaseAdmin()
 
     logger.log(`🗑️ Tentando excluir alerta: ${alertId}`)
-    
+
+    // Atualizado para usar gf_alerts
     const { data, error } = await supabaseAdmin
-      .from('gf_incidents')
+      .from('gf_alerts')
       .delete()
       .eq('id', alertId)
       .select()
@@ -47,8 +49,8 @@ export async function DELETE(request: NextRequest) {
     if (error) {
       logError('Erro ao excluir alerta', { error, alertId, errorDetails: JSON.stringify(error, null, 2) }, 'AlertsDeleteAPI')
       return NextResponse.json(
-        { 
-          error: 'Erro ao excluir alerta', 
+        {
+          error: 'Erro ao excluir alerta',
           message: error.message,
           details: error.details || error.hint || 'Sem detalhes adicionais',
           code: error.code
@@ -58,6 +60,9 @@ export async function DELETE(request: NextRequest) {
     }
 
     // Invalidar cache após exclusão
+    // Cache de lista
+    await redisCacheService.del(createCacheKey('alerts_v4', 'all', 'all'))
+    // Outros caches
     await invalidateEntityCache('alert', alertId)
 
     logger.log(`✅ Alerta excluído com sucesso: ${alertId}`, data)
@@ -74,4 +79,3 @@ export async function DELETE(request: NextRequest) {
     )
   }
 }
-

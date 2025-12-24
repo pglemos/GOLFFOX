@@ -28,7 +28,7 @@ export async function GET(req: NextRequest) {
 
     // Buscar viagens em andamento para filtrar motoristas ocupados
     const { data: activeTrips, error: tripsError } = await supabase
-      .from('trips')
+      .from('viagens')
       .select('motorista_id')
       .eq('status', 'inProgress')
 

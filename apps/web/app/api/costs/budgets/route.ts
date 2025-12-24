@@ -281,7 +281,7 @@ async function deleteBudgetHandler(request: NextRequest) {
     // Buscar budget para obter company_id
     const { data: budget, error: fetchError } = await supabaseServiceRole
       .from('gf_budgets')
-      .select('company_id')
+      .select('empresa_id')
       .eq('id', budgetId)
       .single()
 
@@ -293,7 +293,7 @@ async function deleteBudgetHandler(request: NextRequest) {
     }
 
     // ✅ Validar autenticação e acesso à empresa
-    const { user, error: authError } = await requireCompanyAccess(request, budget.company_id)
+    const { user, error: authError } = await requireCompanyAccess(request, budget.empresa_id || '')
     if (authError) {
       return authError
     }

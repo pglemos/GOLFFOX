@@ -76,20 +76,20 @@ export function UserNotifications() {
     return (
         <Popover open={isOpen} onOpenChange={setIsOpen}>
             <PopoverTrigger asChild>
-                <button
-                    data-slot="button"
-                    type="button"
-                    className={cn(
-                        "focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive inline-flex shrink-0 items-center justify-center gap-2 rounded-md text-sm font-medium whitespace-nowrap transition-all outline-none focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50 relative",
-                        "size-9"
-                    )}
+                <Button
+                    asChild
+                    variant="ghost"
+                    size="icon"
+                    className="relative size-9"
                     aria-label="Notifications"
                 >
-                    <Bell className="h-4 w-4" />
-                    {unreadCount > 0 && (
-                        <span className="bg-destructive absolute top-2 right-2.5 size-2 rounded-full animate-pulse"></span>
-                    )}
-                </button>
+                    <button type="button">
+                        <Bell className="h-4 w-4" />
+                        {unreadCount > 0 && (
+                            <span className="bg-destructive absolute top-1.5 right-1.5 size-2 rounded-full animate-pulse border-2 border-background"></span>
+                        )}
+                    </button>
+                </Button>
             </PopoverTrigger>
             <PopoverContent className="w-80 p-0" align="end">
                 <div className="flex items-center justify-between p-4 border-b">

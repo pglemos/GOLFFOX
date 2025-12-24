@@ -20,6 +20,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { formatCurrency, formatCount } from "@/lib/kpi-utils"
 import { supabase } from "@/lib/supabase"
+import { logError } from "@/lib/logger"
 
 interface CostChartProps {
   companyId?: string
@@ -44,7 +45,7 @@ export function CostCharts({ companyId, period = 'month' }: CostChartProps) {
 
       // Dados mensais (evolução)
       const { data: monthly } = await supabase
-        .from('v_costs_breakdown')
+        .from('v_costs_breakdown' as any)
         .select('*')
         .order('company_id')
 
@@ -63,7 +64,7 @@ export function CostCharts({ companyId, period = 'month' }: CostChartProps) {
 
       // Dados por rota
       const { data: routes } = await supabase
-        .from('v_costs_breakdown')
+        .from('v_costs_breakdown' as any)
         .select('by_route')
         .limit(1)
         .single()
@@ -74,7 +75,7 @@ export function CostCharts({ companyId, period = 'month' }: CostChartProps) {
 
       // Dados por veículo
       const { data: veiculos } = await supabase
-        .from('v_costs_breakdown')
+        .from('v_costs_breakdown' as any)
         .select('by_vehicle')
         .limit(1)
         .single()
@@ -85,7 +86,7 @@ export function CostCharts({ companyId, period = 'month' }: CostChartProps) {
 
       // Dados por motorista (usar v_reports_driver_ranking com custos)
       const { data: motoristas } = await supabase
-        .from('v_reports_driver_ranking')
+        .from('v_reports_driver_ranking' as any)
         .select('motorista_id, motorista_name, routes_completed')
         .limit(10)
 
@@ -99,7 +100,7 @@ export function CostCharts({ companyId, period = 'month' }: CostChartProps) {
 
       // Dados por empresa
       const { data: companies } = await supabase
-        .from('v_costs_breakdown')
+        .from('v_costs_breakdown' as any)
         .select('company_id, company_name, by_company')
         .limit(20)
 
@@ -110,7 +111,7 @@ export function CostCharts({ companyId, period = 'month' }: CostChartProps) {
         })))
       }
     } catch (error) {
-      console.error('Erro ao carregar dados de custos:', error)
+      logError('Erro ao carregar dados de custos', { error }, 'CostCharts')
     } finally {
       setLoading(false)
     }

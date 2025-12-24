@@ -13,6 +13,7 @@ import { Label } from "@/components/ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useCep } from "@/hooks/use-cep"
 import { formatCPF, formatPhone, formatCEP, unformatNumber } from "@/lib/format-utils"
+import { logError } from "@/lib/logger"
 import { notifySuccess, notifyError } from "@/lib/toast"
 
 interface TransportadoraDriversModalProps {
@@ -65,7 +66,7 @@ export function TransportadoraDriversModal({ transportadora, isOpen, onClose }: 
         throw new Error('Erro ao carregar motoristas')
       }
     } catch (error) {
-      console.error('Erro ao carregar motoristas:', error)
+      logError('Erro ao carregar motoristas', { error }, 'TransportadoraDriversModal')
       notifyError(error, 'Erro ao carregar motoristas')
     } finally {
       setLoading(false)

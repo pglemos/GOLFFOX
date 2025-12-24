@@ -226,7 +226,7 @@ export class UserService {
       // Verificar se empresa existe (se fornecida)
       if (company_id) {
         const { data: company, error: companyError } = await supabaseAdmin
-          .from('companies')
+          .from('empresas')
           .select('id, name')
           .eq('id', company_id)
           .single()
@@ -474,7 +474,7 @@ export class UserService {
 
       // Limpar referências em outras tabelas
       await supabaseAdmin
-        .from('trips')
+        .from('viagens')
         .update({ driver_id: null })
         .eq('driver_id', userId)
 

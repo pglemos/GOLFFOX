@@ -4,6 +4,7 @@ import { Navigation } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { warn } from "@/lib/logger"
 import type { EmployeeLite, OptimizeRouteResponse } from "@/types/routes"
 
 interface RoutePreviewMapProps {
@@ -90,14 +91,14 @@ export function RoutePreviewMap({
                     strokeWeight: 4,
                 })
             } catch (e) {
-                console.warn("Erro ao decodificar polyline:", e)
+                warn("Erro ao decodificar polyline", { error: e }, 'RoutePreviewMap')
             }
         }
 
         try {
             googleMap.fitBounds(bounds)
         } catch (e) {
-            console.warn("Erro ao ajustar bounds do mapa:", e)
+            warn("Erro ao ajustar bounds do mapa", { error: e }, 'RoutePreviewMap')
         }
     }, [result, employees, origin, destination])
 

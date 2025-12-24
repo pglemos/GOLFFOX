@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { globalSyncManager } from "@/lib/global-sync"
+import { logError } from "@/lib/logger"
 import { notifySuccess, notifyError } from "@/lib/toast"
 
 interface AssistanceRequest {
@@ -92,7 +93,7 @@ export function EditAssistanceModal({
       onSave()
       onClose()
     } catch (error: any) {
-      console.error("Erro ao atualizar ocorrência:", error)
+      logError("Erro ao atualizar ocorrência", { error }, 'EditAssistanceModal')
       notifyError(error, error.message || "Erro ao atualizar ocorrência")
     } finally {
       setLoading(false)

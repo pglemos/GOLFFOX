@@ -43,7 +43,7 @@ export async function GET(req: NextRequest) {
 
     // Buscar viagens dos motoristas
     let tripsQuery = supabase
-      .from('trips')
+      .from('viagens')
       .select(`
         id,
         motorista_id,

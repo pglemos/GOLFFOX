@@ -25,6 +25,7 @@ import { geocodeAddress } from "@/lib/geocoding"
 import { optimizeRoute } from "@/lib/route-optimization"
 import { supabase } from "@/lib/supabase"
 import { notifySuccess, notifyError } from "@/lib/toast"
+import { debug, warn, logError } from "@/lib/logger"
 import type { OptimizeRouteResponse, EmployeeLite, RouteFormData } from "@/types/routes"
 
 import { useRouteCreate } from "./use-route-create"
@@ -91,7 +92,7 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
             })))
           }
         })
-        .catch(err => console.error("Erro ao carregar motoristas:", err))
+        .catch(err => logError("Erro ao carregar motoristas", { error: err }, 'RouteCreateModal'))
         .finally(() => setLoadingMotoristas(false))
     }
   }, [isMotoristaModalOpen, formData.company_id])
@@ -113,7 +114,7 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
             })))
           }
         })
-        .catch(err => console.error("Erro ao carregar veículos:", err))
+        .catch(err => logError("Erro ao carregar veículos", { error: err }, 'RouteCreateModal'))
         .finally(() => setLoadingVeiculos(false))
     }
   }, [isVeiculoModalOpen, formData.company_id, formData.selected_employees?.length])
@@ -139,7 +140,7 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
           }
           const updateQuery = (supabase.from("gf_employee_company").update(updatePayload as any) as any)
           const { error: updateError } = await updateQuery.eq("id", emp.employee_id)
-          if (updateError) console.warn("Erro ao atualizar coordenadas:", updateError)
+          if (updateError) warn("Erro ao atualizar coordenadas", { error: updateError }, 'RouteCreateModal')
         }
       }))
 
@@ -304,7 +305,7 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
       // .single() retorna o objeto diretamente, não um array
       const routeId = (routeData as any)?.id
       if (!routeId) {
-        console.error("Route data:", routeData)
+        debug("Route data", { routeData }, 'RouteCreateModal')
         throw new Error("Erro ao criar rota: ID não retornado")
       }
 
@@ -324,15 +325,16 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
         }
       })
 
-      const { error: stopsError } = await supabase.from("gf_route_plan").insert(stops.map(s => ({
+      const stopsToInsert = stops.map(s => ({
         rota_id: s.route_id,
         employee_id: s.employee_id,
         stop_order: s.seq,
         latitude: s.lat,
         longitude: s.lng,
         stop_name: s.name,
-        address: s.address
-      })) as any)
+        address: s.address || null
+      }))
+      const { error: stopsError } = await supabase.from("gf_route_plan" as any).insert(stopsToInsert)
 
       if (stopsError) throw stopsError
 
@@ -607,14 +609,14 @@ function LocalRoutePreviewMap({
           strokeWeight: 4,
         })
       } catch (e) {
-        console.warn("Erro ao decodificar polyline:", e)
+        warn("Erro ao decodificar polyline", { error: e }, 'RouteCreateModal')
       }
     }
 
     try {
       googleMap.fitBounds(bounds)
     } catch (e) {
-      console.warn("Erro ao ajustar bounds do mapa:", e)
+      warn("Erro ao ajustar bounds do mapa", { error: e }, 'RouteCreateModal')
     }
   }, [result, employees, origin, destination])
 

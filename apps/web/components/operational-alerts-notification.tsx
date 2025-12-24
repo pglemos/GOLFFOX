@@ -7,7 +7,7 @@
 
 import { useEffect, useState } from 'react'
 
-import { Bell, AlertCircle, XCircle, AlertTriangle, Info } from 'lucide-react'
+import { Activity, AlertCircle, XCircle, AlertTriangle, Info } from 'lucide-react'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -18,6 +18,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu'
+import { logError } from '@/lib/logger'
 import { useRouter, usePathname } from '@/lib/next-navigation'
 import { getUnresolvedAlerts, resolveAlert, type OperationalAlert } from '@/lib/operational-alerts'
 import { supabase } from '@/lib/supabase'
@@ -85,7 +86,7 @@ export function OperationalAlertsNotification() {
         .slice(0, 10)
       setAlerts(sorted)
     } catch (error) {
-      console.error('Erro ao carregar alertas:', error)
+      logError('Erro ao carregar alertas', { error }, 'OperationalAlertsNotification')
     } finally {
       setLoading(false)
     }
@@ -102,7 +103,7 @@ export function OperationalAlertsNotification() {
       await loadAlerts()
       notifySuccess('', { i18n: { ns: 'common', key: 'success.alertResolved' } })
     } catch (error: any) {
-      console.error('Erro ao resolver alerta:', error)
+      logError('Erro ao resolver alerta', { error }, 'OperationalAlertsNotification')
       notifyError('Erro ao resolver alerta', undefined, { i18n: { ns: 'common', key: 'errors.resolveAlert' } })
     }
   }
@@ -151,8 +152,8 @@ export function OperationalAlertsNotification() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="relative hover:bg-bg-hover">
-          <Bell className="h-5 w-5" />
+        <Button variant="ghost" size="icon" className="relative size-9 hover:bg-bg-hover">
+          <Activity className="h-4 w-4" />
           {totalCount > 0 && (
             <Badge
               variant={criticalCount > 0 ? 'destructive' : 'secondary'}

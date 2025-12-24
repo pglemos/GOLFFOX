@@ -176,7 +176,7 @@ export default function TransportadoraMotoristasListPage() {
 
             {/* Modal de motorista */}
             <MotoristaModal
-                motorista={selectedMotorista}
+                motorista={selectedMotorista as any}
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 onSave={() => { setIsModalOpen(false); loadDrivers() }}

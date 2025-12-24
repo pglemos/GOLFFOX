@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { maskCPF } from "@/lib/geocoding"
 import { supabase } from "@/lib/supabase"
+import { logError } from "@/lib/logger"
 
 interface motorista {
   id: string
@@ -74,7 +75,7 @@ export function MotoristaPickerModal({
 
       setMotoristas(motoristasData)
     } catch (error) {
-      console.error("Erro ao carregar motoristas:", error)
+      logError("Erro ao carregar motoristas", { error }, 'MotoristaPickerModal')
     } finally {
       setLoading(false)
     }

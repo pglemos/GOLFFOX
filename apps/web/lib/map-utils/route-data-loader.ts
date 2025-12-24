@@ -48,7 +48,7 @@ export interface RouteData {
 export async function loadRouteData(routeId: string): Promise<RouteData> {
   // Buscar dados da rota
   const { data: route, error: routeError } = await supabase
-    .from('routes')
+    .from('rotas')
     .select('*')
     .eq('id', routeId)
     .single()
@@ -57,7 +57,7 @@ export async function loadRouteData(routeId: string): Promise<RouteData> {
 
   // Buscar pontos de parada com informações dos passageiros
   const { data: stops, error: stopsError } = await supabase
-    .from('gf_route_plan')
+    .from('gf_route_plan' as any)
     .select(`
       *,
       gf_employee_company!inner(name, photo_url, phone, email, type, observations)

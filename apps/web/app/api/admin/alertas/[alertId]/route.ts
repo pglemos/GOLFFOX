@@ -7,7 +7,8 @@ import { getSupabaseAdmin } from '@/lib/supabase-client'
 
 export const runtime = 'nodejs'
 
-const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+// Accept any valid UUID format (not just v4)
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
 export async function PUT(
   request: NextRequest,
@@ -25,7 +26,7 @@ export async function PUT(
     const alertId = alertIdParam?.trim()
     if (!alertId || !UUID_REGEX.test(alertId)) {
       return NextResponse.json(
-        { error: 'alert_id deve ser um UUID válido' },
+        { error: 'id do alerta deve ser um UUID válido' },
         { status: 400 }
       )
     }
@@ -35,8 +36,8 @@ export async function PUT(
 
     // Verificar se alerta existe
     const { data: existingAlert, error: fetchError } = await supabaseAdmin
-      .from('alerts' as any)
-      .select('id, description, severity, status, route_id, veiculo_id')
+      .from('gf_alerts')
+      .select('id, title, message, severity, is_resolved, assigned_to')
       .eq('id', alertId)
       .single()
 
@@ -49,18 +50,44 @@ export async function PUT(
 
     // Preparar dados para atualização
     const updateData: Record<string, unknown> = {}
-    if (body.description !== undefined) updateData.description = body.description?.trim() || null
+    // Mapear campos antigos para novos se necessário
+    if (body.description !== undefined) {
+      updateData.message = body.description?.trim() || null
+      if (!updateData.title) updateData.title = body.description?.slice(0, 50) || 'Alerta'
+    } else if (body.message !== undefined) {
+      updateData.message = body.message?.trim() || null
+    }
+
+    if (body.title !== undefined) updateData.title = body.title?.trim()
+
     if (body.severity !== undefined) updateData.severity = body.severity
-    if (body.status !== undefined) updateData.status = body.status
-    if (body.route_id !== undefined) updateData.route_id = body.route_id || null
-    if (body.veiculo_id !== undefined) updateData.veiculo_id = body.veiculo_id || null
+
+    // Status mapping
+    if (body.status !== undefined) {
+      if (body.status === 'resolved') {
+        updateData.is_resolved = true
+      } else if (body.status === 'open') {
+        updateData.is_resolved = false
+        updateData.assigned_to = null
+      } else if (body.status === 'assigned') {
+        updateData.is_resolved = false
+      }
+    }
+
+    if (body.assigned_to !== undefined) updateData.assigned_to = body.assigned_to || null
+
+    // gf_alerts geralmente não tem rota_id/veiculo_id diretos na raiz, mas em update precisamos respeitar o schema
+    // Se o user mandar rota_id, podemos tentar jogar em metadata/details se o campo não existir
+    // Mas vamos assumir que o frontend vai parar de mandar rota_id direto se alterarmos.
+    // Se mandar, ignoramos ou salvamos em details se pudermos (mas precisariamos ler details antes).
+    // Como simplificação, focamos nos campos principais.
 
     // Atualizar alerta
-    const { data: updatedAlert, error: updateError } = await (supabaseAdmin
-      .from('alerts') as any)
+    const { data: updatedAlert, error: updateError } = await supabaseAdmin
+      .from('gf_alerts')
       .update(updateData)
       .eq('id', alertId)
-      .select('id, description, severity, status, route_id, veiculo_id, created_at, updated_at')
+      .select()
       .single()
 
     if (updateError) {
@@ -93,4 +120,3 @@ export async function PUT(
     )
   }
 }
-

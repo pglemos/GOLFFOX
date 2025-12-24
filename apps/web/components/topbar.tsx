@@ -12,7 +12,6 @@ import {
   PanelLeft
 } from "lucide-react"
 
-import { OperationalAlertsNotification } from "@/components/operational-alerts-notification"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import {
@@ -36,7 +35,7 @@ import { UserNotifications } from "@/components/user-notifications"
 import { useNavigation } from "@/hooks/use-navigation"
 import { useRouter, usePathname } from "@/lib/next-navigation"
 import { supabase } from "@/lib/supabase"
-import { debug } from "@/lib/logger"
+import { debug, logError, warn } from "@/lib/logger"
 import { useResponsive } from "@/hooks/use-responsive"
 import { cn } from "@/lib/utils"
 
@@ -137,8 +136,7 @@ export function Topbar({
             debug('Topbar - Failed to fetch updated user', { status: res.status }, 'Topbar')
           }
         } catch (error) {
-          debug('Topbar - Error updating avatar', { error }, 'Topbar')
-          console.error('Erro ao atualizar avatar:', error)
+          logError('Erro ao atualizar avatar', { error }, 'Topbar')
         }
       }, 800) // Aumentar delay para garantir propagação
     }
@@ -181,7 +179,7 @@ export function Topbar({
     try {
       router.push(path)
     } catch (error) {
-      console.error('Erro ao navegar:', error)
+      logError('Erro ao navegar', { error, path }, 'Topbar')
       // Fallback: usar window.location se router.push falhar
       if (typeof window !== 'undefined') {
         window.location.href = path
@@ -197,11 +195,11 @@ export function Topbar({
       try {
         const { error: signOutError } = await supabase.auth.signOut()
         if (signOutError) {
-          console.warn('Erro ao fazer logout do Supabase:', signOutError)
+          warn('Erro ao fazer logout do Supabase', { error: signOutError }, 'Topbar')
           // Continuar mesmo com erro
         }
       } catch (supabaseError) {
-        console.warn('Erro ao fazer logout do Supabase:', supabaseError)
+        warn('Erro ao fazer logout do Supabase', { error: supabaseError }, 'Topbar')
         // Continuar mesmo com erro
       }
 
@@ -212,7 +210,7 @@ export function Topbar({
           credentials: 'include'
         })
       } catch (apiError) {
-        console.warn('Erro ao limpar sessão no servidor:', apiError)
+        warn('Erro ao limpar sessão no servidor', { error: apiError }, 'Topbar')
         // Continuar mesmo com erro
       }
 
@@ -222,7 +220,7 @@ export function Topbar({
           localStorage.clear()
           sessionStorage.clear()
         } catch (storageError) {
-          console.warn('Erro ao limpar armazenamento:', storageError)
+          warn('Erro ao limpar armazenamento', { error: storageError }, 'Topbar')
         }
       }
 
@@ -234,7 +232,7 @@ export function Topbar({
         router.push('/')
       }
     } catch (error: any) {
-      console.error('Erro no logout:', error)
+      logError('Erro no logout', { error }, 'Topbar')
       // Mesmo com erro, tentar limpar e redirecionar
       if (typeof window !== 'undefined') {
         try {
@@ -323,59 +321,41 @@ export function Topbar({
 
           {/* Command Palette - EXATAMENTE como Application Shell 08 */}
           {!isMobile && (
-            <div>
-              <Dialog open={isCommandPaletteOpen} onOpenChange={setIsCommandPaletteOpen}>
-                <div>
-                  {/* Desktop: Button com texto "Type to search..." */}
-                  <DialogTrigger asChild>
-                    <button
-                      data-slot="button"
-                      className="focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive shrink-0 items-center justify-center gap-2 rounded-md text-sm whitespace-nowrap transition-all outline-none focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50 h-9 has-[>svg]:px-3 hidden !bg-transparent px-1 py-0 font-normal sm:block md:max-lg:hidden"
-                    >
-                      <div className="text-muted-foreground hidden items-center gap-1.5 text-sm sm:flex md:max-lg:hidden">
-                        <Search className="h-4 w-4" />
-                        <span>Digite para buscar...</span>
-                      </div>
-                    </button>
-                  </DialogTrigger>
-                  {/* Tablet: Button apenas com ícone */}
-                  <DialogTrigger asChild>
-                    <button
-                      data-slot="button"
-                      className="focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive inline-flex shrink-0 items-center justify-center gap-2 rounded-md text-sm font-medium whitespace-nowrap transition-all outline-none focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50 size-9 sm:hidden md:max-lg:inline-flex"
-                      aria-label="Search"
-                    >
-                      <Search className="h-4 w-4" aria-hidden="true" />
-                      <span className="sr-only">Abrir busca</span>
-                    </button>
-                  </DialogTrigger>
+            <Dialog open={isCommandPaletteOpen} onOpenChange={setIsCommandPaletteOpen}>
+              <DialogTrigger asChild>
+                <Button
+                  variant="ghost"
+                  className="h-9 px-3 font-normal text-muted-foreground hover:bg-accent/50 md:max-lg:w-9 md:max-lg:px-0"
+                  aria-label="Search"
+                >
+                  <Search className="h-4 w-4" />
+                  <span className="hidden sm:inline-block md:max-lg:hidden ml-2">
+                    Digite para buscar...
+                  </span>
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-lg">
+                <div data-slot="dialog-header" className="flex flex-col gap-2 text-center sm:text-left sr-only">
+                  <DialogTitle data-slot="dialog-title" className="text-lg leading-none font-semibold">Command Palette</DialogTitle>
+                  <DialogDescription data-slot="dialog-description" className="text-muted-foreground text-sm">Search for a command to run...</DialogDescription>
                 </div>
-                <DialogContent className="max-w-lg">
-                  <div data-slot="dialog-header" className="flex flex-col gap-2 text-center sm:text-left sr-only">
-                    <DialogTitle data-slot="dialog-title" className="text-lg leading-none font-semibold">Command Palette</DialogTitle>
-                    <DialogDescription data-slot="dialog-description" className="text-muted-foreground text-sm">Search for a command to run...</DialogDescription>
-                  </div>
-                  <div className="mt-4">
-                    <Input
-                      type="search"
-                      placeholder="Type to search..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full"
-                      autoFocus
-                    />
-                  </div>
-                </DialogContent>
-              </Dialog>
-            </div>
+                <div className="mt-4">
+                  <Input
+                    type="search"
+                    placeholder="Type to search..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full"
+                    autoFocus
+                  />
+                </div>
+              </DialogContent>
+            </Dialog>
           )}
         </div>
 
         {/* Right Actions - Mobile: Menu compacto */}
         <div className="flex items-center gap-1 sm:gap-1.5">
-          {/* Operational Alerts - Sempre visível */}
-          <OperationalAlertsNotification />
-
           {/* Notifications - EXATAMENTE como Application Shell 08 */}
           {/* Notifications - Integrado com backend */}
           <UserNotifications />

@@ -7,7 +7,7 @@
 
 'use client'
 
-import { lazy } from 'react'
+import { lazy, ComponentType } from 'react'
 
 import { withLazyLoading, TablePageSkeleton, DashboardPageSkeleton, MapPageSkeleton } from '@/components/shared/lazy-page-wrapper'
 
@@ -50,17 +50,17 @@ export const LazyCostDashboard = lazy(() =>
  * Componentes com HOC de lazy loading (incluem Error Boundary e Suspense)
  */
 export const AdminMapWithSkeleton = withLazyLoading(
-  () => import('@/components/admin-map/admin-map').then(mod => ({ default: mod.AdminMap })),
+  () => import('@/components/admin-map/admin-map').then(mod => ({ default: mod.AdminMap })) as Promise<{ default: ComponentType<any> }>,
   MapPageSkeleton
 )
 
 export const FinancialDashboardWithSkeleton = withLazyLoading(
-  () => import('@/components/costs/financial-dashboard-expanded').then(mod => ({ default: mod.FinancialDashboardExpanded })),
+  () => import('@/components/costs/financial-dashboard-expanded').then(mod => ({ default: mod.FinancialDashboardExpanded })) as Promise<{ default: ComponentType<any> }>,
   DashboardPageSkeleton
 )
 
 export const CostDashboardWithSkeleton = withLazyLoading(
-  () => import('@/components/costs/cost-dashboard').then(mod => ({ default: mod.CostDashboard })),
+  () => import('@/components/costs/cost-dashboard').then(mod => ({ default: mod.CostDashboard })) as Promise<{ default: ComponentType<any> }>,
   DashboardPageSkeleton
 )
 

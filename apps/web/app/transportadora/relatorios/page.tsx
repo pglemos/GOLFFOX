@@ -23,6 +23,7 @@ import {
 import { useRouter } from "@/lib/next-navigation"
 import { supabase } from "@/lib/supabase"
 import { notifySuccess, notifyError } from "@/lib/toast"
+import { logError } from "@/lib/logger"
 
 
 interface ReportConfig {
@@ -210,7 +211,7 @@ export default function TransportadoraRelatoriosPage() {
         case 'maintenances':
           // Buscar manutenções
           const { data: maintenancesData } = await supabase
-            .from('vehicle_maintenances')
+            .from('vehicle_maintenances' as any)
             .select(`
               *,
               veiculos!inner(transportadora_id, plate)
@@ -309,7 +310,7 @@ export default function TransportadoraRelatoriosPage() {
           break
       }
     } catch (error: any) {
-      console.error("Erro ao exportar:", error)
+      logError("Erro ao exportar", { error }, 'TransportadoraRelatoriosPage')
       notifyError(error, `Erro ao exportar: ${error.message}`, { i18n: { ns: 'common', key: 'errors.export' } })
     } finally {
       setLoadingReport(null)

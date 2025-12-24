@@ -4,6 +4,7 @@
  */
 
 import { fetchWithAuth } from '../fetch-with-auth'
+import { logError } from '../logger'
 
 export interface Vehicle {
   id?: string
@@ -79,7 +80,7 @@ export async function uploadVehiclePhoto(
       url: result.url,
     }
   } catch (error) {
-    console.error('Erro ao fazer upload da foto:', error)
+    logError('Erro ao fazer upload da foto', { error }, 'VehiclesAPI')
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Erro desconhecido ao fazer upload',
@@ -113,7 +114,7 @@ export async function createVehicle(
       data: result.data || result.veiculo,
     }
   } catch (error) {
-    console.error('Erro ao criar veículo:', error)
+    logError('Erro ao criar veículo', { error }, 'VehiclesAPI')
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Erro desconhecido ao criar veículo',
@@ -148,7 +149,7 @@ export async function updateVehicle(
       data: result.data || result.veiculo,
     }
   } catch (error) {
-    console.error('Erro ao atualizar veículo:', error)
+    logError('Erro ao atualizar veículo', { error }, 'VehiclesAPI')
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Erro desconhecido ao atualizar veículo',
@@ -188,7 +189,7 @@ export async function getUserInfo(): Promise<{
       transportadora_id: (userData as any).transportadora_id,
     }
   } catch (error) {
-    console.error('Erro ao buscar informações do usuário:', error)
+    logError('Erro ao buscar informações do usuário', { error }, 'VehiclesAPI')
     return {}
   }
 }

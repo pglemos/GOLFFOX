@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { globalSyncManager } from "@/lib/global-sync"
 import { notifySuccess, notifyError } from "@/lib/toast"
+import { logError } from "@/lib/logger"
 
 import { CreateUserModal } from "./create-operador-login-modal"
 import { EditUserModal } from "./edit-user-modal"
@@ -79,7 +80,7 @@ export function CompanyUsersModal({
         throw new Error(result.error || 'Erro ao carregar usuários')
       }
     } catch (error: any) {
-      console.error('Erro ao carregar usuários:', error)
+      logError('Erro ao carregar usuários', { error }, 'CompanyOperadoresModal')
       notifyError(error, error.message || 'Erro ao carregar usuários')
     } finally {
       setLoading(false)
@@ -106,7 +107,7 @@ export function CompanyUsersModal({
       await loadOperators()
       globalSyncManager.triggerSync('user.deleted', { id: operatorId })
     } catch (error: any) {
-      console.error('Erro ao excluir usuário:', error)
+      logError('Erro ao excluir usuário', { error }, 'CompanyOperadoresModal')
       notifyError(error, error.message || 'Erro ao excluir usuário')
     }
   }
@@ -263,7 +264,7 @@ export function CompanyUsersModal({
 
       {/* Modal Editar Usuário */}
       <EditUserModal
-        user={selectedOperatorForEdit}
+        user={selectedOperatorForEdit as any}
         isOpen={isEditModalOpen}
         onClose={() => {
           setIsEditModalOpen(false)

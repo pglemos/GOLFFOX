@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { globalSyncManager } from "@/lib/global-sync"
+import { logError } from "@/lib/logger"
 import { notifySuccess, notifyError } from "@/lib/toast"
 
 interface Alert {
@@ -67,6 +68,7 @@ export function EditAlertModal({
       const response = await fetch(`/api/admin/alertas/${alert.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({
           description: formData.description.trim() || null,
           severity: formData.severity,
@@ -90,7 +92,7 @@ export function EditAlertModal({
       onSave()
       onClose()
     } catch (error: any) {
-      console.error("Erro ao atualizar alerta:", error)
+      logError("Erro ao atualizar alerta", { error }, 'EditAlertModal')
       notifyError(error, error.message || "Erro ao atualizar alerta")
     } finally {
       setLoading(false)
@@ -163,17 +165,17 @@ export function EditAlertModal({
           </div>
 
           <DialogFooter className="flex-col sm:flex-row gap-3 pt-4 sm:pt-6 border-t mt-4 sm:mt-6">
-            <Button 
-              type="button" 
-              variant="outline" 
-              onClick={onClose} 
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onClose}
               disabled={loading}
               className="w-full sm:w-auto order-2 sm:order-1 text-base font-medium"
             >
               Cancelar
             </Button>
-            <Button 
-              type="submit" 
+            <Button
+              type="submit"
               disabled={loading}
               className="w-full sm:w-auto order-1 sm:order-2 bg-brand hover:bg-brand-hover text-base font-medium"
             >

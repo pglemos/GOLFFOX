@@ -4,7 +4,7 @@
  * Implementa estratégias de retry robustas para chamadas de rede.
  */
 
-import { debug, error as logError, warn as logWarn } from './logger'
+import { debug, error as logError, warn } from './logger'
 
 // ============================================================================
 // TIPOS
@@ -333,7 +333,7 @@ export function retryApiCall<T>(
     backoffFactor: 2,
     operationName,
     onRetry: (error, attempt, delay) => {
-      console.warn(`[${operationName}] Retry ${attempt}: ${error.message}. Next attempt in ${delay}ms`)
+      warn(`[${operationName}] Retry ${attempt}: ${error.message}. Next attempt in ${delay}ms`, { operationName, attempt, delay, error: error.message }, 'RetryUtils')
     },
   })
 }
@@ -352,7 +352,7 @@ export function retryRealtimeConnection<T>(
     maxDelay: 10000,
     operationName,
     onRetry: (error, attempt, delay) => {
-      console.warn(`[${operationName}] Reconnection attempt ${attempt}: ${error.message}`)
+      warn(`[${operationName}] Reconnection attempt ${attempt}: ${error.message}`, { operationName, attempt, error: error.message }, 'RetryUtils')
     },
   })
 }

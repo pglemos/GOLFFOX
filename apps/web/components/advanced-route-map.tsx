@@ -19,6 +19,7 @@ import { loadRouteData as loadRouteDataService, type RouteData, type RouteStop, 
 import { RouteHeader } from './route-map/route-header'
 import { ConnectivityIndicator } from './route-map/connectivity-indicator'
 import { formatDuration, formatDistance } from '@/lib/kpi-utils'
+import { logError } from '@/lib/logger'
 import { supabase } from "@/lib/supabase"
 import { AccessibilityControls, useAccessibilityControls } from './accessibility-controls'
 import { AdvancedPlaybackControls } from './advanced-playback-controls'
@@ -233,7 +234,7 @@ export const AdvancedRouteMap = memo(function AdvancedRouteMap({
       announce(`Rota ${routeDataFormatted.name} carregada com ${routeDataFormatted.stops.length} paradas`)
 
     } catch (err) {
-      console.error('Erro ao carregar dados da rota:', err)
+      logError('Erro ao carregar dados da rota', { error: err }, 'AdvancedRouteMap')
       setError('Erro ao carregar dados da rota')
       announce('Erro ao carregar dados da rota')
     } finally {
@@ -352,7 +353,7 @@ export const AdvancedRouteMap = memo(function AdvancedRouteMap({
       announce(`Mapa inicializado com ${routeData.stops.length} paradas`)
 
     } catch (err) {
-      console.error('Erro ao inicializar mapa:', err)
+      logError('Erro ao inicializar mapa', { error: err }, 'AdvancedRouteMap')
       setError('Erro ao carregar o mapa')
       announce('Erro ao carregar o mapa')
     }

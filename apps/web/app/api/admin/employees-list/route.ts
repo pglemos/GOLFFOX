@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 
+import { debug, info, warn, logError } from '@/lib/logger'
+
 import { createClient } from '@supabase/supabase-js'
 
 import { requireAuth } from '@/lib/api-auth'
-import { logError, debug } from '@/lib/logger'
 
 export const runtime = 'nodejs'
 
@@ -50,7 +51,7 @@ export async function GET(request: NextRequest) {
     let finalCount = count
     
     if ((!data || data.length === 0) && !error) {
-      console.log('⚠️ [EmployeesListAPI] Tabela gf_employee_company vazia, tentando buscar na tabela users...')
+      warn('[EmployeesListAPI] Tabela gf_employee_company vazia, tentando buscar na tabela users...', {}, 'EmployeesListAPI')
       
       let usersQuery = supabaseAdmin
         .from('users')
@@ -65,18 +66,18 @@ export async function GET(request: NextRequest) {
       const { data: usersData, error: usersError, count: usersCount } = await usersQuery
       
       if (!usersError && usersData && usersData.length > 0) {
-        console.log(`✅ [EmployeesListAPI] Encontrados ${usersData.length} funcionários na tabela users`)
+        info(`[EmployeesListAPI] Encontrados ${usersData.length} funcionários na tabela users`, { count: usersData.length }, 'EmployeesListAPI')
         finalData = usersData
         finalCount = usersCount
       } else {
-        console.log('⚠️ [EmployeesListAPI] Nenhum funcionário encontrado na tabela users também', {
+        warn('[EmployeesListAPI] Nenhum funcionário encontrado na tabela users também', {
           error: usersError?.message,
           count: usersCount
-        })
+        }, 'EmployeesListAPI')
       }
     }
 
-    console.log('🔍 [EmployeesListAPI] Query resultado:', {
+    debug('[EmployeesListAPI] Query resultado', {
       count: finalData?.length || 0,
       totalCount: finalCount,
       error: finalError?.message,
@@ -87,16 +88,16 @@ export async function GET(request: NextRequest) {
       hasData: !!finalData,
       dataIsArray: Array.isArray(finalData),
       source: finalData === data ? 'gf_employee_company' : 'users'
-    })
+    }, 'EmployeesListAPI')
 
     if (finalError) {
-      console.error('❌ [EmployeesListAPI] Erro na query:', {
+      logError('[EmployeesListAPI] Erro na query', {
         error: finalError.message,
         code: finalError.code,
         details: finalError.details,
         hint: finalError.hint,
         companyId
-      })
+      }, 'EmployeesListAPI')
       logError('Erro ao buscar funcionários no admin API', { error: finalError, companyId }, 'EmployeesListAPI')
       return NextResponse.json({ 
         success: false, 
@@ -109,13 +110,13 @@ export async function GET(request: NextRequest) {
 
     // Se não há dados, retornar vazio com informações de debug
     if (!finalData || finalData.length === 0) {
-      console.log('⚠️ [EmployeesListAPI] Nenhum funcionário encontrado', {
+      warn('[EmployeesListAPI] Nenhum funcionário encontrado', {
         totalCount: finalCount,
         hasData: !!finalData,
         dataType: typeof finalData,
         companyId: companyId || 'todas',
         checkedTables: ['gf_employee_company', 'users']
-      })
+      }, 'EmployeesListAPI')
       
       // Retornar informações de debug em desenvolvimento
       if (process.env.NODE_ENV === 'development') {
@@ -134,7 +135,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json([])
     }
 
-    console.log('✅ [EmployeesListAPI] Funcionários encontrados:', {
+    info('[EmployeesListAPI] Funcionários encontrados', {
       count: finalData.length,
       totalCount: finalCount,
       firstItem: finalData[0],

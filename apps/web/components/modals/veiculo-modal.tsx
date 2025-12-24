@@ -28,9 +28,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useSupabaseSync } from "@/hooks/use-supabase-sync"
 import { auditLogs } from "@/lib/audit-log"
 import { formatError } from "@/lib/error-utils"
+import { debug, logError, warn } from "@/lib/logger"
 import { t } from "@/lib/i18n"
 import { supabase } from "@/lib/supabase"
 import { notifySuccess, notifyError } from "@/lib/toast"
+import { warn, logError } from "@/lib/logger"
 
 // Lazy load seção de documentos
 const VeiculoDocumentsSection = dynamic(() => import("@/components/veiculo/veiculo-documents-section"), { ssr: false })
@@ -93,7 +95,7 @@ export function VeiculoModal({ veiculo, isOpen, onClose, onSave, carriers }: Vei
           }
         }
       } catch (error) {
-        console.error('Erro ao carregar informações do usuário:', error)
+        logError('Erro ao carregar informações do usuário', { error }, 'VeiculoModal')
       }
     }
 
@@ -159,7 +161,7 @@ export function VeiculoModal({ veiculo, isOpen, onClose, onSave, carriers }: Vei
       const result = await response.json()
       return result.url
     } catch (error: any) {
-      console.error("Erro ao fazer upload:", error)
+      logError("Erro ao fazer upload", { error }, 'VeiculoModal')
       notifyError(formatError(error, "Erro ao fazer upload da foto"))
       return null
     }
@@ -189,7 +191,7 @@ export function VeiculoModal({ veiculo, isOpen, onClose, onSave, carriers }: Vei
             photoUrl = uploadedUrl
           }
         } catch (uploadError: any) {
-          console.warn('⚠️ Erro no upload da foto (continuando sem foto):', uploadError)
+          warn('Erro no upload da foto (continuando sem foto)', { error: uploadError }, 'VeiculoModal')
           // Continuar sem foto se houver erro no upload
         }
       }
@@ -307,8 +309,7 @@ export function VeiculoModal({ veiculo, isOpen, onClose, onSave, carriers }: Vei
         throw new Error('Nenhum dado para salvar. Verifique os campos preenchidos.')
       }
 
-      console.log('📤 Dados a serem salvos:', finalVehicleData)
-      console.log('📊 Total de campos:', Object.keys(finalVehicleData).length)
+      debug('Dados a serem salvos', { data: finalVehicleData, fieldCount: Object.keys(finalVehicleData).length }, 'VeiculoModal')
 
       if (vehicleId) {
         // ATUALIZAR via API service role (evita RLS)
@@ -316,8 +317,7 @@ export function VeiculoModal({ veiculo, isOpen, onClose, onSave, carriers }: Vei
           throw new Error('ID do veículo inválido')
         }
 
-        console.log('🔄 Atualizando veículo via API:', vehicleId)
-        console.log('📦 Payload:', JSON.stringify(finalVehicleData, null, 2))
+        debug('Atualizando veículo via API', { vehicleId, payload: finalVehicleData }, 'VeiculoModal')
 
         const controller = new AbortController()
         const timeout = setTimeout(() => controller.abort(), 30000)
@@ -344,7 +344,7 @@ export function VeiculoModal({ veiculo, isOpen, onClose, onSave, carriers }: Vei
         }
 
         const data = await resp.json()
-        console.log('✅ Veículo atualizado com sucesso:', data)
+        debug('Veículo atualizado com sucesso', { data }, 'VeiculoModal')
         notifySuccess(t('common', 'success.vehicleUpdated'))
 
         // Log de auditoria (não bloquear em caso de erro)
@@ -357,11 +357,11 @@ export function VeiculoModal({ veiculo, isOpen, onClose, onSave, carriers }: Vei
             new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 5000))
           ])
         } catch (auditError) {
-          console.warn('⚠️ Erro ao registrar log de auditoria (não crítico):', auditError)
+          warn('Erro ao registrar log de auditoria (não crítico)', { error: auditError }, 'VeiculoModal')
         }
       } else {
         // CRIAR via API service role (evita RLS)
-        console.log('🆕 Criando novo veículo via API')
+        debug('Criando novo veículo via API', {}, 'VeiculoModal')
         const controller = new AbortController()
         const timeout = setTimeout(() => controller.abort(), 30000)
         let resp: Response
@@ -391,7 +391,7 @@ export function VeiculoModal({ veiculo, isOpen, onClose, onSave, carriers }: Vei
           throw new Error('Veículo criado mas ID não retornado')
         }
         vehicleId = data.id
-        console.log('✅ Veículo criado com sucesso:', data)
+        debug('Veículo criado com sucesso', { data }, 'VeiculoModal')
 
         // Upload da foto APÓS criar (se houver foto pendente)
         if (photoFile && vehicleId) {
@@ -404,10 +404,10 @@ export function VeiculoModal({ veiculo, isOpen, onClose, onSave, carriers }: Vei
                 body: JSON.stringify({ photo_url: uploadedUrl }),
               })
               if (!respPhoto.ok) {
-                console.warn('⚠️ Erro ao atualizar foto após criar veículo (não crítico): status', respPhoto.status)
+                warn('Erro ao atualizar foto após criar veículo (não crítico)', { status: respPhoto.status }, 'VeiculoModal')
               }
             } catch (e) {
-              console.warn('⚠️ Erro de rede ao atualizar foto (não crítico):', e)
+              warn('Erro de rede ao atualizar foto (não crítico)', { error: e }, 'VeiculoModal')
             }
           }
         }
@@ -423,7 +423,7 @@ export function VeiculoModal({ veiculo, isOpen, onClose, onSave, carriers }: Vei
             })
           }
         } catch (auditError) {
-          console.warn('⚠️ Erro ao registrar log de auditoria (não crítico):', auditError)
+          warn('Erro ao registrar log de auditoria (não crítico)', { error: auditError }, 'VeiculoModal')
         }
       }
 
@@ -433,7 +433,7 @@ export function VeiculoModal({ veiculo, isOpen, onClose, onSave, carriers }: Vei
       onSave()
       onClose()
     } catch (error: any) {
-      console.error("❌ Erro ao salvar veículo:", error)
+      logError("Erro ao salvar veículo", { error }, 'VeiculoModal')
 
       // Extrair mensagem de erro de forma mais robusta
       let errorMessage = "Erro ao salvar veículo"
@@ -446,12 +446,12 @@ export function VeiculoModal({ veiculo, isOpen, onClose, onSave, carriers }: Vei
       }
 
       // Log completo do erro para debug
-      console.error("Detalhes completos do erro:", {
+      logError("Detalhes completos do erro", {
         error,
         message: errorMessage,
         stack: error?.stack,
         name: error?.name
-      })
+      }, 'VeiculoModal')
 
       notifyError(formatError(error, errorMessage), undefined, {
         duration: 5000,

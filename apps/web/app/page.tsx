@@ -15,6 +15,7 @@ import { LoginForm } from "@/components/landing/login-form"
 import { AuthManager } from "@/lib/auth"
 import { useRouter, useSearchParams } from "@/lib/next-navigation"
 import { notifyError } from "@/lib/toast"
+import { logError } from "@/lib/logger"
 import { Badge } from "@/components/ui/badge"
 
 export default function LoginPage() {
@@ -39,7 +40,7 @@ function LoginContent() {
       .then(data => {
         if (data?.token) setCsrfToken(data.token)
       })
-      .catch(console.error)
+      .catch((err) => logError('Erro ao buscar CSRF token', { error: err }, 'LoginPage'))
   }, [])
 
   const handleLogin = useCallback(async (email: string, pass: string, remember: boolean) => {
@@ -70,7 +71,8 @@ function LoginContent() {
 
       const next = searchParams.get("next") || AuthManager.getRedirectUrl(user.role)
       if (next) {
-        router.push(next)
+        // Usar window.location para garantir um redirecionamento limpo com a nova sessão
+        window.location.href = next
       }
     } catch (err: any) {
       setError(err.message)

@@ -17,6 +17,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useCep } from "@/hooks/use-cep"
 import { formatCPF, formatPhone, formatCEP } from "@/lib/format-utils"
 import { globalSyncManager } from "@/lib/global-sync"
+import { logError } from "@/lib/logger"
 import { UserProfile } from "@/lib/services/user-service"
 import { notifySuccess, notifyError } from "@/lib/toast"
 
@@ -132,7 +133,7 @@ export function EditUserModal({
       onSave()
       onClose()
     } catch (error: any) {
-      console.error("Erro ao atualizar usuário:", error)
+      logError("Erro ao atualizar usuário", { error }, 'EditUserModal')
       notifyError(error, error.message || "Erro ao atualizar usuário")
     } finally {
       setLoading(false)

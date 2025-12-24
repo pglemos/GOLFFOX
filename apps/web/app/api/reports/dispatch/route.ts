@@ -184,11 +184,11 @@ async function dispatchPostHandler(request: NextRequest) {
     }
 
     // Buscar configuração do schedule (se houver) - selecionar apenas colunas necessárias
-    const scheduleColumns = 'id,company_id,report_key,cron,recipients,is_active'
+    const scheduleColumns = 'id,empresa_id,report_key,cron,recipients,is_active'
     const { data: schedule } = await supabase
       .from('gf_report_schedules')
       .select(scheduleColumns)
-      .eq('company_id', companyId)
+      .eq('empresa_id', companyId)
       .eq('report_key', reportKey)
       .eq('is_active', true)
       .maybeSingle()
@@ -212,9 +212,9 @@ async function dispatchPostHandler(request: NextRequest) {
 
     // Buscar dados da view segura (view materializada - selecionar todas as colunas)
     const { data, error } = await supabase
-      .from(viewName)
+      .from(viewName as any)
       .select('*')
-      .eq('company_id', companyId)
+      .eq('empresa_id', companyId)
       .limit(1000)
 
     if (error) throw error
@@ -239,14 +239,14 @@ async function dispatchPostHandler(request: NextRequest) {
       rows: d.map(r => Object.values(r))
     }))
 
-    const reportData = formatter(data || [])
+    const reportData = formatter((data || []) as unknown as Record<string, unknown>[])
 
     // Gerar CSV (formato mais comum)
     const csvContent = generateCSV(reportData)
     const filename = `${reportKey}_${companyId}_${new Date().toISOString().split('T')[0]}.csv`
 
     // Determinar destinatários
-    const recipients = schedule?.recipients || []
+    const recipients = (schedule as any)?.recipients || []
 
     // Enviar email se houver destinatários
     if (recipients.length > 0) {
@@ -284,7 +284,7 @@ async function dispatchPostHandler(request: NextRequest) {
     await supabase
       .from('gf_report_history')
       .insert({
-        company_id: companyId,
+        empresa_id: companyId,
         report_key: reportKey,
         format,
         recipients: recipients,

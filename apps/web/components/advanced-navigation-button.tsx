@@ -7,6 +7,7 @@ import { MapPin, Loader2 } from 'lucide-react'
 
 import { useAdvancedNavigation } from '@/hooks/use-advanced-navigation'
 import { supabase } from '@/lib/supabase'
+import { logError } from '@/lib/logger'
 
 import { Button } from './ui/button'
 
@@ -41,7 +42,7 @@ export function AdvancedNavigationButton({
   const fetchRoutePoints = useCallback(async (id: string): Promise<RoutePoint[]> => {
     try {
       const { data, error } = await supabase
-        .from('gf_route_plan')
+        .from('gf_route_plan' as any)
         .select(`
           latitude,
           longitude,
@@ -65,7 +66,7 @@ export function AdvancedNavigationButton({
         estimated_arrival: point.estimated_arrival_time
       })) || []
     } catch (error) {
-      console.error('Erro ao buscar pontos da rota:', error)
+      logError('Erro ao buscar pontos da rota', { error }, 'AdvancedNavigationButton')
       return []
     }
   }, [])
@@ -94,7 +95,7 @@ export function AdvancedNavigationButton({
       })
 
     } catch (error) {
-      console.error('Erro na navegação para o mapa:', error)
+      logError('Erro na navegação para o mapa', { error }, 'AdvancedNavigationButton')
     } finally {
       setIsLoading(false)
     }

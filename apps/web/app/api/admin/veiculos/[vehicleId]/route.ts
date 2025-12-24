@@ -82,7 +82,7 @@ export async function DELETE(
 
     // SEGUNDO: Verificar viagens associadas ao veículo
     const { count: tripsCount, error: tripsError } = await supabaseServiceRole
-      .from("trips")
+      .from("viagens")
       .select("id", { head: true, count: "exact" })
       .eq("veiculo_id", vehicleId)
 
@@ -141,7 +141,7 @@ export async function DELETE(
       if (deleteError.code === "23503") {
         // Violação de foreign key - tentar arquivar
         const { count: blockingTrips } = await supabaseServiceRole
-          .from("trips")
+          .from("viagens")
           .select("id", { head: true, count: "exact" })
           .eq("veiculo_id", vehicleId)
 

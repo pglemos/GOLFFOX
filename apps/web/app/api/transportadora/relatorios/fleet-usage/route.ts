@@ -34,16 +34,16 @@ export async function GET(req: NextRequest) {
     // Buscar dados de utilização (trips)
     // Nota: Usando scheduled_date como referência de data da viagem, pois created_at não existe no tipo
     let tripsQuery = supabase
-      .from('trips')
+      .from('viagens')
       .select(`
         id,
-        route_id,
+        rota_id,
         scheduled_date,
         started_at,
-        vehicle_id,
-        routes!inner(transportadora_id)
+        veiculo_id,
+        rotas!inner(transportadora_id)
       `)
-      .eq('routes.transportadora_id', transportadoraId)
+      .eq('rotas.transportadora_id', transportadoraId)
 
     if (startDate) {
       tripsQuery = tripsQuery.gte('scheduled_date', startDate)
@@ -65,11 +65,11 @@ export async function GET(req: NextRequest) {
         longitude,
         recorded_at,
         trip_id,
-        trips!inner (
-            vehicle_id
+        viagens!inner (
+            veiculo_id
         )
       `)
-      .in('trips.vehicle_id', vehicleIds) // Filtra posições cujas trips são desses veículos
+      .in('viagens.veiculo_id', vehicleIds) // Filtra posições cujas viagens são desses veículos
       .order('recorded_at', { ascending: false })
 
     if (positionsError) throw positionsError
@@ -77,11 +77,11 @@ export async function GET(req: NextRequest) {
     // Calcular estatísticas
     const vehicleUsage = veiculos?.map(veiculo => {
       // Filtrar trips deste veículo específico
-      const vehicleTrips = trips?.filter(t => t.vehicle_id === veiculo.id) || []
+      const vehicleTrips = trips?.filter(t => t.veiculo_id === veiculo.id) || []
 
       // Filtrar posições deste veículo (via trip)
       // O cast é necessário pois o tipo retornado pelo join pode ser complexo para inferência
-      const vehiclePositions = (positions as any[])?.filter(p => p.trips?.vehicle_id === veiculo.id) || []
+      const vehiclePositions = (positions as any[])?.filter(p => p.viagens?.veiculo_id === veiculo.id) || []
 
       return {
         veiculo_id: veiculo.id,

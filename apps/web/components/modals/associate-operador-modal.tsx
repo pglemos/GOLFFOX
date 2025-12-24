@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { logError, warn } from "@/lib/logger"
 import { supabase } from "@/lib/supabase"
 
 interface AssociateOperadorModalProps {
@@ -52,7 +53,7 @@ export function AssociateOperatorModal({
       if (queryError) {
         // Se erro for relacionado a coluna is_active, tentar sem filtro
         if (queryError.message?.includes('is_active') || queryError.message?.includes('column')) {
-          console.warn('Coluna is_active não encontrada, continuando sem filtro')
+          warn('Coluna is_active não encontrada, continuando sem filtro', {}, 'AssociateOperadorModal')
           // Já temos a query sem is_active, então o erro não deveria ocorrer
           // Mas se ocorrer, vamos apenas logar e continuar
         } else {
@@ -62,7 +63,7 @@ export function AssociateOperatorModal({
       
       setOperators(data || [])
     } catch (err: any) {
-      console.error("Erro ao carregar operadores:", err)
+      logError("Erro ao carregar operadores", { error: err }, 'AssociateOperadorModal')
       setError("Erro ao carregar operadores. Verifique se há operadores cadastrados.")
       setOperators([]) // Definir array vazio em caso de erro
     } finally {

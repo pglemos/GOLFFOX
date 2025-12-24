@@ -15,6 +15,7 @@ import {
   type Vehicle,
   type VehicleInsert,
 } from '@/lib/api/vehicles-api'
+import { logError, warn } from '@/lib/logger'
 import { notifySuccess, notifyError } from '@/lib/toast'
 
 export interface VehicleFormData {
@@ -174,7 +175,7 @@ export function useVehicleForm(options: UseVehicleFormOptions = {}) {
       }
       return result.url || null
     } catch (error) {
-      console.error('Erro ao fazer upload da foto:', error)
+      logError('Erro ao fazer upload da foto', { error }, 'UseVehicleForm')
       throw error
     }
   }, [photoFile, formData.photo_url])
@@ -294,7 +295,7 @@ export function useVehicleForm(options: UseVehicleFormOptions = {}) {
                 vehicleData.photo_url = photoUrl
               }
             } catch (uploadError: any) {
-              console.warn('⚠️ Erro no upload da foto (continuando sem foto):', uploadError)
+              warn('Erro no upload da foto (continuando sem foto)', { error: uploadError }, 'UseVehicleForm')
             }
           }
         }
@@ -321,7 +322,7 @@ export function useVehicleForm(options: UseVehicleFormOptions = {}) {
                 })
               }
             } catch (uploadError: any) {
-              console.warn('⚠️ Erro no upload da foto após criar:', uploadError)
+              warn('Erro no upload da foto após criar', { error: uploadError }, 'UseVehicleForm')
             }
           }
         }

@@ -4,8 +4,9 @@ import { z } from 'zod'
 
 import { requireAuth } from '@/lib/api-auth'
 import { applyRateLimit } from '@/lib/rate-limit'
-import { supabaseServiceRole } from '@/lib/supabase-server'
-
+import { getSupabaseAdmin } from '@/lib/supabase-client'
+import { redisCacheService, createCacheKey } from '@/lib/cache/redis-cache.service'
+import { logError } from '@/lib/logger'
 
 export const runtime = 'nodejs'
 
@@ -14,9 +15,11 @@ const updateAlertSchema = z.object({
     status: z.enum(['open', 'assigned', 'resolved']).optional(),
     assigned_to: z.string().uuid().optional().nullable(),
     description: z.string().optional(),
-    severity: z.enum(['critical', 'warning', 'info']).optional(),
+    message: z.string().optional(),
+    severity: z.enum(['critical', 'warning', 'info', 'error']).optional(),
     resolved_at: z.string().optional(),
-    resolved_by: z.string().uuid().optional(),
+    resolved_by: z.string().uuid().optional().nullable(),
+    resolution_notes: z.string().optional(),
 })
 
 export async function POST(req: NextRequest) {
@@ -30,55 +33,78 @@ export async function POST(req: NextRequest) {
         const body = await req.json()
         const validated = updateAlertSchema.parse(body)
 
-        const updateData: any = {}
-        if (validated.status) updateData.status = validated.status
-        if (validated.assigned_to !== undefined) updateData.assigned_to = validated.assigned_to
-        if (validated.description) updateData.description = validated.description
-        if (validated.severity) updateData.severity = validated.severity
-        if (validated.resolved_at) updateData.resolved_at = validated.resolved_at
-        if (validated.resolved_by) updateData.resolved_by = validated.resolved_by
+        // Campos básicos que SEMPRE existem no gf_alerts
+        const basicUpdateData: Record<string, unknown> = {}
 
-        const { data, error } = await supabaseServiceRole
-            .from('gf_incidents')
-            .update(updateData as any)
+        // Mapeamento de status para is_resolved (coluna que sabemos existir)
+        if (validated.status === 'resolved') {
+            basicUpdateData.is_resolved = true
+        } else if (validated.status === 'open' || validated.status === 'assigned') {
+            basicUpdateData.is_resolved = false
+        }
+
+        if (validated.message) {
+            basicUpdateData.message = validated.message
+        } else if (validated.description) {
+            basicUpdateData.message = validated.description
+        }
+
+        if (validated.severity) {
+            basicUpdateData.severity = validated.severity
+        }
+
+        // Se não houver dados para atualizar, retornar erro
+        if (Object.keys(basicUpdateData).length === 0) {
+            return NextResponse.json(
+                { success: false, error: 'Nenhum dado para atualizar' },
+                { status: 400 }
+            )
+        }
+
+        const supabaseAdmin = getSupabaseAdmin()
+
+        // Atualizar alerta com campos básicos apenas
+        const { data, error } = await supabaseAdmin
+            .from('gf_alerts')
+            .update(basicUpdateData)
             .eq('id', validated.id)
             .select()
             .single()
 
         if (error) {
+            logError('Erro ao atualizar alerta', { error: error.message, alertId: validated.id, basicUpdateData }, 'AlertUpdateAPI')
             return NextResponse.json(
-                { success: false, error: 'Erro ao atualizar alerta', details: error.message },
+                { success: false, error: 'Erro ao atualizar alerta', message: error.message },
                 { status: 500 }
             )
         }
 
-        // Log de auditoria
-        const userEmail = req.headers.get('user-email') || 'admin'
-        await supabaseServiceRole.from('gf_audit_log').insert({
-            actor_id: req.headers.get('user-id'), // Pode ser null se não vier do middleware, mas requireAuth garante
-            action_type: 'update',
-            resource_type: 'incident',
-            resource_id: validated.id,
-            details: {
-                changes: updateData,
-                updated_by: userEmail
-            }
-        } as any)
+        // Invalidar cache de lista
+        try {
+            await redisCacheService.del(createCacheKey('alerts_v4', 'all', 'all'))
+        } catch (cacheErr) {
+            // Ignorar erro de cache
+        }
 
         return NextResponse.json({
             success: true,
             alert: data
         })
-    } catch (error: any) {
+    } catch (error: unknown) {
         if (error instanceof z.ZodError) {
             return NextResponse.json(
                 { success: false, error: 'Dados inválidos', details: error.errors },
                 { status: 400 }
             )
         }
+
+        const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido'
+        logError('Erro ao processar atualização de alerta', { error: errorMessage }, 'AlertUpdateAPI')
+
         return NextResponse.json(
-            { success: false, error: 'Erro ao processar requisição', message: error.message },
+            { success: false, error: 'Erro ao processar requisição', message: errorMessage },
             { status: 500 }
         )
     }
 }
+

@@ -16,6 +16,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { logError } from "@/lib/logger"
 import { supabase } from "@/lib/supabase"
 
 interface veiculo {
@@ -80,7 +81,7 @@ export function VeiculoPickerModal({
 
       setVeiculos(veiculosData)
     } catch (error) {
-      console.error("Erro ao carregar veículos:", error)
+      logError("Erro ao carregar veículos", { error }, 'VeiculoPickerModal')
     } finally {
       setLoading(false)
     }

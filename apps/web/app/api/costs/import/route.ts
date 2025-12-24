@@ -89,7 +89,7 @@ async function importHandler(request: NextRequest) {
 
     // Buscar rotas, veículos e motoristas para mapeamento
     const { data: routes } = await supabase
-      .from('routes')
+      .from('rotas')
       .select('id, name')
       .eq('company_id', companyId)
 

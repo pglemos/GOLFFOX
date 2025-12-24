@@ -3,7 +3,7 @@
  * Monitora erros de API, falhas de cron, e outros eventos críticos
  */
 
-import { error as logError } from './logger'
+import { error as logError, warn } from './logger'
 
 // Importação condicional do Supabase - apenas no servidor
 let supabase: any = null
@@ -66,7 +66,7 @@ export async function createAlert(alert: OperationalAlert): Promise<void> {
       } catch (apiError) {
         // Se API route não existir ou falhar, apenas logar no console (não quebrar aplicação)
         if (process.env.NODE_ENV === 'development') {
-          console.warn('[OperationalAlerts] Não foi possível criar alerta no cliente:', alert.title, apiError)
+          warn('[OperationalAlerts] Não foi possível criar alerta no cliente', { title: alert.title, error: apiError }, 'OperationalAlerts')
         }
         return
       }
@@ -82,7 +82,7 @@ export async function createAlert(alert: OperationalAlert): Promise<void> {
       } catch (e) {
         // Se não conseguir importar, apenas logar (não quebrar)
         if (process.env.NODE_ENV === 'development') {
-          console.warn('[OperationalAlerts] Supabase não disponível para criar alerta')
+          warn('[OperationalAlerts] Supabase não disponível para criar alerta', {}, 'OperationalAlerts')
         }
         return
       }
@@ -100,14 +100,14 @@ export async function createAlert(alert: OperationalAlert): Promise<void> {
       details: alert.details || {},
       source: alert.source || 'web-app',
       metadata: alert.metadata || {},
-      company_id: alert.company_id || null,
+      empresa_id: alert.company_id || null, // Map company_id input to empresa_id column
       created_at: new Date().toISOString(),
       is_resolved: false,
     })
   } catch (err) {
     // Não quebrar aplicação - apenas logar erro
     if (process.env.NODE_ENV === 'development') {
-      console.warn('[OperationalAlerts] Erro ao criar alerta:', formatSupabaseError(err))
+      warn('[OperationalAlerts] Erro ao criar alerta', { error: formatSupabaseError(err) }, 'OperationalAlerts')
     }
     logError('Erro ao criar alerta operacional', { error: formatSupabaseError(err) }, 'OperationalAlerts')
   }
@@ -249,7 +249,7 @@ export async function getUnresolvedAlerts(
     }
 
     if (error) throw error
-    
+
     // Mapear dados do banco para formato esperado (alert_type -> type)
     interface AlertRecord {
       id: string
@@ -262,12 +262,12 @@ export async function getUnresolvedAlerts(
       created_at: string
       [key: string]: unknown
     }
-    
+
     const mappedData = (data || []).map((alert: AlertRecord) => ({
       ...alert,
       type: alert.type || alert.alert_type || 'other'
     }))
-    
+
     return mappedData
   } catch (error) {
     logError('Erro ao buscar alertas', { error: formatSupabaseError(error) }, 'OperationalAlerts')
@@ -310,11 +310,11 @@ export async function resolveAlert(alertId: string, notes?: string): Promise<voi
     await (supabase as any)
       .from('gf_alerts')
       .update({
-          is_resolved: true,
-          resolved_at: new Date().toISOString(),
-          resolution_notes: notes,
-        })
-        .eq('id', alertId)
+        is_resolved: true,
+        resolved_at: new Date().toISOString(),
+        resolution_notes: notes,
+      })
+      .eq('id', alertId)
   } catch (error) {
     logError('Erro ao resolver alerta', { error: formatSupabaseError(error) }, 'OperationalAlerts')
   }

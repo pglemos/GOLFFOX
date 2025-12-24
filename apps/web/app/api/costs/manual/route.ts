@@ -94,7 +94,7 @@ async function createManualCostHandler(request: NextRequest) {
     // Em modo de teste ou desenvolvimento, criar empresa automaticamente se não existir
     if (isTestMode || isDevelopment) {
       const { data: existingCompany } = await supabaseServiceRole
-        .from('companies')
+        .from('empresas')
         .select('id')
         .eq('id', validated.company_id)
         .single()
@@ -102,7 +102,7 @@ async function createManualCostHandler(request: NextRequest) {
                   if (!existingCompany) {
                     try {
                       const { error: createCompanyError } = await supabaseServiceRole
-                        .from('companies')
+                        .from('empresas')
                         .insert({
                           id: validated.company_id,
                           name: `Empresa Teste ${validated.company_id.substring(0, 8)}`,

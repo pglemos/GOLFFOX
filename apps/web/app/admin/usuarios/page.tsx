@@ -29,6 +29,7 @@ import { useResponsive } from "@/hooks/use-responsive"
 import { useRouter } from "@/lib/next-navigation"
 import { UserService, type UserProfile } from "@/lib/services/user-service"
 import { notifySuccess, notifyError } from "@/lib/toast"
+import { logError } from "@/lib/logger"
 
 function UsuariosPageContent() {
     const router = useRouter()
@@ -72,7 +73,7 @@ function UsuariosPageContent() {
             })
             setUsuarios(data)
         } catch (error) {
-            console.error("Erro ao carregar usuários:", error)
+            logError("Erro ao carregar usuários", { error }, 'UsuariosPage')
             setUsuarios([])
         } finally {
             setDataLoading(false)

@@ -9,6 +9,7 @@ import { Card } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { logError } from "@/lib/logger"
 import { notifySuccess, notifyError } from "@/lib/toast"
 
 interface TransportadoraUsersModalProps {
@@ -41,7 +42,7 @@ export function TransportadoraUsersModal({ transportadora, isOpen, onClose, onSa
         setUsers(result.data || [])
       }
     } catch (error) {
-      console.error('Erro ao carregar usuários:', error)
+      logError('Erro ao carregar usuários', { error }, 'TransportadoraUsersModal')
     } finally {
       setLoading(false)
     }
@@ -77,7 +78,7 @@ export function TransportadoraUsersModal({ transportadora, isOpen, onClose, onSa
       loadUsers()
       onSave()
     } catch (error: any) {
-      console.error('Erro ao criar usuário:', error)
+      logError('Erro ao criar usuário', { error }, 'TransportadoraUsersModal')
       notifyError(error, error.message || 'Erro ao criar usuário')
     } finally {
       setLoading(false)
@@ -104,7 +105,7 @@ export function TransportadoraUsersModal({ transportadora, isOpen, onClose, onSa
       loadUsers()
       onSave()
     } catch (error: any) {
-      console.error('Erro ao excluir usuário:', error)
+      logError('Erro ao excluir usuário', { error }, 'TransportadoraUsersModal')
       notifyError(error, error.message || 'Erro ao excluir usuário')
     }
   }

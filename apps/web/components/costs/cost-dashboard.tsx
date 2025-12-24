@@ -27,6 +27,7 @@ import {
 } from "recharts"
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { logError } from "@/lib/logger"
 import { formatCurrency, formatCount } from "@/lib/kpi-utils"
 
 interface CostKPIs {
@@ -160,7 +161,7 @@ export function CostDashboard({ companyId, period = '30' }: CostDashboardProps) 
       // Usar timeout curto para defer (compatível cross-browser)
       setTimeout(loadCharts, 0)
     } catch (error) {
-      console.error('Erro ao carregar dados do dashboard:', error)
+      logError('Erro ao carregar dados do dashboard', { error }, 'CostDashboard')
       setChartsLoading(false)
     }
   }

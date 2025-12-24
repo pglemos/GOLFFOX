@@ -9,6 +9,7 @@ import { AppShell } from "@/components/app-shell"
 import { SkeletonList } from "@/components/ui/skeleton"
 import { getServerUser, hasServerRole } from "@/lib/server-auth"
 import { getSupabaseAdmin } from "@/lib/supabase-client"
+import { logError } from "@/lib/logger"
 
 const AlertasPageClient = dynamic(
   () => import("@/components/admin/alertas/alertas-page-client").then(m => ({ default: m.AlertasPageClient })),
@@ -42,16 +43,11 @@ export const metadata: Metadata = {
 async function fetchAlertas(severity?: string, status?: string): Promise<Alerta[]> {
   try {
     const supabaseAdmin = getSupabaseAdmin()
-    
+
+    // Usar gf_alerts (tabela correta com dados) ao invés de gf_incidents (vazia)
     let query = supabaseAdmin
-      .from('gf_incidents')
-      .select(`
-        *,
-        companies(name),
-        routes(name),
-        veiculos(plate),
-        motoristas:users!gf_incidents_driver_id_fkey(name, email)
-      `)
+      .from('gf_alerts')
+      .select('*')
       .order('created_at', { ascending: false })
       .limit(100)
 
@@ -60,19 +56,74 @@ async function fetchAlertas(severity?: string, status?: string): Promise<Alerta[
     }
 
     if (status && status !== 'all') {
-      query = query.eq('status', status)
+      if (status === 'open') {
+        query = query.eq('is_resolved', false)
+      } else if (status === 'resolved') {
+        query = query.eq('is_resolved', true)
+      }
     }
 
     const { data, error } = await query
 
     if (error) {
-      console.error('Erro ao buscar alertas:', error)
+      logError('Erro ao buscar alertas', { error: error.message || error }, 'AlertasPage')
       return []
     }
 
-    return (data || []) as Alerta[]
-  } catch (error) {
-    console.error('Erro ao buscar alertas:', error)
+    // Buscar nomes das empresas para enriquecer os dados
+    const alertsData = data || []
+    const companyIds = Array.from(new Set(alertsData.map((a: any) => a.empresa_id || a.company_id).filter(Boolean)))
+
+    let companyMap: Record<string, string> = {}
+    if (companyIds.length > 0) {
+      try {
+        const { data: companies } = await supabaseAdmin
+          .from('empresas')
+          .select('id, name')
+          .in('id', companyIds)
+
+        if (companies) {
+          companyMap = companies.reduce((acc: any, curr: any) => {
+            acc[curr.id] = curr.name
+            return acc
+          }, {})
+        }
+      } catch (err) {
+        // Ignorar erro - apenas não teremos nomes de empresas
+      }
+    }
+
+    // Mapear dados para o formato esperado pelo frontend
+    return alertsData.map((alert: any) => {
+      const details = alert.details || {}
+      const metadata = alert.metadata || {}
+
+      const vehiclePlate = details.vehicle_plate || metadata.vehicle_plate || details.placa || metadata.placa
+      const routeName = details.route_name || metadata.route_name || details.rota || metadata.rota
+      const driverName = details.driver_name || metadata.driver_name || details.motorista || metadata.motorista
+      const driverEmail = details.driver_email || metadata.driver_email
+
+      const companyId = alert.empresa_id || alert.company_id
+      const companyName = companyId ? (companyMap[companyId] || 'Empresa não encontrada') : null
+
+      return {
+        id: alert.id,
+        message: alert.message || alert.title,
+        description: alert.message,
+        type: alert.alert_type || alert.type,
+        severity: alert.severity,
+        status: alert.is_resolved ? 'resolved' : 'open',
+        created_at: alert.created_at,
+        companies: companyName ? { name: companyName } : undefined,
+        veiculos: vehiclePlate ? { plate: vehiclePlate } : undefined,
+        routes: routeName ? { name: routeName } : undefined,
+        motoristas: (driverName || driverEmail) ? { name: driverName, email: driverEmail || '' } : undefined,
+        vehicle_plate: vehiclePlate,
+        route_name: routeName,
+      }
+    }) as Alerta[]
+  } catch (error: any) {
+    logError('Erro ao buscar alertas (catch)', { error: error.message || error }, 'AlertasPage')
     return []
   }
 }

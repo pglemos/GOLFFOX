@@ -76,6 +76,13 @@ export async function GET(request: NextRequest) {
       warn('Nenhuma view de KPIs disponível, retornando array vazio', {}, 'KPIsAPI')
     }
 
+    // Buscar contagem real de alertas críticos (unresolved)
+    const { count: alertsCount } = await supabaseAdmin
+      .from('gf_alerts')
+      .select('*', { count: 'exact', head: true })
+      .eq('is_resolved', false)
+      .in('severity', ['critical', 'error'])
+
     // Mapear campos da view para a interface esperada pelo componente AdminDashboardClient
     // A view v_admin_dashboard_kpis retorna: total_companies, total_operators, total_drivers, total_passengers, active_trips, active_vehicles
     // O componente espera: company_id, company_name, trips_today, vehicles_active, employees_in_transit, critical_alerts, routes_today, trips_completed, trips_in_progress
@@ -85,7 +92,7 @@ export async function GET(request: NextRequest) {
       trips_today: viewData.active_trips || 0,
       vehicles_active: viewData.active_vehicles || 0,
       employees_in_transit: viewData.total_passengers || 0,
-      critical_alerts: 0, // Não disponível na view atualmente
+      critical_alerts: alertsCount || 0,
       routes_today: viewData.active_trips || 0, // Aproximação
       trips_completed: 0, // Não disponível na view atualmente
       trips_in_progress: viewData.active_trips || 0,

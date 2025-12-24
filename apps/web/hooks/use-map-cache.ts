@@ -2,6 +2,8 @@
 
 import { useCallback, useState } from "react"
 
+import { warn } from "@/lib/logger"
+
 const CACHE_PREFIX = "route_cache_"
 const CACHE_DURATION = 5 * 60 * 1000 // 5 minutos
 
@@ -28,7 +30,7 @@ export function useMapCache() {
         }
       }
     } catch (error) {
-      console.warn('Erro ao acessar cache:', error)
+      warn('Erro ao acessar cache', { error }, 'UseMapCache')
     }
     return null
   }, [])
@@ -40,7 +42,7 @@ export function useMapCache() {
       localStorage.setItem(`${CACHE_PREFIX}${key}`, JSON.stringify(entry))
       setCacheExpiry(expiry)
     } catch (error) {
-      console.warn('Erro ao salvar cache:', error)
+      warn('Erro ao salvar cache', { error }, 'UseMapCache')
     }
   }, [])
 

@@ -11,6 +11,7 @@ import { Card } from "@/components/ui/card"
 import { geocodeAddress, optimizeRoute } from "@/lib/google-maps"
 import { useRouter } from "@/lib/next-navigation"
 import { supabase } from "@/lib/supabase"
+import { warn, logError } from "@/lib/logger"
 
 export default function SincronizarPage() {
   const router = useRouter()
@@ -39,7 +40,7 @@ export default function SincronizarPage() {
     try {
       // Buscar todas as rotas
       const { data: rotas, error: rotasError } = await supabase
-        .from("routes")
+        .from("rotas")
         .select("*")
         .eq("is_active", true)
 
@@ -54,7 +55,7 @@ export default function SincronizarPage() {
           const { data: funcionarios, error: funcError } = await supabase
             .from("gf_employee_company")
             .select("*")
-            .eq("company_id", rota.company_id)
+            .eq("empresa_id", rota.empresa_id)
             .eq("is_active", true)
 
           if (funcError) throw funcError
@@ -78,7 +79,7 @@ export default function SincronizarPage() {
                   .update({ latitude: lat, longitude: lng })
                   .eq("id", func.id)
               } else {
-                console.warn(`Não foi possível geocodificar: ${func.address}`)
+                warn(`Não foi possível geocodificar: ${func.address}`, { address: func.address }, 'SincronizarPage')
                 continue
               }
             }
@@ -93,18 +94,18 @@ export default function SincronizarPage() {
             if (optimized) {
               // Limpar pontos antigos
               await supabase
-                .from("gf_route_plan")
+                .from("gf_route_plan" as any)
                 .delete()
-                .eq("route_id", rota.id)
+                .eq("rota_id", rota.id)
 
               // Inserir pontos otimizados
               for (let i = 0; i < optimized.optimized.length; i++) {
                 const ponto = optimized.optimized[i]
                 if (ponto && ponto.lat && ponto.lng) {
                   await supabase
-                    .from("gf_route_plan")
+                    .from("gf_route_plan" as any)
                     .insert({
-                      route_id: rota.id,
+                      rota_id: rota.id,
                       stop_order: i + 1,
                       latitude: ponto.lat,
                       longitude: ponto.lng,
@@ -119,7 +120,7 @@ export default function SincronizarPage() {
             }
           }
         } catch (error) {
-          console.error(`Erro ao processar rota ${rota.id}:`, error)
+          logError(`Erro ao processar rota ${rota.id}`, { error, rotaId: rota.id }, 'SincronizarPage')
           erros++
         }
       }

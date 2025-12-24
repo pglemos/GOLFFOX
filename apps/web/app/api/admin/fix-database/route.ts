@@ -55,7 +55,7 @@ async function fixDatabaseHandler(request: NextRequest, auditContext: AuditConte
     try {
       // Verificar se a coluna já existe (selecionar apenas id e updated_at para verificação)
       const { data: company } = await supabaseAdmin
-        .from('companies')
+        .from('empresas')
         .select('id,updated_at')
         .limit(1)
         .single()

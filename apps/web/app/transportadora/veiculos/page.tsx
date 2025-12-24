@@ -27,6 +27,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Textarea } from "@/components/ui/textarea"
 import { useResponsive } from "@/hooks/use-responsive"
 import { notifyError, notifySuccess } from "@/lib/toast"
+import { logError } from "@/lib/logger"
 import { formatDate, formatCurrency } from "@/lib/format-utils"
 
 export default function TransportadoraVeiculosPage() {
@@ -156,7 +157,7 @@ export default function TransportadoraVeiculosPage() {
 
             // Buscar última manutenção
             const { data: lastMaintenance } = await supabase
-              .from('vehicle_maintenances')
+              .from('vehicle_maintenances' as any)
               .select('*')
               .eq('veiculo_id', v.id)
               .order('completed_date', { ascending: false })
@@ -171,7 +172,7 @@ export default function TransportadoraVeiculosPage() {
               lastMaintenance: lastMaintenance || null
             }
           } catch (error) {
-            console.error(`Erro ao carregar detalhes do veículo ${v.id}:`, error)
+            logError(`Erro ao carregar detalhes do veículo ${v.id}`, { error, vehicleId: v.id }, 'TransportadoraVeiculosPage')
             return {
               ...v,
               hasExpiringDocs: false,
@@ -653,7 +654,7 @@ export default function TransportadoraVeiculosPage() {
                     loadVehicleDocuments(selectedVeiculo)
                   }}
                   onError={(error) => {
-                    console.error('Erro no upload:', error)
+                    logError('Erro no upload', { error }, 'TransportadoraVeiculosPage')
                   }}
                 />
               )}

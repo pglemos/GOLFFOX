@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { useSupabaseSync } from "@/hooks/use-supabase-sync"
+import { logError } from "@/lib/logger"
 import { supabase } from "@/lib/supabase"
 import { notifySuccess, notifyError } from "@/lib/toast"
 
@@ -113,7 +114,7 @@ export function VehicleChecklistModal({
       if (error) throw error
       setMotoristas(data || [])
     } catch (error) {
-      console.error("Erro ao carregar motoristas:", error)
+      logError("Erro ao carregar motoristas", { error }, 'VehicleChecklistModal')
     }
   }
 
@@ -200,13 +201,13 @@ export function VehicleChecklistModal({
           })
         }
       } catch (auditError) {
-        console.error('Erro ao registrar log de auditoria:', auditError)
+        logError('Erro ao registrar log de auditoria', { error: auditError }, 'VehicleChecklistModal')
       }
 
       onSave()
       onClose()
     } catch (error: any) {
-      console.error("Erro ao salvar checklist:", error)
+      logError("Erro ao salvar checklist", { error }, 'VehicleChecklistModal')
       notifyError(error, 'Erro ao salvar checklist', { i18n: { ns: 'common', key: 'errors.saveChecklist' } })
     } finally {
       setLoading(false)

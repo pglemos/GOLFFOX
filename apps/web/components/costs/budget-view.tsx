@@ -26,6 +26,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { logError } from "@/lib/logger"
 import { formatCurrency } from "@/lib/kpi-utils"
 import { notifySuccess, notifyError } from "@/lib/toast"
 
@@ -88,7 +89,7 @@ export function BudgetView({ companyId }: BudgetViewProps) {
       }
 
     } catch (error) {
-      console.error('Erro ao carregar dados de orçamento:', error)
+      logError('Erro ao carregar dados de orçamento', { error }, 'BudgetView')
     } finally {
       setLoading(false)
     }
@@ -122,7 +123,7 @@ export function BudgetView({ companyId }: BudgetViewProps) {
       resetForm()
       loadData()
     } catch (error: any) {
-      console.error('Erro ao salvar orçamento:', error)
+      logError('Erro ao salvar orçamento', { error }, 'BudgetView')
       notifyError(error, 'Erro ao salvar orçamento')
     }
   }
@@ -143,7 +144,7 @@ export function BudgetView({ companyId }: BudgetViewProps) {
       notifySuccess('Orçamento excluído com sucesso!')
       loadData()
     } catch (error: any) {
-      console.error('Erro ao excluir orçamento:', error)
+      logError('Erro ao excluir orçamento', { error }, 'BudgetView')
       notifyError(error, 'Erro ao excluir orçamento')
     }
   }

@@ -27,7 +27,6 @@ export async function PUT(
       cpf,
       cnh,
       cnh_category,
-      cnh_expiry,
       is_active,
       address_zip_code,
       address_street,
@@ -62,16 +61,12 @@ export async function PUT(
       address_state
     })
 
-    // Se houver campos não suportados pelo UserService padrão (como cnh_expiry), atualizar manualmente se necessário.
-    // Mas notei que cnh_expiry só aparece aqui na rota, não vi no Crate. Vou manter a consistência.
-    if (cnh_expiry) {
-      const supabase = getSupabaseAdmin()
-      await supabase.from('users').update({ cnh_expiry }).eq('id', driverId)
-    }
+    // Nota: cnh_expiry não existe na tabela users no schema atual
+    // Se necessário no futuro, adicionar ao schema primeiro
 
     // Invalidação de cache já é feita no UserService
 
-    return successResponse({ motorista: { ...updatedMotorista, cnh_expiry } })
+    return successResponse({ motorista: updatedMotorista })
   } catch (error: any) {
     logError('Erro na API de atualizar motorista', { error, driverId: (await context.params).driverId }, 'DriversUpdateAPI')
     return errorResponse(error, 500, 'Erro ao atualizar motorista')

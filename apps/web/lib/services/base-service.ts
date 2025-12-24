@@ -1,4 +1,5 @@
 import { notifyError } from "@/lib/toast"
+import { logError } from "@/lib/logger"
 
 export class BaseService {
     protected static async handleRequest<T>(request: Promise<any>): Promise<T | null> {
@@ -7,7 +8,7 @@ export class BaseService {
             if (error) throw error
             return data as T
         } catch (error) {
-            console.error(`[Service Error]:`, error)
+            logError(`[Service Error]`, { error }, 'BaseService')
             notifyError(error, "Falha na comunicação com o banco de dados")
             return null
         }
@@ -22,7 +23,7 @@ export class BaseService {
             }
             return await res.json() as T
         } catch (error) {
-            console.error(`[Fetch Error ${url}]:`, error)
+            logError(`[Fetch Error ${url}]`, { url, error }, 'BaseService')
             notifyError(error, "Erro ao processar requisição")
             return null
         }

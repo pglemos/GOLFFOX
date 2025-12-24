@@ -180,7 +180,7 @@ export const MapLayers = memo(function MapLayers({
     veiculos.forEach((veiculo) => {
       // Verificar se o veículo tem coordenadas válidas
       // Se não tiver, pular a criação do marcador no mapa, mas o veículo ainda aparecerá na lista
-      if (!isValidCoordinate(veiculo.lat, veiculo.lng)) {
+      if (veiculo.lat === null || veiculo.lng === null || !isValidCoordinate(veiculo.lat, veiculo.lng)) {
         // Veículo sem coordenadas GPS - não criar marcador no mapa
         // Mas o veículo ainda estará disponível na lista de veículos
         debug('Veículo sem coordenadas GPS — exibido só na lista', { plate: veiculo.plate, veiculo_id: veiculo.veiculo_id }, 'AdminMapLayers')
@@ -210,7 +210,7 @@ export const MapLayers = memo(function MapLayers({
 
       try {
         const marker = new google.maps.Marker({
-          position: { lat: veiculo.lat, lng: veiculo.lng },
+          position: { lat: veiculo.lat!, lng: veiculo.lng! },
           map: null, // Clusterer vai adicionar
           icon,
           title: `${veiculo.plate} - ${veiculo.route_name}`,

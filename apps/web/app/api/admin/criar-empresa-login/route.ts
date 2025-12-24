@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
 
     // Verificar se empresa existe
     const { data: company, error: companyError } = await supabaseServiceRole
-      .from('companies')
+      .from('empresas')
       .select('id, name')
       .eq('id', company_id)
       .single()
@@ -133,7 +133,7 @@ export async function POST(request: NextRequest) {
     try {
       await supabaseServiceRole.from('gf_user_company_map').insert({
         user_id: userId,
-        company_id: company_id,
+        empresa_id: company_id,
         created_at: new Date().toISOString()
       })
     } catch (_) { }

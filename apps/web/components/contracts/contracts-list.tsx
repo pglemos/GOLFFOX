@@ -13,6 +13,7 @@ import { DataTablePremium } from "@/components/ui/data-table-premium"
 import { SkeletonList } from "@/components/ui/skeleton"
 import { formatCurrency } from "@/lib/kpi-utils"
 import { supabase } from "@/lib/supabase"
+import { logError } from "@/lib/logger"
 
 
 interface Contract {
@@ -45,7 +46,7 @@ export function ContractsList({ companyId }: ContractsListProps) {
                 if (error) throw error
                 setContracts(data as any as Contract[])
             } catch (error) {
-                console.error('Erro ao carregar contratos:', error)
+                logError('Erro ao carregar contratos', { error }, 'ContractsList')
             } finally {
                 setLoading(false)
             }

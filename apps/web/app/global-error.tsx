@@ -5,6 +5,7 @@ import { useEffect } from "react"
 import { AlertTriangle, RefreshCcw, Home } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
+import { logError } from "@/lib/logger"
 
 export default function GlobalError({
   error,
@@ -15,7 +16,7 @@ export default function GlobalError({
 }) {
   useEffect(() => {
     // Log do erro para monitoramento operacional
-    console.error("[Global Error Boundary]:", error)
+    logError("[Global Error Boundary]", { error, stack: error.stack }, 'GlobalError')
   }, [error])
 
   return (

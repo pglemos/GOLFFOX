@@ -7,6 +7,7 @@ import { Upload, X, FileText, Image as ImageIcon, Loader2, Download, Eye } from 
 import { Button } from "@/components/ui/button"
 import { isImageFile, isPdfFile, formatFileSize } from "@/hooks/use-file-upload"
 import { cn } from "@/lib/utils"
+import { logError } from "@/lib/logger"
 
 /**
  * Props do componente FileUpload
@@ -145,7 +146,7 @@ export function FileUpload({
                 }
             }
         } catch (err) {
-            console.error('Erro no upload:', err)
+            logError('Erro no upload', { error: err }, 'FileUpload')
             setError('Erro ao enviar arquivo')
             if (!currentUrl) {
                 setPreview(null)

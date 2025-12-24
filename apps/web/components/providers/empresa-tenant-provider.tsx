@@ -5,6 +5,7 @@ import { createContext, useContext, useState, useEffect, ReactNode, useCallback,
 import { useRouter, useSearchParams, usePathname } from '@/lib/next-navigation'
 import { supabase } from '@/lib/supabase'
 import { ensureSupabaseSession } from '@/lib/supabase-session'
+import { debug, warn } from '@/lib/logger'
 
 interface TenantContextType {
   tenantCompanyId: string | null
@@ -46,7 +47,7 @@ function OperatorTenantProviderInner({ children }: { children: ReactNode }) {
       setLoading(true)
       setError(null)
       await ensureSupabaseSession()
-      console.log('🔍 Carregando empresas do operador...')
+      debug('Carregando empresas do operador', {}, 'EmpresaTenantProvider')
 
       // ✅ PRIMEIRO: Tentar buscar da view v_my_companies
       let data: any[] | null = null
@@ -59,13 +60,13 @@ function OperatorTenantProviderInner({ children }: { children: ReactNode }) {
         data = result.data
         queryError = result.error
       } catch (viewErr: any) {
-        console.warn('⚠️ Erro ao buscar da view v_my_companies, tentando método alternativo:', viewErr)
+        warn('Erro ao buscar da view v_my_companies, tentando método alternativo', { error: viewErr }, 'EmpresaTenantProvider')
         queryError = viewErr
       }
 
       // ✅ FALLBACK: Se a view falhar, buscar empresas via tabela gf_user_company_map
       if (queryError || !data || data.length === 0) {
-        console.log('🔄 Tentando método alternativo: buscar via gf_user_company_map...')
+        debug('Tentando método alternativo: buscar via gf_user_company_map', {}, 'EmpresaTenantProvider')
 
         try {
           // Buscar empresas associadas ao usuário via gf_user_company_map
@@ -95,18 +96,18 @@ function OperatorTenantProviderInner({ children }: { children: ReactNode }) {
               })
               .filter((c: any) => c !== null)
 
-            console.log(`✅ ${data.length} empresas encontradas via gf_user_company_map`)
+            debug(`${data.length} empresas encontradas via gf_user_company_map`, { count: data.length }, 'EmpresaTenantProvider')
             queryError = null
           } else if (mapError) {
-            console.warn('⚠️ Erro ao buscar via gf_user_company_map:', mapError)
+            warn('Erro ao buscar via gf_user_company_map', { error: mapError }, 'EmpresaTenantProvider')
           }
         } catch (fallbackErr: any) {
-          console.warn('⚠️ Erro no método alternativo:', fallbackErr)
+          warn('Erro no método alternativo', { error: fallbackErr }, 'EmpresaTenantProvider')
         }
 
         // ✅ FALLBACK 2: Se ainda não encontrou, tentar buscar via users.company_id
         if (!data || data.length === 0) {
-          console.log('🔄 Tentando método alternativo 2: buscar via users.company_id...')
+          debug('Tentando método alternativo 2: buscar via users.company_id', {}, 'EmpresaTenantProvider')
 
           try {
             // Obter ID do usuário atual
@@ -122,7 +123,7 @@ function OperatorTenantProviderInner({ children }: { children: ReactNode }) {
               if (!userError && userData && (userData as any).company_id) {
                 // Buscar dados da empresa
                 const { data: companyData, error: companyError } = await supabase
-                  .from('companies')
+                  .from('empresas')
                   .select('id, name, logo_url')
                   .eq('id', (userData as any).company_id)
                   .maybeSingle()
@@ -133,19 +134,19 @@ function OperatorTenantProviderInner({ children }: { children: ReactNode }) {
                     name: (companyData as any).name || 'Empresa',
                     logo_url: (companyData as any).logo_url || null
                   }]
-                  console.log(`✅ Empresa encontrada via users.company_id: ${(companyData as any).name}`)
+                  debug(`Empresa encontrada via users.company_id: ${(companyData as any).name}`, { companyName: (companyData as any).name }, 'EmpresaTenantProvider')
                   queryError = null
                 }
               }
             }
           } catch (userErr: any) {
-            console.warn('⚠️ Erro ao buscar via users.company_id:', userErr)
+            warn('Erro ao buscar via users.company_id', { error: userErr }, 'EmpresaTenantProvider')
           }
         }
       }
 
       if (queryError && (!data || data.length === 0)) {
-        console.error('❌ Erro ao buscar empresas:', queryError)
+        logError('Erro ao buscar empresas', { error: queryError }, 'EmpresaTenantProvider')
         setError(`Erro ao carregar empresas: ${queryError.message || 'View v_my_companies não disponível ou sem permissão'}`)
         setCompanies([])
         return
@@ -157,7 +158,7 @@ function OperatorTenantProviderInner({ children }: { children: ReactNode }) {
         logoUrl: c.logo_url || null
       }))
 
-      console.log(`✅ ${formattedCompanies.length} empresas encontradas:`, formattedCompanies.map(c => c.name))
+      debug(`${formattedCompanies.length} empresas encontradas`, { companies: formattedCompanies.map(c => c.name) }, 'EmpresaTenantProvider')
       setCompanies(formattedCompanies)
 
       // Buscar brand tokens da primeira empresa ou empresa selecionada
@@ -170,7 +171,7 @@ function OperatorTenantProviderInner({ children }: { children: ReactNode }) {
         const selectedCompany = formattedCompanies.find((c: { id: string }) => c.id === selectedId) || formattedCompanies[0]
 
         if (selectedCompany) {
-          console.log(`✅ Empresa selecionada: ${selectedCompany.name} (${selectedCompany.id})`)
+          debug(`Empresa selecionada: ${selectedCompany.name}`, { companyId: selectedCompany.id, companyName: selectedCompany.name }, 'EmpresaTenantProvider')
           setTenantCompanyId(selectedCompany.id)
           setCompanyName(selectedCompany.name)
           setLogoUrl(selectedCompany.logoUrl || null)
@@ -197,18 +198,18 @@ function OperatorTenantProviderInner({ children }: { children: ReactNode }) {
           // A seleção de tenant é persistida apenas em localStorage.
         }
       } else {
-        console.warn('⚠️ Nenhuma empresa encontrada para o operador, tentando fallback...')
+        warn('Nenhuma empresa encontrada para o operador, tentando fallback', {}, 'EmpresaTenantProvider')
 
         // FALLBACK: Tentar buscar qualquer empresa disponível (para usuários de teste)
         try {
           const { data: anyCompany } = await supabase
-            .from('companies')
+            .from('empresas')
             .select('id, name, logo_url')
             .limit(1)
             .maybeSingle()
 
           if (anyCompany) {
-            console.log(`✅ Usando empresa fallback: ${(anyCompany as any).name}`)
+            debug(`Usando empresa fallback: ${(anyCompany as any).name}`, { companyName: (anyCompany as any).name }, 'EmpresaTenantProvider')
             const fallbackCompany = {
               id: (anyCompany as any).id,
               name: (anyCompany as any).name || 'Empresa',
@@ -227,13 +228,13 @@ function OperatorTenantProviderInner({ children }: { children: ReactNode }) {
             setError('Nenhuma empresa encontrada. Entre em contato com o administrador para associar seu usuário a uma empresa cadastrada.')
           }
         } catch (fallbackErr) {
-          console.error('❌ Erro no fallback de empresa:', fallbackErr)
+          logError('Erro no fallback de empresa', { error: fallbackErr }, 'EmpresaTenantProvider')
           setTenantCompanyId(null)
           setError('Nenhuma empresa encontrada. Entre em contato com o administrador para associar seu usuário a uma empresa cadastrada.')
         }
       }
     } catch (err: any) {
-      console.error('❌ Erro ao carregar empresas:', err)
+      logError('Erro ao carregar empresas', { error: err }, 'EmpresaTenantProvider')
       setError(`Erro inesperado: ${err?.message || 'Erro desconhecido'}`)
       setCompanies([])
     } finally {
@@ -244,7 +245,7 @@ function OperatorTenantProviderInner({ children }: { children: ReactNode }) {
   const switchTenant = useCallback((companyId: string) => {
     const company = companies.find(c => c.id === companyId)
     if (!company) {
-      console.warn(`⚠️ Empresa ${companyId} não encontrada`)
+      warn(`Empresa ${companyId} não encontrada`, { companyId }, 'EmpresaTenantProvider')
       return
     }
 
@@ -308,7 +309,7 @@ export const EmpresaTenantProvider = OperatorTenantProvider
 export function useOperatorTenant() {
   const context = useContext(TenantContext)
   if (!context) {
-    console.error('⚠️ useOperatorTenant usado fora do OperatorTenantProvider')
+    logError('useOperatorTenant usado fora do OperatorTenantProvider', {}, 'EmpresaTenantProvider')
     // Retornar valores padrão em vez de lançar erro para evitar crash
     return {
       tenantCompanyId: null,

@@ -4,6 +4,7 @@ import { useEffect } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
+import { logError } from '@/lib/logger'
 
 export default function Error({
   error,
@@ -13,8 +14,7 @@ export default function Error({
   reset: () => void
 }) {
   useEffect(() => {
-    console.error('❌ Erro na página de funcionários:', error)
-    console.error('Stack trace:', error.stack)
+    logError('Erro na página de funcionários', { error, stack: error.stack }, 'FuncionariosError')
   }, [error])
 
   return (

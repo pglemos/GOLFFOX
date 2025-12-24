@@ -22,6 +22,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
+import { logError } from "@/lib/logger"
 import { useSupabaseSync } from "@/hooks/use-supabase-sync"
 import { supabase } from "@/lib/supabase"
 import { notifySuccess, notifyError } from "@/lib/toast"
@@ -162,13 +163,13 @@ export function VehicleMaintenanceModal({
           })
         }
       } catch (auditError) {
-        console.error('Erro ao registrar log de auditoria:', auditError)
+        logError('Erro ao registrar log de auditoria', { error: auditError }, 'VehicleMaintenanceModal')
       }
 
       onSave()
       onClose()
     } catch (error: any) {
-      console.error("Erro ao salvar manutenção:", error)
+      logError("Erro ao salvar manutenção", { error }, 'VehicleMaintenanceModal')
       notifyError(error, 'Erro ao salvar manutenção', { i18n: { ns: 'common', key: 'errors.saveMaintenance' } })
     } finally {
       setLoading(false)

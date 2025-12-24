@@ -4,6 +4,7 @@ import { useState, useCallback, useRef, useEffect } from 'react'
 
 import { motion } from 'framer-motion'
 
+import { logError, warn } from '@/lib/logger'
 import { useRouter, useSearchParams } from '@/lib/next-navigation'
 
 interface RouteState {
@@ -89,7 +90,7 @@ export function useAdvancedNavigation() {
       
       setPreloadedAssets(prev => new Set([...prev, targetTab]))
     } catch (error) {
-      console.warn(`Erro ao pré-carregar assets para ${targetTab}:`, error)
+      warn(`Erro ao pré-carregar assets para ${targetTab}`, { error, targetTab }, 'UseAdvancedNavigation')
     }
   }, [preloadedAssets])
 
@@ -240,7 +241,7 @@ export function useAdvancedNavigation() {
       }, 50)
 
     } catch (error) {
-      console.error('Erro na navegação avançada:', error)
+      logError('Erro na navegação avançada', { error }, 'UseAdvancedNavigation')
       setIsTransitioning(false)
     }
   }, [router, searchParams, preloadAssets, calculateOptimalZoom])

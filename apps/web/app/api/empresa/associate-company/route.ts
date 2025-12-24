@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
     // 2. Verificar se já existe mapeamento (selecionar apenas colunas necessárias)
     const { data: existingMapping } = await supabaseAdmin
       .from('gf_user_company_map')
-      .select('user_id,company_id')
+      .select('user_id,empresa_id')
       .eq('user_id', operatorUser.id)
       .limit(1)
       .single()
@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ 
         success: true, 
         message: 'Operador já está associado a uma empresa',
-        companyId: existingMapping.company_id
+        companyId: existingMapping.empresa_id
       })
     }
 
@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
     if (companyId) {
       // Verificar se a empresa existe
       const { data: company, error: companyError } = await supabaseAdmin
-        .from('companies')
+        .from('empresas')
         .select('id, name')
         .eq('id', companyId)
         .eq('is_active', true)
@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
     } else {
       // Buscar primeira empresa disponível
       const { data: companies, error: companiesError } = await supabaseAdmin
-        .from('companies')
+        .from('empresas')
         .select('id, name')
         .eq('is_active', true)
         .limit(1)
@@ -89,7 +89,7 @@ export async function POST(request: NextRequest) {
       .from('gf_user_company_map')
       .insert({
         user_id: operatorUser.id,
-        company_id: finalCompanyId
+        empresa_id: finalCompanyId
       })
       .select()
       .single()
@@ -103,9 +103,9 @@ export async function POST(request: NextRequest) {
       .from('users')
       .upsert({
         id: operatorUser.id,
-        email: operatorUser.email,
+        email: operatorUser.email || '',
         role: 'gestor_transportadora',
-        company_id: finalCompanyId,
+        empresa_id: finalCompanyId,
         is_active: true
       }, {
         onConflict: 'id'

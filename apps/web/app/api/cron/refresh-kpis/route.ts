@@ -52,7 +52,7 @@ export async function GET(request: NextRequest) {
 
   try {
     // Verificar se a função RPC existe antes de chamar
-    const { error: rpcError } = await supabaseServiceRole.rpc('refresh_mv_operador_kpis')
+    const { error: rpcError } = await supabaseServiceRole.rpc('refresh_mv_operator_kpis')
     
     if (rpcError) {
       logError('Erro ao atualizar MV de KPIs', { error: rpcError }, 'CronRefreshKPIs')

@@ -213,7 +213,7 @@ export class RealtimeService {
 
             if (!tripData) {
               const { data, error: tripError } = await (supabase
-                .from('trips')
+                .from('viagens')
                 .select('id, veiculo_id, route_id, motorista_id, status')
                 .eq('id', position.trip_id)
                 .single() as any)

@@ -90,7 +90,7 @@ export async function POST(request: NextRequest) {
     let finalCompanyId = validated.empresa_id
     if (!finalCompanyId) {
       const { data: companies } = await supabaseServiceRole
-        .from('companies')
+        .from('empresas')
         .select('id')
         .eq('is_active', true)
         .limit(1)
@@ -102,7 +102,7 @@ export async function POST(request: NextRequest) {
         try {
           const testCompanyId = '00000000-0000-0000-0000-000000000001'
           const { data: newCompany, error: createCompanyError } = await supabaseServiceRole
-            .from('companies')
+            .from('empresas')
             .insert({
               id: testCompanyId,
               name: 'Empresa Teste Padrão',

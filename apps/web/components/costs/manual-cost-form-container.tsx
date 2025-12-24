@@ -10,6 +10,7 @@
 import { useState, useEffect, useCallback } from "react"
 
 import { useApiMutation } from "@/hooks/use-api-mutation"
+import { logError } from "@/lib/logger"
 import { notifySuccess, notifyError } from "@/lib/toast"
 
 import { ManualCostFormView, type ManualCostFormData, type CostCategory } from "./manual-cost-form-view"
@@ -115,7 +116,7 @@ export function ManualCostFormContainer({
         notifyError('Erro ao carregar categorias')
       }
     } catch (error) {
-      console.error('Erro ao carregar categorias:', error)
+      logError('Erro ao carregar categorias', { error }, 'ManualCostFormContainer')
       notifyError('Erro ao carregar categorias')
     } finally {
       setLoadingCategories(false)

@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { logError } from "@/lib/logger"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useSupabaseSync } from "@/hooks/use-supabase-sync"
 import { auditLogs } from "@/lib/audit-log"
@@ -142,14 +143,14 @@ export function RouteModal({
   const loadCompanies = async () => {
     try {
       const { data, error } = await supabase
-        .from('companies')
+        .from('empresas')
         .select('id, name')
         .order('name')
 
       if (error) throw error
       setCompanies(data || [])
     } catch (error: any) {
-      console.error('Erro ao carregar empresas:', error)
+      logError('Erro ao carregar empresas', { error }, 'RouteModal')
       notifyError(error, t('common', 'errors.loadCompanies'))
     }
   }
@@ -183,7 +184,7 @@ export function RouteModal({
       if (route?.id) {
         // Atualizar
         const { error } = await supabase
-          .from('routes')
+          .from('rotas')
           .update(payload as any)
           .eq('id', route.id)
 
@@ -204,7 +205,7 @@ export function RouteModal({
       } else {
         // Criar
         const { data, error } = await supabase
-          .from('routes')
+          .from('rotas')
           .insert(payload as any)
           .select("*")
           .single()
@@ -234,7 +235,7 @@ export function RouteModal({
       onSave()
       onClose()
     } catch (error: any) {
-      console.error('Erro ao salvar rota:', error)
+      logError('Erro ao salvar rota', { error }, 'RouteModal')
       notifyError(error, t('common', 'errors.saveRoute'))
     } finally {
       setLoading(false)
@@ -269,7 +270,7 @@ export function RouteModal({
       notifySuccess('', { i18n: { ns: 'common', key: 'success.pointsGeneratedSaved' } })
       if (onGenerateStops) await onGenerateStops(routeId)
     } catch (error: any) {
-      console.error('Erro ao gerar pontos:', error)
+      logError('Erro ao gerar pontos', { error }, 'RouteModal')
       notifyError(error, t('common', 'errors.generatePoints'))
     } finally {
       setGeneratingStops(false)
@@ -302,7 +303,7 @@ export function RouteModal({
         await onOptimize(routeId)
       }
     } catch (error: any) {
-      console.error('Erro ao otimizar rota:', error)
+      logError('Erro ao otimizar rota', { error }, 'RouteModal')
       notifyError(error, t('common', 'errors.optimizeRoute'))
     } finally {
       setOptimizing(false)

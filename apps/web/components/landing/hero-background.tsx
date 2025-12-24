@@ -1,11 +1,20 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import { motion, useScroll, useTransform, useSpring } from "framer-motion"
+import { motion, useTransform, useSpring, useMotionValue } from "framer-motion"
 
 export function HeroBackground() {
     const containerRef = useRef<HTMLDivElement>(null)
-    const { scrollY } = useScroll()
+    const scrollY = useMotionValue(0)
+
+    useEffect(() => {
+        const handleScroll = () => {
+            scrollY.set(window.scrollY)
+        }
+        window.addEventListener('scroll', handleScroll)
+        handleScroll() // Initial value
+        return () => window.removeEventListener('scroll', handleScroll)
+    }, [scrollY])
 
     // Parallax suave
     const y1 = useTransform(scrollY, [0, 1000], [0, 400])

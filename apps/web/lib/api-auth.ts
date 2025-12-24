@@ -21,6 +21,7 @@ export interface AuthenticatedUser {
   email: string
   role: string
   company_id?: string | null
+  empresa_id?: string | null
   transportadora_id?: string | null
 }
 
@@ -180,7 +181,7 @@ export async function validateAuth(request: NextRequest): Promise<AuthenticatedU
 
               const { data: userData, error: dbError } = await supabaseAdmin
                 .from('users')
-                .select('id, email, role, company_id, transportadora_id')
+                .select('id, email, role, empresa_id, transportadora_id')
                 .eq('id', sessionData.id)
                 .maybeSingle()
 
@@ -190,7 +191,8 @@ export async function validateAuth(request: NextRequest): Promise<AuthenticatedU
                   id: userData.id,
                   email: userData.email || sessionData.email || '',
                   role: normalizedRole,
-                  company_id: userData.company_id || sessionData.company_id || sessionData.companyId || null,
+                  company_id: userData.empresa_id || sessionData.company_id || sessionData.companyId || null,
+                  empresa_id: userData.empresa_id || sessionData.company_id || sessionData.companyId || null,
                   transportadora_id: userData.transportadora_id || sessionData.transportadora_id || null
                 }
 
@@ -210,6 +212,7 @@ export async function validateAuth(request: NextRequest): Promise<AuthenticatedU
               email: sessionData.email || '',
               role: normalizedRole,
               company_id: sessionData.company_id || sessionData.companyId || null,
+              empresa_id: sessionData.company_id || sessionData.companyId || null,
               transportadora_id: sessionData.transportadora_id || null
             }
 
@@ -278,7 +281,7 @@ export async function validateAuth(request: NextRequest): Promise<AuthenticatedU
     // Buscar TODOS os dados do usuário do banco
     const { data: userData, error: dbError } = await supabaseAdmin
       .from('users')
-      .select('id, email, role, company_id, transportadora_id')
+      .select('id, email, role, empresa_id, transportadora_id')
       .eq('id', user.id)
       .maybeSingle()
 
@@ -306,7 +309,8 @@ export async function validateAuth(request: NextRequest): Promise<AuthenticatedU
       id: userData.id,
       email: userData.email || user.email || '',
       role: normalizedRole,
-      company_id: userData.company_id || null,
+      company_id: userData.empresa_id || null,
+      empresa_id: userData.empresa_id || null,
       transportadora_id: userData.transportadora_id || null
     }
 
@@ -454,9 +458,9 @@ export async function requireCompanyAccess(
 
       const { data: mapping } = await supabaseAdmin
         .from('gf_user_company_map')
-        .select('company_id')
+        .select('empresa_id')
         .eq('user_id', user.id)
-        .eq('company_id', companyId)
+        .eq('empresa_id', companyId)
         .single()
 
       if (!mapping) {

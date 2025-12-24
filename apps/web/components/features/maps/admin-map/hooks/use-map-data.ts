@@ -65,22 +65,22 @@ export function useMapData({ companyFilter }: UseMapDataOptions = {}) {
       routesLoadTimeoutRef.current = setTimeout(async () => {
         try {
           let routesQuery = supabase
-            .from('routes')
-            .select(`id, name, company_id`)
+            .from('rotas')
+            .select(`id, name, empresa_id`)
             .eq('is_active', true)
             .limit(LIMIT)
 
           if (currentCompany && currentCompany !== 'null' && currentCompany !== '') {
-            routesQuery = routesQuery.eq('company_id', currentCompany)
+            routesQuery = routesQuery.eq('empresa_id', currentCompany)
           }
 
           const { data: routesData, error: routesError } = await routesQuery
 
           if (!routesError && routesData && routesData.length > 0) {
-            const routeIds = routesData.map((r: SupabaseRoute) => r.id)
+            const routeIds = routesData.map((r: any) => r.id)
 
             const { data: stopsData } = await supabase
-              .from('route_stops')
+              .from('v_route_stops')
               .select('route_id, lat, lng, seq, name')
               .in('route_id', routeIds)
               .order('route_id')
@@ -101,7 +101,7 @@ export function useMapData({ companyFilter }: UseMapDataOptions = {}) {
               })
             }
 
-            const formattedRoutes = (routesData || []).map((r: SupabaseRoute) => ({
+            const formattedRoutes = (routesData || []).map((r: any) => ({
               route_id: r.id,
               route_name: r.name,
               company_id: r.company_id,
@@ -193,25 +193,25 @@ export function useMapData({ companyFilter }: UseMapDataOptions = {}) {
         const routeIds = routes?.map((r: RoutePolyline) => r.route_id) || []
         if (routeIds.length > 0) {
           const { data: stopsData, error: stopsError } = await supabase
-            .from('route_stops')
+            .from('v_route_stops' as any)
             .select(
-              `id, route_id, seq, name, lat, lng, radius_m, routes!inner(name)`
+              `id, rota_id, stop_order, stop_name, latitude, longitude, route_name`
             )
-            .in('route_id', routeIds)
-            .order('route_id', { ascending: true })
-            .order('seq', { ascending: true })
+            .in('rota_id', routeIds)
+            .order('rota_id', { ascending: true })
+            .order('stop_order', { ascending: true })
 
           if (!stopsError && stopsData) {
             setRouteStops(
-              stopsData.map((stop: SupabaseStopWithRoute) => ({
-                id: stop.id,
-                route_id: stop.route_id,
-                route_name: stop.routes?.name || '',
-                seq: stop.seq,
-                name: stop.name,
-                lat: stop.lat,
-                lng: stop.lng,
-                radius_m: stop.radius_m || 50
+              (stopsData || []).map((stop: any) => ({
+                id: stop.id || '',
+                route_id: stop.rota_id || '',
+                route_name: stop.route_name || '',
+                seq: stop.stop_order || 0,
+                name: stop.stop_name || '',
+                lat: stop.latitude || 0,
+                lng: stop.longitude || 0,
+                radius_m: 50
               }))
             )
           }

@@ -7,6 +7,7 @@ import { Loader2, MapPin } from "lucide-react"
 
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { logError } from "@/lib/logger"
 import { cn } from "@/lib/utils"
 
 interface AddressAutocompleteProps {
@@ -45,7 +46,7 @@ export function AddressAutocomplete({
 
   useEffect(() => {
     if (loadError) {
-      console.error("Erro ao carregar Google Maps:", loadError)
+      logError("Erro ao carregar Google Maps", { error: loadError }, 'AddressAutocomplete')
       onGeocodeError?.("Erro ao carregar serviço de endereços")
     }
   }, [loadError, onGeocodeError])

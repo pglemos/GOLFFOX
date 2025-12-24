@@ -8,6 +8,7 @@ import { showCriticalAlert } from "@/components/alerts/alert-toast"
 import { useOperatorTenant } from "@/components/providers/empresa-tenant-provider"
 import { supabase } from "@/lib/supabase"
 import { notifySuccess } from "@/lib/toast"
+import { debug } from "@/lib/logger"
 
 export interface RealtimeProviderProps {
     children: React.ReactNode
@@ -21,7 +22,7 @@ export function RealtimeProvider({ children }: RealtimeProviderProps) {
     useEffect(() => {
         if (!tenantCompanyId) return
 
-        console.log(`🔌 [Realtime] Conectando ao canal da empresa: ${tenantCompanyId}`)
+        debug(`[Realtime] Conectando ao canal da empresa`, { tenantCompanyId }, 'RealtimeProvider')
 
         // Cleanup previous channel if exists
         if (channelRef.current) {
@@ -39,7 +40,7 @@ export function RealtimeProvider({ children }: RealtimeProviderProps) {
                     filter: `company_id=eq.${tenantCompanyId}`,
                 },
                 (payload) => {
-                    console.log('🔔 [Realtime] Novo alerta recebido:', payload)
+                    debug('[Realtime] Novo alerta recebido', { payload }, 'RealtimeProvider')
 
                     // Invalidate queries to refresh UI
                     queryClient.invalidateQueries({ queryKey: ["alerts"] })
@@ -64,14 +65,14 @@ export function RealtimeProvider({ children }: RealtimeProviderProps) {
             )
             .subscribe((status) => {
                 if (status === 'SUBSCRIBED') {
-                    console.log('✅ [Realtime] Inscrito com sucesso!')
+                    debug('[Realtime] Inscrito com sucesso', {}, 'RealtimeProvider')
                 }
             })
 
         channelRef.current = channel
 
         return () => {
-            console.log('🔌 [Realtime] Desconectando...')
+            debug('[Realtime] Desconectando', {}, 'RealtimeProvider')
             if (channelRef.current) {
                 supabase.removeChannel(channelRef.current)
             }

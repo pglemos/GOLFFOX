@@ -2,6 +2,7 @@
 
 import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from "@tanstack/react-query"
 
+import { debug, logError } from "@/lib/logger"
 import { supabase } from "@/lib/supabase"
 
 /**
@@ -119,9 +120,9 @@ export function useEmployees(
   return useQuery({
     queryKey: ["employees", companyId, page, pageSize, searchQuery],
     queryFn: async () => {
-      console.log('🔍 [useEmployees] Buscando funcionários via API:', { companyId, page, pageSize, searchQuery })
+      debug('[useEmployees] Buscando funcionários via API', { companyId, page, pageSize, searchQuery }, 'UseEmpresaData')
       if (!companyId) {
-        console.log('🔍 [useEmployees] Sem companyId, retornando vazio')
+        debug('[useEmployees] Sem companyId, retornando vazio', {}, 'UseEmpresaData')
         return { data: [], count: 0 }
       }
 
@@ -141,13 +142,13 @@ export function useEmployees(
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({ error: 'Erro desconhecido' }))
-        console.error('❌ [useEmployees] Erro na API:', errorData)
+        logError('[useEmployees] Erro na API', { error: errorData }, 'UseEmpresaData')
         throw new Error(errorData.error || 'Erro ao buscar funcionários')
       }
 
       const result = await response.json()
 
-      console.log('🔍 [useEmployees] Resultado da API:', {
+      debug('[useEmployees] Resultado da API', {
         dataLength: result.data?.length,
         count: result.count,
         companyId,

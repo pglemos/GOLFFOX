@@ -16,6 +16,7 @@ import { SkeletonList } from "@/components/ui/skeleton"
 import { Switch } from "@/components/ui/switch"
 import { supabase } from "@/lib/supabase"
 import { notifySuccess, notifyError } from "@/lib/toast"
+import { logError } from "@/lib/logger"
 
 
 
@@ -49,7 +50,7 @@ export function CostCentersList({ companyId }: CostCentersListProps) {
             if (error) throw error
             setCostCenters(data as any as CostCenter[])
         } catch (error) {
-            console.error('Erro ao carregar centros de custo:', error)
+            logError('Erro ao carregar centros de custo', { error }, 'CostCentersList')
             notifyError('Erro ao carregar dados')
         } finally {
             setLoading(false)
@@ -95,7 +96,7 @@ export function CostCentersList({ companyId }: CostCentersListProps) {
             setFormData({ code: '', name: '', is_active: true })
             loadCostCenters()
         } catch (error) {
-            console.error('Erro ao salvar:', error)
+            logError('Erro ao salvar', { error }, 'CostCentersList')
             notifyError('Erro ao salvar centro de custo')
         }
     }
@@ -113,7 +114,7 @@ export function CostCentersList({ companyId }: CostCentersListProps) {
             notifySuccess('Centro de custo removido')
             loadCostCenters()
         } catch (error) {
-            console.error('Erro ao remover:', error)
+            logError('Erro ao remover', { error }, 'CostCentersList')
             notifyError('Erro ao remover')
         }
     }

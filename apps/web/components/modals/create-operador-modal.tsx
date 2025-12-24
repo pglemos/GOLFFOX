@@ -19,6 +19,7 @@ import { Label } from "@/components/ui/label"
 import { fetchWithErrorHandling } from "@/lib/api/fetch-with-error-handling"
 import { formatPhone, formatCEP, formatCPF, formatCNPJ } from "@/lib/format-utils"
 import { globalSyncManager } from "@/lib/global-sync"
+import { logError } from "@/lib/logger"
 import { supabase } from "@/lib/supabase"
 import { notifySuccess, notifyError } from "@/lib/toast"
 
@@ -239,7 +240,7 @@ export function CreateOperatorModal({
         setProgress("")
       }, 2000)
     } catch (error: any) {
-      console.error("Erro ao criar empresa:", error)
+      logError("Erro ao criar empresa", { error }, 'CreateOperadorModal')
       notifyError(error, "Erro ao criar empresa")
       setStep(1)
     } finally {

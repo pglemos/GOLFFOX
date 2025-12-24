@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input"
 import { useAuth } from "@/hooks/use-auth"
 import { formatCurrency } from "@/lib/format"
 import { supabase } from "@/lib/supabase"
+import { logError } from "@/lib/logger"
 
 interface Contract {
     id: string
@@ -39,7 +40,7 @@ export default function AdminContratosPage() {
                     .order('created_at', { ascending: false })
 
                 if (error) {
-                    console.error('Error loading contracts:', error)
+                    logError('Error loading contracts', { error }, 'AdminContratosPage')
                     // Use mock data if table doesn't exist
                     setContracts([
                         { id: '1', name: 'Contrato Empresa ABC', value_amount: 15000, status: 'active', start_date: '2024-01-01', end_date: '2024-12-31', company_name: 'Empresa ABC' },
@@ -50,7 +51,7 @@ export default function AdminContratosPage() {
                     setContracts((data || []).map((c: any) => ({ ...c, company_name: 'Empresa' })))
                 }
             } catch (err) {
-                console.error('Error:', err)
+                logError('Error loading contracts', { error: err }, 'AdminContratosPage')
                 setContracts([])
             } finally {
                 setLoading(false)

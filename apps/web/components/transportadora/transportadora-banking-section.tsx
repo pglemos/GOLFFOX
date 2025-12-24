@@ -15,6 +15,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
+import { logError } from "@/lib/logger"
 import { notifySuccess, notifyError } from "@/lib/toast"
 import {
     BankAccountType,
@@ -76,7 +77,7 @@ export function TransportadoraBankingSection({
                 }
             }
         } catch (error) {
-            console.error("Erro ao carregar dados bancários:", error)
+            logError("Erro ao carregar dados bancários", { error }, 'TransportadoraBankingSection')
         } finally {
             setLoading(false)
         }

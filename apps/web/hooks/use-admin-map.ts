@@ -138,8 +138,8 @@ export function useAdminMap(options: UseAdminMapOptions = {}): UseAdminMapReturn
 
       // Carregar rotas
       const { data: routesData, error: routesError } = await supabase
-        .from('routes')
-        .select('id, name, company_id')
+        .from('rotas')
+        .select('id, name, empresa_id')
         .order('name')
 
       if (signal.aborted) return
@@ -149,7 +149,7 @@ export function useAdminMap(options: UseAdminMapOptions = {}): UseAdminMapReturn
         setRoutes(routesData.map(r => ({
           route_id: r.id,
           route_name: r.name,
-          company_id: r.company_id,
+          company_id: r.empresa_id,
           polyline_points: [], // Será preenchido por lazy loading ou via route_stops se necessário
           stops_count: 0
         })))

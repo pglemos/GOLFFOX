@@ -9,6 +9,7 @@ import { AppShell } from "@/components/app-shell"
 import { Card } from "@/components/ui/card"
 import { useRouter } from "@/lib/next-navigation"
 import { supabase } from "@/lib/supabase"
+import { logError } from "@/lib/logger"
 
 export default function PrestadoresOperatorPage() {
   const router = useRouter()
@@ -32,7 +33,7 @@ export default function PrestadoresOperatorPage() {
           await loadPrestadores(currentUser.id)
         }
       } catch (error) {
-        console.error("Erro ao carregar sessão:", error)
+        logError("Erro ao carregar sessão", { error }, 'PrestadoresPage')
       } finally {
         setLoading(false)
       }
@@ -44,30 +45,30 @@ export default function PrestadoresOperatorPage() {
     try {
       const { data: userData, error: userError } = await supabase
         .from('users')
-        .select('company_id')
+        .select('empresa_id')
         .eq('id', userId)
         .single()
 
       if (userError) {
-        console.error("Erro ao buscar usuário:", userError)
+        logError("Erro ao buscar usuário", { error: userError }, 'PrestadoresPage')
         return
       }
 
-      if (userData?.company_id) {
+      if (userData?.empresa_id) {
         // @ts-ignore - Supabase type inference issue with views
         const { data, error } = await (((supabase
           .from('v_operador_assigned_carriers' as any)
           .select('*')
-          .eq('empresa_id', userData.company_id)) as any) as any)
+          .eq('empresa_id', userData.empresa_id)) as any) as any)
         
         if (error) {
-          console.error("Erro ao buscar prestadores:", error)
+          logError("Erro ao buscar prestadores", { error }, 'PrestadoresPage')
           return
         }
         setPrestadores(data || [])
       }
     } catch (error) {
-      console.error("Erro ao carregar prestadores:", error)
+      logError("Erro ao carregar prestadores", { error }, 'PrestadoresPage')
     }
   }
 

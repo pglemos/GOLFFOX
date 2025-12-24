@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
                     .select('role, empresa_id, transportadora_id')
                     .eq('id', authData.user.id)
                     .single()
-                profile = { ...p, company_id: p.empresa_id } as any
+                profile = p ? { ...p, company_id: p.empresa_id } as any : null
             }
         }
 

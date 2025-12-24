@@ -20,6 +20,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { globalSyncManager } from "@/lib/global-sync"
+import { logError } from "@/lib/logger"
 import { notifySuccess, notifyError } from "@/lib/toast"
 
 
@@ -80,7 +81,6 @@ export function EditCompanyModal({
 
   useEffect(() => {
     if (company && isOpen) {
-      console.log('Carregando dados da empresa no modal:', company)
       setFormData({
         name: company.name || "",
         cnpj: company.cnpj || "",
@@ -173,7 +173,7 @@ export function EditCompanyModal({
       onSave()
       onClose()
     } catch (error: any) {
-      console.error("Erro ao atualizar empresa:", error)
+      logError("Erro ao atualizar empresa", { error }, 'EditCompanyModal')
       notifyError(error, error.message || "Erro ao atualizar empresa")
     } finally {
       setLoading(false)

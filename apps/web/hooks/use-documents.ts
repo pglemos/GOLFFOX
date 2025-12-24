@@ -65,7 +65,7 @@ export function useDocuments({
     const [uploading, setUploading] = useState(false)
 
     const { upload } = useFileUpload({
-        bucket: config.bucket,
+        bucket: config.bucket as any,
         maxSize: 10,
     })
 
@@ -80,7 +80,7 @@ export function useDocuments({
                 setDocuments(data || [])
             }
         } catch (error) {
-            console.error("Erro ao carregar documentos:", error)
+            logError("Erro ao carregar documentos", { error }, 'UseDocuments')
         } finally {
             setLoading(false)
         }

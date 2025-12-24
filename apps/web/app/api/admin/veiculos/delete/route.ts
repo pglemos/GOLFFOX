@@ -35,9 +35,9 @@ export async function DELETE(request: NextRequest) {
 
     // Primeiro, setar vehicle_id para NULL em trips (mesmo que seja SET NULL, fazemos explicitamente)
     await supabaseAdmin
-      .from('trips')
-      .update({ vehicle_id: null })
-      .eq('vehicle_id', vehicleId)
+      .from('viagens')
+      .update({ veiculo_id: null })
+      .eq('veiculo_id', vehicleId)
 
     // Agora excluir o veículo
     const { data, error } = await supabaseAdmin

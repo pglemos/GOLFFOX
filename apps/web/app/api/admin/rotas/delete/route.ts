@@ -34,9 +34,9 @@ export async function DELETE(request: NextRequest) {
 
     // Primeiro, buscar todos os trips relacionados para excluir dependências
     const { data: trips, error: tripsFetchError } = await supabaseAdmin
-      .from('trips')
+      .from('viagens')
       .select('id')
-      .eq('route_id', routeId)
+      .eq('rota_id', routeId)
 
     if (tripsFetchError) {
       logError('Erro ao buscar trips da rota', { error: tripsFetchError, routeId }, 'RoutesDeleteAPI')
@@ -55,9 +55,9 @@ export async function DELETE(request: NextRequest) {
       // 1. trip_summary PRIMEIRO (antes de qualquer trigger ser disparado)
       logger.log('   1. Excluindo trip_summary (primeiro para evitar constraint violation)...')
       const { error: tripSummaryError } = await supabaseAdmin
-        .from('trip_summary')
+        .from('viagem_resumo')
         .delete()
-        .in('trip_id', tripIds)
+        .in('viagem_id', tripIds)
 
       if (tripSummaryError) {
         // Se a tabela não existir, continuar (código 42P01 = tabela não existe)
@@ -82,7 +82,7 @@ export async function DELETE(request: NextRequest) {
       const { error: positionsError } = await supabaseAdmin
         .from('motorista_positions' as any)
         .delete()
-        .in('trip_id', tripIds)
+        .in('viagem_id', tripIds)
 
       // Ignorar erros relacionados a trip_summary (trigger tentará atualizar mas já foi excluído)
       if (positionsError) {
@@ -114,7 +114,7 @@ export async function DELETE(request: NextRequest) {
         const { error: depError } = await supabaseAdmin
           .from(table as any)
           .delete()
-          .in('trip_id', tripIds)
+          .in('viagem_id', tripIds)
 
         if (depError) {
           // Se a tabela não existir ou não tiver a coluna, continuar
@@ -132,9 +132,9 @@ export async function DELETE(request: NextRequest) {
       // 4. Agora excluir os trips (todas as dependências já foram excluídas)
       logger.log('   4. Excluindo trips...')
       const { error: tripsDeleteError } = await supabaseAdmin
-        .from('trips')
+        .from('viagens')
         .delete()
-        .eq('route_id', routeId)
+        .eq('rota_id', routeId)
 
       if (tripsDeleteError) {
         logError('Erro ao excluir viagens da rota', { error: tripsDeleteError, routeId }, 'RoutesDeleteAPI')
@@ -149,9 +149,9 @@ export async function DELETE(request: NextRequest) {
 
     // Segundo, excluir explicitamente paradas da rota (route_stops)
     const { error: stopsDeleteError } = await supabaseAdmin
-      .from('route_stops')
+      .from('gf_route_plan' as any)
       .delete()
-      .eq('route_id', routeId)
+      .eq('rota_id', routeId)
 
     if (stopsDeleteError) {
       logError('Erro ao excluir paradas da rota', { error: stopsDeleteError, routeId }, 'RoutesDeleteAPI')
@@ -163,7 +163,7 @@ export async function DELETE(request: NextRequest) {
 
     // Terceiro, excluir permanentemente a rota
     const { data, error } = await supabaseAdmin
-      .from('routes')
+      .from('rotas')
       .delete()
       .eq('id', routeId)
       .select()

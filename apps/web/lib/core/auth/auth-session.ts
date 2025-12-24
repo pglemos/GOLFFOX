@@ -81,6 +81,10 @@ async function syncSupabaseSession(
         warn('Erro ao sincronizar sessão Supabase', { error: result.error }, 'AuthSession')
       } else {
         debug('Sessão Supabase sincronizada', {}, 'AuthSession')
+        // Disparar evento de sincronização concluída
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('golffox:auth:sync', { detail: { success: true } }))
+        }
       }
     } catch (setSessionErr: unknown) {
       const err = setSessionErr instanceof Error ? setSessionErr : new Error(String(setSessionErr))

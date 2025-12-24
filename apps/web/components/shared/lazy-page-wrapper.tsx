@@ -15,6 +15,7 @@ import { AlertCircle, RefreshCw } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
+import { logError } from '@/lib/logger'
 
 interface LazyPageWrapperProps {
   children: React.ReactNode
@@ -97,7 +98,7 @@ class ErrorBoundary extends Component<
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('ErrorBoundary caught an error:', error, errorInfo)
+    logError('ErrorBoundary caught an error', { error, errorInfo }, 'LazyPageWrapper')
   }
 
   resetError = () => {

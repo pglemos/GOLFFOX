@@ -26,6 +26,7 @@ import { useDebounce } from "@/lib/debounce"
 import { useRouter } from "@/lib/next-navigation"
 import { supabase } from "@/lib/supabase"
 import { notifySuccess, notifyError } from "@/lib/toast"
+import { debug, logError, warn } from "@/lib/logger"
 
 import { FuncionariosErrorBoundary } from "./error-boundary"
 
@@ -77,11 +78,11 @@ function FuncionariosPageContent() {
   useEffect(() => {
     const getUser = async () => {
       try {
-        console.log('[FuncionariosPage] Verificando sessão do usuário')
+        debug('[FuncionariosPage] Verificando sessão do usuário', {}, 'FuncionariosPage')
         const { data: { session }, error: sessionError } = await supabase.auth.getSession()
 
         if (sessionError) {
-          console.error('[FuncionariosPage] Erro ao obter sessão:', sessionError)
+          logError('[FuncionariosPage] Erro ao obter sessão', { error: sessionError }, 'FuncionariosPage')
           setError('Erro ao carregar sessão')
           setLoading(false)
           return
@@ -93,11 +94,11 @@ function FuncionariosPageContent() {
           return
         }
 
-        console.log('[FuncionariosPage] Usuário autenticado:', session.user.email)
+        debug('[FuncionariosPage] Usuário autenticado', { email: session.user.email }, 'FuncionariosPage')
         setUser(session.user)
         setLoading(false)
       } catch (err) {
-        console.error('[FuncionariosPage] Erro ao obter usuário:', err)
+        logError('[FuncionariosPage] Erro ao obter usuário', { error: err }, 'FuncionariosPage')
         setError('Erro ao carregar dados do usuário')
         setLoading(false)
       }
@@ -105,7 +106,7 @@ function FuncionariosPageContent() {
 
     // Timeout de segurança
     const timeout = setTimeout(() => {
-      console.warn('⚠️  Timeout ao carregar usuário')
+      warn('Timeout ao carregar usuário', {}, 'FuncionariosPage')
       setLoading(false)
     }, 5000)
 

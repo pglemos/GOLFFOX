@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 
 import { useTransportadoraTenant } from "@/components/providers/transportadora-tenant-provider"
+import { logError } from "@/lib/logger"
 import { supabase } from "@/lib/supabase"
 import { notifySuccess, notifyError } from "@/lib/toast"
 
@@ -49,7 +50,7 @@ export function useResolveTransportadoraAlert() {
         },
         onError: (error) => {
             notifyError("Erro ao resolver alerta")
-            console.error(error)
+            logError("Erro ao resolver alerta", { error }, 'UseTransportadoraData')
         }
     })
 }

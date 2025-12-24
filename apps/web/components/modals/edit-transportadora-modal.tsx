@@ -12,6 +12,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { logError } from "@/lib/logger"
 import { supabase } from "@/lib/supabase"
 import { notifySuccess, notifyError } from "@/lib/toast"
 import type { transportadora } from "@/types/carrier"
@@ -122,16 +123,16 @@ export function EditCarrierModal({ transportadora, isOpen, onClose, onSave }: Ed
           errorMessage = errorData.error || errorData.message || errorMessage
           errorDetails = errorData.details ? JSON.stringify(errorData.details) : ''
 
-          console.error('❌ Erro da API update-transportadora:', {
+          logError('Erro da API update-transportadora', {
             status: response.status,
             statusText: response.statusText,
             errorData
-          })
+          }, 'EditTransportadoraModal')
         } catch (parseError) {
-          console.error('❌ Erro da API (sem JSON):', {
+          logError('Erro da API (sem JSON)', {
             status: response.status,
             statusText: response.statusText
-          })
+          }, 'EditTransportadoraModal')
         }
 
         // Mensagens específicas por status code
@@ -165,7 +166,7 @@ export function EditCarrierModal({ transportadora, isOpen, onClose, onSave }: Ed
       }
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido ao atualizar transportadora'
-      console.error('❌ Exceção ao atualizar transportadora:', error)
+      logError('Exceção ao atualizar transportadora', { error }, 'EditTransportadoraModal')
       notifyError(error instanceof Error ? error : new Error(errorMessage), errorMessage)
       //❌ NÃO fechar modal em erro
     } finally {

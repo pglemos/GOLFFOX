@@ -3,6 +3,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
 
 import { supabase } from '@/lib/supabase'
+import { logError } from '@/lib/logger'
 
 interface TransportadoraContextType {
     transportadoraId: string | null
@@ -48,7 +49,7 @@ export function TransportadoraTenantProvider({ children }: TransportadoraTenantP
                 if (foundId) {
                     // Buscar dados da transportadora
                     const { data: transportadoraData } = await (supabase
-                        .from('carriers')
+                        .from('transportadoras')
                         .select('id, name, logo_url')
                         .eq('id', foundId)
                         .single() as any)
@@ -64,7 +65,7 @@ export function TransportadoraTenantProvider({ children }: TransportadoraTenantP
                 }
 
             } catch (err: unknown) {
-                console.error('Erro ao carregar transportadora:', err)
+                logError('Erro ao carregar transportadora', { error: err }, 'TransportadoraTenantProvider')
                 const error = err as Error
                 setError(error.message || 'Erro desconhecido')
             } finally {

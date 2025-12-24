@@ -52,7 +52,7 @@ export function HeatmapLayer({
 
     // Filtrar veículos com coordenadas válidas
     const validVehicles = veiculos.filter((v) => {
-      const isValid = Number.isFinite(v.lat) && Number.isFinite(v.lng) && v.lat >= -90 && v.lat <= 90 && v.lng >= -180 && v.lng <= 180
+      const isValid = v.lat !== null && v.lng !== null && Number.isFinite(v.lat) && Number.isFinite(v.lng) && v.lat >= -90 && v.lat <= 90 && v.lng >= -180 && v.lng <= 180
       return isValid
     })
 
@@ -67,7 +67,7 @@ export function HeatmapLayer({
 
     // Preparar dados para heatmap
     const dataPoints: HeatmapDataPoint[] = validVehicles.map((veiculo) => ({
-      location: new google.maps.LatLng(veiculo.lat, veiculo.lng),
+      location: new google.maps.LatLng(veiculo.lat!, veiculo.lng!),
       weight: 1, // Peso igual para cada veículo
     }))
 

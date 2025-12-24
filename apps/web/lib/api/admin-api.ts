@@ -4,6 +4,7 @@
  */
 
 import { fetchWithAuth } from '../fetch-with-auth'
+import { logError } from '../logger'
 
 export interface KpiData {
   company_id: string
@@ -80,7 +81,7 @@ export async function getAdminKPIs(
       kpis: result.kpis || [],
     }
   } catch (error) {
-    console.error('Erro ao buscar KPIs do admin:', error)
+    logError('Erro ao buscar KPIs do admin', { error }, 'AdminAPI')
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Erro desconhecido ao buscar KPIs',
@@ -123,7 +124,7 @@ export async function getAuditLogs(
       logs: result.logs || result.data || [],
     }
   } catch (error) {
-    console.error('Erro ao buscar logs de auditoria:', error)
+    logError('Erro ao buscar logs de auditoria', { error }, 'AdminAPI')
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Erro desconhecido ao buscar logs',

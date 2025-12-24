@@ -78,7 +78,7 @@ export const MapFilters = memo(function MapFilters({
       // Carregar empresas (apenas uma vez)
       if (companies.length === 0) {
         const { data: companiesData } = await supabase
-          .from('companies')
+          .from('empresas')
           .select('id, name')
           .order('name')
         if (companiesData) setCompanies(companiesData)
@@ -86,12 +86,12 @@ export const MapFilters = memo(function MapFilters({
 
       // Carregar rotas (filtrar por empresa)
       const routesQuery = supabase
-        .from('routes')
+        .from('rotas')
         .select('id, name')
         .order('name')
       
       if (filters.company) {
-        routesQuery.eq('company_id', filters.company)
+        routesQuery.eq('empresa_id', filters.company)
       }
       
       const { data: routesData } = await routesQuery

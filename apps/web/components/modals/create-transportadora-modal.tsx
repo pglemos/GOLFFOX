@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { logError } from "@/lib/logger"
 import { supabase } from "@/lib/supabase"
 import { notifySuccess, notifyError } from "@/lib/toast"
 
@@ -116,7 +117,7 @@ export function CreateTransportadoraModal({ isOpen, onClose, onSave }: CreateTra
         throw new Error(result.error || 'Erro ao criar transportadora')
       }
     } catch (err: any) {
-      console.error('❌ Exceção ao criar transportadora:', err)
+      logError('Exceção ao criar transportadora', { error: err }, 'CreateTransportadoraModal')
       notifyError(err, err.message || 'Erro ao criar transportadora')
     } finally {
       setLoading(false)

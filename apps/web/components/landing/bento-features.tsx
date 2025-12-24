@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useRef, MouseEvent } from "react"
-import { motion, useMotionTemplate, useMotionValue } from "framer-motion"
+import { motion, useMotionValue } from "framer-motion"
 import { Users, Ticket, Bus, Smartphone, Route, Clock } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -80,13 +80,7 @@ function FeatureCard({ feature, index }: { feature: any, index: number }) {
             <motion.div
                 className="pointer-events-none absolute -inset-px rounded-3xl opacity-0 transition duration-300 group-hover:opacity-100"
                 style={{
-                    background: useMotionTemplate`
-            radial-gradient(
-              650px circle at ${mouseX}px ${mouseY}px,
-              rgba(249, 115, 22, 0.15),
-              transparent 80%
-            )
-          `,
+                    background: `radial-gradient(650px circle at ${mouseX.get()}px ${mouseY.get()}px, rgba(249, 115, 22, 0.15), transparent 80%)`,
                 }}
             />
 

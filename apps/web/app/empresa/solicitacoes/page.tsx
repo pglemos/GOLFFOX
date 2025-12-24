@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { useRouter } from "@/lib/next-navigation"
 import { supabase } from "@/lib/supabase"
+import { logError } from "@/lib/logger"
 
 export default function SolicitacoesOperatorPage() {
   const router = useRouter()
@@ -27,12 +28,12 @@ export default function SolicitacoesOperatorPage() {
       
       const { data: userData } = await supabase
         .from('users')
-        .select('company_id')
+        .select('empresa_id')
         .eq('id', session.user.id)
         .single()
 
-      if (userData?.company_id) {
-        setEmpresaId(userData.company_id)
+      if (userData?.empresa_id) {
+        setEmpresaId(userData.empresa_id)
       }
       
       setUser({ ...session.user })
@@ -60,7 +61,7 @@ export default function SolicitacoesOperatorPage() {
         setItems(data || [])
       }
     } catch (error) {
-      console.error("Erro ao carregar solicitações:", error)
+      logError("Erro ao carregar solicitações", { error }, 'SolicitacoesPage')
     }
   }
 

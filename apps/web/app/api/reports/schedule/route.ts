@@ -239,7 +239,7 @@ async function schedulePostHandler(request: NextRequest) {
         // Em modo de teste, tentar obter uma empresa existente
         try {
           const { data: companies, error: companiesError } = await supabase
-            .from('companies')
+            .from('empresas')
             .select('id')
             .limit(1)
             .single()

@@ -278,7 +278,7 @@ export function useApiMutation<TData = unknown, TVariables = unknown>(
       // Notificação de sucesso
       if (showSuccessToast) {
         if (successI18nKey) {
-          notifySuccess('', { i18n: successI18nKey })
+          notifySuccess('', { i18n: successI18nKey as any })
         } else {
           notifySuccess(successMessage || 'Operação realizada com sucesso')
         }

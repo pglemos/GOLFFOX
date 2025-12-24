@@ -5,6 +5,7 @@ import React, { createContext, useContext, useState, useEffect, useCallback } fr
 import { useRouter, usePathname } from "next/navigation"
 
 import { supabase } from "@/lib/supabase"
+import { logError } from "@/lib/logger"
 
 interface User {
   id: string
@@ -96,7 +97,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(null)
       }
     } catch (error) {
-      console.error("[AuthProvider] Erro ao carregar usuário:", error)
+      logError("[AuthProvider] Erro ao carregar usuário", { error }, 'AuthProvider')
       setUser(null)
     } finally {
       setLoading(false)

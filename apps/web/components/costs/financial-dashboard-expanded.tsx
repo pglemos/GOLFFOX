@@ -184,7 +184,7 @@ export function FinancialDashboardExpanded({
                     recurring_costs_count: (costsData.data || []).filter((c: ManualCost) => c.is_recurring).length,
                 })
             } catch (error) {
-                console.error('Erro ao carregar dados financeiros:', error)
+                logError('Erro ao carregar dados financeiros', { error }, 'FinancialDashboardExpanded')
                 // Feedback ao usuário
                 const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido'
                 setKpis({

@@ -19,6 +19,7 @@ import { exportToCSV, exportToExcel, exportToPDF, formatDelaysReport, formatOccu
 import { useRouter } from "@/lib/next-navigation"
 import { supabase } from "@/lib/supabase"
 import { notifySuccess, notifyError } from "@/lib/toast"
+import { logError } from "@/lib/logger"
 
 export default function RelatoriosOperatorPage() {
   const router = useRouter()
@@ -79,7 +80,7 @@ export default function RelatoriosOperatorPage() {
 
       notifySuccess('', { i18n: { ns: 'operador', key: 'reports.exportSuccess', params: { title: report.title } } })
     } catch (error: any) {
-      console.error("Erro ao exportar relatório:", error)
+      logError("Erro ao exportar relatório", { error }, 'RelatoriosPage')
       notifyError('Erro ao exportar', undefined, { i18n: { ns: 'operador', key: 'reports.exportError', params: { message: error.message || 'Erro desconhecido' } } })
     }
   }

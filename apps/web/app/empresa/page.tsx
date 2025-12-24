@@ -23,6 +23,7 @@ import { useRealtimeKPIs, useRealtimeAlerts } from "@/hooks/use-realtime-updates
 import { useMobile } from "@/hooks/use-mobile"
 import { cn } from "@/lib/utils"
 import { ResponsiveChart } from "@/components/shared/responsive-chart"
+import { debug } from "@/lib/logger"
 
 export default function EmpresaDashboard() {
   const router = useRouter()
@@ -35,7 +36,7 @@ export default function EmpresaDashboard() {
 
       // Se tem parâmetro ?company=, redirecionar para URL limpa
       if (url.searchParams.has('company')) {
-        console.log('⚠️ Removendo parâmetro ?company= da URL')
+        debug('Removendo parâmetro ?company= da URL', {}, 'EmpresaDashboard')
         router.replace('/empresa')
         return
       }

@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { logError } from "@/lib/logger"
 import { notifySuccess, notifyError } from "@/lib/toast"
 
 interface CostCategory {
@@ -63,7 +64,7 @@ export function ManualCostForm({
         setGroups(Array.from(new Set(data.map((c: CostCategory) => c.group_name))))
       }
     } catch (error) {
-      console.error('Erro ao carregar categorias:', error)
+      logError('Erro ao carregar categorias', { error }, 'ManualCostForm')
     }
   }
 
@@ -100,7 +101,7 @@ export function ManualCostForm({
       onClose()
       resetForm()
     } catch (error: any) {
-      console.error('Erro ao salvar custo:', error)
+      logError('Erro ao salvar custo', { error }, 'ManualCostForm')
       notifyError(error, 'Erro ao salvar custo')
     } finally {
       setLoading(false)

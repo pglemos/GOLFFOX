@@ -11,6 +11,7 @@ import { AlertCircle } from 'lucide-react'
 
 import { Badge } from '@/components/ui/badge'
 import { usePathname } from '@/lib/next-navigation'
+import { logError } from '@/lib/logger'
 import { getUnresolvedAlerts, hasCriticalAlerts } from '@/lib/operational-alerts'
 import { supabase } from '@/lib/supabase'
 
@@ -61,7 +62,7 @@ export function OperationalAlertsBadge() {
       setAlertCount(alerts.length)
       setHasCritical(await hasCriticalAlerts())
     } catch (error) {
-      console.error('Erro ao carregar alertas:', error)
+      logError('Erro ao carregar alertas', { error }, 'OperationalAlertsBadge')
     } finally {
       setLoading(false)
     }

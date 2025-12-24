@@ -90,11 +90,11 @@ export async function logAudit(params: LogAuditParams): Promise<void> {
       try {
         const { data: userData } = await supabase
           .from('users')
-          .select('company_id')
+          .select('empresa_id')
           .eq('id', actorId)
           .single()
 
-        companyId = userData?.company_id || null
+        companyId = (userData as any)?.empresa_id || null
       } catch (error) {
         // Ignorar erro, usar null
       }

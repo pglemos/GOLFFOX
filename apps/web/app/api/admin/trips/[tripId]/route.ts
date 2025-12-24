@@ -56,7 +56,7 @@ export async function PUT(
 
     // Verificar se viagem existe
     const { data: existingTrip, error: fetchError } = await supabaseAdmin
-      .from('trips')
+      .from('viagens')
       .select('*')
       .eq('id', tripId)
       .single()
@@ -107,7 +107,7 @@ export async function PUT(
 
     // Atualizar viagem
     const { data: updatedTrip, error: updateError } = await supabaseAdmin
-      .from('trips')
+      .from('viagens')
       .update(updateData)
       .eq('id', tripId)
       .select()
@@ -183,7 +183,7 @@ export async function DELETE(
 
     // Verificar se viagem existe (selecionar apenas id para verificação)
     const { data: existingTrip, error: fetchError } = await supabaseAdmin
-      .from('trips')
+      .from('viagens')
       .select('id')
       .eq('id', tripId)
       .single()
@@ -197,7 +197,7 @@ export async function DELETE(
 
     // Excluir viagem (hard delete - trips podem ser excluídos sem problemas)
     const { error: deleteError } = await supabaseAdmin
-      .from('trips')
+      .from('viagens')
       .delete()
       .eq('id', tripId)
 

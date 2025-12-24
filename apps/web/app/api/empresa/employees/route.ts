@@ -42,10 +42,10 @@ export async function GET(request: NextRequest) {
         const supabase = getSupabaseAdmin()
         const { data: userData } = await supabase
           .from('users')
-          .select('company_id')
+          .select('empresa_id')
           .eq('id', authenticatedUser.id)
           .single()
-        finalCompanyId = userData?.company_id || null
+        finalCompanyId = userData?.empresa_id || null
       }
     }
 

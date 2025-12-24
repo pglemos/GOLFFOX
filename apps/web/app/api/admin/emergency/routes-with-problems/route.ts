@@ -16,7 +16,7 @@ export async function GET(req: NextRequest) {
 
     // Buscar rotas ativas
     const { data: allRoutes, error: routesError } = await supabase
-      .from('routes')
+      .from('rotas')
       .select(`
         id,
         name,
@@ -34,7 +34,7 @@ export async function GET(req: NextRequest) {
     // Buscar incidentes abertos relacionados a rotas
     const { data: incidents, error: incidentsError } = await supabase
       .from('gf_incidents')
-      .select('route_id, severity, status, description')
+      .select('rota_id, severity, status, description')
       .eq('status', 'open')
       .in('severity', ['high', 'critical'])
 
@@ -45,7 +45,7 @@ export async function GET(req: NextRequest) {
     // Buscar solicitações de socorro abertas
     const { data: assistanceRequests, error: assistanceError } = await supabase
       .from('gf_assistance_requests')
-      .select('route_id, status, request_type')
+      .select('rota_id, status, request_type')
       .eq('status', 'open')
 
     if (assistanceError) {
@@ -56,14 +56,14 @@ export async function GET(req: NextRequest) {
     const routeIdsWithProblems = new Set<string>()
     
     ;(incidents || [] as any[]).forEach((incident: any) => {
-      if (incident.route_id) {
-        routeIdsWithProblems.add(incident.route_id)
+      if (incident.rota_id) {
+        routeIdsWithProblems.add(incident.rota_id)
       }
     })
 
     ;(assistanceRequests || [] as any[]).forEach((request: any) => {
-      if (request.route_id) {
-        routeIdsWithProblems.add(request.route_id)
+      if (request.rota_id) {
+        routeIdsWithProblems.add(request.rota_id)
       }
     })
 
@@ -73,18 +73,18 @@ export async function GET(req: NextRequest) {
     // Buscar viagens ativas para essas rotas
     const routeIdsArray = Array.from(routeIdsWithProblems)
     const { data: activeTrips } = routeIdsArray.length > 0 ? await supabase
-      .from('trips')
-      .select('route_id, veiculo_id, motorista_id')
-      .eq('status', 'inProgress')
-      .in('route_id', routeIdsArray) : { data: [] }
+      .from('viagens')
+      .select('rota_id, veiculo_id, motorista_id')
+      .eq('status', 'in_progress')
+      .in('rota_id', routeIdsArray) : { data: [] }
 
     // Criar mapas de rota -> veículo/motorista
     const routeVehicleMap = new Map<string, string>()
     const routeDriverMap = new Map<string, string>()
     
     ;((activeTrips as any)?.data || []).forEach((trip: any) => {
-      if (trip.veiculo_id) routeVehicleMap.set(trip.route_id, trip.veiculo_id)
-      if (trip.motorista_id) routeDriverMap.set(trip.route_id, trip.motorista_id)
+      if (trip.veiculo_id) routeVehicleMap.set(trip.rota_id, trip.veiculo_id)
+      if (trip.motorista_id) routeDriverMap.set(trip.rota_id, trip.motorista_id)
     })
 
     // Buscar veículos

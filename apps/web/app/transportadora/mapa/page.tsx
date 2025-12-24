@@ -44,7 +44,7 @@ function TransportadoraMapaContent() {
   useEffect(() => {
     if (transportadoraId) {
       supabase
-        .from('routes')
+        .from('rotas')
         .select('id, name')
         .eq('transportadora_id', transportadoraId)
         .then(({ data }) => {

@@ -9,6 +9,7 @@ import { AppShell } from "@/components/app-shell"
 import { Card } from "@/components/ui/card"
 import { useRouter } from "@/lib/next-navigation"
 import { supabase } from "@/lib/supabase"
+import { logError } from "@/lib/logger"
 
 export default function ConformidadeOperatorPage() {
   const router = useRouter()
@@ -36,7 +37,7 @@ export default function ConformidadeOperatorPage() {
     try {
       const { data: userData } = await supabase
         .from('users')
-        .select('company_id')
+        .select('empresa_id')
         .eq('id', user?.id)
         .single()
 
@@ -45,8 +46,8 @@ export default function ConformidadeOperatorPage() {
         .select('*')
         .order('created_at', { ascending: false })
 
-      if (userData?.company_id) {
-        query = query.eq('empresa_id', userData.company_id)
+      if (userData?.empresa_id) {
+        query = query.eq('empresa_id', userData.empresa_id)
       }
 
       const { data, error } = await query
@@ -54,7 +55,7 @@ export default function ConformidadeOperatorPage() {
       if (error) throw error
       setIncidentes(data || [])
     } catch (error) {
-      console.error("Erro ao carregar incidentes:", error)
+      logError("Erro ao carregar incidentes", { error }, 'ConformidadePage')
     }
   }
 

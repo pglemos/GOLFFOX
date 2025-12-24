@@ -68,7 +68,7 @@ async function handleDelete(request: NextRequest) {
 
     // Excluir routes (e suas dependências serão excluídas via CASCADE)
     const { error: routesError } = await (supabaseAdmin
-      .from('routes') as any)
+      .from('rotas') as any)
       .delete()
       .eq('company_id', companyId)
 
@@ -111,7 +111,7 @@ async function handleDelete(request: NextRequest) {
     // 3. Excluir empresa permanentemente
     logger.log('   3. Excluindo empresa...')
     const { data, error } = await (supabaseAdmin
-      .from('companies') as any)
+      .from('empresas') as any)
       .delete()
       .eq('id', companyId)
       .select()

@@ -31,6 +31,7 @@ import { formatError } from "@/lib/error-utils"
 import { t } from "@/lib/i18n"
 import { supabase } from "@/lib/supabase"
 import { notifySuccess, notifyError } from "@/lib/toast"
+import { logError } from "@/lib/logger"
 
 
 // Lazy load seções pesadas
@@ -132,7 +133,7 @@ export function MotoristaModal({ motorista, isOpen, onClose, onSave, carriers = 
     try {
       // Carregar documentos do motorista
       const { data: docs } = await supabase
-        .from("gf_driver_documents")
+        .from("gf_driver_documents" as any)
         .select("*")
         .eq("driver_id", motoristaId)
         .order("created_at", { ascending: false })
@@ -141,7 +142,7 @@ export function MotoristaModal({ motorista, isOpen, onClose, onSave, carriers = 
 
 
     } catch (error) {
-      console.error("Erro ao carregar dados do motorista:", error)
+      logError("Erro ao carregar dados do motorista", { error }, 'MotoristaModal')
     }
   }
 
@@ -238,7 +239,7 @@ export function MotoristaModal({ motorista, isOpen, onClose, onSave, carriers = 
       onSave()
       onClose()
     } catch (error: any) {
-      console.error("Erro ao salvar motorista:", error)
+      logError("Erro ao salvar motorista", { error }, 'MotoristaModal')
       notifyError(error, t('common', 'errors.saveDriver'))
     } finally {
       setLoading(false)
@@ -272,7 +273,7 @@ export function MotoristaModal({ motorista, isOpen, onClose, onSave, carriers = 
       const publicUrl = result.url
 
       const { error: docError } = await (supabase as any)
-        .from("gf_driver_documents")
+        .from("gf_driver_documents" as any)
         .insert({
           driver_id: motorista.id,
           document_type: type,
@@ -285,7 +286,7 @@ export function MotoristaModal({ motorista, isOpen, onClose, onSave, carriers = 
       notifySuccess('', { i18n: { ns: 'common', key: 'success.documentUploaded' } })
       loadMotoristaData(motorista.id)
     } catch (error: any) {
-      console.error("Erro ao fazer upload:", error)
+      logError("Erro ao fazer upload", { error }, 'MotoristaModal')
       notifyError(error, t('common', 'errors.documentUpload'))
     }
   }

@@ -7,39 +7,7 @@ import { getErrorMeta } from "@/lib/error-utils"
 import { debug, warn, error as logError } from "@/lib/logger"
 import { supabase } from "@/lib/supabase"
 import type { Veiculo } from "@/types/map"
-
-interface SupabaseVeiculo {
-  id: string
-  plate: string
-  model?: string
-  year?: number
-  prefix?: string
-  capacity?: number
-  is_active: boolean
-  photo_url?: string
-  company_id?: string
-  transportadora_id?: string
-  companies?: { name: string }
-}
-
-interface SupabaseTrip {
-  id: string
-  veiculo_id: string
-  motorista_id: string
-  route_id: string
-  status: string
-  routes?: { name: string }
-  users?: { id: string; name: string }
-}
-
-interface SupabasePosition {
-  trip_id: string
-  latitude: number
-  longitude: number
-  speed: number | null
-  timestamp: string
-  veiculo_id?: string
-}
+import type { SupabaseTrip, SupabasePosition, SupabaseVeiculo } from "@/types/supabase-data"
 
 /**
  * Carrega e processa veículos ativos para exibição no mapa
@@ -62,15 +30,15 @@ export async function loadVehicles(companyId?: string): Promise<Veiculo[]> {
         capacity,
         is_active,
         photo_url,
-        company_id,
+        empresa_id,
         transportadora_id,
-        companies(name)
+        empresas(name)
       `)
       .eq('is_active', true)
 
     // Aplicar filtro de empresa apenas se fornecido e não vazio
     if (companyId && companyId.trim() !== '' && companyId !== 'null' && companyId !== 'undefined') {
-      vehiclesQuery = vehiclesQuery.eq('company_id', companyId)
+      vehiclesQuery = vehiclesQuery.eq('empresa_id', companyId)
       debug('Aplicando filtro de empresa', { companyId }, 'VehicleLoader')
     } else {
       debug('Sem filtro de empresa - carregando todos os veículos ativos', {}, 'VehicleLoader')
@@ -100,11 +68,11 @@ export async function loadVehicles(companyId?: string): Promise<Veiculo[]> {
         try {
           let fallbackQuery = supabase
             .from('veiculos')
-            .select('id, plate, model, is_active, company_id')
+            .select('id, plate, model, is_active, empresa_id')
             .eq('is_active', true)
 
           if (companyId && companyId.trim() !== '' && companyId !== 'null' && companyId !== 'undefined') {
-            fallbackQuery = fallbackQuery.eq('company_id', companyId)
+            fallbackQuery = fallbackQuery.eq('empresa_id', companyId)
           }
 
           const { data: fallbackData, error: fallbackError } = await fallbackQuery
@@ -190,10 +158,19 @@ export async function loadVehicles(companyId?: string): Promise<Veiculo[]> {
 
     const tripsByVehicle = new Map<string, SupabaseTrip>()
     if (activeTrips) {
-      activeTrips.forEach((trip: SupabaseTrip | any) => {
-        const vId = trip.veiculo_id
+      activeTrips.forEach((trip: any) => {
+        const typedTrip: SupabaseTrip = {
+          id: trip.id,
+          veiculo_id: trip.veiculo_id,
+          motorista_id: trip.motorista_id,
+          rota_id: trip.rota_id,
+          status: trip.status,
+          rotas: trip.rotas,
+          users: trip.users,
+        }
+        const vId = typedTrip.veiculo_id
         if (vId && !tripsByVehicle.has(vId)) {
-          tripsByVehicle.set(vId, trip)
+          tripsByVehicle.set(vId, typedTrip)
         }
       })
     }
@@ -224,10 +201,14 @@ export async function loadVehicles(companyId?: string): Promise<Veiculo[]> {
         const tripToVehicle = new Map(
           recentTrips?.map((t: any) => [t.id, t.veiculo_id]) || []
         )
-        lastPositions = (recentPositions || []).map((pos: any) => ({
-          ...pos,
+        lastPositions = (recentPositions || []).map((pos: any): SupabasePosition => ({
+          viagem_id: pos.viagem_id,
+          lat: pos.lat,
+          lng: pos.lng,
+          speed: pos.speed || null,
+          timestamp: pos.timestamp,
           trip_id: pos.viagem_id, // Alias para compatibilidade
-          veiculo_id: tripToVehicle.get(pos.viagem_id),
+          veiculo_id: (tripToVehicle.get(pos.viagem_id) as string | undefined) || undefined,
         }))
       } else {
         // Buscar últimas posições conhecidas se não há recentes
@@ -242,10 +223,14 @@ export async function loadVehicles(companyId?: string): Promise<Veiculo[]> {
           const tripToVehicle = new Map(
             recentTrips?.map((t: any) => [t.id, t.veiculo_id]) || []
           )
-          lastPositions = (allPositions || []).map((pos: any) => ({
-            ...pos,
+          lastPositions = (allPositions || []).map((pos: any): SupabasePosition => ({
+            viagem_id: pos.viagem_id,
+            lat: pos.lat,
+            lng: pos.lng,
+            speed: pos.speed || null,
+            timestamp: pos.timestamp,
             trip_id: pos.viagem_id, // Alias para compatibilidade
-            veiculo_id: tripToVehicle.get(pos.viagem_id),
+            veiculo_id: (tripToVehicle.get(pos.viagem_id) as string | undefined) || undefined,
           }))
         }
       }
@@ -290,8 +275,8 @@ export async function loadVehicles(companyId?: string): Promise<Veiculo[]> {
         veiculo_id: v.id,
         plate: v.plate,
         model: v.model || '',
-        company_id: v.company_id || '',
-        company_name: v.companies?.name || '',
+        company_id: v.empresa_id || '',
+        company_name: v.empresas?.name || '',
         trip_id: trip?.id || '',
         route_id: trip?.rota_id || '',
         route_name: trip?.rotas?.name || 'Sem rota ativa',
@@ -308,11 +293,11 @@ export async function loadVehicles(companyId?: string): Promise<Veiculo[]> {
     })
 
     // Normalizar coordenadas
-    const normalizedVehicles = processedVehicles.map((v: Veiculo) => {
+    const normalizedVehicles = (processedVehicles as Veiculo[]).map((v: Veiculo) => {
       if (v.lat !== null && v.lng !== null && isValidCoordinate(v.lat, v.lng)) {
         const normalized = normalizeCoordinate(v.lat, v.lng)
         if (normalized) {
-          return { ...v, lat: normalized.lat, lng: normalized.lng }
+          return { ...v, lat: normalized.lat, lng: normalized.lng } as Veiculo
         }
       }
 

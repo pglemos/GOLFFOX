@@ -23,6 +23,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { logError } from "@/lib/logger"
 import type { MotoristaPicker, VeiculoPicker } from "@/types/entities"
 
 // ============================================================================
@@ -193,7 +194,7 @@ export function GenericPickerModal<T extends PickerItem>({
     } catch (err) {
       const message = err instanceof Error ? err.message : "Erro ao carregar dados"
       setError(message)
-      console.error("Erro ao carregar itens:", err)
+      logError("Erro ao carregar itens", { error: err }, 'GenericPickerModal')
     } finally {
       setLoading(false)
     }

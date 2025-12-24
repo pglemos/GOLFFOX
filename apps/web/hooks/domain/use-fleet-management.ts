@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react"
 
+import { logError } from "@/lib/logger"
 import { FleetService } from "@/lib/services/fleet-service"
 import { supabase } from "@/lib/supabase"
 import { ensureSupabaseSession } from "@/lib/supabase-session"
@@ -25,7 +26,7 @@ export function useFleetManagement(userId: string) {
                 setVeiculos(data || [])
             }
         } catch (error) {
-            console.error("Erro ao carregar veículos:", error)
+            logError("Erro ao carregar veículos", { error }, 'UseFleetManagement')
         }
     }
 
@@ -41,7 +42,7 @@ export function useFleetManagement(userId: string) {
                 setDocuments(data || [])
             }
         } catch (error) {
-            console.error("Erro ao carregar documentos:", error)
+            logError("Erro ao carregar documentos", { error }, 'UseFleetManagement')
         }
     }
 
@@ -57,7 +58,7 @@ export function useFleetManagement(userId: string) {
                 setMaintenances(data || [])
             }
         } catch (error) {
-            console.error("Erro ao carregar manutenções:", error)
+            logError("Erro ao carregar manutenções", { error }, 'UseFleetManagement')
         }
     }
 

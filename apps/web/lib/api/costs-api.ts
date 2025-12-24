@@ -6,6 +6,7 @@
 import type { ManualCostInsert, ManualCost, CostCategory } from '@/types/financial'
 
 import { fetchWithAuth } from '../fetch-with-auth'
+import { logError } from '../logger'
 
 export interface CostFilters {
   page?: number
@@ -65,7 +66,7 @@ export async function createManualCost(
       data: result.data,
     }
   } catch (error) {
-    console.error('Erro ao criar custo:', error)
+    logError('Erro ao criar custo', { error }, 'CostsAPI')
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Erro desconhecido ao criar custo',
@@ -97,7 +98,7 @@ export async function getCostCategories(): Promise<CostCategoriesResponse> {
       data: Array.isArray(data) ? data : data.data || [],
     }
   } catch (error) {
-    console.error('Erro ao buscar categorias:', error)
+    logError('Erro ao buscar categorias', { error }, 'CostsAPI')
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Erro desconhecido ao buscar categorias',
@@ -147,7 +148,7 @@ export async function getCosts(filters: CostFilters = {}): Promise<CostsResponse
       totalPages: result.totalPages,
     }
   } catch (error) {
-    console.error('Erro ao buscar custos:', error)
+    logError('Erro ao buscar custos', { error }, 'CostsAPI')
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Erro desconhecido ao buscar custos',

@@ -353,34 +353,32 @@ async function loginHandler(req: NextRequest) {
         }
       }
 
-      // Tentativa 3: Se ainda não funcionou, tentar query direta por email (último recurso)
+      // Tentativa 3: Query direta por ID (Fallback seguro)
       if (!rpcWorked && !existingUser) {
-        debug('⚠️ RPC não funcionou, tentando query direta por email (pode falhar por RLS)...', {
-          userId: data.user.id,
-          email: data.user.email || email
-        }, 'AuthAPI')
+        debug('⚠️ RPC não funcionou, tentando query direta por ID...', { userId: data.user.id }, 'AuthAPI')
+        const resultById = await supabaseAdmin
+          .from('users')
+          .select('id, email, name, role, empresa_id, transportadora_id, avatar_url')
+          .eq('id', data.user.id)
+          .maybeSingle()
+
+        if (resultById.data) {
+          existingUser = resultById.data
+          debug('✅ Usuário encontrado via Query Direta (ID)')
+        }
+      }
+
+      // Tentativa 4: Query direta por email (Último recurso)
+      if (!existingUser) {
+        debug('⚠️ Buscando por email...', { email }, 'AuthAPI')
 
         const resultByEmail = await supabaseAdmin
           .from('users')
-          .select('id, email, name, role, company_id, transportadora_id, avatar_url')
+          .select('id, email, name, role, empresa_id, transportadora_id, avatar_url')
           .eq('email', (data.user.email || email).toLowerCase().trim())
           .maybeSingle()
 
         existingUser = resultByEmail.data
-        userCheckError = resultByEmail.error
-
-        debug('Resultado da busca por email (fallback final):', {
-          found: !!existingUser,
-          hasError: !!userCheckError,
-          error: userCheckError ? {
-            message: userCheckError.message,
-            code: userCheckError.code,
-            details: userCheckError.details
-          } : null,
-          foundUserId: existingUser?.id,
-          foundEmail: existingUser?.email,
-          foundRole: existingUser?.role
-        }, 'AuthAPI')
       }
     } catch (err: any) {
       userCheckError = err
@@ -404,7 +402,7 @@ async function loginHandler(req: NextRequest) {
       // ✅ SETUP DE AUTO-PROVISIONING ROBUSTO PARA DEV
       const isDev = process.env.NODE_ENV === 'development' || !process.env.NODE_ENV || true;
 
-      console.log('[AuthAPI] User not in DB. Environment:', process.env.NODE_ENV, 'ForceDev:', isDev);
+      debug('[AuthAPI] User not in DB', { environment: process.env.NODE_ENV, forceDev: isDev }, 'AuthAPI');
 
       if (isDev) {
         logError('DEV MODE: Usuário não encontrado na tabela users. Criando automaticamente...', {
@@ -426,16 +424,16 @@ async function loginHandler(req: NextRequest) {
             // Removido created_at, updated_at, is_active para usar defaults do banco
           };
 
-          console.log('[AuthAPI] Attempting Minimal Insert:', JSON.stringify(minimalPayload));
+          debug('[AuthAPI] Attempting Minimal Insert', { payload: minimalPayload }, 'AuthAPI');
 
           const { data: newUser, error: createError } = await supabaseAdminForCreate
             .from('users')
-            .insert(minimalPayload)
+            .upsert(minimalPayload, { onConflict: 'id' })
             .select()
             .single()
 
           if (createError) {
-            console.error('[AuthAPI] Insert Error FULL OBJ:', JSON.stringify(createError, null, 2));
+            logError('[AuthAPI] Insert Error', { error: createError }, 'AuthAPI');
             // Lançar erro com objeto completo para pegar no catch
             throw createError
           }
@@ -443,7 +441,7 @@ async function loginHandler(req: NextRequest) {
           existingUser = newUser
           logError('DEV MODE: Usuário criado com sucesso!', { newUser }, 'AuthAPI')
         } catch (autoCreateErr: any) {
-          console.error('[AuthAPI] Exception in Auto-Create:', autoCreateErr);
+          logError('[AuthAPI] Exception in Auto-Create', { error: autoCreateErr }, 'AuthAPI');
 
           // Construir mensagem detalhada
           const errorDetails = {
@@ -534,7 +532,9 @@ async function loginHandler(req: NextRequest) {
     const token = data.session.access_token
     const refreshToken = data.session.refresh_token
 
-    let companyId: string | null = finalUser.company_id || null
+    // Mapear empresa_id para company_id para compatibilidade com o resto do app
+    let companyId: string | null = finalUser.empresa_id || finalUser.company_id || null
+
     // Verificar se é gestor_transportadora (ou operador legado) que precisa de empresa associada
     if (role === 'gestor_transportadora' || role === 'gestor_empresa') {
       try {
@@ -556,12 +556,13 @@ async function loginHandler(req: NextRequest) {
           .select('company_id')
           .eq('user_id', data.user.id)
           .maybeSingle()
+
         companyId = mapping?.company_id || companyId || null
         if (!companyId) {
           return NextResponse.json({ error: 'Usuário gestor da transportadora sem empresa associada', code: 'no_company_mapping' }, { status: 403 })
         }
         const { data: company } = await supabaseAdminForCheck
-          .from('companies')
+          .from('empresas')
           .select('id, is_active')
           .eq('id', companyId)
           .maybeSingle()
@@ -584,7 +585,7 @@ async function loginHandler(req: NextRequest) {
       role,
       companyId: companyId || undefined,
       company_id: companyId || undefined, // Adicionar snake_case para compatibilidade com testes
-      transportadoraId: (role === 'gestor_transportadora' || role === 'gestor_transportadora') ? transportadoraId : undefined,
+      transportadoraId: (role === 'gestor_transportadora') ? transportadoraId : undefined,
       avatar_url: finalUser?.avatar_url || null,
     }
 

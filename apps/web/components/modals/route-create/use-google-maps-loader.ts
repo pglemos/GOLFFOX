@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react"
 
 import { loadGoogleMaps } from "@/lib/google-maps-loader"
+import { logError } from "@/lib/logger"
 
 export function useGoogleMapsLoader(shouldLoad: boolean) {
     const [isLoaded, setIsLoaded] = useState(false)
@@ -12,7 +13,7 @@ export function useGoogleMapsLoader(shouldLoad: boolean) {
                 .then(() => setIsLoaded(true))
                 .catch((err) => {
                     setError("Erro ao carregar Google Maps")
-                    console.error(err)
+                    logError('Erro ao carregar Google Maps', { error: err }, 'useGoogleMapsLoader')
                 })
         }
     }, [shouldLoad])

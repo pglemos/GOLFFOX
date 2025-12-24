@@ -59,7 +59,7 @@ async function createOperatorHandler(request: NextRequest) {
     if (body?.website) extraFields.website = body.website
 
     if (Object.keys(extraFields).length > 0) {
-      await supabaseServiceRole.from('companies').update(extraFields).eq('id', company.id)
+      await supabaseServiceRole.from('empresas').update(extraFields).eq('id', company.id)
     }
 
     let operatorUser = null

@@ -36,7 +36,7 @@ export function useCep() {
 
             return result.address
         } catch (error) {
-            console.error('Erro ao buscar CEP:', error)
+            logError('Erro ao buscar CEP', { error }, 'UseCep')
             notifyError('Erro ao buscar endereço pelo CEP')
             return null
         } finally {

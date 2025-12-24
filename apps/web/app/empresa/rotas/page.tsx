@@ -17,6 +17,7 @@ import { useActiveTrips } from "@/hooks/use-empresa-data"
 import operatorI18nData from "@/i18n/operador.json"
 import { useRouter } from "@/lib/next-navigation"
 import { supabase } from "@/lib/supabase"
+import { logError } from "@/lib/logger"
 
 
 
@@ -72,7 +73,7 @@ export default function OperatorRotasPage() {
         }
         setUser({ ...session.user })
       } catch (err) {
-        console.error(err)
+        logError('Erro ao carregar rotas', { error: err }, 'OperatorRotasPage')
       } finally {
         setAuthLoading(false)
       }

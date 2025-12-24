@@ -3,7 +3,7 @@ import { Database } from "@/types/supabase"
 
 import { BaseService } from "./base-service"
 
-export type Company = Database['public']['Tables']['companies']['Row']
+export type Company = Database['public']['Tables']['empresas']['Row']
 
 export class CompanyService extends BaseService {
     /**

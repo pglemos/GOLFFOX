@@ -5,6 +5,7 @@ import { useEffect, useState, useCallback, useRef } from "react"
 import { Map as MapIcon } from "lucide-react"
 
 import { loadGoogleMapsAPI } from "@/lib/google-maps-loader"
+import { logError } from "@/lib/logger"
 
 interface veiculo {
   id: string
@@ -81,7 +82,7 @@ export function CarrierMap({ veiculos, className = "" }: TransportadoraMapProps)
         mapInstanceRef.current = map
         setLoading(false)
       } catch (error) {
-        console.error('Erro ao inicializar mapa:', error)
+        logError('Erro ao inicializar mapa', { error }, 'TransportadoraMap')
         setError('Erro ao carregar o mapa')
         setLoading(false)
       }

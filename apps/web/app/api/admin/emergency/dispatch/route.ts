@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
 
     // Buscar informações da rota
     const { data: route, error: routeError } = await supabase
-      .from('routes')
+      .from('rotas')
       .select('id, name, company_id')
       .eq('id', routeId)
       .single()

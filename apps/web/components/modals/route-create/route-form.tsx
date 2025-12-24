@@ -155,7 +155,7 @@ export function RouteForm({
                             label="Origem (Garagem)"
                             placeholder="Digite o endereço completo da garagem"
                             onGeocodeError={(error) => {
-                                console.error("Geocode error:", error)
+                                logError("Geocode error", { error }, 'RouteForm')
                             }}
                             className="w-full"
                         />
@@ -172,7 +172,7 @@ export function RouteForm({
                             label="Destino (Empresa)"
                             placeholder="Digite o endereço completo da empresa"
                             onGeocodeError={(error) => {
-                                console.error("Geocode error:", error)
+                                logError("Geocode error", { error }, 'RouteForm')
                             }}
                             className="w-full"
                         />

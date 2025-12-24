@@ -17,6 +17,7 @@ import { useDebounce } from "@/lib/debounce"
 import { useRouter, useSearchParams } from "@/lib/next-navigation"
 import { supabase } from "@/lib/supabase"
 import { notifyError, notifySuccess } from "@/lib/toast"
+import { logError } from "@/lib/logger"
 
 
 function AlertasOperatorPageInner() {
@@ -69,7 +70,7 @@ function AlertasOperatorPageInner() {
       try {
         const { data: { session }, error: sessionError } = await supabase.auth.getSession()
         if (sessionError) {
-          console.error('Erro ao verificar sessão:', sessionError)
+          logError('Erro ao verificar sessão', { error: sessionError }, 'AlertasPage')
           setError('Erro ao verificar autenticação')
           return
         }
@@ -79,7 +80,7 @@ function AlertasOperatorPageInner() {
         }
         setUser({ ...session.user })
       } catch (err: any) {
-        console.error('Erro ao obter usuário:', err)
+        logError('Erro ao obter usuário', { error: err }, 'AlertasPage')
         setError('Erro ao carregar dados do usuário')
       } finally {
         setLoading(false)

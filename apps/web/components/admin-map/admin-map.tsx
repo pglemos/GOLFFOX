@@ -70,7 +70,7 @@ export interface AdminMapProps {
 // Re-exportar tipos para compatibilidade
 export type veiculo = Veiculo
 export type Alert = MapAlert
-export { RoutePolyline } from '@/types/map'
+export type { RoutePolyline } from '@/types/map'
 
 export function AdminMap({
   companyId,
@@ -420,53 +420,54 @@ export function AdminMap({
         // Buscar rotas diretamente da tabela routes e montar polyline_points a partir de route_stops
         // Carregar todas as rotas filtradas (otimização futura: usar geolocalização)
         let routesQuery = supabase
-          .from('routes')
+          .from('rotas')
           .select(`
             id,
             name,
-            company_id
+            empresa_id
           `)
           .eq('is_active', true)
           .limit(LIMIT)
         
         // Aplicar filtro de empresa apenas se não for null ou vazio
         if (currentCompany && currentCompany !== 'null' && currentCompany !== '') {
-          routesQuery = routesQuery.eq('company_id', currentCompany)
+          routesQuery = routesQuery.eq('empresa_id', currentCompany)
         }
         
         const { data: routesData, error: routesError } = await routesQuery
 
         if (!routesError && routesData && routesData.length > 0) {
           // Buscar route_stops para cada rota
-          const routeIds = routesData.map((r: SupabaseRoute) => r.id)
+          const routeIds = routesData.map((r: any) => r.id)
           
           const { data: stopsData, error: stopsError } = await supabase
-            .from('route_stops')
-            .select('route_id, lat, lng, seq, name')
-            .in('route_id', routeIds)
-            .order('route_id')
-            .order('seq')
+            .from('v_route_stops')
+            .select('rota_id, latitude, longitude, stop_order, stop_name')
+            .in('rota_id', routeIds)
+            .order('rota_id')
+            .order('stop_order')
           
           // Agrupar stops por route_id
           const stopsByRoute = new Map()
           if (stopsData) {
-            (stopsData || []).forEach((stop: SupabaseStop) => {
-              if (!stopsByRoute.has(stop.route_id)) {
-                stopsByRoute.set(stop.route_id, [])
+            (stopsData || []).forEach((stop: any) => {
+              const routeId = stop.rota_id
+              if (!stopsByRoute.has(routeId)) {
+                stopsByRoute.set(routeId, [])
               }
-              stopsByRoute.get(stop.route_id).push({
-                lat: stop.lat,
-                lng: stop.lng,
-                order: stop.seq
+              stopsByRoute.get(routeId).push({
+                lat: stop.latitude,
+                lng: stop.longitude,
+                order: stop.stop_order
               })
             })
           }
           
           // Converter dados da tabela para o formato esperado
-          const formattedRoutes = (routesData || []).map((r: SupabaseRoute) => ({
+          const formattedRoutes = (routesData || []).map((r: any) => ({
             route_id: r.id,
             route_name: r.name,
-            company_id: r.company_id,
+            company_id: r.empresa_id,
             polyline_points: stopsByRoute.get(r.id) || [],
             stops_count: stopsByRoute.get(r.id)?.length || 0
           }))
@@ -641,7 +642,7 @@ export function AdminMap({
         try {
           let incidentsQuery = supabase
             .from('gf_incidents')
-            .select('id, company_id, route_id, veiculo_id, severity, description, created_at, status')
+            .select('id, empresa_id, rota_id, veiculo_id, severity, description, created_at, status')
             .eq('status', 'open')
 
           if (companyFilter) {
@@ -676,7 +677,7 @@ export function AdminMap({
         try {
           let assistanceQuery = supabase
             .from('gf_service_requests')
-            .select('id, empresa_id, route_id, tipo, status, payload, created_at')
+            .select('id, empresa_id, rota_id, tipo, status, payload, created_at')
             .eq('tipo', 'socorro')
             .eq('status', 'open')
 
@@ -715,8 +716,8 @@ export function AdminMap({
           const mappedIncidents = (incidentsData || []).map((i: SupabaseIncident) => ({
             alert_id: i.id,
             alert_type: 'incident',
-            company_id: i.company_id,
-            route_id: i.route_id,
+            company_id: i.empresa_id,
+            route_id: i.rota_id,
             veiculo_id: i.veiculo_id,
             severity: i.severity,
             lat: null, // gf_incidents não tem coluna lat
@@ -778,31 +779,30 @@ export function AdminMap({
       const routeIds = routes?.map((r: RoutePolyline) => r.route_id) || []
       if (routeIds.length > 0) {
         const { data: stopsData, error: stopsError } = await supabase
-          .from('route_stops')
+          .from('v_route_stops')
           .select(`
             id,
-            route_id,
-            seq,
-            name,
-            lat,
-            lng,
-            radius_m,
-            routes!inner(name)
+            rota_id,
+            stop_order,
+            stop_name,
+            latitude,
+            longitude,
+            route_name
           `)
-          .in('route_id', routeIds)
-          .order('route_id', { ascending: true })
-          .order('seq', { ascending: true })
+          .in('rota_id', routeIds)
+          .order('rota_id', { ascending: true })
+          .order('stop_order', { ascending: true })
 
         if (!stopsError && stopsData) {
-          setRouteStops(stopsData.map((stop: SupabaseStopWithRoute) => ({
-            id: stop.id,
-            route_id: stop.route_id,
-            route_name: stop.routes?.name || '',
-            seq: stop.seq,
-            name: stop.name,
-            lat: stop.lat,
-            lng: stop.lng,
-            radius_m: stop.radius_m || 50,
+          setRouteStops(stopsData.map((stop: any) => ({
+            id: stop.id || '',
+            route_id: stop.rota_id || '',
+            route_name: stop.route_name || '',
+            seq: stop.stop_order || 0,
+            name: stop.stop_name || '',
+            lat: stop.latitude || 0,
+            lng: stop.longitude || 0,
+            radius_m: 50, // Valor padrão, não está na view
           })))
         }
       }
@@ -1070,8 +1070,8 @@ export function AdminMap({
 
       // Buscar dados da viagem
       const { data: tripData, error: tripError } = await supabase
-        .from('trips')
-        .select('id, started_at, completed_at, route_id')
+        .from('viagens')
+        .select('id, started_at, completed_at, rota_id')
         .eq('id', veiculo.trip_id)
         .single()
 
@@ -1153,7 +1153,7 @@ export function AdminMap({
     try {
       // Carregar última viagem completa do veículo
       const { data: tripData, error: tripError } = await supabase
-        .from('trips')
+        .from('viagens')
         .select('id, started_at, completed_at')
         .eq('id', veiculo.trip_id)
         .single()
@@ -1238,7 +1238,7 @@ export function AdminMap({
   // Carregar trajeto quando veículo selecionado
   useEffect(() => {
     if (selection.selectedVeiculo && playback.mode === 'live') {
-      loadVeiculoTrajectory(selection.selectedVeiculo)
+      loadVeiculoTrajectory(selection.selectedVeiculo as any)
     } else if (!selection.selectedVeiculo && playback.mode === 'live') {
       setHistoricalTrajectories([])
       playback.setShowTrajectories(false)
@@ -1557,11 +1557,12 @@ export function AdminMap({
                         speed: position.speed,
                         heading: position.heading,
                         last_position_time: timestamp.toISOString(),
-                      }
+                      } as Veiculo
                       return updated
                     } else {
                       // Criar veículo básico se não existir
                       return [...prev, {
+                        id: position.veiculo_id,
                         veiculo_id: position.veiculo_id,
                         trip_id: position.trip_id,
                         route_id: position.route_id,
@@ -1577,9 +1578,9 @@ export function AdminMap({
                         speed: position.speed,
                         heading: position.heading,
                         vehicle_status: 'moving' as const,
-                        passenger_count: position.passenger_count,
+                        passenger_count: position.passenger_count || 0,
                         last_position_time: timestamp.toISOString(),
-                      }]
+                      } as Veiculo]
                     }
                   })
 
@@ -1626,7 +1627,7 @@ export function AdminMap({
       <AnimatePresence>
         {selection.selectedVeiculo && (
           <VehiclePanel
-            veiculo={selection.selectedVeiculo}
+            veiculo={selection.selectedVeiculo as unknown as Veiculo}
             onClose={() => selection.setSelectedVeiculo(null)}
             onFollow={() => {
               // Seguir veículo (auto-center)
@@ -1649,34 +1650,34 @@ export function AdminMap({
                 )
                 
                 if (confirmed) {
-                  await handleDispatchAssistance(selection.selectedVeiculo)
+                  await handleDispatchAssistance(selection.selectedVeiculo as unknown as Veiculo)
                 }
               }
             }}
             onViewHistory={async () => {
               if (selection.selectedVeiculo) {
-                await handleViewVehicleHistory(selection.selectedVeiculo)
+                await handleViewVehicleHistory(selection.selectedVeiculo as any)
               }
             }}
           />
         )}
         {selection.selectedRoute && (
           <RoutePanel
-            route={selection.selectedRoute}
+            route={selection.selectedRoute as any}
             onClose={() => selection.setSelectedRoute(null)}
           />
         )}
         {selection.selectedAlert && (
           <AlertsPanel
-            alerts={[selection.selectedAlert]}
+            alerts={[selection.selectedAlert as any]}
             onClose={() => selection.setSelectedAlert(null)}
           />
         )}
         {playback.showTrajectoryAnalysis && trajectoryAnalysis && selection.selectedVeiculo && (
           <TrajectoryPanel
             analysis={trajectoryAnalysis}
-            vehiclePlate={selection.selectedVeiculo.plate}
-            routeName={selection.selectedVeiculo.route_name}
+            vehiclePlate={selection.selectedVeiculo?.plate || ''}
+            routeName={(selection.selectedVeiculo as any)?.route_name || ''}
             onClose={() => {
               playback.setShowTrajectoryAnalysis(false)
               setTrajectoryAnalysis(null)
@@ -1693,11 +1694,11 @@ export function AdminMap({
             veiculos={veiculos}
             routes={routes}
             alerts={alerts}
-            selectedVeiculo={selection.selectedVeiculo}
+            selectedVeiculo={selection.selectedVeiculo as any}
             onVehicleClick={selection.setSelectedVeiculo}
             onRouteClick={selection.setSelectedRoute}
             onAlertClick={(alert) => {
-              selection.setSelectedAlert(alert)
+              selection.setSelectedAlert(alert as any)
               // Navegar para localização do alerta no mapa
               if (alert.lat && alert.lng && mapInstanceRef.current) {
                 mapInstanceRef.current.setCenter({ lat: alert.lat, lng: alert.lng })

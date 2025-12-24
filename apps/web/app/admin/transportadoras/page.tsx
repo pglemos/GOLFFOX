@@ -17,6 +17,7 @@ import { useDebounce } from "@/hooks/use-debounce"
 import { useGlobalSync } from "@/hooks/use-global-sync"
 import { useRouter } from "@/lib/next-navigation"
 import { notifySuccess, notifyError } from "@/lib/toast"
+import { logError } from "@/lib/logger"
 
 export default function TransportadorasPage() {
   const router = useRouter()
@@ -49,7 +50,7 @@ export default function TransportadorasPage() {
         throw new Error(result.error || 'Erro ao carregar transportadoras')
       }
     } catch (error: any) {
-      console.error('Erro ao carregar transportadoras:', error)
+      logError('Erro ao carregar transportadoras', { error }, 'TransportadorasPage')
       setErrorCarriers(error)
       setCarriers([])
     } finally {
@@ -83,7 +84,7 @@ export default function TransportadorasPage() {
         throw new Error(result.error || 'Erro ao excluir transportadora')
       }
     } catch (error: any) {
-      console.error('Erro ao excluir transportadora:', error)
+      logError('Erro ao excluir transportadora', { error }, 'TransportadorasPage')
       const errorMessage = error.message || 'Erro desconhecido ao excluir transportadora'
       notifyError(error, errorMessage)
     }

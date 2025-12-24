@@ -20,6 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { logError } from "@/lib/logger"
 import { useSupabaseSync } from "@/hooks/use-supabase-sync"
 import { auditLogs } from "@/lib/audit-log"
 import { formatError } from "@/lib/error-utils"
@@ -99,13 +100,13 @@ export function ChangeRoleModal({
           const errorData = await response.json()
           errorMessage = errorData.error || errorData.message || errorMessage
 
-          console.error('❌ Erro da API change-role:', {
+          logError('Erro da API change-role', {
             status: response.status,
             statusText: response.statusText,
             errorData
-          })
+          }, 'ChangeRoleModal')
         } catch (parseError) {
-          console.error('❌ Erro da API (sem JSON):', response.status)
+          logError('Erro da API (sem JSON)', { status: response.status }, 'ChangeRoleModal')
         }
 
         // Mensagens específicas
@@ -147,7 +148,7 @@ export function ChangeRoleModal({
         throw new Error(result.error || 'Erro ao alterar papel')
       }
     } catch (error: any) {
-      console.error("❌ Exceção ao alterar papel:", error)
+      logError("Exceção ao alterar papel", { error }, 'ChangeRoleModal')
       notifyError(error, error.message || "Erro ao alterar papel")
     } finally {
       setLoading(false)

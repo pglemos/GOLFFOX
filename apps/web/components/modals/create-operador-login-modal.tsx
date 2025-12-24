@@ -16,6 +16,7 @@ import { Label } from "@/components/ui/label"
 import { useCep } from "@/hooks/use-cep"
 import { formatCPF, formatPhone, formatCEP } from "@/lib/format-utils"
 import { globalSyncManager } from "@/lib/global-sync"
+import { logError } from "@/lib/logger"
 import { CompanyService, type Company } from "@/lib/services/company-service"
 import { notifySuccess, notifyError } from "@/lib/toast"
 
@@ -75,7 +76,7 @@ export function CreateUserModal({
       const data = await CompanyService.listCompanies()
       setCompanies(data)
     } catch (error) {
-      console.error('Erro ao carregar empresas:', error)
+      logError('Erro ao carregar empresas', { error }, 'CreateOperadorLoginModal')
     } finally {
       setLoadingCompanies(false)
     }

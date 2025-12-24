@@ -37,6 +37,7 @@ import { useRouter } from "@/lib/next-navigation"
 import { supabase } from "@/lib/supabase"
 
 import { notifySuccess, notifyError } from "@/lib/toast"
+import { logError } from "@/lib/logger"
 import { RouteCreateModal } from "./route-create-modal"
 
 
@@ -107,7 +108,7 @@ export function RotasPageContent() {
       }
       throw new Error((result && result.error) || 'Erro ao carregar rotas')
     } catch (error) {
-      console.error("Erro ao carregar rotas:", error)
+      logError("Erro ao carregar rotas", { error }, 'RotasPageContent')
       setRotas([])
     } finally {
       setRotasLoading(false)
@@ -162,7 +163,7 @@ export function RotasPageContent() {
         throw new Error(result.error || 'Erro ao excluir rota')
       }
     } catch (error: any) {
-      console.error('Erro ao excluir rota:', error)
+      logError('Erro ao excluir rota', { error }, 'RotasPageContent')
       const errorMessage = error.message || 'Erro desconhecido ao excluir rota'
       notifyError(error, errorMessage)
     }

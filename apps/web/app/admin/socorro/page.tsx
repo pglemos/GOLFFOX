@@ -18,6 +18,7 @@ import { useAuth } from "@/components/providers/auth-provider"
 import { useRouter } from "@/lib/next-navigation"
 import { supabase } from "@/lib/supabase"
 import { notifySuccess, notifyError } from "@/lib/toast"
+import { logError } from "@/lib/logger"
 import {
   Select,
   SelectContent,
@@ -88,7 +89,7 @@ export default function SocorroPage() {
         dispatchFormDispatch({ type: 'SET_VEHICLES', payload: vehiclesResult.vehicles || [] })
       }
     } catch (error) {
-      console.error('Erro ao carregar recursos de emergência:', error)
+      logError('Erro ao carregar recursos de emergência', { error }, 'SocorroPage')
     } finally {
       dispatchFormDispatch({ type: 'SET_LOADING_RESOURCES', payload: false })
     }
@@ -129,7 +130,7 @@ export default function SocorroPage() {
       await loadEmergencyResources()
       await loadOcorrencias()
     } catch (error: any) {
-      console.error('Erro ao despachar socorro:', error)
+      logError('Erro ao despachar socorro', { error }, 'SocorroPage')
       notifyError(error.message || 'Erro ao despachar socorro')
     } finally {
       dispatchFormDispatch({ type: 'SET_DISPATCHING', payload: false })
@@ -156,7 +157,7 @@ export default function SocorroPage() {
         throw new Error(result.error || 'Erro ao carregar ocorrências')
       }
     } catch (error) {
-      console.error("Erro ao carregar ocorrências:", error)
+      logError("Erro ao carregar ocorrências", { error }, 'SocorroPage')
       setOcorrencias([])
     } finally {
       setDataLoading(false)
@@ -189,7 +190,7 @@ export default function SocorroPage() {
         throw new Error(result.error || 'Erro ao excluir solicitação de socorro')
       }
     } catch (error: any) {
-      console.error('Erro ao excluir solicitação de socorro:', error)
+      logError('Erro ao excluir solicitação de socorro', { error }, 'SocorroPage')
       const errorMessage = error.message || 'Erro desconhecido ao excluir solicitação de socorro'
       notifyError(error, errorMessage)
     }
@@ -522,7 +523,7 @@ export default function SocorroPage() {
                                 } as any)
                               }
                             } catch (error) {
-                              console.error('Erro ao criar alerta:', error)
+                              logError('Erro ao criar alerta', { error }, 'SocorroPage')
                             }
                           }}
                         >

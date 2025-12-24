@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { useRouter } from "@/lib/next-navigation"
 import { supabase } from "@/lib/supabase"
+import { logError } from "@/lib/logger"
 
 function ComunicacoesOperatorPageInner() {
   const router = useRouter()
@@ -27,12 +28,12 @@ function ComunicacoesOperatorPageInner() {
       
       const { data: userData } = await supabase
         .from('users')
-        .select('company_id')
+        .select('empresa_id')
         .eq('id', session.user.id)
         .single()
 
-      if (userData?.company_id) {
-        setEmpresaId(userData.company_id)
+      if (userData?.empresa_id) {
+        setEmpresaId(userData.empresa_id)
       }
       
       setUser({ ...session.user })
@@ -63,7 +64,7 @@ function ComunicacoesOperatorPageInner() {
       if (error) throw error
       setItems(data || [])
     } catch (error) {
-      console.error("Erro ao carregar comunicações:", error)
+      logError("Erro ao carregar comunicações", { error }, 'ComunicacoesPage')
     }
   }
 

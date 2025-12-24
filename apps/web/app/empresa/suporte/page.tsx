@@ -13,6 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea"
 import { useAuth } from "@/components/providers/auth-provider"
 import { notifySuccess, notifyError } from "@/lib/toast"
+import { debug } from "@/lib/logger"
 
 export default function EmpresaSuportePage() {
     const { user, loading } = useAuth()
@@ -32,7 +33,7 @@ export default function EmpresaSuportePage() {
             await new Promise(resolve => setTimeout(resolve, 1000))
 
             // TODO: Implementar envio real via API/Banco
-            console.log('Ticket enviado:', formData)
+            debug('Ticket enviado', { formData }, 'EmpresaSuportePage')
 
             notifySuccess('Mensagem enviada com sucesso! Entraremos em contato em breve.')
             setFormData({ subject: "", type: "incident", message: "" })

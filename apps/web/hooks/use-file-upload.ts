@@ -259,7 +259,7 @@ export function useFileUpload(options: UseFileUploadOptions): UseFileUploadRetur
 
             return data.signedUrl
         } catch (err) {
-            console.error('Erro ao gerar URL assinada:', err)
+            logError('Erro ao gerar URL assinada', { error: err }, 'UseFileUpload')
             return null
         }
     }, [bucket])

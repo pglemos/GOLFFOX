@@ -25,6 +25,7 @@ import { useSupabaseSync } from "@/hooks/use-supabase-sync"
 import { formatError } from "@/lib/error-utils"
 import { supabase } from "@/lib/supabase"
 import { notifySuccess, notifyError } from "@/lib/toast"
+import { logError } from "@/lib/logger"
 
 interface AssistanceRequest {
   id: string
@@ -75,7 +76,7 @@ export function AssistanceModal({ request, isOpen, onClose, onSave }: Assistance
       if (motoristas) {
         // Filtrar motoristas que não estão em viagem
         const { data: activeTrips } = await supabase
-          .from("trips")
+          .from("viagens")
           .select("motorista_id")
           .eq("status", "inProgress")
 
@@ -91,7 +92,7 @@ export function AssistanceModal({ request, isOpen, onClose, onSave }: Assistance
 
       if (veiculos) {
         const { data: activeTrips } = await supabase
-          .from("trips")
+          .from("viagens")
           .select("veiculo_id")
           .eq("status", "inProgress")
 
@@ -99,7 +100,7 @@ export function AssistanceModal({ request, isOpen, onClose, onSave }: Assistance
         setAvailableVehicles(veiculos.filter((v: any) => !activeVehicleIds.has(v.id)))
       }
     } catch (error) {
-      console.error("Erro ao carregar recursos:", error)
+      logError("Erro ao carregar recursos", { error }, 'AssistanceModal')
     }
   }
 
@@ -141,7 +142,7 @@ export function AssistanceModal({ request, isOpen, onClose, onSave }: Assistance
       onSave()
       onClose()
     } catch (error: any) {
-      console.error("Erro ao despachar:", error)
+      logError("Erro ao despachar", { error }, 'AssistanceModal')
       notifyError(formatError(error, "Erro ao despachar socorro"))
     } finally {
       setLoading(false)

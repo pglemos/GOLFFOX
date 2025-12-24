@@ -16,9 +16,9 @@ export interface SupabaseVeiculo {
   capacity?: number
   is_active: boolean
   photo_url?: string
-  company_id?: string
+  empresa_id?: string
   transportadora_id?: string
-  companies?: { name: string } | null
+  empresas?: { name: string } | null
 }
 
 /**

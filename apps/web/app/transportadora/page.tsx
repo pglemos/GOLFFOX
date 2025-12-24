@@ -48,6 +48,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { t } from "@/lib/i18n"
 import { cn } from "@/lib/utils"
+import { debug, logError } from "@/lib/logger"
 
 export default function TransportadoraDashboard() {
   const router = useRouter()
@@ -96,7 +97,7 @@ export default function TransportadoraDashboard() {
       const transportadoraData = { transportadora_id: (user as any)?.transportadora_id || null }
 
       if (!transportadoraId) {
-        console.error("Usuário não está associado a uma transportadora")
+        logError("Usuário não está associado a uma transportadora", {}, 'TransportadoraPage')
         return
       }
 
@@ -183,13 +184,12 @@ export default function TransportadoraDashboard() {
           total_points?: number
         }
 
-        // @ts-expect-error - gf_gamification_scores não está no tipo do Supabase ainda
         const { data: rankings } = await supabase
-          .from('gf_gamification_scores')
+          .from('gf_gamification_scores' as any)
           .select('*')
           .in('motorista_id', driverIds) as { data: GamificationScore[] | null }
 
-        driversWithStats = (driversData || []).map((motorista: { id: string; name: string }) => {
+        driversWithStats = (driversData || []).map((motorista: any) => {
           const ranking = rankings?.find((r) => r.motorista_id === motorista.id)
           return {
             id: motorista.id,
@@ -233,7 +233,7 @@ export default function TransportadoraDashboard() {
 
       // Buscar rotas da transportadora para contar viagens
       const { data: routes } = await supabase
-        .from('routes')
+        .from('rotas')
         .select('id')
         .eq('transportadora_id', transportadoraId)
 
@@ -243,7 +243,7 @@ export default function TransportadoraDashboard() {
       let tripsCount = 0
       if (routeIds.length > 0) {
         const { count } = await supabase
-          .from('trips')
+          .from('viagens')
           .select('*', { count: 'exact', head: true })
           .in('route_id', routeIds)
           .gte('created_at', currentMonthStart.toISOString())
@@ -290,7 +290,7 @@ export default function TransportadoraDashboard() {
           .lt('month', previousMonthEnd.toISOString()),
         routeIds.length > 0
           ? supabase
-            .from('trips')
+            .from('viagens')
             .select('*', { count: 'exact', head: true })
             .in('route_id', routeIds)
             .gte('created_at', previousMonthStart.toISOString())
@@ -362,7 +362,7 @@ export default function TransportadoraDashboard() {
 
       // Atualizar userData para usar no FleetMap
     } catch (error) {
-      console.error("Erro ao carregar dados da frota:", error)
+      logError("Erro ao carregar dados da frota", { error }, 'TransportadoraPage')
     }
   }, [transportadoraId])
 
@@ -415,7 +415,7 @@ export default function TransportadoraDashboard() {
     try {
       router.push('/transportadora/motoristas')
     } catch (err) {
-      console.error('❌ Router.push failed, using window.location:', err)
+      logError('Router.push failed, using window.location', { error: err }, 'TransportadoraPage')
       window.location.href = '/transportadora/motoristas'
     }
   }, [router])
@@ -424,7 +424,7 @@ export default function TransportadoraDashboard() {
     try {
       router.push('/transportadora/alertas')
     } catch (err) {
-      console.error('❌ Router.push failed, using window.location:', err)
+      logError('Router.push failed, using window.location', { error: err }, 'TransportadoraPage')
       window.location.href = '/transportadora/alertas'
     }
   }, [router])
@@ -433,7 +433,7 @@ export default function TransportadoraDashboard() {
     try {
       router.push('/transportadora/custos')
     } catch (err) {
-      console.error('❌ Router.push failed, using window.location:', err)
+      logError('Router.push failed, using window.location', { error: err }, 'TransportadoraPage')
       window.location.href = '/transportadora/custos'
     }
   }, [router])
@@ -722,7 +722,7 @@ export default function TransportadoraDashboard() {
               )}>
                 <LazyWrapper>
                   <FleetMap
-                    transportadoraId={transportadoraId}
+                    transportadoraId={transportadoraId as any}
                   />
                 </LazyWrapper>
               </div>
@@ -765,13 +765,13 @@ export default function TransportadoraDashboard() {
                   variant="outline"
                   className="flex-shrink-0 w-full sm:w-auto min-h-[44px] touch-manipulation"
                   onClick={(e) => {
-                    console.log('🔵 [DEBUG] Button Ver todos motoristas clicked', e)
+                    debug('Button Ver todos motoristas clicked', { event: e }, 'TransportadoraPage')
                     e.preventDefault()
                     e.stopPropagation()
                     try {
                       router.push('/transportadora/motoristas')
                     } catch (err) {
-                      console.error('❌ Router.push failed, using window.location:', err)
+                      logError('Router.push failed, using window.location', { error: err }, 'TransportadoraPage')
                       window.location.href = '/transportadora/motoristas'
                     }
                   }}
@@ -881,11 +881,11 @@ export default function TransportadoraDashboard() {
               pagination={true}
               pageSize={10}
               onRowClick={(row) => {
-                console.log('🔵 [DEBUG] Table row clicked', row)
+                debug('Table row clicked', { row }, 'TransportadoraPage')
                 try {
                   router.push(`/transportadora/veiculos?vehicleId=${row.id}`)
                 } catch (err) {
-                  console.error('❌ Router.push failed, using window.location:', err)
+                  logError('Router.push failed, using window.location', { error: err }, 'TransportadoraPage')
                   window.location.href = `/transportadora/veiculos?vehicleId=${row.id}`
                 }
               }}

@@ -5,6 +5,7 @@
 import { exportToCSV, exportToPDF } from "@/lib/export-utils"
 import { formatCurrency, formatDistance, formatDuration } from "@/lib/kpi-utils"
 import { notifySuccess, notifyError } from "@/lib/toast"
+import { logError } from "@/lib/logger"
 
 import type { getDiscrepancyStatus } from "./discrepancy-calculator"
 
@@ -97,7 +98,7 @@ export function exportReconciliationReport(
       }
     })
   } catch (error: any) {
-    console.error('Erro ao exportar relatório:', error)
+    logError('Erro ao exportar relatório', { error }, 'ExportHandler')
     notifyError('Erro ao exportar', undefined, {
       i18n: { ns: 'common', key: 'errors.export' }
     })

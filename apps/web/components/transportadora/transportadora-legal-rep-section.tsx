@@ -11,6 +11,7 @@ import { FileUpload } from "@/components/ui/file-upload"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useFileUpload } from "@/hooks/use-file-upload"
+import { logError } from "@/lib/logger"
 import { notifySuccess, notifyError } from "@/lib/toast"
 import {
     TransportadoraLegalRepData,
@@ -84,7 +85,7 @@ export function TransportadoraLegalRepSection({
                 }
             }
         } catch (error) {
-            console.error("Erro ao carregar dados:", error)
+            logError("Erro ao carregar dados", { error }, 'TransportadoraLegalRepSection')
         } finally {
             setLoading(false)
         }
@@ -131,7 +132,7 @@ export function TransportadoraLegalRepSection({
             setFileToUpload(null)
             return true
         } catch (error) {
-            console.error(error)
+            logError("Erro ao enviar CNH", { error }, 'TransportadoraLegalRepSection')
             notifyError(error, "Erro ao enviar CNH")
             return false
         } finally {

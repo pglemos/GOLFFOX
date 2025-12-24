@@ -3,6 +3,7 @@ import { useState, useEffect, useMemo } from "react"
 import { geocodeAddress } from "@/lib/geocoding"
 import { supabase } from "@/lib/supabase"
 import { notifyError } from "@/lib/toast"
+import { logError } from "@/lib/logger"
 import type { EmployeeLite, OptimizeRouteResponse, RouteFormData } from "@/types/routes"
 import type { Database } from "@/types/supabase"
 
@@ -98,8 +99,8 @@ export function useRouteCreate(isOpen: boolean) {
             const result = await response.json()
 
             if (result.success && result.companies && Array.isArray(result.companies)) {
-                const companiesData = (result.companies || []).filter((c: Database["public"]["Tables"]["companies"]["Row"]) => c.is_active !== false)
-                const formattedCompanies = companiesData.map((c: Database["public"]["Tables"]["companies"]["Row"]) => ({
+                const companiesData = (result.companies || []).filter((c: Database["public"]["Tables"]["empresas"]["Row"]) => c.is_active !== false)
+                const formattedCompanies = companiesData.map((c: Database["public"]["Tables"]["empresas"]["Row"]) => ({
                     id: c.id,
                     name: c.name || 'Sem nome'
                 })).filter((c: { id: string; name: string }) => c.id && c.name)
@@ -109,7 +110,7 @@ export function useRouteCreate(isOpen: boolean) {
                 throw new Error(result.error || 'Erro ao carregar empresas')
             }
         } catch (error: any) {
-            console.error("Erro ao carregar empresas:", error)
+            logError("Erro ao carregar empresas", { error }, 'useRouteCreate')
             try {
                 const { data, error: supabaseError } = await supabase
                     .from("empresas")
@@ -125,7 +126,7 @@ export function useRouteCreate(isOpen: boolean) {
 
                 setCompanies(formatted)
             } catch (fallbackError: any) {
-                console.error("Erro no fallback:", fallbackError)
+                logError("Erro no fallback", { error: fallbackError }, 'useRouteCreate')
                 setCompanies([])
             }
         } finally {
@@ -139,9 +140,9 @@ export function useRouteCreate(isOpen: boolean) {
         setLoadingEmployees(true)
         try {
             let { data, error } = await supabase
-                .from("v_company_employees_secure")
+                .from("v_company_employees_secure" as any)
                 .select("*")
-                .eq("company_id", formData.company_id)
+                .eq("company_id", formData.company_id) as any
 
             if (error && (error.message?.includes("does not exist") || (error as any).code === "PGRST205")) {
                 try {
@@ -159,7 +160,7 @@ export function useRouteCreate(isOpen: boolean) {
                         }
                     }
                 } catch (apiError) {
-                    console.error("Erro API funcionários:", apiError)
+                    logError("Erro API funcionários", { error: apiError }, 'useRouteCreate')
                 }
 
                 const { data: empData, error: empError } = await supabase
@@ -191,7 +192,7 @@ export function useRouteCreate(isOpen: boolean) {
 
             setEmployees((data || []) as unknown as EmployeeLite[])
         } catch (error: any) {
-            console.error("Erro ao carregar funcionários:", error)
+            logError("Erro ao carregar funcionários", { error }, 'useRouteCreate')
             notifyError(error, "Erro ao carregar funcionários")
         } finally {
             setLoadingEmployees(false)
@@ -226,7 +227,7 @@ export function useRouteCreate(isOpen: boolean) {
                 }
             }
         } catch (error) {
-            console.error("Erro ao carregar endereço da empresa:", error)
+            logError("Erro ao carregar endereço da empresa", { error }, 'useRouteCreate')
         }
     }
 

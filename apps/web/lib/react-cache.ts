@@ -7,6 +7,8 @@
 
 import { cache } from 'react'
 
+import { debug } from './logger'
+
 /**
  * Create a cached version of an async function
  * Results are memoized per request, preventing duplicate work
@@ -41,7 +43,7 @@ export function cacheDataFetch<T extends (...args: any[]) => Promise<any>>(
     const cachedFn = cache(fn)
     return ((...args: Parameters<T>) => {
       if (process.env.NODE_ENV === 'development') {
-        console.log(`[Cache] ${key}`, args)
+        debug(`[Cache] ${key}`, { key, args }, 'ReactCache')
       }
       return cachedFn(...args)
     }) as T

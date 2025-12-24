@@ -24,6 +24,7 @@ import {
 import { useSupabaseSync } from "@/hooks/use-supabase-sync"
 import { supabase } from "@/lib/supabase"
 import { notifySuccess, notifyError } from "@/lib/toast"
+import { logError } from "@/lib/logger"
 
 interface ScheduleReportModalProps {
   isOpen: boolean
@@ -90,7 +91,7 @@ export function ScheduleReportModal({
   const loadCompanies = async () => {
     try {
       const { data, error } = await supabase
-        .from("companies")
+        .from("empresas")
         .select("id, name")
         .eq("is_active", true)
         .order("name")
@@ -98,7 +99,7 @@ export function ScheduleReportModal({
       if (error) throw error
       setCompanies(data || [])
     } catch (error: any) {
-      console.error("Erro ao carregar empresas:", error)
+      logError("Erro ao carregar empresas", { error }, 'ScheduleReportModal')
       notifyError("Erro ao carregar empresas", undefined, {
         i18n: { ns: 'common', key: 'errors.generic' }
       })
@@ -232,7 +233,7 @@ export function ScheduleReportModal({
         setIsActive(true)
       }
     } catch (error: any) {
-      console.error("Erro ao criar agendamento:", error)
+      logError("Erro ao criar agendamento", { error }, 'ScheduleReportModal')
       notifyError(error.message || "Erro ao criar agendamento", undefined, {
         i18n: { ns: 'operador', key: 'reports.schedule.errors.createSchedule' }
       })

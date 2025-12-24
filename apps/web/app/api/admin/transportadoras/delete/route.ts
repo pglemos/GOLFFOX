@@ -67,7 +67,7 @@ export async function DELETE(req: NextRequest) {
 
     // 3. Excluir rotas relacionadas
     const { error: routesError } = await supabase
-      .from('routes')
+      .from('rotas')
       .delete()
       .eq('transportadora_id', carrierId)
 

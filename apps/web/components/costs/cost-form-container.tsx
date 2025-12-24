@@ -13,6 +13,7 @@ import { useForm } from "react-hook-form"
 import { z } from "zod"
 
 import { useCreateCost } from "@/hooks/use-costs"
+import { logError } from "@/lib/logger"
 import { notifyError } from "@/lib/toast"
 import type { ManualCostInsert, ProfileType, CostCategory } from "@/types/financial"
 
@@ -121,7 +122,7 @@ export function CostFormContainer({
             const { url } = await response.json()
             return url
         } catch (error) {
-            console.error('Erro no upload:', error)
+            logError('Erro no upload', { error }, 'CostFormContainer')
             return null
         }
     }
@@ -170,7 +171,7 @@ export function CostFormContainer({
             setUploadProgress(0)
             onSuccess?.()
         } catch (error) {
-            console.error('Erro ao salvar custo:', error)
+            logError('Erro ao salvar custo', { error }, 'CostFormContainer')
             // Erro já é tratado pelo hook
         } finally {
             setUploadProgress(0)

@@ -6,6 +6,7 @@
 import type { ManualCost, ManualRevenue, Budget } from '@/types/financial'
 
 import { fetchWithAuth } from '../fetch-with-auth'
+import { logError } from '../logger'
 
 export interface FinancialFilters {
   page?: number
@@ -77,7 +78,7 @@ export async function getFinancialData(
       budgets: budgetsData.success ? budgetsData.data || [] : [],
     }
   } catch (error) {
-    console.error('Erro ao buscar dados financeiros:', error)
+    logError('Erro ao buscar dados financeiros', { error }, 'FinancialAPI')
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Erro desconhecido ao buscar dados financeiros',
@@ -124,7 +125,7 @@ export async function getCosts(filters: FinancialFilters = {}): Promise<CostsRes
       data: result.data || [],
     }
   } catch (error) {
-    console.error('Erro ao buscar custos:', error)
+    logError('Erro ao buscar custos', { error }, 'FinancialAPI')
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Erro desconhecido ao buscar custos',
@@ -169,7 +170,7 @@ export async function getRevenues(filters: FinancialFilters = {}): Promise<Reven
       data: result.data || [],
     }
   } catch (error) {
-    console.error('Erro ao buscar receitas:', error)
+    logError('Erro ao buscar receitas', { error }, 'FinancialAPI')
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Erro desconhecido ao buscar receitas',
@@ -212,7 +213,7 @@ export async function getBudgets(filters: FinancialFilters = {}): Promise<Budget
       data: result.data || [],
     }
   } catch (error) {
-    console.error('Erro ao buscar orçamentos:', error)
+    logError('Erro ao buscar orçamentos', { error }, 'FinancialAPI')
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Erro desconhecido ao buscar orçamentos',

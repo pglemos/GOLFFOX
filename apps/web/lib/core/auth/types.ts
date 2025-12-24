@@ -12,6 +12,8 @@ export interface UserData {
   avatar_url?: string | null
   company_id?: string | null
   transportadora_id?: string | null
+  // Usado para sinalizar sincronização concluída
+  isSynced?: boolean
 }
 
 export interface AuthStorageOptions {

@@ -13,7 +13,13 @@ export function getAccessTokenFromGolffoxCookie(): string | null {
   if (!match) return null
 
   try {
-    const decoded = atob(match[1])
+    const raw = match[1]
+    let decoded: string
+    try {
+      decoded = atob(raw)
+    } catch {
+      decoded = decodeURIComponent(raw)
+    }
     const parsed = JSON.parse(decoded)
     const token = parsed?.access_token || parsed?.accessToken
     return typeof token === 'string' && token.length > 0 ? token : null
@@ -33,14 +39,16 @@ export async function ensureSupabaseSession(): Promise<Session | null> {
 
   if (!bootstrapPromise) {
     bootstrapPromise = (async () => {
+      debug('[SupabaseSession] Iniciando bootstrap da sessão via cookie', {}, 'SupabaseSession')
       const { data, error } = await supabase.auth.setSession({
         access_token: token,
         refresh_token: token,
       })
       if (error) {
-        console.warn('Failed to set Supabase session from golffox-session cookie', { error })
+        warn('[SupabaseSession] Falha ao definir sessão via cookie', { error: error.message }, 'SupabaseSession')
         return null
       }
+      debug('[SupabaseSession] Sessão sincronizada com sucesso via cookie', {}, 'SupabaseSession')
       return data.session
     })().finally(() => {
       bootstrapPromise = null

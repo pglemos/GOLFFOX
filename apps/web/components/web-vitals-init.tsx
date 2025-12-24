@@ -3,6 +3,7 @@
 import { useEffect } from 'react'
 
 import { initWebVitals } from '@/lib/web-vitals'
+import { debug } from '@/lib/logger'
 
 export function WebVitalsInit() {
   useEffect(() => {
@@ -10,7 +11,7 @@ export function WebVitalsInit() {
       initWebVitals()
     } catch (err) {
       // Não bloquear renderização por erros não críticos de métricas
-      console.debug('WebVitalsInit: init skipped', err)
+      debug('WebVitalsInit: init skipped', { error: err }, 'WebVitalsInit')
     }
   }, [])
 

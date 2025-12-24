@@ -158,7 +158,7 @@ export function createDocumentsHandler(config: DocumentHandlerConfig) {
 
             if (existing) {
                 // Atualizar documento existente
-                const existingId = (existing as { id: string }).id
+                const existingId = (existing as unknown as { id: string }).id
                 const { data: updated, error: updateError } = await (supabaseAdmin
                     .from(docConfig.table as any) as any)
                     .update({
