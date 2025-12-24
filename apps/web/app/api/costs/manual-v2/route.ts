@@ -75,7 +75,7 @@ export async function GET(request: NextRequest) {
         veiculo:veiculos(id, plate, model),
         route:routes(id, name),
         company:companies(id, name),
-        transportadora:carriers(id, name)
+        transportadora:transportadoras(id, name)
       `, { count: 'exact' })
 
         // Aplicar filtro de tenant baseado no papel
@@ -256,19 +256,19 @@ export async function POST(request: NextRequest) {
 
         // Definir tenant baseado no papel
         let companyId = body.company_id || body.companyId
-        let carrierId = body.transportadora_id || body.carrierId
+        let transportadoraId = body.transportadora_id || body.carrierId
 
         if (profile?.role === 'gestor_empresa' || profile?.role === 'gestor_empresa') {
             companyId = profile.company_id || companyId
-            carrierId = null
+            transportadoraId = null
         } else if (profile?.role === 'gestor_transportadora' || profile?.role === 'gestor_transportadora' || profile?.role === 'gestor_empresa') {
-            carrierId = profile.transportadora_id || carrierId
+            transportadoraId = profile.transportadora_id || transportadoraId
             companyId = null
         }
         // Admin pode especificar qualquer tenant
 
         // Validar constraint chk_tenant: deve ter company_id OU transportadora_id
-        if (!companyId && !carrierId) {
+        if (!companyId && !transportadoraId) {
             return NextResponse.json(
                 { success: false, error: 'É necessário especificar uma empresa ou transportadora' },
                 { status: 400 }
@@ -280,21 +280,21 @@ export async function POST(request: NextRequest) {
             .from('gf_manual_costs_v2' as any)
             .insert({
                 company_id: companyId,
-                transportadora_id: carrierId,
-                category_id: body.categoryId,
-                description: body.description,
-                amount: body.amount,
-                cost_date: body.costDate,
-                is_recurring: body.isRecurring ?? false,
-                recurring_interval: body.recurringInterval,
-                recurring_end_date: body.recurringEndDate,
-                veiculo_id: body.vehicleId,
-                route_id: body.routeId,
-                motorista_id: body.driverId,
-                attachment_url: body.attachmentUrl,
-                attachment_name: body.attachmentName,
-                notes: body.notes,
-                status: body.status ?? 'confirmed',
+                transportadora_id: transportadoraId,
+                category_id: validated.category_id,
+                description: validated.description,
+                amount: validated.amount,
+                cost_date: validated.cost_date,
+                is_recurring: validated.is_recurring,
+                recurring_interval: validated.recurring_interval,
+                recurring_end_date: (body.recurringEndDate || body.recurring_end_date),
+                veiculo_id: validated.veiculo_id,
+                route_id: validated.route_id,
+                motorista_id: validated.motorista_id,
+                attachment_url: validated.attachment_url,
+                attachment_name: (body.attachmentName || body.attachment_name),
+                notes: validated.notes,
+                status: validated.status,
                 created_by: userId,
             })
             .select(`
