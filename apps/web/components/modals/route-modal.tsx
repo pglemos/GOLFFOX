@@ -211,7 +211,7 @@ export function RouteModal({
         const { data, error } = await supabase
           .from('rotas')
           .insert(payload as RotasInsert)
-          .select("*")
+          .select('id, name, empresa_id, description, origin_address, destination_address, scheduled_time, days_of_week, exceptions, holidays, is_active, shift, created_at, updated_at')
           .single()
 
         if (error) throw error

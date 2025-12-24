@@ -43,7 +43,7 @@ export function CostCentersList({ companyId }: CostCentersListProps) {
         try {
             const { data, error } = await supabase
                 .from('gf_cost_centers')
-                .select('*')
+                .select('id, code, name, is_active, empresa_id, company_id, created_at, updated_at')
                 .eq('company_id', companyId)
                 .order('code')
 

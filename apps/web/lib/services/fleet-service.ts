@@ -14,7 +14,7 @@ export class FleetService extends BaseService {
     const data = await this.handleRequest<Vehicle[]>(
       supabase
         .from('veiculos')
-        .select('*')
+        .select('id, plate, model, brand, year, capacity, prefix, vehicle_type, fuel_type, color, chassis, renavam, photo_url, is_active, empresa_id, transportadora_id, created_at, updated_at')
         .eq('transportadora_id', transportadoraId)
         .order('plate', { ascending: true })
     )
@@ -28,7 +28,7 @@ export class FleetService extends BaseService {
     const data = await this.handleRequest<Driver[]>(
       supabase
         .from('users')
-        .select('*')
+        .select('id, name, email, cpf, phone, cnh, cnh_category, avatar_url, is_active, transportadora_id, empresa_id, role, created_at, updated_at')
         .eq('transportadora_id', transportadoraId)
         .eq('role', 'motorista')
         .eq('is_active', true)

@@ -127,10 +127,10 @@ export class UserService {
       const supabaseAdmin = getSupabaseAdmin()
       const { role, status, companyId } = filters
 
-      // Selecionar todas as colunas para evitar erros de colunas inexistentes
+      // Selecionar apenas colunas principais usadas
       let query = supabaseAdmin
         .from('users')
-        .select('*')
+        .select('id, email, name, role, is_active, company_id, transportadora_id, phone, cpf, cnh, cnh_category, avatar_url, created_at, updated_at')
         .order('created_at', { ascending: false })
 
       if (role && role !== 'all') {

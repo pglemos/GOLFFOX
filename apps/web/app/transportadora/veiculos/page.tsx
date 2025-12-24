@@ -149,7 +149,7 @@ export default function TransportadoraVeiculosPage() {
             // Buscar documentos vencendo
             const { data: expiringDocs } = await supabase
               .from('v_carrier_expiring_documents')
-              .select('*')
+              .select('id, document_type, document_name, expiry_date, days_to_expiry, alert_level, entity_id, entity_type')
               .eq('entity_type', 'veiculo')
               .eq('entity_id', v.id)
               .in('alert_level', ['expired', 'critical'])
@@ -157,8 +157,8 @@ export default function TransportadoraVeiculosPage() {
 
             // Buscar última manutenção
             const { data: lastMaintenance } = await supabase
-              .from('vehicle_maintenances')
-              .select('*')
+              .from('gf_vehicle_maintenance')
+              .select('id, veiculo_id, maintenance_type, description, scheduled_date, completed_date, cost_parts_brl, cost_labor_brl, status, created_at')
               .eq('veiculo_id', v.id)
               .order('completed_date', { ascending: false })
               .order('scheduled_date', { ascending: false })

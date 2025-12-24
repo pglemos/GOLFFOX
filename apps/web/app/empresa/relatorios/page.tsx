@@ -50,9 +50,17 @@ export default function RelatoriosOperatorPage() {
       // Tentar buscar dados de views seguras se disponíveis
       if (report.viewName) {
         // Views seguras já filtram por company_id via RLS
+        // Selecionar colunas específicas baseado no tipo de relatório
+        const columns = report.viewName === 'v_reports_delays' 
+          ? 'id, date, route_name, trip_id, delay_minutes, reason, hour'
+          : report.viewName === 'v_reports_occupancy'
+          ? 'id, date, route_name, trip_id, hour, avg_occupancy, capacity'
+          : report.viewName === 'v_reports_not_boarded'
+          ? 'id, date, route_name, trip_id, passenger_name, frequency, reason'
+          : '*'
         const { data, error } = await supabase
           .from(report.viewName)
-          .select('*')
+          .select(columns)
           .limit(1000)
 
         if (error) throw error

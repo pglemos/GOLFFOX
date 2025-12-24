@@ -49,7 +49,7 @@ export async function loadRouteData(routeId: string): Promise<RouteData> {
   // Buscar dados da rota
   const { data: route, error: routeError } = await supabase
     .from('rotas')
-    .select('*')
+    .select('id, name, description, distance, estimated_duration, empresa_id, transportadora_id, is_active, created_at, updated_at')
     .eq('id', routeId)
     .single()
 

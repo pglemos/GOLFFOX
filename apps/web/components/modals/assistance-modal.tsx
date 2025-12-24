@@ -69,7 +69,7 @@ export function AssistanceModal({ request, isOpen, onClose, onSave }: Assistance
       // Carregar motoristas disponíveis (sem viagem em andamento)
       const { data: motoristas } = await supabase
         .from("users")
-        .select("*")
+        .select("id, name, email, phone, cpf, cnh, cnh_category, avatar_url, is_active, role, transportadora_id")
         .eq("role", "motorista")
         .eq("is_active", true)
 
@@ -87,7 +87,7 @@ export function AssistanceModal({ request, isOpen, onClose, onSave }: Assistance
       // Carregar veículos disponíveis (sem viagem em andamento)
       const { data: veiculos } = await supabase
         .from("veiculos")
-        .select("*")
+        .select("id, plate, model, brand, year, capacity, prefix, vehicle_type, fuel_type, color, is_active, empresa_id, transportadora_id")
         .eq("is_active", true)
 
       if (veiculos) {

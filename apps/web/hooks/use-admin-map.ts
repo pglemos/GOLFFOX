@@ -386,7 +386,7 @@ export function useAdminMap(options: UseAdminMapOptions = {}): UseAdminMapReturn
       // Buscar trajetória histórica
       const { data: trajectoryData, error } = await (supabase
         .from('motorista_positions')
-        .select('*')
+        .select('id, motorista_id, veiculo_id, viagem_id, latitude, longitude, heading, speed, accuracy, timestamp, created_at')
         .eq('veiculo_id', vehicleId)
         .order('timestamp', { ascending: true })
         .limit(500))

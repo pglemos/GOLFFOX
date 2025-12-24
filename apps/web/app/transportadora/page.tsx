@@ -107,7 +107,7 @@ export default function TransportadoraDashboard() {
       // Carregar veículos
       const { data: veiculos } = await supabase
         .from('veiculos')
-        .select('*')
+        .select('id, plate, model, brand, year, capacity, prefix, vehicle_type, fuel_type, color, is_active, empresa_id, transportadora_id')
         .eq('transportadora_id', transportadoraId)
 
       // Carregar posições dos veículos usando RPC do mapa
@@ -171,7 +171,7 @@ export default function TransportadoraDashboard() {
       // Carregar motoristas
       const { data: driversData } = await supabase
         .from('users')
-        .select('*')
+        .select('id, name, email, cpf, phone, cnh, cnh_category, avatar_url, is_active, transportadora_id, empresa_id, role')
         .eq('role', 'motorista')
         .eq('transportadora_id', transportadoraId)
 
@@ -189,7 +189,7 @@ export default function TransportadoraDashboard() {
 
         const { data: rankings } = await supabase
           .from('gf_gamification_scores')
-          .select('*')
+          .select('motorista_id, trips_completed, total_points, routes_completed, created_at, updated_at')
           .in('motorista_id', driverIds)
 
         driversWithStats = (driversData || []).map((motorista: { id: string; name?: string; [key: string]: unknown }) => {
@@ -209,7 +209,7 @@ export default function TransportadoraDashboard() {
       // Buscar alertas críticos de vencimento
       const { data: alerts } = await supabase
         .from('v_carrier_expiring_documents')
-        .select('*')
+        .select('id, document_type, document_name, expiry_date, days_to_expiry, alert_level, transportadora_id, entity_id, entity_type, created_at')
         .eq('transportadora_id', transportadoraId)
         .in('alert_level', ['expired', 'critical'])
 

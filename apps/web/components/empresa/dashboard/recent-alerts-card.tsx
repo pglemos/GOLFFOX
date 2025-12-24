@@ -23,7 +23,7 @@ export function RecentAlertsCard({ companyId }: RecentAlertsCardProps) {
         queryFn: async () => {
             const { data, error } = await supabase
                 .from('gf_alerts')
-                .select('*')
+                .select('id, message, title, alert_type, type, severity, is_resolved, empresa_id, company_id, metadata, created_at')
                 .eq('company_id', companyId)
                 .eq('is_resolved', false) // Apenas não resolvidos
                 .order('created_at', { ascending: false })

@@ -50,7 +50,7 @@ export function useReconciliation(invoiceId: string | null, isOpen: boolean) {
       // Buscar fatura
       const { data: invData, error: invError } = await supabase
         .from('gf_invoices')
-        .select('*')
+        .select('id, invoice_number, period_start, period_end, total_amount, status, empresa_id, transportadora_id, notes, approved_at, approved_by, reconciled_by, created_at, updated_at')
         .eq('id', invoiceId)
         .single()
 

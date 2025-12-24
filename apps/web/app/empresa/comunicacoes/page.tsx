@@ -52,7 +52,7 @@ function ComunicacoesOperatorPageInner() {
     try {
       let query = supabase
         .from('gf_announcements')
-        .select('*')
+        .select('id, empresa_id, transportadora_id, title, message, type, target_role, expires_at, is_active, published_at, created_at')
         .order('created_at', { ascending: false })
       
       if (empresaId) {

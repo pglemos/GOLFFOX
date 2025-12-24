@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 
 import { requireAuth } from '@/lib/api-auth'
 import { successResponse, errorResponse, validationErrorResponse } from '@/lib/api-response'
+import { redisCacheService, createCacheKey, withRedisCache } from '@/lib/cache/redis-cache.service'
 import { debug, warn, logError } from '@/lib/logger'
 import { UserService } from '@/lib/services/server/user-service'
 import { getSupabaseAdmin } from '@/lib/supabase-client'
@@ -27,67 +28,81 @@ export async function GET(request: NextRequest) {
     const transportadoraId = searchParams.get('transportadora_id') || undefined
     const isActive = searchParams.get('is_active')
 
-    let query = supabase
-      .from('users')
-      .select('id, name, email, phone, cpf, role, transportadora_id, is_active, created_at, updated_at')
-      .eq('role', 'motorista')
-      .order('created_at', { ascending: false })
+    // ✅ Cache Redis para lista de motoristas (TTL: 3 minutos - dados mudam mais frequentemente)
+    // Criar chave de cache baseada nos filtros para cachear diferentes queries
+    const cacheKeyParts = ['motoristas', 'list', page.toString(), limit.toString()]
+    if (search) cacheKeyParts.push(`search:${search}`)
+    if (transportadoraId) cacheKeyParts.push(`transportadora:${transportadoraId}`)
+    if (isActive) cacheKeyParts.push(`active:${isActive}`)
+    const cacheKey = createCacheKey(...cacheKeyParts)
+    
+    const result = await withRedisCache(
+      cacheKey,
+      async () => {
+        let query = supabase
+          .from('users')
+          .select('id, name, email, phone, cpf, role, transportadora_id, is_active, created_at, updated_at')
+          .eq('role', 'motorista')
+          .order('created_at', { ascending: false })
 
-    // Aplicar filtros
-    if (search) {
-      query = query.or(`name.ilike.%${search}%,email.ilike.%${search}%,cpf.ilike.%${search}%`)
-    }
+        // Aplicar filtros
+        if (search) {
+          query = query.or(`name.ilike.%${search}%,email.ilike.%${search}%,cpf.ilike.%${search}%`)
+        }
 
-    if (transportadoraId) {
-      query = query.eq('transportadora_id', transportadoraId)
-    }
+        if (transportadoraId) {
+          query = query.eq('transportadora_id', transportadoraId)
+        }
 
-    if (isActive !== null && isActive !== undefined) {
-      query = query.eq('is_active', isActive === 'true')
-    }
+        if (isActive !== null && isActive !== undefined) {
+          query = query.eq('is_active', isActive === 'true')
+        }
 
-    // Paginação
-    query = query.range(offset, offset + limit - 1)
+        // Paginação
+        query = query.range(offset, offset + limit - 1)
 
-    const { data, error } = await query
+        const { data, error } = await query
 
-    if (error) {
-      logError('Erro ao listar motoristas', { error }, 'DriversAPI')
-      return NextResponse.json(
-        { error: 'Erro ao listar motoristas', message: error.message },
-        { status: 500 }
-      )
-    }
+        if (error) {
+          throw error
+        }
 
-    // Contar total (para paginação)
-    let countQuery = supabase
-      .from('users')
-      .select('id', { count: 'exact', head: true })
-      .eq('role', 'motorista')
+        // Contar total (para paginação)
+        let countQuery = supabase
+          .from('users')
+          .select('id', { count: 'exact', head: true })
+          .eq('role', 'motorista')
 
-    if (search) {
-      countQuery = countQuery.or(`name.ilike.%${search}%,email.ilike.%${search}%,cpf.ilike.%${search}%`)
-    }
+        if (search) {
+          countQuery = countQuery.or(`name.ilike.%${search}%,email.ilike.%${search}%,cpf.ilike.%${search}%`)
+        }
 
-    if (transportadoraId) {
-      countQuery = countQuery.eq('transportadora_id', transportadoraId)
-    }
+        if (transportadoraId) {
+          countQuery = countQuery.eq('transportadora_id', transportadoraId)
+        }
 
-    if (isActive !== null && isActive !== undefined) {
-      countQuery = countQuery.eq('is_active', isActive === 'true')
-    }
+        if (isActive !== null && isActive !== undefined) {
+          countQuery = countQuery.eq('is_active', isActive === 'true')
+        }
 
-    const { count } = await countQuery
+        const { count } = await countQuery
+
+        return {
+          data: data || [],
+          pagination: {
+            page,
+            limit,
+            total: count || 0,
+            totalPages: Math.ceil((count || 0) / limit),
+          },
+        }
+      },
+      180 // 3 minutos (dados mudam mais frequentemente)
+    )
 
     return NextResponse.json({
       success: true,
-      data: data || [],
-      pagination: {
-        page,
-        limit,
-        total: count || 0,
-        totalPages: Math.ceil((count || 0) / limit),
-      },
+      ...result,
     })
   } catch (error) {
     logError('Erro ao listar motoristas', { error }, 'DriversAPI')

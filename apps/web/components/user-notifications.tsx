@@ -41,7 +41,7 @@ export function UserNotifications() {
 
             const { data, error } = await supabase
                 .from('gf_notifications')
-                .select('*')
+                .select('id, user_id, type, title, message, link, is_read, created_at, updated_at')
                 .eq('user_id', user.id)
                 .order('created_at', { ascending: false })
                 .limit(20)

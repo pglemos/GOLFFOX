@@ -41,7 +41,7 @@ export default function SincronizarPage() {
       // Buscar todas as rotas
       const { data: rotas, error: rotasError } = await supabase
         .from("rotas")
-        .select("*")
+        .select("id, name, empresa_id, is_active")
         .eq("is_active", true)
 
       if (rotasError) throw rotasError
@@ -54,7 +54,7 @@ export default function SincronizarPage() {
           // Buscar funcionários da empresa da rota
           const { data: funcionarios, error: funcError } = await supabase
             .from("gf_employee_company")
-            .select("*")
+            .select("id, employee_id, empresa_id, name, address, latitude, longitude, is_active")
             .eq("empresa_id", rota.empresa_id)
             .eq("is_active", true)
 

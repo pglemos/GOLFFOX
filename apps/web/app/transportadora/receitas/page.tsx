@@ -64,7 +64,7 @@ export default function ReceitasPage() {
         try {
             const { data, error } = await supabase
                 .from('gf_manual_revenues')
-                .select('*')
+                .select('id, description, amount, type, reference_month, revenue_date, category, status, transportadora_id, empresa_id, created_at, updated_at')
                 .eq('transportadora_id', carrierId)
                 .order('created_at', { ascending: false })
 

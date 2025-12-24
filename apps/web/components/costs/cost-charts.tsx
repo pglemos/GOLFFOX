@@ -50,7 +50,7 @@ export function CostCharts({ companyId, period = 'month' }: CostChartProps) {
       // Dados mensais (evolução)
       const { data: monthly } = await supabase
         .from('v_costs_breakdown')
-        .select('*')
+        .select('company_id, by_company, by_route, by_vehicle, period_month, period_year')
         .order('company_id')
 
       if (monthly) {

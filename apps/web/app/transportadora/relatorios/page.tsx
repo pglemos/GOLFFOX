@@ -244,7 +244,7 @@ export default function TransportadoraRelatoriosPage() {
           // Buscar documentos vencendo
           const { data: documentsData } = await supabase
             .from('v_carrier_expiring_documents')
-            .select('*')
+            .select('id, document_type, document_name, expiry_date, days_to_expiry, alert_level, transportadora_id, entity_id, entity_type, item_type, entity_name, expiration_date, days_remaining')
             .eq('transportadora_id', transportadoraId)
             .gte('expiry_date', dateStart)
             .lte('expiry_date', dateEnd)

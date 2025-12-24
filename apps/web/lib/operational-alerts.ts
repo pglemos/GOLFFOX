@@ -223,7 +223,7 @@ export async function getUnresolvedAlerts(
     // Priorizar view segura por operador se existir, com fallback para tabela base
     let query = supabase
       .from('v_operador_alerts_secure')
-      .select('*')
+      .select('id, message, title, alert_type, type, severity, is_resolved, assigned_to, empresa_id, company_id, details, metadata, created_at, resolved_at')
       .eq('is_resolved', false)
       .order('created_at', { ascending: false })
       .limit(limit)
@@ -238,7 +238,7 @@ export async function getUnresolvedAlerts(
     if (error) {
       let fallbackQuery = supabase
         .from('gf_alerts')
-        .select('*')
+        .select('id, message, title, alert_type, type, severity, is_resolved, assigned_to, empresa_id, company_id, details, metadata, created_at, resolved_at')
         .eq('is_resolved', false)
         .order('created_at', { ascending: false })
         .limit(limit)

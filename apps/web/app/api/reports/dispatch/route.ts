@@ -210,12 +210,19 @@ async function dispatchPostHandler(request: NextRequest) {
       )
     }
 
-    // Buscar dados da view segura (view materializada - selecionar todas as colunas dinamicamente)
-    // Para views de relatórios, selecionamos todas as colunas pois são agregadas e variam por tipo
-    // Mas podemos otimizar limitando a quantidade de dados retornados
+    // Buscar dados da view segura (view materializada)
+    // Selecionar colunas específicas baseado no tipo de relatório para otimizar performance
+    const columnsByReport: Record<string, string> = {
+      'delays': 'id, date, route_name, trip_id, delay_minutes, reason, hour',
+      'occupancy': 'id, date, route_name, trip_id, hour, avg_occupancy, capacity',
+      'not_boarded': 'id, date, route_name, trip_id, passenger_name, frequency, reason',
+      'efficiency': '*', // View complexa, manter todas as colunas
+      'roi_sla': '*' // View complexa, manter todas as colunas
+    }
+    const columns = columnsByReport[reportKey] || '*'
     const { data, error } = await supabase
       .from(viewName as 'v_reports_delays_secure' | 'v_reports_occupancy_secure' | 'v_reports_not_boarded_secure' | 'v_reports_efficiency_secure' | 'v_reports_roi_sla_secure')
-      .select('*')
+      .select(columns)
       .eq('empresa_id', companyId)
       .limit(1000)
 

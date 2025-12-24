@@ -144,7 +144,7 @@ export function useRouteCreate(isOpen: boolean) {
             // Tentar usar view segura primeiro (pode não existir em todos os ambientes)
             let { data, error } = await (supabase
                 .from("v_company_employees_secure" as never)
-                .select("*")
+                .select("employee_id, name, cpf, address, latitude, longitude, type, is_active, company_id")
                 .eq("company_id", formData.company_id) as unknown as ReturnType<typeof supabase.from<"gf_employee_company">>)
 
             if (error && (error.message?.includes("does not exist") || (error as { code?: string }).code === "PGRST205")) {

@@ -53,7 +53,7 @@ export default function SolicitacoesOperatorPage() {
       if (empresaId) {
         const { data, error } = await supabase
           .from('gf_service_requests')
-          .select('*')
+          .select('id, empresa_id, tipo, status, description, priority, created_at, updated_at, resolved_at')
           .eq('empresa_id', empresaId)
           .order('created_at', { ascending: false })
         

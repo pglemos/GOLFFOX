@@ -42,8 +42,8 @@ export default function ConformidadeOperatorPage() {
         .single()
 
       let query = supabase
-        .from('gf_operador_incidents')
-        .select('*')
+        .from('gf_incidents')
+        .select('id, empresa_id, tipo, severidade, status, description, created_at, updated_at, resolved_at')
         .order('created_at', { ascending: false })
 
       if (userData?.empresa_id) {

@@ -306,7 +306,7 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
       const { data: routeData, error: routeError } = await supabase
         .from("rotas")
         .insert(insertPayload as RotasInsert)
-        .select("*")
+        .select('id, name, empresa_id, description, origin_address, destination_address, scheduled_time, days_of_week, exceptions, holidays, is_active, shift, motorista_id, veiculo_id, polyline, created_at, updated_at')
         .single()
 
       if (routeError) throw routeError

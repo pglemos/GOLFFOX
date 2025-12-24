@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 
 import { requireAuth } from '@/lib/api-auth'
+import { redisCacheService, createCacheKey, withRedisCache } from '@/lib/cache/redis-cache.service'
 import { logger, logError } from '@/lib/logger'
 import { supabaseServiceRole } from '@/lib/supabase-server'
 import { createVehicleSchema, validateWithSchema } from '@/lib/validation/schemas'
@@ -28,20 +29,28 @@ export async function GET(request: NextRequest) {
     const authErrorResponse = await requireAuth(request, 'admin')
     if (authErrorResponse) return authErrorResponse
 
-    // Selecionar apenas colunas principais usadas
-    const { data, error } = await supabaseServiceRole
-      .from('veiculos')
-      .select('id, plate, model, brand, year, capacity, prefix, vehicle_type, fuel_type, color, chassis, renavam, photo_url, is_active, empresa_id, transportadora_id, created_at, updated_at')
-      .order('created_at', { ascending: false })
+    // ✅ Cache Redis para lista de veículos (TTL: 5 minutos)
+    const cacheKey = createCacheKey('veiculos', 'list')
+    
+    const data = await withRedisCache(
+      cacheKey,
+      async () => {
+        // Selecionar apenas colunas principais usadas
+        const { data, error } = await supabaseServiceRole
+          .from('veiculos')
+          .select('id, plate, model, brand, year, capacity, prefix, vehicle_type, fuel_type, color, chassis, renavam, photo_url, is_active, empresa_id, transportadora_id, created_at, updated_at')
+          .order('created_at', { ascending: false })
 
-    if (error) {
-      return NextResponse.json(
-        { error: 'Erro ao buscar veículos', message: error.message },
-        { status: 500 }
-      )
-    }
+        if (error) {
+          throw error
+        }
 
-    return NextResponse.json(data || [])
+        return data || []
+      },
+      300 // 5 minutos
+    )
+
+    return NextResponse.json(data)
   } catch (err) {
     const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'
     return NextResponse.json(

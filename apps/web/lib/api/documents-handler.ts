@@ -70,10 +70,10 @@ export function createDocumentsHandler(config: DocumentHandlerConfig) {
                 )
             }
 
-            // Buscar documentos
+            // Buscar documentos (selecionar apenas colunas comuns a todas as tabelas de documentos)
             const { data: documents, error } = await supabaseAdmin
                 .from(docConfig.table)
-                .select('*')
+                .select('id, document_type, document_number, expiry_date, file_url, file_name, is_valid, created_at, updated_at')
                 .eq(docConfig.foreignKey, entityId)
                 .order('document_type', { ascending: true })
 

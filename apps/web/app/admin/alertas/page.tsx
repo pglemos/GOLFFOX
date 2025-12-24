@@ -47,7 +47,7 @@ async function fetchAlertas(severity?: string, status?: string): Promise<Alerta[
     // Usar gf_alerts (tabela correta com dados) ao invés de gf_incidents (vazia)
     let query = supabaseAdmin
       .from('gf_alerts')
-      .select('*')
+      .select('id, message, title, alert_type, type, severity, is_resolved, assigned_to, empresa_id, company_id, details, metadata, created_at, resolved_at')
       .order('created_at', { ascending: false })
       .limit(100)
 

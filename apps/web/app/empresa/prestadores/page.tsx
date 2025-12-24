@@ -58,7 +58,7 @@ export default function PrestadoresOperatorPage() {
         // View não está nos tipos do Supabase, mas existe no banco
         const { data, error } = await supabase
           .from('v_operador_assigned_carriers')
-          .select('*')
+          .select('id, empresa_id, transportadora_id, carrier_name, period_start, period_end, avg_punctuality, avg_availability, created_at')
           .eq('empresa_id', userData.empresa_id)
         
         if (error) {

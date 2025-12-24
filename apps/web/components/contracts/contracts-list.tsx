@@ -41,7 +41,7 @@ export function ContractsList({ companyId }: ContractsListProps) {
             try {
                 const { data, error } = await supabase
                     .from('gf_contracts')
-                    .select('*')
+                    .select('id, name, start_date, end_date, value_amount, status, terms_url, empresa_id, created_at, updated_at')
                     .eq('empresa_id', companyId)
                     .order('created_at', { ascending: false })
 

@@ -134,7 +134,7 @@ export function MotoristaModal({ motorista, isOpen, onClose, onSave, carriers = 
       // Carregar documentos do motorista
       const { data: docs } = await supabase
         .from("gf_driver_documents")
-        .select("*")
+        .select("id, driver_id, document_type, document_number, expiry_date, file_url, file_name, is_valid, created_at, updated_at")
         .eq("driver_id", motoristaId)
         .order("created_at", { ascending: false })
 

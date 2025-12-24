@@ -41,7 +41,7 @@ export default function OperatorRotasPage() {
       if (!tenantCompanyId) return []
       const { data, error } = await supabase
         .from("v_operador_routes_secure")
-        .select("*")
+        .select("id, name, description, empresa_id, transportadora_id, is_active, created_at, updated_at")
         .order("name", { ascending: true })
 
       if (error) throw error

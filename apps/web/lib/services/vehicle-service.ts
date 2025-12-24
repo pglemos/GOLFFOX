@@ -31,7 +31,7 @@ export class VehicleService extends BaseService {
     static async listVehicles(transportadoraId: string): Promise<Vehicle[]> {
         const { data: vehicles, error } = await supabase
             .from('veiculos')
-            .select('*')
+            .select('id, plate, model, brand, year, capacity, prefix, vehicle_type, fuel_type, color, chassis, renavam, photo_url, is_active, empresa_id, transportadora_id, created_at, updated_at')
             .eq('transportadora_id', transportadoraId)
             .order('created_at', { ascending: false })
 
