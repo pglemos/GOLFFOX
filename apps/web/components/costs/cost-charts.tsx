@@ -2,19 +2,13 @@
 
 import { useState, useEffect } from "react"
 
+import dynamic from "next/dynamic"
 import { TrendingUp, DollarSign, Route, Truck, Users, Building2 } from "lucide-react"
-import { 
-  LineChart, 
-  Line, 
-  BarChart, 
-  Bar, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  Legend, 
-  ResponsiveContainer 
-} from "recharts"
+// Lazy load componentes pesados do recharts
+const LineChart = dynamic(() => import("recharts").then((mod) => mod.LineChart), { ssr: false })
+const BarChart = dynamic(() => import("recharts").then((mod) => mod.BarChart), { ssr: false })
+const ResponsiveContainer = dynamic(() => import("recharts").then((mod) => mod.ResponsiveContainer), { ssr: false })
+import { Line, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from "recharts"
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"

@@ -41,11 +41,16 @@ let nextConfig = {
       '@radix-ui/react-dialog',
       '@radix-ui/react-dropdown-menu',
       '@radix-ui/react-select',
+      '@radix-ui/react-popover',
+      '@radix-ui/react-tabs',
+      '@radix-ui/react-toast',
       '@tanstack/react-table',
       '@tanstack/react-query',
       'recharts',
+      'lucide-react', // Otimizar imports de ícones (bundle grande)
       '@googlemaps/js-api-loader',
       '@react-google-maps/api',
+      'framer-motion', // Otimizar imports de animações
     ],
     // instrumentationHook não é mais necessário no Next.js 16.1.0+
     // O arquivo instrumentation.ts é detectado automaticamente

@@ -14,7 +14,7 @@ export type { SupabaseClient } from '@supabase/supabase-js'
 export { getSupabaseAdmin } from './server'
 
 // Session helpers
-export { ensureSupabaseSession, getAccessTokenFromGolffoxCookie } from './session'
+export { ensureSupabaseSession } from './session'
 
 // Client helper
 export { getSupabaseClient } from './client-helper'

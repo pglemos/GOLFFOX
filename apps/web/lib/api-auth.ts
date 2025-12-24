@@ -119,37 +119,9 @@ export async function validateAuth(request: NextRequest): Promise<AuthenticatedU
       }
     }
 
-    // 3. ✅ CORREÇÃO: Tentar obter token do cookie customizado (golffox-session)
-    // O cookie customizado PODE conter accessToken quando setado via API de login
-    if (!accessToken) {
-      const sessionCookie = request.cookies.get('golffox-session')?.value
-      if (sessionCookie) {
-        try {
-          const sessionData = decodeBase64Json(sessionCookie)
-          if (sessionData) {
-            // Tentar accessToken primeiro (formato atual do login)
-            const token = sessionData.accessToken as string || sessionData.access_token as string
-            if (token) {
-              accessToken = token
-              tokenSource = 'golffox-session'
-              debug('Token encontrado no cookie golffox-session', {
-                hasAccessToken: !!sessionData.accessToken,
-                hasAccess_token: !!sessionData.access_token
-              }, 'ApiAuth')
-            } else {
-              // Se não tem token mas tem dados do usuário, logar para debug
-              debug('Cookie golffox-session encontrado mas sem accessToken', {
-                hasId: !!sessionData.id,
-                hasRole: !!sessionData.role,
-                keys: Object.keys(sessionData)
-              }, 'ApiAuth')
-            }
-          }
-        } catch (e) {
-          warn('Erro ao processar cookie golffox-session', { error: e }, 'ApiAuth')
-        }
-      }
-    }
+    // 3. ✅ SEGURANÇA: Cookie customizado (golffox-session) NÃO contém mais access_token
+    // O access_token foi removido do cookie por segurança
+    // Não tentar ler token do cookie customizado - usar apenas cookie do Supabase ou header
 
     // ✅ CORREÇÃO: Se não encontrou token mas tem cookie golffox-session válido, usar dados do cookie
     if (!accessToken) {

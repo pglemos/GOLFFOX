@@ -2,22 +2,14 @@
 
 import { useMemo } from "react"
 
+import dynamic from "next/dynamic"
 import { TrendingUp, Users, DollarSign } from "lucide-react"
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-  BarChart,
-  Bar,
-  PieChart,
-  Pie,
-  Cell,
-} from "recharts"
+// Lazy load componentes pesados do recharts
+const LineChart = dynamic(() => import("recharts").then((mod) => mod.LineChart), { ssr: false })
+const BarChart = dynamic(() => import("recharts").then((mod) => mod.BarChart), { ssr: false })
+const PieChart = dynamic(() => import("recharts").then((mod) => mod.PieChart), { ssr: false })
+const ResponsiveContainer = dynamic(() => import("recharts").then((mod) => mod.ResponsiveContainer), { ssr: false })
+import { Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Bar, Pie, Cell } from "recharts"
 
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 

@@ -2,9 +2,13 @@
 
 import { useEffect, useState } from "react"
 
+import dynamic from "next/dynamic"
 import { motion } from "framer-motion"
 import { Truck, Search, MapPin, FileText, Wrench, AlertCircle, Upload, Download, Grid3x3, List, Filter } from "lucide-react"
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
+// Lazy load componentes pesados do recharts
+const BarChart = dynamic(() => import("recharts").then((mod) => mod.BarChart), { ssr: false })
+const ResponsiveContainer = dynamic(() => import("recharts").then((mod) => mod.ResponsiveContainer), { ssr: false })
+import { Bar, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts"
 
 import { AppShell } from "@/components/app-shell"
 import { DocumentList } from "@/components/documents/document-list"

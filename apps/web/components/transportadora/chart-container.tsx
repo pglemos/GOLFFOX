@@ -1,6 +1,8 @@
 "use client"
 
-import { ResponsiveContainer } from "recharts"
+import dynamic from "next/dynamic"
+// Lazy load ResponsiveContainer para reduzir bundle size inicial
+const ResponsiveContainer = dynamic(() => import("recharts").then((mod) => mod.ResponsiveContainer), { ssr: false })
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { cn } from "@/lib/utils"

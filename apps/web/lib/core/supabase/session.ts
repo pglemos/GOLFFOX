@@ -4,57 +4,24 @@ import { supabase } from './client'
 
 import type { Session } from '@supabase/supabase-js'
 
-let bootstrapPromise: Promise<Session | null> | null = null
+/**
+ * ✅ SEGURANÇA: Removida função getAccessTokenFromGolffoxCookie()
+ * O access_token não é mais armazenado no cookie customizado por segurança
+ * O Supabase gerencia sua própria sessão via cookie sb-${projectRef}-auth-token
+ */
 
-export function getAccessTokenFromGolffoxCookie(): string | null {
-  if (typeof document === 'undefined') return null
-
-  const match = document.cookie.match(/(?:^|;\\s*)golffox-session=([^;]+)/)
-  if (!match) return null
-
-  try {
-    const raw = match[1]
-    let decoded: string
-    try {
-      decoded = atob(raw)
-    } catch {
-      decoded = decodeURIComponent(raw)
-    }
-    const parsed = JSON.parse(decoded)
-    const token = parsed?.access_token || parsed?.accessToken
-    return typeof token === 'string' && token.length > 0 ? token : null
-  } catch {
-    return null
-  }
-}
-
+/**
+ * Garante que a sessão do Supabase está disponível
+ * Confia apenas na sessão gerenciada pelo próprio Supabase
+ * Não tenta ler tokens do cookie customizado por segurança
+ */
 export async function ensureSupabaseSession(): Promise<Session | null> {
   if (typeof window === 'undefined') return null
 
+  // O Supabase já gerencia sua própria sessão via cookies
+  // Não precisamos mais tentar ler tokens do cookie customizado
   const { data: { session } } = await supabase.auth.getSession()
-  if (session) return session
-
-  const token = getAccessTokenFromGolffoxCookie()
-  if (!token) return null
-
-  if (!bootstrapPromise) {
-    bootstrapPromise = (async () => {
-      debug('[SupabaseSession] Iniciando bootstrap da sessão via cookie', {}, 'SupabaseSession')
-      const { data, error } = await supabase.auth.setSession({
-        access_token: token,
-        refresh_token: token,
-      })
-      if (error) {
-        warn('[SupabaseSession] Falha ao definir sessão via cookie', { error: error.message }, 'SupabaseSession')
-        return null
-      }
-      debug('[SupabaseSession] Sessão sincronizada com sucesso via cookie', {}, 'SupabaseSession')
-      return data.session
-    })().finally(() => {
-      bootstrapPromise = null
-    })
-  }
-
-  return bootstrapPromise
+  
+  return session
 }
 

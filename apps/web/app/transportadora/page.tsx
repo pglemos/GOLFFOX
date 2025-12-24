@@ -35,7 +35,12 @@ import {
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "@/lib/next-navigation"
 import { useAuth } from "@/components/providers/auth-provider"
-import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts"
+// Lazy load recharts para reduzir bundle size inicial
+import dynamic from "next/dynamic"
+const LineChart = dynamic(() => import("recharts").then((mod) => mod.LineChart), { ssr: false })
+const BarChart = dynamic(() => import("recharts").then((mod) => mod.BarChart), { ssr: false })
+const PieChart = dynamic(() => import("recharts").then((mod) => mod.PieChart), { ssr: false })
+import { Line, Bar, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts"
 import { AppShell } from "@/components/app-shell"
 import { KpiCard } from "@/components/kpi-card"
 import { FilterDrawer } from "@/components/shared/filter-drawer"

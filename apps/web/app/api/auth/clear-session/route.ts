@@ -13,25 +13,22 @@ export async function POST(req: NextRequest) {
     const url = new URL(req.url)
     const isSecure = url.protocol === "https:"
 
-    // Extra: ler cookie atual para registro/auditoria mínima e invalidar cache
+    // ✅ SEGURANÇA: Cookie não contém mais access_token
+    // Ler cookie atual apenas para registro/auditoria mínima
     const existing = req.cookies.get("golffox-session")?.value
     let userMeta: Record<string, unknown> | null = null
-    let accessToken: string | null = null
     if (existing) {
       try {
         const decoded = Buffer.from(existing, "base64").toString("utf-8")
         userMeta = JSON.parse(decoded)
-        // Extrair token para invalidar cache
-        accessToken = userMeta?.access_token || userMeta?.accessToken || null
+        // ✅ access_token não está mais no cookie, não tentar ler
       } catch (_e) {
         userMeta = null
       }
     }
 
-    // Invalidar cache de autenticação se houver token
-    if (accessToken) {
-      invalidateCachedAuth(accessToken)
-    }
+    // ✅ Nota: Cache de autenticação será invalidado naturalmente quando o token expirar
+    // ou quando o usuário fizer logout do Supabase (que gerencia sua própria sessão)
 
     const res = NextResponse.json({ ok: true, cleared: true, user: userMeta || null })
 

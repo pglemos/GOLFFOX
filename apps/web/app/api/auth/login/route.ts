@@ -622,7 +622,8 @@ async function loginHandler(req: NextRequest) {
       : new NextResponse(null, { status: 303, headers: { Location: redirectPath } })
 
     // ✅ Criar cookie customizado no servidor para autenticação nas rotas API
-    // ✅ CORREÇÃO: Incluir access_token para que validateAuth funcione corretamente
+    // ✅ SEGURANÇA: NÃO incluir access_token no cookie por segurança
+    // O access_token deve ser obtido apenas do cookie do Supabase ou header Authorization
     // O cookie é usado pelo proxy/middleware para validar sessão via Supabase
     const sessionPayload = {
       id: userPayload.id,
@@ -630,10 +631,8 @@ async function loginHandler(req: NextRequest) {
       name: userPayload.name,
       role: userPayload.role,
       companyId: userPayload.companyId,
-      avatar_url: userPayload.avatar_url,
-      // ✅ OBRIGATÓRIO: Incluir access_token para que o middleware e o validateAuth funcionem
-      accessToken: data.session.access_token,
-      refreshToken: data.session.refresh_token
+      avatar_url: userPayload.avatar_url
+      // ✅ access_token e refreshToken removidos por segurança
     }
     const sessionCookieValue = Buffer.from(JSON.stringify(sessionPayload)).toString('base64')
 

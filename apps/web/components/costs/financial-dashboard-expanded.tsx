@@ -28,21 +28,13 @@ import {
     RefreshCw,
     ChevronRight,
 } from "lucide-react"
-import {
-    LineChart,
-    Line,
-    BarChart,
-    Bar,
-    PieChart as RechartsPie,
-    Pie,
-    Cell,
-    XAxis,
-    YAxis,
-    CartesianGrid,
-    Tooltip,
-    ResponsiveContainer,
-    Legend,
-} from "recharts"
+import dynamic from "next/dynamic"
+// Lazy load componentes pesados do recharts
+const LineChart = dynamic(() => import("recharts").then((mod) => mod.LineChart), { ssr: false })
+const BarChart = dynamic(() => import("recharts").then((mod) => mod.BarChart), { ssr: false })
+const RechartsPie = dynamic(() => import("recharts").then((mod) => mod.PieChart), { ssr: false })
+const ResponsiveContainer = dynamic(() => import("recharts").then((mod) => mod.ResponsiveContainer), { ssr: false })
+import { Line, Bar, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from "recharts"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"

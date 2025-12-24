@@ -67,20 +67,21 @@ async function setSessionHandler(req: NextRequest) {
 
     const body = await req.json()
     const user: UserData | undefined = body?.user
-    const accessToken: string | undefined = body?.access_token || body?.token
 
     if (!user || !user.id || !user.email || !user.role) {
       return NextResponse.json({ error: "invalid_user_payload" }, { status: 400 })
     }
 
-    // Payload no cookie (INCLUI access_token para validateAuth)
+    // ✅ SEGURANÇA: Payload no cookie SEM access_token
+    // O access_token NÃO deve ser armazenado no cookie por segurança
+    // O token deve ser obtido apenas do cookie do Supabase ou header Authorization
     // Cookie é HttpOnly, então não é acessível via JavaScript (proteção XSS)
     const sessionPayload = {
       id: user.id,
       email: user.email,
       role: user.role,
-      companyId: user.companyId ?? null,
-      accessToken: accessToken || null
+      companyId: user.companyId ?? null
+      // ✅ access_token removido por segurança
     }
 
     // Serializa como Base64 (padrão do sistema)
@@ -94,7 +95,7 @@ async function setSessionHandler(req: NextRequest) {
 
     debug('set-session: preparando cookie', {
       user: { id: user.id, role: user.role },
-      // Nota: accessToken não é mais armazenado no cookie por segurança
+      // ✅ accessToken não é mais armazenado no cookie por segurança
       host,
       isSecure,
       isDev

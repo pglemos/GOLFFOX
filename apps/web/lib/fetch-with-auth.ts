@@ -3,12 +3,13 @@
  * Sempre busca o token da sessão do Supabase e inclui no header Authorization
  */
 
-import { error as logError, warn, debug } from './logger'
-import { supabase, ensureSupabaseSession, getAccessTokenFromGolffoxCookie } from '@/lib/core/supabase'
+import { error as logError, debug } from './logger'
+import { supabase, ensureSupabaseSession } from '@/lib/core/supabase'
 
 /**
  * Obtém o token de acesso da sessão do Supabase
- * Prioriza: 1. Sessão em memória, 2. Cookie de sessão (rápido), 3. Bootstrap (lento)
+ * ✅ SEGURANÇA: Não tenta ler token do cookie customizado
+ * Prioriza: 1. Sessão em memória, 2. Bootstrap da sessão do Supabase
  */
 export async function getAuthToken(): Promise<string | null> {
   try {
@@ -16,15 +17,9 @@ export async function getAuthToken(): Promise<string | null> {
     const { data: { session } } = await supabase.auth.getSession()
     if (session?.access_token) return session.access_token
 
-    // 2. Tentar obter o token diretamente do cookie customizado (Estratégia "Fastest")
-    // Isso evita esperar pelo bootstrap do Supabase nas primeiras requisições
-    const cookieToken = getAccessTokenFromGolffoxCookie()
-    if (cookieToken) {
-      debug('Usando token extraído diretamente do cookie para a requisição', {}, 'FetchWithAuth')
-      // Opcional: Garante o bootstrap em background para futuras chamadas
-      ensureSupabaseSession()
-      return cookieToken
-    }
+    // 2. ✅ SEGURANÇA: Não tentar ler token do cookie customizado
+    // O access_token foi removido do cookie por segurança
+    // O Supabase gerencia sua própria sessão via cookie sb-${projectRef}-auth-token
 
     // 3. Fallback final: Tentar assegurar bootstrap completo
     const guaranteedSession = await ensureSupabaseSession()
