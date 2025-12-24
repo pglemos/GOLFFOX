@@ -45,7 +45,7 @@ export async function GET(
     // Selecionar apenas colunas necessárias para listagem (otimização de performance)
     const documentColumns = 'id,veiculo_id,document_type,document_number,file_url,file_name,issue_date,expiry_date,value_brl,insurance_company,policy_number,status,notes,created_at,updated_at'
     const { data, error } = await supabaseServiceRole
-      .from('vehicle_documents' as any)
+      .from('vehicle_documents')
       .select(documentColumns)
       .eq('veiculo_id', params.vehicleId)
       .order('created_at', { ascending: false })
@@ -81,7 +81,7 @@ export async function POST(
     const validated = documentSchema.parse(body)
 
     const { data, error } = await supabaseServiceRole
-      .from('vehicle_documents' as any)
+      .from('vehicle_documents')
       .insert({
         veiculo_id: params.vehicleId,
         ...validated,

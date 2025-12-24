@@ -45,7 +45,7 @@ export default function OperatorRotasPage() {
         .order("name", { ascending: true })
 
       if (error) throw error
-      return (data as any[]) || []
+      return data || []
     },
     enabled: !!tenantCompanyId
   })
@@ -56,8 +56,10 @@ export default function OperatorRotasPage() {
   // Mapeia quais rotas estão ativas para acesso O(1)
   const activeRouteIds = useMemo(() => {
     const ids = new Set<string>()
-    activeTrips.forEach((trip: any) => {
-      if (trip.route_id) ids.add(trip.route_id)
+    activeTrips.forEach((trip) => {
+      if (trip && 'route_id' in trip && typeof trip.route_id === 'string') {
+        ids.add(trip.route_id)
+      }
     })
     return ids
   }, [activeTrips])
@@ -96,7 +98,7 @@ export default function OperatorRotasPage() {
         <div className="min-h-screen flex items-center justify-center p-4">
           <Card className="p-8 max-w-md w-full text-center">
             <h2 className="text-xl font-bold mb-2 text-error">Erro ao carregar</h2>
-            <p className="text-ink-muted mb-4">{tenantError || (rotasError as any)?.message}</p>
+            <p className="text-ink-muted mb-4">{tenantError || (rotasError instanceof Error ? rotasError.message : String(rotasError))}</p>
             <Button onClick={() => window.location.reload()} variant="default">
               Tentar Novamente
             </Button>

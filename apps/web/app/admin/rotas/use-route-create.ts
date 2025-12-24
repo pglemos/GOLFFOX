@@ -139,12 +139,13 @@ export function useRouteCreate(isOpen: boolean) {
 
         setLoadingEmployees(true)
         try {
-            let { data, error } = await supabase
-                .from("v_company_employees_secure" as any)
+            // Tentar usar view segura primeiro (pode não existir em todos os ambientes)
+            let { data, error } = await (supabase
+                .from("v_company_employees_secure" as never)
                 .select("*")
-                .eq("company_id", formData.company_id) as any
+                .eq("company_id", formData.company_id) as unknown as ReturnType<typeof supabase.from<"gf_employee_company">>)
 
-            if (error && (error.message?.includes("does not exist") || (error as any).code === "PGRST205")) {
+            if (error && (error.message?.includes("does not exist") || (error as { code?: string }).code === "PGRST205")) {
                 try {
                     const response = await fetch(`/api/admin/employees-list?company_id=${formData.company_id}`, {
                         method: 'GET',
@@ -165,14 +166,14 @@ export function useRouteCreate(isOpen: boolean) {
 
                 const { data: empData, error: empError } = await supabase
                     .from("gf_employee_company")
-                    .select("id, company_id, name, cpf, address, latitude, longitude")
-                    .eq("company_id", formData.company_id)
+                    .select("id, empresa_id, name, cpf, address, latitude, longitude")
+                    .eq("empresa_id", formData.company_id)
 
                 if (empError) throw empError
 
-                data = (empData || []).map((emp: any) => ({
+                data = (empData || []).map((emp) => ({
                     employee_id: emp.id,
-                    company_id: emp.company_id,
+                    company_id: emp.empresa_id,
                     first_name: emp.name?.split(" ")[0] || "",
                     last_name: emp.name?.split(" ").slice(1).join(" ") || "",
                     cpf: emp.cpf || "",
@@ -182,7 +183,7 @@ export function useRouteCreate(isOpen: boolean) {
                     zipcode: "",
                     lat: emp.latitude ? parseFloat(emp.latitude.toString()) : null,
                     lng: emp.longitude ? parseFloat(emp.longitude.toString()) : null,
-                })) as any
+                })) as EmployeeLite[]
 
                 setEmployees((data || []) as unknown as EmployeeLite[])
                 return
@@ -209,8 +210,8 @@ export function useRouteCreate(isOpen: boolean) {
                 .eq("id", formData.company_id)
                 .maybeSingle()
 
-            if (data && (data as any).address) {
-                const address = (data as any).address
+            if (data && data.address) {
+                const address = data.address
                 const geocoded = await geocodeAddress(address)
                 if (geocoded) {
                     setFormData((prev) => ({

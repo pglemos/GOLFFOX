@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 
 import { logError } from '@/lib/logger'
 import { getSupabaseAdmin } from '@/lib/supabase-client'
+import type { Database } from '@/types/supabase'
+
+type CostsVsBudgetRow = Database['public']['Views']['v_costs_vs_budget']['Row']
 
 export async function GET(request: NextRequest) {
   try {
@@ -18,7 +21,7 @@ export async function GET(request: NextRequest) {
     // Buscar dados da view v_costs_vs_budget (view materializada - selecionar todas as colunas)
     const supabase = getSupabaseAdmin()
     const { data, error } = await supabase
-      .from('v_costs_vs_budget' as any)
+      .from('v_costs_vs_budget')
       .select('*')
       .eq('company_id', companyId)
       .order('period_year', { ascending: false })

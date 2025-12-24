@@ -429,7 +429,7 @@ async function runReportHandler(request: NextRequest): Promise<NextResponse> {
 export const POST = withRateLimit(runReportHandler, 'sensitive')
 
 // Formatar número para separador decimal BR (vírgula)
-function formatNumberBR(value: any): string {
+function formatNumberBR(value: number | string | null | undefined): string {
   if (value === null || value === undefined) return ''
   const num = typeof value === 'number' ? value : parseFloat(value)
   if (isNaN(num)) return String(value)
@@ -437,14 +437,14 @@ function formatNumberBR(value: any): string {
   return num.toFixed(2).replace('.', ',')
 }
 
-function generateCSV(data: any[], columns: string[], reportKey: string) {
+function generateCSV(data: Record<string, unknown>[], columns: string[], reportKey: string) {
   // Filtrar apenas colunas válidas e formatar números
   const filteredData = data.map(row => {
-    const filtered: any = {}
+    const filtered: Record<string, unknown> = {}
     columns.forEach(col => {
-      if ((row as any)[col] !== undefined) {
+      if (row[col] !== undefined) {
         // Formatar números com vírgula decimal
-        const value = (row as any)[col]
+        const value = row[col]
         if (typeof value === 'number') {
           filtered[col] = formatNumberBR(value)
         } else {
@@ -518,7 +518,7 @@ async function generateCSVStream(
         }
         for (const row of page) {
           const cells = columns.map((col) => {
-            const v = (row as any)[col]
+            const v = row[col]
             if (typeof v === 'number') {
               return formatNumberBR(v)
             }
@@ -542,23 +542,24 @@ async function generateCSVStream(
   })
 }
 
-async function generateExcel(data: any[], columns: string[], reportKey: string) {
+async function generateExcel(data: Record<string, unknown>[], columns: string[], reportKey: string) {
   try {
     // Dynamic import para evitar bundle no client
     const XLSX = await import('@e965/xlsx')
 
     // Filtrar apenas colunas válidas
     const filteredData = data.map(row => {
-      const filtered: any = {}
+      const filtered: Record<string, unknown> = {}
       columns.forEach(col => {
-        if ((row as any)[col] !== undefined) {
-          filtered[col] = (row as any)[col]
+        if (row[col] !== undefined) {
+          filtered[col] = row[col]
         }
       })
       return filtered
     })
 
     // Se não há dados, criar worksheet vazio com header
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let worksheet: any
     if (filteredData.length === 0) {
       // Criar worksheet vazio com apenas header
@@ -693,7 +694,7 @@ async function generatePDF(data: any[], columns: string[], reportKey: string) {
           }
           x = 50
           columns.slice(0, 4).forEach((col, i) => {
-            const value = String((row as any)[col] || '')
+            const value = String((row[col] ?? '') || '')
             doc.text(value.substring(0, 30), x, doc.y, { width: colWidths[i] })
             x += colWidths[i]
           })

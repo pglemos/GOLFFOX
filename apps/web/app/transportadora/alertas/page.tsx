@@ -41,10 +41,10 @@ export default function AlertasPage() {
 
   // Contadores
   const alertCounts = {
-    veiculo_parado: alerts.filter((a: any) => a.alert_type === "veiculo_parado" && !a.is_resolved).length,
-    critico: alerts.filter((a: any) => a.severity === "critical" && !a.is_resolved).length,
-    aviso: alerts.filter((a: any) => a.severity === "warning" && !a.is_resolved).length,
-    informativo: alerts.filter((a: any) => a.severity === "info" && !a.is_resolved).length,
+    veiculo_parado: alerts.filter((a: { alert_type?: string; is_resolved?: boolean }) => a.alert_type === "veiculo_parado" && !a.is_resolved).length,
+    critico: alerts.filter((a: { severity?: string; is_resolved?: boolean }) => a.severity === "critical" && !a.is_resolved).length,
+    aviso: alerts.filter((a: { severity?: string; is_resolved?: boolean }) => a.severity === "warning" && !a.is_resolved).length,
+    informativo: alerts.filter((a: { severity?: string; is_resolved?: boolean }) => a.severity === "info" && !a.is_resolved).length,
   }
 
   const handleResolve = (alertId: string) => {
@@ -98,7 +98,7 @@ export default function AlertasPage() {
         name: transportadoraName,
         email: user.email || '',
         role: 'transportadora',
-        avatar_url: (user as any).avatar_url
+        avatar_url: user.avatar_url || undefined
       } : {
         id: '',
         name: transportadoraName || 'Transportadora',

@@ -94,7 +94,7 @@ export default function SincronizarPage() {
             if (optimized) {
               // Limpar pontos antigos
               await supabase
-                .from("gf_route_plan" as any)
+                .from("gf_route_plan")
                 .delete()
                 .eq("rota_id", rota.id)
 
@@ -103,7 +103,7 @@ export default function SincronizarPage() {
                 const ponto = optimized.optimized[i]
                 if (ponto && ponto.lat && ponto.lng) {
                   await supabase
-                    .from("gf_route_plan" as any)
+                    .from("gf_route_plan")
                     .insert({
                       rota_id: rota.id,
                       stop_order: i + 1,

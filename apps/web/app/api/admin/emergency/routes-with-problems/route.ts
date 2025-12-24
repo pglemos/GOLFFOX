@@ -3,6 +3,14 @@ import { NextRequest, NextResponse } from 'next/server'
 import { requireAuth } from '@/lib/api-auth'
 import { logError } from '@/lib/logger'
 import { getSupabaseAdmin } from '@/lib/supabase-client'
+import type { Database } from '@/types/supabase'
+
+type IncidentRow = Database['public']['Tables']['gf_incidents']['Row']
+type AssistanceRequestRow = Database['public']['Tables']['gf_assistance_requests']['Row']
+type RotasRow = Database['public']['Tables']['rotas']['Row']
+type ViagemRow = Database['public']['Tables']['viagens']['Row']
+type VeiculoRow = Database['public']['Tables']['veiculos']['Row']
+type UserRow = Database['public']['Tables']['users']['Row']
 
 export const runtime = 'nodejs'
 
@@ -55,20 +63,20 @@ export async function GET(req: NextRequest) {
     // Filtrar rotas que têm problemas
     const routeIdsWithProblems = new Set<string>()
     
-    ;(incidents || [] as any[]).forEach((incident: any) => {
+    ;(incidents || [] as IncidentRow[]).forEach((incident) => {
       if (incident.rota_id) {
         routeIdsWithProblems.add(incident.rota_id)
       }
     })
 
-    ;(assistanceRequests || [] as any[]).forEach((request: any) => {
+    ;(assistanceRequests || [] as AssistanceRequestRow[]).forEach((request) => {
       if (request.rota_id) {
         routeIdsWithProblems.add(request.rota_id)
       }
     })
 
     // Buscar informações de veículos e motoristas através das viagens ativas
-    const routesWithProblemsList = ((allRoutes || []) as any[]).filter((route: any) => routeIdsWithProblems.has(route.id))
+    const routesWithProblemsList = ((allRoutes || []) as RotasRow[]).filter((route) => routeIdsWithProblems.has(route.id))
     
     // Buscar viagens ativas para essas rotas
     const routeIdsArray = Array.from(routeIdsWithProblems)
@@ -82,7 +90,7 @@ export async function GET(req: NextRequest) {
     const routeVehicleMap = new Map<string, string>()
     const routeDriverMap = new Map<string, string>()
     
-    ;((activeTrips as any)?.data || []).forEach((trip: any) => {
+    ;(activeTrips?.data || [] as ViagemRow[]).forEach((trip) => {
       if (trip.veiculo_id) routeVehicleMap.set(trip.rota_id, trip.veiculo_id)
       if (trip.motorista_id) routeDriverMap.set(trip.rota_id, trip.motorista_id)
     })
@@ -101,11 +109,11 @@ export async function GET(req: NextRequest) {
       .select('id, name, email')
       .in('id', driverIds) : { data: [] }
 
-    const vehiclesMap = new Map(((veiculos || []) as any[]).map((v: any) => [v.id, v]))
-    const driversMap = new Map(((motoristas || []) as any[]).map((d: any) => [d.id, d]))
+    const vehiclesMap = new Map(((veiculos || []) as VeiculoRow[]).map((v) => [v.id, v]))
+    const driversMap = new Map(((motoristas || []) as UserRow[]).map((d) => [d.id, d]))
 
     // Formatar rotas com informações completas
-    const formattedRoutes = routesWithProblemsList.map((route: any) => {
+    const formattedRoutes = routesWithProblemsList.map((route: RotasRow) => {
       const vehicleId = routeVehicleMap.get(route.id)
       const driverId = routeDriverMap.get(route.id)
       const veiculo = vehicleId ? vehiclesMap.get(vehicleId) : null
@@ -117,16 +125,16 @@ export async function GET(req: NextRequest) {
         origin: route.origin || '',
         destination: route.destination || '',
         veiculo: veiculo ? {
-          id: (veiculo as any).id,
-          plate: (veiculo as any).plate,
-          model: (veiculo as any).model
+          id: veiculo.id,
+          plate: veiculo.plate,
+          model: veiculo.model
         } : null,
         motorista: motorista ? {
-          id: (motorista as any).id,
-          name: (motorista as any).name,
-          email: (motorista as any).email
+          id: motorista.id,
+          name: motorista.name,
+          email: motorista.email
         } : null,
-        displayName: `${route.name}${veiculo || motorista ? ` (Veículo: ${(veiculo as any)?.plate || 'N/A'} / Motorista: ${(motorista as any)?.name || 'N/A'})` : ''}`
+        displayName: `${route.name}${veiculo || motorista ? ` (Veículo: ${veiculo?.plate || 'N/A'} / Motorista: ${motorista?.name || 'N/A'})` : ''}`
       }
     })
 

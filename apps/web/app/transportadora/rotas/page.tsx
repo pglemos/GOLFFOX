@@ -73,7 +73,7 @@ export default function TransportadoraRotasPage() {
 
             if (error) throw error
 
-            const formattedRoutes = (data || []).map((r: any) => ({
+            const formattedRoutes = (data || []).map((r: { motorista?: { name?: string } | null; veiculo?: { plate?: string } | null; [key: string]: unknown }) => ({
                 ...r,
                 motorista_name: r.motorista?.name,
                 vehicle_plate: r.veiculo?.plate,

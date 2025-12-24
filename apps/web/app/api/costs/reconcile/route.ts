@@ -6,6 +6,9 @@ import { requireAuth } from '@/lib/api-auth'
 import { logError } from '@/lib/logger'
 import { withRateLimit } from '@/lib/rate-limit'
 import { getSupabaseAdmin } from '@/lib/supabase-client'
+import type { Database } from '@/types/supabase'
+
+type CostsConciliationRow = Database['public']['Views']['v_costs_conciliation']['Row']
 
 const reconcileSchema = z.object({
   invoice_id: z.string().uuid(),
@@ -70,7 +73,7 @@ async function reconcileHandler(request: NextRequest) {
     }
 
     // Verificar se há divergência significativa
-    const conciliationDataTyped = conciliationData as any
+    const conciliationDataTyped = conciliationData as CostsConciliationRow
     const hasSignificantDiscrepancy =
       Math.abs(conciliationDataTyped.discrepancy_amount || 0) > validated.discrepancy_threshold_amount ||
       (conciliationDataTyped.discrepancy_percent || 0) > validated.discrepancy_threshold_percent
@@ -87,7 +90,7 @@ async function reconcileHandler(request: NextRequest) {
 
     const updateData: Record<string, unknown> = {
       reconciliation_status: status,
-      notes: validated.notes || (conciliationData as any).notes
+      notes: validated.notes || (conciliationData as CostsConciliationRow).notes || null
     }
 
     if (validated.action === 'approve') {

@@ -429,7 +429,7 @@ export default function TransportadoraVeiculosPage() {
 
             {/* Modal */}
             <VeiculoModal
-                veiculo={selectedVeiculo as any}
+                veiculo={selectedVeiculo}
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 onSave={() => { setIsModalOpen(false); loadVehicles() }}

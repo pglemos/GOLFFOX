@@ -107,7 +107,7 @@ export default function TransportadoraMotoristasListPage() {
     }
 
     return (
-        <AppShell panel="gestor_transportadora" user={{ id: user.id, name: user.name || 'Gestor da Transportadora', email: user.email || '', role: user.role || 'gestor_transportadora', avatar_url: (user as any).avatar_url }}>
+        <AppShell panel="gestor_transportadora" user={{ id: user.id, name: user.name || 'Gestor da Transportadora', email: user.email || '', role: user.role || 'gestor_transportadora', avatar_url: user.avatar_url || undefined }}>
             <div className="space-y-4 sm:space-y-6 w-full overflow-x-hidden">
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
@@ -176,7 +176,7 @@ export default function TransportadoraMotoristasListPage() {
 
             {/* Modal de motorista */}
             <MotoristaModal
-                motorista={selectedMotorista as any}
+                motorista={selectedMotorista}
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 onSave={() => { setIsModalOpen(false); loadDrivers() }}

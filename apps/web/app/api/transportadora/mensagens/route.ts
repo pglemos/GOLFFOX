@@ -3,6 +3,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/api-auth';
 import { logError } from '@/lib/logger';
 import { getSupabaseAdmin } from '@/lib/supabase-client';
+import type { Database } from '@/types/supabase';
+
+type MessageRow = Database['public']['Tables']['motorista_messages']['Row']
+type MessageInsert = Database['public']['Tables']['motorista_messages']['Insert']
+type MessageUpdate = Database['public']['Tables']['motorista_messages']['Update']
 
 // GET /api/transportadora/mensagens - Listar mensagens dos motoristas
 export async function GET(request: NextRequest) {
@@ -21,7 +26,7 @@ export async function GET(request: NextRequest) {
         const limit = parseInt(searchParams.get('limit') || '100');
 
         let query = supabase
-            .from('motorista_messages' as any)
+            .from('motorista_messages')
             .select(`
                 *,
                 motorista:users!motorista_id(id, name, phone)
@@ -55,8 +60,8 @@ export async function GET(request: NextRequest) {
         // Estatísticas
         const stats = {
             total: data?.length || 0,
-            unread: data?.filter((m: any) => !m.read_at).length || 0,
-            emergencies: data?.filter((m: any) => m.is_emergency).length || 0,
+            unread: data?.filter((m: MessageRow) => !m.read_at).length || 0,
+            emergencies: data?.filter((m: MessageRow) => m.is_emergency).length || 0,
         };
 
         return NextResponse.json({ data, stats });
@@ -88,7 +93,7 @@ export async function POST(request: NextRequest) {
         }
 
         const { data, error } = await supabase
-            .from('motorista_messages' as any)
+            .from('motorista_messages')
             .insert({
                 motorista_id,
                 transportadora_id,
@@ -96,7 +101,7 @@ export async function POST(request: NextRequest) {
                 message,
                 message_type,
                 is_emergency: false,
-            } as any)
+            } as MessageInsert)
             .select()
             .single();
 
@@ -134,8 +139,8 @@ export async function PUT(request: NextRequest) {
         }
 
         const { data, error } = await supabase
-            .from('motorista_messages' as any)
-            .update({ read_at: new Date().toISOString() } as any)
+            .from('motorista_messages')
+            .update({ read_at: new Date().toISOString() } as MessageUpdate)
             .in('id', ids)
             .select();
 

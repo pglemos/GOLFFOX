@@ -3,6 +3,10 @@ import { NextRequest, NextResponse } from "next/server"
 import { requireAuth } from '@/lib/api-auth'
 import { logError } from '@/lib/logger'
 import { getSupabaseAdmin } from '@/lib/supabase-client'
+import type { Database } from '@/types/supabase'
+
+type GamificationScoreRow = Database['public']['Tables']['gf_gamification_scores']['Row']
+type ViagemRow = Database['public']['Tables']['viagens']['Row']
 
 export async function GET(req: NextRequest) {
   // Verificar autenticação (transportadora)
@@ -35,7 +39,7 @@ export async function GET(req: NextRequest) {
     // Buscar dados de gamificação/ranking (selecionar apenas colunas necessárias)
     const rankingColumns = 'id,motorista_id,trips_completed,total_points,average_rating,on_time_percentage,safety_score,created_at,updated_at'
     const { data: rankings, error: rankingsError } = await supabase
-      .from('gf_gamification_scores' as any)
+      .from('gf_gamification_scores')
       .select(rankingColumns)
       .in('motorista_id', driverIds)
 
@@ -61,14 +65,14 @@ export async function GET(req: NextRequest) {
       tripsQuery = tripsQuery.lte('created_at', endDate)
     }
 
-    const { data: trips, error: tripsError } = await (tripsQuery as any)
+    const { data: trips, error: tripsError } = await tripsQuery
 
     if (tripsError) throw tripsError
 
     // Calcular performance por motorista
     const driverPerformance = motoristas?.map(motorista => {
-      const driverRanking = (rankings as any[])?.find(r => r.motorista_id === motorista.id)
-      const driverTrips = (trips as any[])?.filter(t => t.motorista_id === motorista.id) || []
+      const driverRanking = (rankings as GamificationScoreRow[])?.find(r => r.motorista_id === motorista.id)
+      const driverTrips = (trips as ViagemRow[])?.filter(t => t.motorista_id === motorista.id) || []
 
       return {
         motorista_id: motorista.id,

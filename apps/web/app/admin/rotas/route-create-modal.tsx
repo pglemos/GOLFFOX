@@ -26,7 +26,12 @@ import { optimizeRoute } from "@/lib/route-optimization"
 import { supabase } from "@/lib/supabase"
 import { notifySuccess, notifyError } from "@/lib/toast"
 import { debug, warn, logError } from "@/lib/logger"
+import type { Database } from "@/types/supabase"
 import type { OptimizeRouteResponse, EmployeeLite, RouteFormData } from "@/types/routes"
+
+type RotasInsert = Database['public']['Tables']['rotas']['Insert']
+type RotasRow = Database['public']['Tables']['rotas']['Row']
+type EmployeeCompanyUpdate = Database['public']['Tables']['gf_employee_company']['Update']
 
 import { useRouteCreate } from "./use-route-create"
 
@@ -138,7 +143,7 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
             latitude: geocoded.lat,
             longitude: geocoded.lng
           }
-          const updateQuery = (supabase.from("gf_employee_company").update(updatePayload as any) as any)
+          const updateQuery = supabase.from("gf_employee_company").update(updatePayload as EmployeeCompanyUpdate)
           const { error: updateError } = await updateQuery.eq("id", emp.employee_id)
           if (updateError) warn("Erro ao atualizar coordenadas", { error: updateError }, 'RouteCreateModal')
         }
@@ -296,14 +301,17 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
         motorista_id: selectedMotorista.id,
         veiculo_id: selectedVeiculo.id,
         polyline: optimizationResult?.polyline || null,
-      } as any
-      const insertQuery = supabase.from("rotas").insert(insertPayload) as any
-      const { data: routeData, error: routeError } = await insertQuery.select("*").single()
+      }
+      const { data: routeData, error: routeError } = await supabase
+        .from("rotas")
+        .insert(insertPayload as RotasInsert)
+        .select("*")
+        .single()
 
       if (routeError) throw routeError
 
       // .single() retorna o objeto diretamente, não um array
-      const routeId = (routeData as any)?.id
+      const routeId = (routeData as RotasRow)?.id
       if (!routeId) {
         debug("Route data", { routeData }, 'RouteCreateModal')
         throw new Error("Erro ao criar rota: ID não retornado")
@@ -334,7 +342,7 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
         stop_name: s.name,
         address: s.address || null
       }))
-      const { error: stopsError } = await supabase.from("gf_route_plan" as any).insert(stopsToInsert)
+      const { error: stopsError } = await supabase.from("gf_rota_plano").insert(stopsToInsert)
 
       if (stopsError) throw stopsError
 

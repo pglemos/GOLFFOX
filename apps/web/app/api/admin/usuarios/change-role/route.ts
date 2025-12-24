@@ -8,6 +8,10 @@ import { logger } from '@/lib/logger'
 import { applyRateLimit } from '@/lib/rate-limit'
 import { normalizeRole, isValidRole } from '@/lib/role-mapper'
 import { getSupabaseAdmin } from '@/lib/supabase-client'
+import type { Database } from '@/types/supabase'
+
+type UserRow = Database['public']['Tables']['users']['Row']
+type UserUpdate = Database['public']['Tables']['users']['Update']
 
 export const runtime = 'nodejs'
 
@@ -50,14 +54,14 @@ export async function POST(req: NextRequest) {
         }
 
         // Validação: não permitir mudar se role é a mesma (comparar com role normalizado)
-        if (normalizeRole((targetUser as any).role) === normalizedRole) {
+        if (normalizeRole(targetUser.role) === normalizedRole) {
             return errorResponse(new Error('O usuário já possui este papel'), 400)
         }
 
         // Atualizar role usando service role (bypass RLS) - usar role normalizado
         const { data: updatedUser, error: updateError } = await supabase
             .from('users')
-            .update({ role: normalizedRole } as any)
+            .update({ role: normalizedRole } as UserUpdate)
             .eq('id', validated.userId)
             .select()
             .single()
@@ -93,7 +97,7 @@ export async function POST(req: NextRequest) {
         return successResponse(
             { user: updatedUser },
             200,
-            { message: `Papel alterado de "${(targetUser as any).role}" para "${normalizedRole}" com sucesso` }
+            { message: `Papel alterado de "${targetUser.role}" para "${normalizedRole}" com sucesso` }
         )
     } catch (error: any) {
         logger.error('Erro ao processar mudança de papel', { error }, 'ChangeRoleAPI')

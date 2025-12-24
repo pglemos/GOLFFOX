@@ -194,13 +194,13 @@ async function schedulePostHandler(request: NextRequest) {
         updated_at: new Date().toISOString()
       }
 
-      // Adicionar company_id apenas se fornecido (pode ser null para admin)
+      // Adicionar empresa_id apenas se fornecido (pode ser null para admin)
       if (finalCompanyId !== undefined) {
-        updateData.company_id = finalCompanyId
+        updateData.empresa_id = finalCompanyId
       }
 
       const { data, error } = await supabase
-        .from('gf_report_schedules' as any)
+        .from('gf_report_schedules')
         .update(updateData)
         .eq('id', scheduleId)
         .select()
@@ -234,7 +234,7 @@ async function schedulePostHandler(request: NextRequest) {
 
       // Adicionar company_id - em modo de teste, tentar obter uma empresa existente se não fornecido
       if (finalCompanyId !== undefined && finalCompanyId !== null) {
-        insertData.company_id = finalCompanyId
+        insertData.empresa_id = finalCompanyId
       } else if (allowAuthBypass) {
         // Em modo de teste, tentar obter uma empresa existente
         try {
@@ -245,7 +245,7 @@ async function schedulePostHandler(request: NextRequest) {
             .single()
 
           if (!companiesError && companies) {
-            insertData.company_id = companies.id
+            insertData.empresa_id = companies.id
             logger.log(`⚠️ Modo de teste: usando companyId existente: ${companies.id}`)
           } else {
             // Se não há empresas, retornar erro informativo
@@ -287,7 +287,7 @@ async function schedulePostHandler(request: NextRequest) {
       // Se não houver usuário autenticado, created_by será null (aceitável em modo de teste)
 
       const { data, error } = await supabase
-        .from('gf_report_schedules' as any)
+        .from('gf_report_schedules')
         .insert(insertData)
         .select()
         .single()
@@ -301,7 +301,7 @@ async function schedulePostHandler(request: NextRequest) {
             logger.log('⚠️ Erro com created_by, tentando sem essa coluna...')
             delete insertData.created_by
             const retryResult = await supabase
-              .from('gf_report_schedules' as any)
+              .from('gf_report_schedules')
               .insert(insertData)
               .select()
               .single()
@@ -367,14 +367,14 @@ async function scheduleGetHandler(request: NextRequest) {
     const companyId = searchParams.get('companyId')
 
     // Selecionar apenas colunas necessárias para listagem (otimização de performance)
-    const scheduleColumns = 'id,company_id,report_key,cron,recipients,is_active,created_by,created_at,updated_at'
+    const scheduleColumns = 'id,empresa_id,report_key,cron,recipients,is_active,created_by,created_at,updated_at'
     let query = supabase
-      .from('gf_report_schedules' as any)
+      .from('gf_report_schedules')
       .select(scheduleColumns)
       .order('created_at', { ascending: false })
 
     if (companyId) {
-      query = query.eq('company_id', companyId)
+      query = query.eq('empresa_id', companyId)
     }
 
     const { data, error } = await query
@@ -410,7 +410,7 @@ async function scheduleDeleteHandler(request: NextRequest) {
     }
 
     const { error } = await supabase
-      .from('gf_report_schedules' as any)
+      .from('gf_report_schedules')
       .delete()
       .eq('id', scheduleId)
 

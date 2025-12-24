@@ -19,6 +19,7 @@ import { useRouter } from "@/lib/next-navigation"
 import { supabase } from "@/lib/supabase"
 import { notifySuccess, notifyError } from "@/lib/toast"
 import { logError } from "@/lib/logger"
+import type { Database } from "@/types/supabase"
 import {
   Select,
   SelectContent,
@@ -28,18 +29,21 @@ import {
 } from "@/components/ui/select"
 import { Label } from "@/components/ui/label"
 
+type AssistanceRequest = Database['public']['Tables']['gf_assistance_requests']['Row']
+type AlertInsert = Database['public']['Tables']['gf_alerts']['Insert']
+
 export default function SocorroPage() {
   const router = useRouter()
   const { user, loading: authLoading } = useAuth()
   const [dataLoading, setDataLoading] = useState(true)
-  const [ocorrencias, setOcorrencias] = useState<any[]>([])
-  const [selectedRequest, setSelectedRequest] = useState<any>(null)
+  const [ocorrencias, setOcorrencias] = useState<AssistanceRequest[]>([])
+  const [selectedRequest, setSelectedRequest] = useState<AssistanceRequest | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
   const [filtersExpanded, setFiltersExpanded] = useState(false)
   const [tempFilterStatus, setTempFilterStatus] = useState<string>("all")
   const [filterStatus, setFilterStatus] = useState<string>("all")
-  const [selectedRequestForEdit, setSelectedRequestForEdit] = useState<any>(null)
+  const [selectedRequestForEdit, setSelectedRequestForEdit] = useState<AssistanceRequest | null>(null)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
 
   // Estados para o formulário de despacho
@@ -512,15 +516,17 @@ export default function SocorroPage() {
                             try {
                               const { data: { session } } = await supabase.auth.getSession()
                               if (session) {
-                                await supabase.from('gf_incidents').insert({
-                                  company_id: ocorrencia.company_id || null,
-                                  route_id: ocorrencia.route_id || null,
+                                const alertData: AlertInsert = {
+                                  empresa_id: ocorrencia.empresa_id || null,
+                                  rota_id: ocorrencia.rota_id || null,
                                   veiculo_id: ocorrencia.veiculo_id || null,
                                   motorista_id: ocorrencia.motorista_id || null,
                                   severity: 'critical',
                                   status: 'open',
-                                  description: `Ocorrência de socorro: ${ocorrencia.request_type} - ${ocorrencia.description || ''}`
-                                } as any)
+                                  message: `Ocorrência de socorro: ${ocorrencia.request_type} - ${ocorrencia.description || ''}`,
+                                  type: 'assistance_request'
+                                }
+                                await supabase.from('gf_alerts').insert(alertData)
                               }
                             } catch (error) {
                               logError('Erro ao criar alerta', { error }, 'SocorroPage')
@@ -538,7 +544,7 @@ export default function SocorroPage() {
                             try {
                               const { error } = await supabase
                                 .from('gf_assistance_requests')
-                                .update({ status: 'resolved', resolved_at: new Date().toISOString() } as any)
+                                .update({ status: 'resolved', resolved_at: new Date().toISOString() })
                                 .eq('id', ocorrencia.id)
 
                               if (error) throw error

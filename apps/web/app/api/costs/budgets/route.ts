@@ -6,6 +6,11 @@ import { requireCompanyAccess, requireAuth, validateAuth } from '@/lib/api-auth'
 import { logError } from '@/lib/logger'
 import { withRateLimit } from '@/lib/rate-limit'
 import { supabaseServiceRole } from '@/lib/supabase-server'
+import type { Database } from '@/types/supabase'
+
+type BudgetRow = Database['public']['Tables']['gf_budgets']['Row']
+type BudgetInsert = Database['public']['Tables']['gf_budgets']['Insert']
+type BudgetUpdate = Database['public']['Tables']['gf_budgets']['Update']
 
 const budgetSchema = z.object({
   company_id: z.string().uuid(),
@@ -187,14 +192,15 @@ async function createOrUpdateBudgetHandler(request: NextRequest) {
     let result
     if (existing) {
       // Atualizar existente
+      const updateData: BudgetUpdate = {
+        amount_budgeted: validated.amount_budgeted,
+        notes: validated.notes,
+        updated_at: new Date().toISOString()
+      }
       const { data, error } = await supabaseServiceRole
         .from('gf_budgets')
-        .update({
-          amount_budgeted: validated.amount_budgeted,
-          notes: validated.notes,
-          updated_at: new Date().toISOString()
-        } as any)
-        .eq('id', (existing as any).id)
+        .update(updateData)
+        .eq('id', (existing as BudgetRow).id)
         .select()
         .single()
 
@@ -215,17 +221,18 @@ async function createOrUpdateBudgetHandler(request: NextRequest) {
       result = data
     } else {
       // Criar novo
+      const insertData: BudgetInsert = {
+        empresa_id: validated.company_id,
+        period_month: validated.period_month,
+        period_year: validated.period_year,
+        category_id: validated.category_id || null,
+        amount_budgeted: validated.amount_budgeted,
+        notes: validated.notes || null,
+        created_by: user.id
+      }
       const { data, error } = await supabaseServiceRole
         .from('gf_budgets')
-        .insert({
-          company_id: validated.company_id,
-          period_month: validated.period_month,
-          period_year: validated.period_year,
-          category_id: validated.category_id || null,
-          amount_budgeted: validated.amount_budgeted,
-          notes: validated.notes || null,
-          created_by: user.id
-        } as any)
+        .insert(insertData)
         .select()
         .single()
 

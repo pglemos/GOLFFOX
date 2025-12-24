@@ -8,7 +8,11 @@ import { logger, logError } from '@/lib/logger'
 import { applyRateLimit } from '@/lib/rate-limit'
 import { getSupabaseAdmin } from '@/lib/supabase-client'
 import { createTransportadoraSchema } from '@/lib/validation/schemas'
+import type { Database } from '@/types/supabase'
 import { CarrierInsert } from '@/types/carrier'
+
+type TransportadoraRow = Database['public']['Tables']['transportadoras']['Row']
+type TransportadoraInsert = Database['public']['Tables']['transportadoras']['Insert']
 
 export const runtime = 'nodejs'
 
@@ -77,8 +81,8 @@ export async function POST(req: NextRequest) {
 
     const supabase = getSupabaseAdmin()
     const { data, error } = await supabase
-      .from('transportadoras' as any)
-      .insert(insertData as any)
+      .from('transportadoras')
+      .insert(insertData as TransportadoraInsert)
       .select()
       .single()
 
@@ -87,7 +91,7 @@ export async function POST(req: NextRequest) {
       return errorResponse(error, 500, 'Erro ao criar transportadora')
     }
 
-    logger.debug('[CREATE transportadora] Success! transportadora created:', (data as any).id)
+    logger.debug('[CREATE transportadora] Success! transportadora created:', (data as TransportadoraRow).id)
 
     return successResponse(data)
   } catch (error: unknown) {

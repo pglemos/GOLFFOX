@@ -12,7 +12,12 @@ import { requireAuth } from '@/lib/api-auth'
 import { logError } from '@/lib/logger'
 import { getSupabaseAdmin } from '@/lib/supabase-client'
 import { createCostSchema } from '@/lib/validation/schemas'
+import type { Database } from '@/types/supabase'
 import type { ManualCost, ManualCostInsert, CostFilters } from '@/types/financial'
+
+type ProfileRow = Database['public']['Tables']['profiles']['Row']
+type ManualCostV2Row = Database['public']['Tables']['gf_manual_costs_v2']['Row']
+type ManualCostV2Insert = Database['public']['Tables']['gf_manual_costs_v2']['Insert']
 
 export const runtime = 'nodejs'
 
@@ -37,7 +42,7 @@ export async function GET(request: NextRequest) {
                     .select('role, empresa_id, transportadora_id')
                     .eq('id', authData.user.id)
                     .single()
-                profile = p ? { ...p, company_id: p.empresa_id } as any : null
+                profile = p ? { ...p, company_id: p.empresa_id, role: p.role, transportadora_id: p.transportadora_id } : null
             }
         }
 
@@ -68,7 +73,7 @@ export async function GET(request: NextRequest) {
 
         // Construir query
         let query = supabaseAdmin
-            .from('gf_manual_costs_v2' as any)
+            .from('gf_manual_costs_v2')
             .select(`
         *,
         category:gf_cost_categories(id, name, icon, color),
@@ -123,7 +128,7 @@ export async function GET(request: NextRequest) {
             .order(sortBy, { ascending: sortOrder })
             .range(offset, offset + pageSize - 1)
 
-        const { data, error, count } = await (query as any)
+        const { data, error, count } = await query
 
         if (error) {
             logError('[API] Erro ao buscar custos', { error }, 'CostsManualV2API')
@@ -146,7 +151,7 @@ export async function GET(request: NextRequest) {
         }
 
         // Transformar para a interface ManualCost
-        const costs: ManualCost[] = (data || []).map((row: any) => ({
+        const costs: ManualCost[] = (data || []).map((row: ManualCostV2Row & { category?: any; veiculo?: any; rota?: any; empresa?: any; transportadora?: any }) => ({
             id: row.id,
             company_id: row.empresa_id,
             transportadora_id: row.transportadora_id,
@@ -222,7 +227,7 @@ export async function POST(request: NextRequest) {
                     .select('role, company_id, transportadora_id')
                     .eq('id', authData.user.id)
                     .single()
-                profile = p as any
+                profile = p ? { role: p.role, company_id: p.empresa_id, transportadora_id: p.transportadora_id } : null
             }
         }
 
@@ -276,32 +281,33 @@ export async function POST(request: NextRequest) {
         }
 
         // Inserir custo
-        const { data, error } = await (supabaseAdmin
-            .from('gf_manual_costs_v2' as any)
-            .insert({
-                empresa_id: companyId,
-                transportadora_id: transportadoraId,
-                category_id: validated.category_id,
-                description: validated.description,
-                amount: validated.amount,
-                cost_date: validated.cost_date,
-                is_recurring: validated.is_recurring,
-                recurring_interval: validated.recurring_interval,
-                recurring_end_date: (body.recurringEndDate || body.recurring_end_date),
-                veiculo_id: validated.veiculo_id,
-                rota_id: validated.rota_id,
-                motorista_id: validated.motorista_id,
-                attachment_url: validated.attachment_url,
-                attachment_name: (body.attachmentName || body.attachment_name),
-                notes: validated.notes,
-                status: validated.status,
-                created_by: userId,
-            })
+        const insertData: ManualCostV2Insert = {
+            empresa_id: companyId || null,
+            transportadora_id: transportadoraId || null,
+            category_id: validated.category_id,
+            description: validated.description,
+            amount: validated.amount,
+            cost_date: validated.cost_date,
+            is_recurring: validated.is_recurring,
+            recurring_interval: validated.recurring_interval,
+            recurring_end_date: (body.recurringEndDate || body.recurring_end_date) || null,
+            veiculo_id: validated.veiculo_id || null,
+            rota_id: validated.rota_id || null,
+            motorista_id: validated.motorista_id || null,
+            attachment_url: validated.attachment_url || null,
+            attachment_name: (body.attachmentName || body.attachment_name) || null,
+            notes: validated.notes || null,
+            status: validated.status,
+            created_by: userId || null,
+        }
+        const { data, error } = await supabaseAdmin
+            .from('gf_manual_costs_v2')
+            .insert(insertData)
             .select(`
         *,
         category:gf_cost_categories(id, name, icon, color)
       `)
-            .single() as any)
+            .single()
 
         if (error) {
             logError('[API] Erro ao criar custo', { error }, 'CostsManualV2API')

@@ -3,6 +3,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/api-auth';
 import { logError } from '@/lib/logger';
 import { getSupabaseAdmin } from '@/lib/supabase-client';
+import type { Database } from '@/types/supabase';
+
+type ChecklistRow = Database['public']['Tables']['gf_veiculo_checklists']['Row']
+type ChecklistUpdate = Database['public']['Tables']['gf_veiculo_checklists']['Update']
 
 // GET /api/transportadora/checklists - Listar checklists dos motoristas
 export async function GET(request: NextRequest) {
@@ -21,7 +25,7 @@ export async function GET(request: NextRequest) {
         const limit = parseInt(searchParams.get('limit') || '50');
 
         let query = supabase
-            .from('veiculo_checklists' as any)
+            .from('gf_veiculo_checklists')
             .select(`
                 *,
                 motorista:users!motorista_id(id, name, phone),
@@ -59,10 +63,10 @@ export async function GET(request: NextRequest) {
         // Estatísticas
         const stats = {
             total: data?.length || 0,
-            pending: data?.filter((c: any) => c.status === 'pending').length || 0,
-            approved: data?.filter((c: any) => c.status === 'approved').length || 0,
-            rejected: data?.filter((c: any) => c.status === 'rejected').length || 0,
-            incomplete: data?.filter((c: any) => c.status === 'incomplete').length || 0,
+            pending: data?.filter((c: ChecklistRow) => c.status === 'pending').length || 0,
+            approved: data?.filter((c: ChecklistRow) => c.status === 'approved').length || 0,
+            rejected: data?.filter((c: ChecklistRow) => c.status === 'rejected').length || 0,
+            incomplete: data?.filter((c: ChecklistRow) => c.status === 'incomplete').length || 0,
         };
 
         return NextResponse.json({ data, stats });
@@ -94,12 +98,12 @@ export async function PUT(request: NextRequest) {
         }
 
         const { data, error } = await supabase
-            .from('veiculo_checklists' as any)
+            .from('gf_veiculo_checklists')
             .update({
                 status,
                 reviewed_by,
                 reviewed_at: new Date().toISOString(),
-            } as any)
+            } as ChecklistUpdate)
             .eq('id', id)
             .select()
             .single();

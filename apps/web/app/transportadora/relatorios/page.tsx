@@ -211,7 +211,7 @@ export default function TransportadoraRelatoriosPage() {
         case 'maintenances':
           // Buscar manutenções
           const { data: maintenancesData } = await supabase
-            .from('vehicle_maintenances' as any)
+            .from('vehicle_maintenances')
             .select(`
               *,
               veiculos!inner(transportadora_id, plate)

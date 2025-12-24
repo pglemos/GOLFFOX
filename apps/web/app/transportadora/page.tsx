@@ -49,6 +49,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { t } from "@/lib/i18n"
 import { cn } from "@/lib/utils"
 import { debug, logError } from "@/lib/logger"
+import type { Database } from "@/types/supabase"
+
+type GamificationScoreRow = Database['public']['Tables']['gf_gamification_scores']['Row']
 
 export default function TransportadoraDashboard() {
   const router = useRouter()
@@ -94,7 +97,7 @@ export default function TransportadoraDashboard() {
   const loadFleetData = useCallback(async () => {
     try {
       // Buscar dados da transportadora (preferir cookie para evitar RLS no client)
-      const transportadoraData = { transportadora_id: (user as any)?.transportadora_id || null }
+      const transportadoraData = { transportadora_id: user?.transportadora_id || null }
 
       if (!transportadoraId) {
         logError("Usuário não está associado a uma transportadora", {}, 'TransportadoraPage')
@@ -115,9 +118,9 @@ export default function TransportadoraDashboard() {
       })
 
       // Mapear veículos com posições do RPC
-      const fleetData = (veiculos || []).map((veiculo: any) => {
-        const bus = (mapData as any)?.buses?.find((b: any) => b.veiculo_id === veiculo.id)
-        const garage = (mapData as any)?.garages?.find((g: any) => g.veiculo_id === veiculo.id)
+      const fleetData = (veiculos || []).map((veiculo) => {
+        const bus = mapData?.buses?.find((b: { veiculo_id: string }) => b.veiculo_id === veiculo.id)
+        const garage = mapData?.garages?.find((g: { veiculo_id: string }) => g.veiculo_id === veiculo.id)
 
         if (bus) {
           return {
@@ -185,9 +188,9 @@ export default function TransportadoraDashboard() {
         }
 
         const { data: rankings } = await supabase
-          .from('gf_gamification_scores' as any)
+          .from('gf_gamification_scores')
           .select('*')
-          .in('motorista_id', driverIds) as { data: GamificationScore[] | null }
+          .in('motorista_id', driverIds)
 
         driversWithStats = (driversData || []).map((motorista: any) => {
           const ranking = rankings?.find((r) => r.motorista_id === motorista.id)
@@ -722,7 +725,7 @@ export default function TransportadoraDashboard() {
               )}>
                 <LazyWrapper>
                   <FleetMap
-                    transportadoraId={transportadoraId as any}
+                    transportadoraId={transportadoraId || undefined}
                   />
                 </LazyWrapper>
               </div>

@@ -55,11 +55,11 @@ export default function PrestadoresOperatorPage() {
       }
 
       if (userData?.empresa_id) {
-        // @ts-ignore - Supabase type inference issue with views
-        const { data, error } = await (((supabase
-          .from('v_operador_assigned_carriers' as any)
+        // View não está nos tipos do Supabase, mas existe no banco
+        const { data, error } = await supabase
+          .from('v_operador_assigned_carriers')
           .select('*')
-          .eq('empresa_id', userData.empresa_id)) as any) as any)
+          .eq('empresa_id', userData.empresa_id)
         
         if (error) {
           logError("Erro ao buscar prestadores", { error }, 'PrestadoresPage')

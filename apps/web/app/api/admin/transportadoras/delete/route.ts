@@ -34,7 +34,7 @@ export async function DELETE(req: NextRequest) {
 
     // Verificar se a transportadora existe
     const { data: transportadora, error: carrierError } = await (supabase
-      .from('transportadoras' as any)
+      .from('transportadoras')
       .select('id, name')
       .eq('id', carrierId)
       .single())
@@ -46,7 +46,7 @@ export async function DELETE(req: NextRequest) {
     // 1. Remover referências de users (setar transportadora_id como NULL)
     const { error: usersError } = await supabase
       .from('users')
-      .update({ transportadora_id: null } as any)
+      .update({ transportadora_id: null } as UserUpdate)
       .eq('transportadora_id', carrierId)
 
     if (usersError) {
@@ -57,7 +57,7 @@ export async function DELETE(req: NextRequest) {
     // 2. Remover referências de veiculos (setar transportadora_id como NULL)
     const { error: vehiclesError } = await supabase
       .from('veiculos')
-      .update({ transportadora_id: null } as any)
+      .update({ transportadora_id: null } as VeiculoUpdate)
       .eq('transportadora_id', carrierId)
 
     if (vehiclesError) {
@@ -82,12 +82,12 @@ export async function DELETE(req: NextRequest) {
         .from('costs' as any)
         .select('id')
         .eq('transportadora_id', carrierId)
-        .limit(1) as any)
+        .limit(1))
 
       if (!costsCheckError && costsData && costsData.length > 0) {
         await supabase
-          .from('costs' as any)
-          .update({ transportadora_id: null } as any)
+          .from('gf_costs')
+          .update({ transportadora_id: null })
           .eq('transportadora_id', carrierId)
       }
     } catch (costsError: any) {
@@ -96,7 +96,7 @@ export async function DELETE(req: NextRequest) {
 
     // 5. Agora podemos excluir a transportadora
     const { error: deleteError } = await (supabase
-      .from('transportadoras' as any)
+      .from('transportadoras')
       .delete()
       .eq('id', carrierId))
 

@@ -6,6 +6,10 @@ import { requireCompanyAccess } from '@/lib/api-auth'
 import { logger, logError } from '@/lib/logger'
 import { withRateLimit } from '@/lib/rate-limit'
 import { supabaseServiceRole } from '@/lib/supabase-server'
+import type { Database } from '@/types/supabase'
+
+type EmpresaInsert = Database['public']['Tables']['empresas']['Insert']
+type CostCategoryInsert = Database['public']['Tables']['gf_cost_categories']['Insert']
 
 const costSchema = z.object({
   company_id: z.string().uuid(),
@@ -107,7 +111,7 @@ async function createManualCostHandler(request: NextRequest) {
                           id: validated.company_id,
                           name: `Empresa Teste ${validated.company_id.substring(0, 8)}`,
                           is_active: true
-                        } as any)
+                        } as EmpresaInsert)
           
           if (createCompanyError) {
             logger.warn('Erro ao criar empresa de teste:', createCompanyError)
@@ -123,7 +127,7 @@ async function createManualCostHandler(request: NextRequest) {
     // Verificar se categoria existe e está ativa
     // Primeiro, verificar se a tabela existe tentando uma query simples
     let categoryExists = false
-    let finalCategory: any = null
+    let finalCategory: { id: string; is_active: boolean } | null = null
     
     try {
       const { data: category, error: categoryError } = await supabaseServiceRole
@@ -178,7 +182,7 @@ async function createManualCostHandler(request: NextRequest) {
                     // Tentar upsert primeiro (pode funcionar mesmo se a tabela tiver problemas)
                     const { data: upsertedCategory, error: upsertError } = await supabaseServiceRole
                       .from('gf_cost_categories')
-                      .upsert(defaultCategory as any, { onConflict: 'id' })
+                      .upsert(defaultCategory as CostCategoryInsert, { onConflict: 'id' })
                       .select('id, is_active')
                       .single()
                     
@@ -190,7 +194,7 @@ async function createManualCostHandler(request: NextRequest) {
                       // Se upsert falhou, tentar insert simples
                       const { data: insertedCategory, error: insertError } = await supabaseServiceRole
                         .from('gf_cost_categories')
-                        .insert(defaultCategory as any)
+                        .insert(defaultCategory as CostCategoryInsert)
                         .select('id, is_active')
                         .single()
           

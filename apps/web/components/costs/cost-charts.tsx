@@ -21,6 +21,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { formatCurrency, formatCount } from "@/lib/kpi-utils"
 import { supabase } from "@/lib/supabase"
 import { logError } from "@/lib/logger"
+import type { Database } from "@/types/supabase"
+
+type CostsBreakdownRow = Database['public']['Views']['v_costs_breakdown']['Row']
+type DriverRankingRow = Database['public']['Views']['v_reports_driver_ranking']['Row']
 
 interface CostChartProps {
   companyId?: string
@@ -29,11 +33,11 @@ interface CostChartProps {
 
 export function CostCharts({ companyId, period = 'month' }: CostChartProps) {
   const [loading, setLoading] = useState(true)
-  const [monthlyData, setMonthlyData] = useState<any[]>([])
-  const [byRouteData, setByRouteData] = useState<any[]>([])
-  const [byVehicleData, setByVehicleData] = useState<any[]>([])
-  const [byDriverData, setByDriverData] = useState<any[]>([])
-  const [byCompanyData, setByCompanyData] = useState<any[]>([])
+  const [monthlyData, setMonthlyData] = useState<Array<{ month: string; total: number }>>([])
+  const [byRouteData, setByRouteData] = useState<Array<{ route: string; cost: number }>>([])
+  const [byVehicleData, setByVehicleData] = useState<Array<{ vehicle: string; cost: number }>>([])
+  const [byDriverData, setByDriverData] = useState<Array<{ name: string; routes: number; cost: number }>>([])
+  const [byCompanyData, setByCompanyData] = useState<Array<{ company: string; cost: number }>>([])
 
   useEffect(() => {
     loadChartData()
@@ -45,14 +49,14 @@ export function CostCharts({ companyId, period = 'month' }: CostChartProps) {
 
       // Dados mensais (evolução)
       const { data: monthly } = await supabase
-        .from('v_costs_breakdown' as any)
+        .from('v_costs_breakdown')
         .select('*')
         .order('company_id')
 
       if (monthly) {
         // Agrupar por mês
         const grouped: Record<string, { month: string; total: number }> = {}
-        monthly.forEach((item: any) => {
+        monthly.forEach((item: CostsBreakdownRow) => {
           const month = new Date().toISOString().slice(0, 7) // YYYY-MM
           if (!grouped[month]) {
             grouped[month] = { month, total: 0 }
@@ -64,34 +68,34 @@ export function CostCharts({ companyId, period = 'month' }: CostChartProps) {
 
       // Dados por rota
       const { data: routes } = await supabase
-        .from('v_costs_breakdown' as any)
+        .from('v_costs_breakdown')
         .select('by_route')
         .limit(1)
         .single()
 
-      if ((routes as any)?.by_route) {
-        setByRouteData(Array.isArray((routes as any).by_route) ? (routes as any).by_route : [])
+      if (routes?.by_route) {
+        setByRouteData(Array.isArray(routes.by_route) ? routes.by_route : [])
       }
 
       // Dados por veículo
       const { data: veiculos } = await supabase
-        .from('v_costs_breakdown' as any)
+        .from('v_costs_breakdown')
         .select('by_vehicle')
         .limit(1)
         .single()
 
-      if ((veiculos as any)?.by_vehicle) {
-        setByVehicleData(Array.isArray((veiculos as any).by_vehicle) ? (veiculos as any).by_vehicle : [])
+      if (veiculos?.by_vehicle) {
+        setByVehicleData(Array.isArray(veiculos.by_vehicle) ? veiculos.by_vehicle : [])
       }
 
       // Dados por motorista (usar v_reports_driver_ranking com custos)
       const { data: motoristas } = await supabase
-        .from('v_reports_driver_ranking' as any)
+        .from('v_reports_driver_ranking')
         .select('motorista_id, motorista_name, routes_completed')
         .limit(10)
 
       if (motoristas) {
-        setByDriverData(motoristas.map((d: any) => ({
+        setByDriverData(motoristas.map((d: DriverRankingRow) => ({
           name: d.motorista_name || 'Motorista',
           routes: d.routes_completed || 0,
           cost: (d.routes_completed || 0) * 50 // Estimativa
@@ -100,7 +104,7 @@ export function CostCharts({ companyId, period = 'month' }: CostChartProps) {
 
       // Dados por empresa
       const { data: companies } = await supabase
-        .from('v_costs_breakdown' as any)
+        .from('v_costs_breakdown')
         .select('company_id, company_name, by_company')
         .limit(20)
 

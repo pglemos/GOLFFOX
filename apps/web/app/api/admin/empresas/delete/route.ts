@@ -5,6 +5,9 @@ import { validationErrorResponse, errorResponse, successResponse } from '@/lib/a
 import { logger, logError } from '@/lib/logger'
 import { invalidateEntityCache } from '@/lib/next-cache'
 import { getSupabaseAdmin } from '@/lib/supabase-client'
+import type { Database } from '@/types/supabase'
+
+type UserUpdate = Database['public']['Tables']['users']['Update']
 
 export const runtime = 'nodejs'
 
@@ -53,8 +56,8 @@ async function handleDelete(request: NextRequest) {
     // 1. Atualizar users para setar company_id = NULL (pode não ter ON DELETE SET NULL)
     logger.log('   1. Atualizando users (setando company_id para NULL)...')
     const { error: usersUpdateError } = await (supabaseAdmin
-      .from('users') as any)
-      .update({ company_id: null })
+      .from('users')
+      .update({ empresa_id: null } as UserUpdate)
       .eq('company_id', companyId)
 
     if (usersUpdateError) {
@@ -68,9 +71,9 @@ async function handleDelete(request: NextRequest) {
 
     // Excluir routes (e suas dependências serão excluídas via CASCADE)
     const { error: routesError } = await (supabaseAdmin
-      .from('rotas') as any)
+      .from('rotas')
       .delete()
-      .eq('company_id', companyId)
+      .eq('empresa_id', companyId)
 
     if (routesError && routesError.code !== '42P01') {
       logError('Erro ao excluir routes', { error: routesError, companyId }, 'CompaniesDeleteAPI')
@@ -96,8 +99,8 @@ async function handleDelete(request: NextRequest) {
       // Algumas tabelas podem usar empresa_id em vez de company_id
       const columnName = table === 'gf_service_requests' ? 'empresa_id' : 'company_id'
 
-      const { error: depError } = await (supabaseAdmin
-        .from(table as any) as any)
+      const { error: depError } = await supabaseAdmin
+        .from(table)
         .delete()
         .eq(columnName, companyId)
 
@@ -110,8 +113,8 @@ async function handleDelete(request: NextRequest) {
 
     // 3. Excluir empresa permanentemente
     logger.log('   3. Excluindo empresa...')
-    const { data, error } = await (supabaseAdmin
-      .from('empresas') as any)
+    const { data, error } = await supabaseAdmin
+      .from('empresas')
       .delete()
       .eq('id', companyId)
       .select()

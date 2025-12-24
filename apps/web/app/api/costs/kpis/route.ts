@@ -4,6 +4,10 @@ import { requireAuth, validateAuth, requireCompanyAccess } from '@/lib/api-auth'
 import { logger, logError } from '@/lib/logger'
 import { withRateLimit } from '@/lib/rate-limit'
 import { getSupabaseAdmin } from '@/lib/supabase-client'
+import type { Database } from '@/types/supabase'
+
+type CostsKpisRow = Database['public']['Views']['v_costs_kpis']['Row']
+type CostsVsBudgetRow = Database['public']['Views']['v_costs_vs_budget']['Row']
 
 async function getCostsKpisHandler(request: NextRequest) {
   try {
@@ -60,7 +64,7 @@ async function getCostsKpisHandler(request: NextRequest) {
     // Buscar KPIs da view (view materializada - selecionar todas as colunas)
     const supabase = getSupabaseAdmin()
     const { data, error } = await supabase
-      .from('v_costs_kpis' as any)
+      .from('v_costs_kpis')
       .select('*')
       .eq('company_id', companyId)
       .maybeSingle()
@@ -112,7 +116,7 @@ async function getCostsKpisHandler(request: NextRequest) {
     // Adicionar variação vs orçamento se houver
     const periodDays = period === '90' ? 90 : 30
     const { data: budgetData, error: budgetError } = await supabase
-      .from('v_costs_vs_budget' as any)
+      .from('v_costs_vs_budget')
       .select('budgeted_amount, actual_amount, variance_percent')
       .eq('company_id', companyId)
       .gte('period_year', new Date().getFullYear())
@@ -125,12 +129,12 @@ async function getCostsKpisHandler(request: NextRequest) {
     }
 
     const response = {
-      ...(data as any),
+      ...(data as CostsKpisRow),
       budget_variance: budgetData ? {
-        budgeted: (budgetData as any).budgeted_amount || 0,
-        actual: (budgetData as any).actual_amount || 0,
-        variance_percent: (budgetData as any).variance_percent || 0,
-        variance_absolute: ((budgetData as any).actual_amount || 0) - ((budgetData as any).budgeted_amount || 0)
+        budgeted: (budgetData as CostsVsBudgetRow).budgeted_amount || 0,
+        actual: (budgetData as CostsVsBudgetRow).actual_amount || 0,
+        variance_percent: (budgetData as CostsVsBudgetRow).variance_percent || 0,
+        variance_absolute: ((budgetData as CostsVsBudgetRow).actual_amount || 0) - ((budgetData as CostsVsBudgetRow).budgeted_amount || 0)
       } : null,
       period_days: parseInt(period)
     }

@@ -31,6 +31,11 @@ import { Textarea } from "@/components/ui/textarea"
 import { useDebounce } from "@/hooks/use-debounce"
 import { supabase } from "@/lib/supabase"
 import { notifySuccess, notifyError } from "@/lib/toast"
+import type { Database } from "@/types/supabase"
+
+type MaintenanceRow = Database['public']['Tables']['gf_vehicle_maintenance']['Row']
+type MaintenanceInsert = Database['public']['Tables']['gf_vehicle_maintenance']['Insert']
+type MaintenanceUpdate = Database['public']['Tables']['gf_vehicle_maintenance']['Update']
 
 interface Maintenance {
     id: string
@@ -129,8 +134,8 @@ export default function ManutencaoPage() {
     const loadMaintenances = useCallback(async () => {
         try {
             setDataLoading(true)
-            const { data, error } = await (supabase as any)
-                .from('vehicle_maintenances')
+            const { data, error } = await supabase
+                .from('gf_vehicle_maintenance')
                 .select(`
           *,
           veiculo:veiculos(plate, model)
@@ -138,7 +143,7 @@ export default function ManutencaoPage() {
                 .order('scheduled_date', { ascending: false })
 
             if (error) throw error
-            setMaintenances((data as any) || [])
+            setMaintenances((data as MaintenanceRow[]) || [])
         } catch (error) {
             notifyError(error, "Erro ao carregar manutenções")
             setMaintenances([])
@@ -149,7 +154,7 @@ export default function ManutencaoPage() {
 
     const loadVehicles = useCallback(async () => {
         try {
-            const { data } = await (supabase as any)
+            const { data } = await supabase
                 .from('veiculos')
                 .select('id, plate, model')
                 .eq('is_active', true)
@@ -206,15 +211,15 @@ export default function ManutencaoPage() {
             }
 
             if (selectedMaintenance) {
-                const { error } = await (supabase as any)
-                    .from('vehicle_maintenances')
-                    .update(payload)
+                const { error } = await supabase
+                    .from('gf_vehicle_maintenance')
+                    .update(payload as MaintenanceUpdate)
                     .eq('id', selectedMaintenance.id)
                 if (error) throw error
             } else {
-                const { error } = await (supabase as any)
-                    .from('vehicle_maintenances')
-                    .insert(payload)
+                const { error } = await supabase
+                    .from('gf_vehicle_maintenance')
+                    .insert(payload as MaintenanceInsert)
                 if (error) throw error
             }
 
@@ -232,7 +237,7 @@ export default function ManutencaoPage() {
         if (!confirm('Excluir esta manutenção?')) return
 
         try {
-            const { error } = await (supabase as any)
+            const { error } = await supabase
                 .from('vehicle_maintenances')
                 .delete()
                 .eq('id', id)

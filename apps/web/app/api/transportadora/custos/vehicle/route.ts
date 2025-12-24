@@ -53,7 +53,7 @@ export async function GET(req: NextRequest) {
       .single()
 
     let query = supabaseServiceRole
-      .from('vehicle_costs' as any)
+      .from('vehicle_costs')
       .select(`
         *,
         veiculos(plate, model, transportadora_id)
@@ -77,7 +77,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Filtrar apenas veículos da transportadora do usuário após buscar
-    const filteredData = (data || []).filter((cost: any) => {
+    const filteredData = (data || []).filter((cost: { veiculos?: { transportadora_id?: string } | null; [key: string]: unknown }) => {
       if (!userData?.transportadora_id) return false
       const veiculo = cost.veiculos
       if (!veiculo) return false
@@ -85,7 +85,7 @@ export async function GET(req: NextRequest) {
     })
 
     return NextResponse.json(filteredData)
-  } catch (error: any) {
+  } catch (error: unknown) {
     return NextResponse.json(
       { error: 'Erro ao processar requisição', message: error.message },
       { status: 500 }
@@ -134,7 +134,7 @@ export async function POST(req: NextRequest) {
     }
 
     const { data, error } = await supabaseServiceRole
-      .from('vehicle_costs' as any)
+      .from('vehicle_costs')
       .insert({
         ...validated,
         created_by: user.id,
@@ -150,7 +150,7 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json(data, { status: 201 })
-  } catch (error: any) {
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: 'Dados inválidos', details: error.errors },

@@ -157,7 +157,7 @@ export default function TransportadoraVeiculosPage() {
 
             // Buscar última manutenção
             const { data: lastMaintenance } = await supabase
-              .from('vehicle_maintenances' as any)
+              .from('vehicle_maintenances')
               .select('*')
               .eq('veiculo_id', v.id)
               .order('completed_date', { ascending: false })

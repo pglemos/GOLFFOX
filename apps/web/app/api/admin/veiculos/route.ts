@@ -96,7 +96,7 @@ export async function POST(request: NextRequest) {
         .limit(1)
 
       if (companies && companies.length > 0) {
-        finalCompanyId = (companies[0] as any).id
+        finalCompanyId = (companies[0] as EmpresaRow).id
       } else if (isTestMode || isDevelopment) {
         // Criar empresa de teste automaticamente
         try {
@@ -107,12 +107,12 @@ export async function POST(request: NextRequest) {
               id: testCompanyId,
               name: 'Empresa Teste Padrão',
               is_active: true
-            } as any)
+            } as EmpresaInsert)
             .select('id')
             .single()
 
           if (!createCompanyError && newCompany) {
-            finalCompanyId = (newCompany as any).id
+            finalCompanyId = (newCompany as EmpresaRow).id
             logger.log(`✅ Empresa de teste criada automaticamente: ${finalCompanyId}`)
           } else if (createCompanyError && createCompanyError.code !== '23505') {
             // Se erro não for de duplicação, logar

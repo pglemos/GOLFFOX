@@ -42,13 +42,13 @@ export function CostCentersList({ companyId }: CostCentersListProps) {
     const loadCostCenters = async () => {
         try {
             const { data, error } = await supabase
-                .from('gf_cost_centers' as any)
+                .from('gf_cost_centers')
                 .select('*')
                 .eq('company_id', companyId)
                 .order('code')
 
             if (error) throw error
-            setCostCenters(data as any as CostCenter[])
+            setCostCenters((data as CostCenterRow[]) || [])
         } catch (error) {
             logError('Erro ao carregar centros de custo', { error }, 'CostCentersList')
             notifyError('Erro ao carregar dados')
@@ -66,7 +66,7 @@ export function CostCentersList({ companyId }: CostCentersListProps) {
             if (editingCenter) {
                 // Update
                 const { error } = await supabase
-                    .from('gf_cost_centers' as any)
+                    .from('gf_cost_centers')
                     .update({
                         code: formData.code,
                         name: formData.name,
@@ -79,13 +79,13 @@ export function CostCentersList({ companyId }: CostCentersListProps) {
             } else {
                 // Insert
                 const { error } = await supabase
-                    .from('gf_cost_centers' as any)
+                    .from('gf_cost_centers')
                     .insert({
-                        company_id: companyId,
+                        empresa_id: companyId,
                         code: formData.code,
                         name: formData.name,
                         is_active: formData.is_active
-                    })
+                    } as CostCenterInsert)
 
                 if (error) throw error
                 notifySuccess('Centro de custo criado')
@@ -106,7 +106,7 @@ export function CostCentersList({ companyId }: CostCentersListProps) {
 
         try {
             const { error } = await supabase
-                .from('gf_cost_centers' as any)
+                .from('gf_cost_centers')
                 .delete()
                 .eq('id', id)
 

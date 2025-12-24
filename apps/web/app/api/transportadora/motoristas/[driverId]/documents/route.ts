@@ -43,7 +43,7 @@ export async function GET(
     // Selecionar apenas colunas necessárias para listagem (otimização de performance)
     const documentColumns = 'id,motorista_id,document_type,document_number,file_url,file_name,file_size_bytes,issue_date,expiry_date,status,notes,created_at,updated_at'
     const { data, error } = await supabaseServiceRole
-      .from('driver_documents' as any)
+      .from('driver_documents')
       .select(documentColumns)
       .eq('motorista_id', params.driverId)
       .order('created_at', { ascending: false })
@@ -79,7 +79,7 @@ export async function POST(
     const validated = documentSchema.parse(body)
 
     const { data, error } = await supabaseServiceRole
-      .from('driver_documents' as any)
+      .from('driver_documents')
       .insert({
         motorista_id: params.driverId,
         ...validated,

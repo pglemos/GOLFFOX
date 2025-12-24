@@ -4,6 +4,7 @@ import { requireAuth } from '@/lib/api-auth'
 import { logger, logError } from '@/lib/logger'
 import { invalidateEntityCache } from '@/lib/next-cache'
 import { getSupabaseAdmin } from '@/lib/supabase-client'
+import type { Database } from '@/types/supabase'
 
 export const runtime = 'nodejs'
 
@@ -80,7 +81,7 @@ export async function DELETE(request: NextRequest) {
       // o trigger pode falhar, mas não deve bloquear a exclusão se tratarmos o erro corretamente
       logger.log('   2. Excluindo motorista_positions...')
       const { error: positionsError } = await supabaseAdmin
-        .from('motorista_positions' as any)
+        .from('motorista_positions')
         .delete()
         .in('viagem_id', tripIds)
 
@@ -112,7 +113,7 @@ export async function DELETE(request: NextRequest) {
 
       for (const table of dependentTables) {
         const { error: depError } = await supabaseAdmin
-          .from(table as any)
+          .from(table)
           .delete()
           .in('viagem_id', tripIds)
 
@@ -149,7 +150,7 @@ export async function DELETE(request: NextRequest) {
 
     // Segundo, excluir explicitamente paradas da rota (route_stops)
     const { error: stopsDeleteError } = await supabaseAdmin
-      .from('gf_route_plan' as any)
+      .from('gf_rota_plano')
       .delete()
       .eq('rota_id', routeId)
 

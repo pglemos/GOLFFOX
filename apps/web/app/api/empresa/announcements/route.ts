@@ -3,6 +3,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/api-auth';
 import { logError } from '@/lib/logger';
 import { getSupabaseAdmin } from '@/lib/supabase-client';
+import type { Database } from '@/types/supabase';
+
+type AnnouncementRow = Database['public']['Tables']['announcements']['Row']
+type AnnouncementInsert = Database['public']['Tables']['announcements']['Insert']
+type AnnouncementUpdate = Database['public']['Tables']['announcements']['Update']
 
 // GET /api/empresa/announcements - Listar avisos
 export async function GET(request: NextRequest) {
@@ -19,14 +24,14 @@ export async function GET(request: NextRequest) {
         const activeOnly = searchParams.get('active') !== 'false';
         const limit = parseInt(searchParams.get('limit') || '50');
 
-        let query = (supabase as any)
+        let query = supabase
             .from('announcements')
             .select('*')
             .order('published_at', { ascending: false })
             .limit(limit);
 
         if (companyId) {
-            query = query.eq('company_id', companyId);
+            query = query.eq('empresa_id', companyId);
         }
 
         if (type) {
@@ -73,10 +78,10 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        const { data, error } = await (supabase as any)
+        const { data, error } = await supabase
             .from('announcements')
             .insert({
-                company_id,
+                empresa_id: company_id,
                 transportadora_id,
                 title,
                 message,
@@ -122,7 +127,7 @@ export async function PUT(request: NextRequest) {
             );
         }
 
-        const { data, error } = await (supabase as any)
+        const { data, error } = await supabase
             .from('announcements')
             .update(updates)
             .eq('id', id)
@@ -162,9 +167,9 @@ export async function DELETE(request: NextRequest) {
             );
         }
 
-        const { error } = await (supabase as any)
+        const { error } = await supabase
             .from('announcements')
-            .update({ is_active: false })
+            .update({ is_active: false } as AnnouncementUpdate)
             .eq('id', id);
 
         if (error) {

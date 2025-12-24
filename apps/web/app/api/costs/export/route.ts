@@ -56,7 +56,7 @@ async function exportHandler(request: NextRequest) {
       'date', 'group_name', 'category', 'subcategory', 'route_name', 'vehicle_plate', 'driver_email', 'amount', 'qty', 'unit', 'source', 'notes', 'company_id', 'route_id', 'veiculo_id', 'motorista_id', 'cost_category_id'
     ]
     let query = getSupabaseAdmin()
-      .from('v_costs_secure' as any)
+      .from('v_costs_secure')
       .select(columns.join(','))
       .eq('company_id', companyId)
 
@@ -97,7 +97,7 @@ async function exportHandler(request: NextRequest) {
       .eq('id', companyId)
       .single()
 
-    const companyName = (company as any)?.name || 'Empresa'
+    const companyName = (company as EmpresaRow)?.name || 'Empresa'
 
     // Preparar dados para exportação
     const reportData = {
@@ -117,7 +117,7 @@ async function exportHandler(request: NextRequest) {
         'Origem',
         'Observações'
       ],
-      rows: (costs || []).map((cost: any) => [
+      rows: (costs || []).map((cost: CostsSecureRow) => [
         new Date(cost.date).toLocaleDateString('pt-BR'),
         cost.group_name || '-',
         cost.category || '-',
@@ -153,7 +153,7 @@ async function exportHandler(request: NextRequest) {
           const pageLimit = limit
           while (true) {
             const { data: page, error: pageError } = await getSupabaseAdmin()
-              .from('v_costs_secure' as any)
+              .from('v_costs_secure')
               .select(columns.join(','))
               .eq('company_id', companyId)
               .order('date', { ascending: false })
@@ -168,7 +168,7 @@ async function exportHandler(request: NextRequest) {
             }
 
             for (const cost of page) {
-              const costData = cost as any
+              const costData = cost as CostsSecureRow
               const cells = [
                 new Date(costData.date).toLocaleDateString('pt-BR'),
                 costData.group_name || '-',
