@@ -104,7 +104,7 @@ export function CSVImportModal({ isOpen, onClose, onSave, empresaId }: CSVImport
           i18n: { ns: 'common', key: 'success.validRowsFound', params: { count: result.valid.length } }
         })
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       logError("Erro ao ler arquivo", { error }, 'CSVImportModal')
       notifyError(`Erro ao ler arquivo: ${error.message || 'Erro desconhecido'}`)
     }

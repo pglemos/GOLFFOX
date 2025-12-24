@@ -154,7 +154,7 @@ export function useFileUpload(options: UseFileUploadOptions): UseFileUploadRetur
                 setProgress(50)
 
                 if (!response.ok) {
-                    let errorData: any = {}
+                    let errorData: { error?: string; details?: string } = {}
                     try {
                         errorData = await response.json()
                     } catch {

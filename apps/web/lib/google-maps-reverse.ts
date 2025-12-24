@@ -49,7 +49,12 @@ export async function reverseGeocode(
       // Extrair componentes do endereço
       const components: ReverseGeocodeResult['components'] = {}
       
-      result.address_components.forEach((component: any) => {
+      interface AddressComponent {
+        long_name: string
+        short_name: string
+        types: string[]
+      }
+      result.address_components.forEach((component: AddressComponent) => {
         const types = component.types
         
         if (types.includes('street_number')) {

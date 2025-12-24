@@ -66,10 +66,10 @@ export async function PUT(
     await invalidateEntityCache('motorista', driverId)
 
     return NextResponse.json({ success: true, motorista })
-  } catch (error: any) {
+  } catch (error: unknown) {
     logError('Erro na API de atualizar motorista', { error, driverId: (await context.params).driverId }, 'TransportadoraDriverUpdateAPI')
     return NextResponse.json(
-      { success: false, error: error.message || 'Erro desconhecido' },
+      { success: false, error: error instanceof Error ? error.message : 'Erro desconhecido' },
       { status: 500 }
     )
   }
@@ -113,10 +113,10 @@ export async function DELETE(
     await invalidateEntityCache('motorista', driverId)
 
     return NextResponse.json({ success: true })
-  } catch (error: any) {
+  } catch (error: unknown) {
     logError('Erro na API de excluir motorista', { error, driverId: (await context.params).driverId }, 'TransportadoraDriverDeleteAPI')
     return NextResponse.json(
-      { success: false, error: error.message || 'Erro desconhecido' },
+      { success: false, error: error instanceof Error ? error.message : 'Erro desconhecido' },
       { status: 500 }
     )
   }

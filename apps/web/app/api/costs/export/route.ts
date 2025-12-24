@@ -42,7 +42,7 @@ async function exportHandler(request: NextRequest) {
     }
 
     // Parse filters
-    let filters: any = {}
+    let filters: Record<string, unknown> = {}
     if (filtersParam) {
       try {
         filters = JSON.parse(filtersParam)

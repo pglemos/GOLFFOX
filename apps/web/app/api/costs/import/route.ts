@@ -81,9 +81,15 @@ async function importHandler(request: NextRequest) {
       .select('id, group_name, category, subcategory')
       .eq('is_active', true)
 
-    const categoryMap = new Map()
-    categories?.forEach((cat: any) => {
-      const key = `${cat.group_name}|${cat.category}|${cat.subcategory || ''}`
+    import type { Database } from '@/types/supabase'
+    type GfCostCategoriesRow = Database['public']['Tables']['gf_cost_categories']['Row']
+    
+    const categoryMap = new Map<string, string>()
+    categories?.forEach((cat: GfCostCategoriesRow) => {
+      const groupName = (cat as { group_name?: string; category?: string; subcategory?: string }).group_name || ''
+      const category = (cat as { category?: string }).category || ''
+      const subcategory = (cat as { subcategory?: string }).subcategory || ''
+      const key = `${groupName}|${category}|${subcategory}`
       categoryMap.set(key, cat.id)
     })
 
@@ -189,7 +195,7 @@ async function importHandler(request: NextRequest) {
       errors: errors.length,
       errors_details: errors.slice(0, 10) // Limitar detalhes de erros
     })
-  } catch (error: any) {
+  } catch (error: unknown) {
     logError('Erro ao importar custos', { error, companyId: request.formData ? (await request.formData()).get('company_id') : null }, 'CostsImportAPI')
     return NextResponse.json(
       { error: error.message || 'Erro desconhecido' },

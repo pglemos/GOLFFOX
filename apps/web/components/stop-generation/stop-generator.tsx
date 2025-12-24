@@ -72,8 +72,8 @@ export default function StopGenerator({ routeId }: { routeId: string }) {
       const json = (await resp.json()) as ApiResponse
       setData(json)
       drawOnMap(json)
-    } catch (e: any) {
-      setError(e?.message || 'Falha ao gerar pontos')
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Falha ao gerar pontos')
     } finally {
       setLoading(false)
     }

@@ -123,10 +123,10 @@ export const cacheService = new CacheService()
  * Decorator para cachear resultado de função
  */
 export function cached(key: string, ttl: number = 5 * 60 * 1000) {
-  return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+  return function (target: unknown, propertyKey: string, descriptor: PropertyDescriptor) {
     const originalMethod = descriptor.value
 
-    descriptor.value = async function (...args: any[]) {
+    descriptor.value = async function (...args: unknown[]) {
       const cacheKey = `${key}:${JSON.stringify(args)}`
       const cached = cacheService.get(cacheKey)
 
@@ -180,7 +180,7 @@ export async function withCache<T>(
  *   { revalidate: 3600 }
  * )
  */
-export function createNextCache<T extends (...args: any[]) => Promise<any>>(
+export function createNextCache<T extends (...args: unknown[]) => Promise<unknown>>(
   fn: T,
   tags: string[] = [],
   options: {

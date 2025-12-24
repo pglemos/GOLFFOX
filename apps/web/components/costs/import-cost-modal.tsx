@@ -90,9 +90,10 @@ export function ImportCostModal({ isOpen, onClose, onSave, companyId }: ImportCo
           }
         })
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const err = error as { message?: string }
       logError('Erro ao processar arquivo', { error }, 'ImportCostModal')
-      notifyError('', undefined, { i18n: { ns: 'common', key: 'errors.processFile', params: { message: error?.message || 'Erro desconhecido' } } })
+      notifyError('', undefined, { i18n: { ns: 'common', key: 'errors.processFile', params: { message: err?.message || 'Erro desconhecido' } } })
     }
   }
 
@@ -133,7 +134,8 @@ export function ImportCostModal({ isOpen, onClose, onSave, companyId }: ImportCo
       onSave()
       onClose()
       reset()
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const err = error as { message?: string }
       logError('Erro ao importar custos', { error }, 'ImportCostModal')
       notifyError('', undefined, {
         i18n: {

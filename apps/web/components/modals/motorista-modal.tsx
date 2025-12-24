@@ -238,7 +238,7 @@ export function MotoristaModal({ motorista, isOpen, onClose, onSave, carriers = 
 
       onSave()
       onClose()
-    } catch (error: any) {
+    } catch (error: unknown) {
       logError("Erro ao salvar motorista", { error }, 'MotoristaModal')
       notifyError(error, t('common', 'errors.saveDriver'))
     } finally {
@@ -285,7 +285,7 @@ export function MotoristaModal({ motorista, isOpen, onClose, onSave, carriers = 
 
       notifySuccess('', { i18n: { ns: 'common', key: 'success.documentUploaded' } })
       loadMotoristaData(motorista.id)
-    } catch (error: any) {
+    } catch (error: unknown) {
       logError("Erro ao fazer upload", { error }, 'MotoristaModal')
       notifyError(error, t('common', 'errors.documentUpload'))
     }

@@ -79,9 +79,10 @@ export function CompanyUsersModal({
       } else {
         throw new Error(result.error || 'Erro ao carregar usuários')
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const err = error as { message?: string }
       logError('Erro ao carregar usuários', { error }, 'CompanyOperadoresModal')
-      notifyError(error, error.message || 'Erro ao carregar usuários')
+      notifyError(error, err.message || 'Erro ao carregar usuários')
     } finally {
       setLoading(false)
     }
@@ -106,9 +107,10 @@ export function CompanyUsersModal({
       notifySuccess('Usuário excluído com sucesso')
       await loadOperators()
       globalSyncManager.triggerSync('user.deleted', { id: operatorId })
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const err = error as { message?: string }
       logError('Erro ao excluir usuário', { error }, 'CompanyOperadoresModal')
-      notifyError(error, error.message || 'Erro ao excluir usuário')
+      notifyError(error, err.message || 'Erro ao excluir usuário')
     }
   }
 

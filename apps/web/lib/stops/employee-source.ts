@@ -30,7 +30,7 @@ export async function getEmployeesForRoute(routeId: string, employeeDb?: string,
     if (error) throw error
     if (!data || data.length === 0) return []
 
-    return data.map((row: any) => ({
+    return data.map((row: { id: string; name: string; route_id?: string; street?: string; number?: string; neighborhood?: string; city?: string; state?: string; cep?: string }) => ({
       id: row.id,
       fullName: row.name,
       routeId: row.route_id,
@@ -56,7 +56,7 @@ export async function getEmployeesForRoute(routeId: string, employeeDb?: string,
       if (error) throw error
       if (!data || data.length === 0) return []
 
-      return data.map((row: any) => ({
+      return data.map((row: { id: string; full_name: string; route_id?: string; street?: string; number?: string; neighborhood?: string; city?: string; state?: string; cep?: string }) => ({
         id: row.id,
         fullName: row.full_name,
         routeId: row.route_id,

@@ -141,7 +141,9 @@ export async function GET(request: NextRequest) {
         }
 
         // Transformar para o tipo ManualRevenue (snake_case)
-        const revenues: ManualRevenue[] = (data || []).map((row: any) => ({
+        import type { Database } from '@/types/supabase'
+        type GfManualRevenuesRow = Database['public']['Tables']['gf_manual_revenues']['Row']
+        const revenues: ManualRevenue[] = (data || []).map((row: GfManualRevenuesRow) => ({
             id: row.id,
             company_id: row.company_id,
             transportadora_id: row.transportadora_id,

@@ -170,8 +170,8 @@ export function DocumentUpload({
 
       // Resetar sucesso após 3 segundos
       setTimeout(() => setSuccess(false), 3000)
-    } catch (err: any) {
-      const errorMessage = err.message || 'Erro ao fazer upload do arquivo'
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Erro ao fazer upload do arquivo'
       setError(errorMessage)
       onError?.(errorMessage)
     } finally {

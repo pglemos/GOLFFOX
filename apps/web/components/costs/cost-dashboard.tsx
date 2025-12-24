@@ -106,11 +106,11 @@ export function CostDashboard({ companyId, period = '30' }: CostDashboardProps) 
           const breakdownRes = await fetch(`/api/costs/manual?company_id=${companyId}&limit=200`, { headers: { 'x-test-mode': 'true' } })
           if (breakdownRes.ok) {
             const { data } = await breakdownRes.json()
-            const grouped = (data || []).reduce((acc: any, cost: any) => {
+            const grouped = (data || []).reduce((acc: Record<string, number>, cost: { group_name?: string; amount?: number | string }) => {
               const group = cost.group_name || 'Outros'
-              acc[group] = (acc[group] || 0) + parseFloat(cost.amount || 0)
+              acc[group] = (acc[group] || 0) + parseFloat(String(cost.amount || 0))
               return acc
-            }, {})
+            }, {} as Record<string, number>)
             setBreakdown(
               Object.entries(grouped)
                 .map(([name, value]) => ({ name, value: value as number }))
@@ -123,11 +123,11 @@ export function CostDashboard({ companyId, period = '30' }: CostDashboardProps) 
           if (trendRes.ok) {
             const { data: trendCosts } = await trendRes.json()
             const monthlyMap: Record<string, number> = {};
-            (trendCosts || []).forEach((cost: any) => {
+            (trendCosts || []).forEach((cost: { date?: string; cost_date?: string; amount?: number | string }) => {
               const dateStr = cost.date || cost.cost_date
               const d = dateStr ? new Date(dateStr) : null
               const monthKey = d && !isNaN(d.getTime()) ? d.toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' }) : 'N/A'
-              monthlyMap[monthKey] = (monthlyMap[monthKey] || 0) + parseFloat(cost.amount || 0)
+              monthlyMap[monthKey] = (monthlyMap[monthKey] || 0) + parseFloat(String(cost.amount || 0))
             })
             const trendData = Object.entries(monthlyMap)
               .filter(([m]) => m !== 'N/A')

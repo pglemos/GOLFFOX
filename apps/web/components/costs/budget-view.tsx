@@ -122,9 +122,9 @@ export function BudgetView({ companyId }: BudgetViewProps) {
       setEditingBudget(null)
       resetForm()
       loadData()
-    } catch (error: any) {
+    } catch (error: unknown) {
       logError('Erro ao salvar orçamento', { error }, 'BudgetView')
-      notifyError(error, 'Erro ao salvar orçamento')
+      notifyError(error instanceof Error ? error : new Error('Erro desconhecido'), 'Erro ao salvar orçamento')
     }
   }
 
@@ -143,9 +143,9 @@ export function BudgetView({ companyId }: BudgetViewProps) {
 
       notifySuccess('Orçamento excluído com sucesso!')
       loadData()
-    } catch (error: any) {
+    } catch (error: unknown) {
       logError('Erro ao excluir orçamento', { error }, 'BudgetView')
-      notifyError(error, 'Erro ao excluir orçamento')
+      notifyError(error instanceof Error ? error : new Error('Erro desconhecido'), 'Erro ao excluir orçamento')
     }
   }
 

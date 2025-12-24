@@ -110,7 +110,15 @@ class EventStore {
   /**
    * Mapear dados do banco para DomainEvent
    */
-  private mapToDomainEvent(row: any): DomainEvent {
+  private mapToDomainEvent(row: {
+    event_id: string
+    event_type: string
+    aggregate_id: string
+    aggregate_type: string
+    occurred_at: string
+    event_data: Record<string, unknown>
+    metadata?: Record<string, unknown>
+  }): DomainEvent {
     return {
       eventId: row.event_id,
       eventType: row.event_type,

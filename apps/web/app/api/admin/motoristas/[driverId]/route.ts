@@ -67,7 +67,7 @@ export async function PUT(
     // Invalidação de cache já é feita no UserService
 
     return successResponse({ motorista: updatedMotorista })
-  } catch (error: any) {
+  } catch (error: unknown) {
     logError('Erro na API de atualizar motorista', { error, driverId: (await context.params).driverId }, 'DriversUpdateAPI')
     return errorResponse(error, 500, 'Erro ao atualizar motorista')
   }
@@ -103,10 +103,10 @@ export async function GET(
     }
 
     return NextResponse.json({ success: true, motorista })
-  } catch (error: any) {
+  } catch (error: unknown) {
     logError('Erro na API de buscar motorista', { error, driverId: (await context.params).driverId }, 'DriversGetAPI')
     return NextResponse.json(
-      { success: false, error: error.message || 'Erro desconhecido' },
+      { success: false, error: error instanceof Error ? error.message : 'Erro desconhecido' },
       { status: 500 }
     )
   }

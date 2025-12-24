@@ -41,7 +41,7 @@ type SyncCallback = (event: { type: SyncEventType; data: any }) => void
 export function useGlobalSync(
   eventTypes: SyncEventType[],
   callback: SyncCallback,
-  deps: any[] = []
+  deps: unknown[] = []
 ) {
   const callbackRef = useRef(callback)
   const idRef = useRef(`sync-${Math.random().toString(36).substring(7)}`)
@@ -65,7 +65,7 @@ export function useGlobalSync(
     }
   }, [eventTypes.join(',')])
 
-  return useCallback((eventType: SyncEventType, data: any) => {
+  return useCallback((eventType: SyncEventType, data: Record<string, unknown>) => {
     globalSyncManager.triggerSync(eventType, data)
   }, [])
 }

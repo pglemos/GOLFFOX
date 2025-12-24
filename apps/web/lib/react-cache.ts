@@ -18,7 +18,7 @@ import { debug } from './logger'
  *   return await fetchCompany(id)
  * })
  */
-export function createCachedFunction<T extends (...args: any[]) => Promise<any>>(
+export function createCachedFunction<T extends (...args: unknown[]) => Promise<unknown>>(
   fn: T
 ): T {
   return cache(fn) as T
@@ -34,7 +34,7 @@ export function createCachedFunction<T extends (...args: any[]) => Promise<any>>
  *   return data
  * })
  */
-export function cacheDataFetch<T extends (...args: any[]) => Promise<any>>(
+export function cacheDataFetch<T extends (...args: unknown[]) => Promise<unknown>>(
   fn: T,
   key?: string
 ): T {

@@ -77,9 +77,10 @@ export function TransportadoraUsersModal({ transportadora, isOpen, onClose, onSa
       setShowCreateForm(false)
       loadUsers()
       onSave()
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const err = error as { message?: string }
       logError('Erro ao criar usuário', { error }, 'TransportadoraUsersModal')
-      notifyError(error, error.message || 'Erro ao criar usuário')
+      notifyError(error, err.message || 'Erro ao criar usuário')
     } finally {
       setLoading(false)
     }
@@ -104,9 +105,10 @@ export function TransportadoraUsersModal({ transportadora, isOpen, onClose, onSa
       notifySuccess('Usuário excluído com sucesso')
       loadUsers()
       onSave()
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const err = error as { message?: string }
       logError('Erro ao excluir usuário', { error }, 'TransportadoraUsersModal')
-      notifyError(error, error.message || 'Erro ao excluir usuário')
+      notifyError(error, err.message || 'Erro ao excluir usuário')
     }
   }
 

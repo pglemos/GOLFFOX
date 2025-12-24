@@ -174,10 +174,10 @@ export async function POST(request: NextRequest) {
       shouldNotify: shouldNotifyResult.shouldNotify,
       notifyReason: shouldNotifyResult.reason
     })
-  } catch (error: any) {
+  } catch (error: unknown) {
     logError('Erro ao verificar proximidade', { error }, 'CheckProximityAPI')
     return NextResponse.json(
-      { error: error.message || 'Erro ao verificar proximidade' },
+      { error: error instanceof Error ? error.message : 'Erro ao verificar proximidade' },
       { status: 500 }
     )
   }
@@ -218,10 +218,10 @@ export async function GET(request: NextRequest) {
     })
 
     return POST(mockRequest)
-  } catch (error: any) {
+  } catch (error: unknown) {
     logError('Erro no GET check-proximity', { error }, 'CheckProximityAPI')
     return NextResponse.json(
-      { error: error.message || 'Erro ao verificar proximidade' },
+      { error: error instanceof Error ? error.message : 'Erro ao verificar proximidade' },
       { status: 500 }
     )
   }

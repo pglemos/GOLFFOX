@@ -398,7 +398,7 @@ export function useAdminMap(options: UseAdminMapOptions = {}): UseAdminMapReturn
         return
       }
 
-      const actualPositions: ActualPosition[] = (trajectoryData || []).map((p: any) => ({
+      const actualPositions: ActualPosition[] = (trajectoryData || []).map((p: { latitude?: number; lat?: number; longitude?: number; lng?: number; recorded_at?: string; timestamp?: string; speed?: number }) => ({
         lat: p.latitude || p.lat,
         lng: p.longitude || p.lng,
         timestamp: new Date(p.recorded_at || p.timestamp).getTime(),
@@ -417,7 +417,7 @@ export function useAdminMap(options: UseAdminMapOptions = {}): UseAdminMapReturn
 
       const analysis = analyzeTrajectory(plannedRoute, actualPositions)
       setTrajectoryAnalysis(analysis)
-    } catch (err: any) {
+    } catch (err: unknown) {
       logError('Erro ao analisar trajetória', { error: err }, 'useAdminMap')
       notifyError(err, 'Erro ao analisar trajetória')
     }

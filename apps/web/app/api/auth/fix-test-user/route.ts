@@ -49,7 +49,8 @@ export async function GET(req: NextRequest) {
       const { data: users, error: listError } = await supabaseAdmin.auth.admin.listUsers()
       if (listError) throw listError
 
-      existing = users?.users?.find((u: any) => u.email?.toLowerCase() === testEmail.toLowerCase())
+      type AdminUser = { id: string; email?: string }
+      existing = users?.users?.find((u: AdminUser) => u.email?.toLowerCase() === testEmail.toLowerCase())
     }
 
     if (!existing) {

@@ -153,7 +153,7 @@ export class RealtimeService {
       if (this.options.enablePolling) {
         this.startPolling()
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       error('Erro ao conectar realtime', { error: err }, 'RealtimeService')
       this.options.onError?.(err instanceof Error ? err : new Error(String(err)))
 
@@ -443,7 +443,7 @@ export class RealtimeService {
             }
           })
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
         error('Erro no polling de posições', { error: err }, 'RealtimeService')
       }
     }, this.options.pollingInterval)

@@ -76,7 +76,8 @@ export async function GET(request: NextRequest) {
       const routesQuery = supabaseAdmin.from('rotas').select('id').eq('empresa_id', companyId)
       const { data: routes } = await routesQuery
       if (routes && routes.length > 0) {
-        query = query.in('rota_id', routes.map((r: any) => r.id))
+        type RotasRow = Database['public']['Tables']['rotas']['Row']
+        query = query.in('rota_id', routes.map((r: RotasRow) => r.id))
       } else {
         query = query.eq('rota_id', '00000000-0000-0000-0000-000000000000') // Never matches
       }
@@ -300,7 +301,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Criar viagem
-    const tripData: any = {
+    type ViagensInsert = Database['public']['Tables']['viagens']['Insert']
+    const tripData: ViagensInsert = {
       rota_id: routeId,
       scheduled_date: finalScheduledDate,
       status: status

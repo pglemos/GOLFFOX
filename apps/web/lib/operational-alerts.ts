@@ -5,8 +5,11 @@
 
 import { error as logError, warn } from './logger'
 
+import type { SupabaseClient } from '@supabase/supabase-js'
+import type { Database } from '@/types/supabase'
+
 // Importação condicional do Supabase - apenas no servidor
-let supabase: any = null
+let supabase: SupabaseClient<Database> | null = null
 if (typeof window === 'undefined') {
   // Apenas no servidor, importar Supabase
   try {
@@ -17,7 +20,7 @@ if (typeof window === 'undefined') {
   }
 }
 
-function formatSupabaseError(error: any): string {
+function formatSupabaseError(error: unknown): string {
   if (!error) return 'Erro desconhecido'
   const e = error.error || error
   if (typeof e === 'string') return e

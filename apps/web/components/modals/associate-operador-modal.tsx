@@ -62,7 +62,7 @@ export function AssociateOperatorModal({
       }
       
       setOperators(data || [])
-    } catch (err: any) {
+    } catch (err: unknown) {
       logError("Erro ao carregar operadores", { error: err }, 'AssociateOperadorModal')
       setError("Erro ao carregar operadores. Verifique se há operadores cadastrados.")
       setOperators([]) // Definir array vazio em caso de erro
@@ -105,8 +105,9 @@ export function AssociateOperatorModal({
       onSave()
       onClose()
       setOperatorEmail("")
-    } catch (err: any) {
-      setError(err.message || "Erro ao associar operador")
+    } catch (err: unknown) {
+      const error = err as { message?: string }
+      setError(error.message || "Erro ao associar operador")
     } finally {
       setLoading(false)
     }

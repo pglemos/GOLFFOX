@@ -12,7 +12,8 @@
 
 import { debug, warn, logError } from '@/lib/logger'
 
-let datadogTracer: any = null
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let datadogTracer: any = null // Datadog tracer type is not available in @types/dd-trace
 let isInitialized = false
 
 /**
@@ -125,6 +126,7 @@ export function getDatadogTracer() {
 /**
  * Criar span customizado
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function createSpan(name: string, operation: string, callback: (span: any) => Promise<any>) {
   const tracer = getDatadogTracer()
   if (!tracer) {

@@ -112,7 +112,8 @@ export async function POST(
 
     try {
       const { data: authUsers } = await supabase.auth.admin.listUsers()
-      const found = authUsers?.users?.find((u: any) => u.email?.toLowerCase() === authEmail.toLowerCase())
+      type AdminUser = { id: string; email?: string }
+      const found = authUsers?.users?.find((u: AdminUser) => u.email?.toLowerCase() === authEmail.toLowerCase())
       if (found) {
         authUserId = found.id
         existingAuthUser = true
@@ -135,7 +136,8 @@ export async function POST(
         if (authError.message?.includes('already') || authError.message?.includes('registered')) {
           try {
             const { data: authUsers } = await supabase.auth.admin.listUsers()
-            const found = authUsers?.users?.find((u: any) => u.email?.toLowerCase() === authEmail.toLowerCase())
+            type AdminUser = { id: string; email?: string }
+      const found = authUsers?.users?.find((u: AdminUser) => u.email?.toLowerCase() === authEmail.toLowerCase())
             if (found) {
               authUserId = found.id
               existingAuthUser = true

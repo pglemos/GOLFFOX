@@ -97,7 +97,7 @@ export function exportReconciliationReport(
         params: { format: format.toUpperCase() }
       }
     })
-  } catch (error: any) {
+  } catch (error: unknown) {
     logError('Erro ao exportar relatório', { error }, 'ExportHandler')
     notifyError('Erro ao exportar', undefined, {
       i18n: { ns: 'common', key: 'errors.export' }

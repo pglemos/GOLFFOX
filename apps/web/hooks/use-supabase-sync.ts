@@ -47,13 +47,14 @@ export function useSupabaseSync(options: UseSupabaseSyncOptions = {}) {
         }
 
         return result
-      } catch (error: any) {
+      } catch (error: unknown) {
+        const err = error as { message?: string }
         const errorResult: SyncResult = {
           success: false,
           attempts: 1,
           error: {
             code: 500,
-            message: error.message || 'Erro desconhecido',
+            message: err.message || 'Erro desconhecido',
             body: error,
             timestamp: new Date().toISOString(),
           },
@@ -84,7 +85,7 @@ export function useSupabaseSync(options: UseSupabaseSyncOptions = {}) {
         notifySuccess('', { i18n: { ns: 'common', key: 'success.reprocessSync', params: { succeeded: result.succeeded, failed: result.failed } } })
       }
       return result
-    } catch (error: any) {
+    } catch (error: unknown) {
       if (showToast) {
         notifyError('', undefined, { i18n: { ns: 'common', key: 'errors.reprocessSync' } })
       }

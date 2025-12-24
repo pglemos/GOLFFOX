@@ -60,9 +60,10 @@ async function createAuditLog(context: AuditContext): Promise<{ success: boolean
     }
 
     return { success: true }
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const err = error as { message?: string }
     logError('Exceção ao criar log de auditoria', { error, context }, 'DangerousRouteAudit')
-    return { success: false, error: error?.message || 'Erro desconhecido' }
+    return { success: false, error: err?.message || 'Erro desconhecido' }
   }
 }
 
@@ -174,7 +175,7 @@ export function withDangerousRouteAudit<T = any>(
       })
       
       return response
-    } catch (error: any) {
+    } catch (error: unknown) {
       // Registrar erro na auditoria
       logError('Erro ao executar operação perigosa', {
         error,

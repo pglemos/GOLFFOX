@@ -102,7 +102,7 @@ export function CreateOperatorModal({
         formData.addressData.cep ? `CEP: ${formData.addressData.cep}` : ''
       ].filter(Boolean).join(', ')
 
-      const requestBody: any = {
+      const requestBody: Record<string, unknown> = {
         companyName: formData.companyName,
         cnpj: formData.cnpj || null,
         stateRegistration: formData.stateRegistration || null,
@@ -239,7 +239,7 @@ export function CreateOperatorModal({
         setStep(1)
         setProgress("")
       }, 2000)
-    } catch (error: any) {
+    } catch (error: unknown) {
       logError("Erro ao criar empresa", { error }, 'CreateOperadorModal')
       notifyError(error, "Erro ao criar empresa")
       setStep(1)

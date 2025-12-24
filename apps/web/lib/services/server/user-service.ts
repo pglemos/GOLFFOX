@@ -198,7 +198,7 @@ export class UserService {
         throw new Error(`Erro ao listar motoristas: ${error.message}`)
       }
 
-      const drivers = (data || []).map((driver: any) => ({
+      const drivers = (data || []).map((driver: { transportadora?: { name?: string } | null; [key: string]: unknown }) => ({
         ...driver,
         transportadora_name: driver.transportadora?.name
       }))
@@ -312,7 +312,7 @@ export class UserService {
       if (!userId) throw new Error("Falha crítica ao obter ID do usuário")
 
       // 4. Criar registro no Banco de Dados
-      const userData: any = {
+      const userData: UserInsert = {
         id: userId,
         email: sanitizedEmail,
         name: name.trim(),

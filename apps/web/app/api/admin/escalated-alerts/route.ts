@@ -52,10 +52,10 @@ export async function GET(request: NextRequest) {
     debug('Alertas escalados buscados', { count: data?.length || 0 }, 'escalated-alerts-api')
 
     return NextResponse.json({ alerts: data || [] }, { status: 200 })
-  } catch (error: any) {
+  } catch (error: unknown) {
     logError('Exceção ao buscar alertas escalados', { error }, 'escalated-alerts-api')
     return NextResponse.json(
-      { error: 'Erro interno ao buscar alertas escalados', details: error.message },
+      { error: 'Erro interno ao buscar alertas escalados', details: error instanceof Error ? error.message : 'Erro desconhecido' },
       { status: 500 }
     )
   }
@@ -118,10 +118,10 @@ export async function POST(request: NextRequest) {
     debug('Alerta escalado criado', { id: data.id }, 'escalated-alerts-api')
 
     return NextResponse.json({ alert: data }, { status: 201 })
-  } catch (error: any) {
+  } catch (error: unknown) {
     logError('Exceção ao criar alerta escalado', { error }, 'escalated-alerts-api')
     return NextResponse.json(
-      { error: 'Erro interno ao criar alerta escalado', details: error.message },
+      { error: 'Erro interno ao criar alerta escalado', details: error instanceof Error ? error.message : 'Erro desconhecido' },
       { status: 500 }
     )
   }

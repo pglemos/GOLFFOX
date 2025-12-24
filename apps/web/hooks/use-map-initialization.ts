@@ -36,7 +36,7 @@ interface UseMapInitializationOptions {
   /**
    * Callback para definir status de billing
    */
-  onBillingStatusChange: (status: any) => void
+  onBillingStatusChange: (status: { active?: boolean; [key: string]: unknown }) => void
   /**
    * Callback para carregar dados iniciais
    */
@@ -60,7 +60,7 @@ interface UseMapInitializationOptions {
   /**
    * Função de tradução
    */
-  t: (ns: string, key: string, params?: any) => string
+  t: (ns: string, key: string, params?: Record<string, unknown>) => string
   /**
    * Callback para notificar erros
    */

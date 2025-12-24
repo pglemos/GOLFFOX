@@ -173,7 +173,7 @@ export function VehicleMaintenanceModal({
 
       onSave()
       onClose()
-    } catch (error: any) {
+    } catch (error: unknown) {
       logError("Erro ao salvar manutenção", { error }, 'VehicleMaintenanceModal')
       notifyError(error, 'Erro ao salvar manutenção', { i18n: { ns: 'common', key: 'errors.saveMaintenance' } })
     } finally {

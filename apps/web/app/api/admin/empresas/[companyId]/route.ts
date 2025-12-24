@@ -81,9 +81,9 @@ export async function PUT(
       success: true,
       company: updatedCompany
     })
-  } catch (err: any) {
+  } catch (err: unknown) {
     logError('Erro ao atualizar empresa', { error: err, companyId: (await context.params).companyId }, 'CompaniesUpdateAPI')
-    const message = err.message
+    const message = err instanceof Error ? err.message : 'Erro desconhecido'
     const status = message.includes('obrigatório') || message.includes('inválido') || message.includes('já existe') ? 400 : 500
 
     return NextResponse.json(
@@ -188,12 +188,12 @@ export async function DELETE(
         message: 'Empresa excluída com sucesso'
       })
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     const params = await context.params
     const { companyId: errorCompanyId } = params
     logError('Erro ao excluir empresa', { error, companyId: errorCompanyId }, 'CompaniesDeleteAPI')
     return NextResponse.json(
-      { error: 'Erro ao excluir empresa', message: error.message },
+      { error: 'Erro ao excluir empresa', message: error instanceof Error ? error.message : 'Erro desconhecido' },
       { status: 500 }
     )
   }

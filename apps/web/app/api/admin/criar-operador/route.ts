@@ -8,8 +8,11 @@ import { withRateLimit } from '@/lib/rate-limit'
 import { CompanyService, type CreateCompanyData } from '@/lib/services/server/company-service'
 import { UserService } from '@/lib/services/server/user-service'
 import { supabaseServiceRole } from '@/lib/supabase-server'
+import type { Database } from '@/types/supabase'
 
 export const runtime = 'nodejs'
+
+type EmpresasUpdate = Database['public']['Tables']['empresas']['Update']
 
 async function createOperatorHandler(request: NextRequest) {
   try {
@@ -53,7 +56,7 @@ async function createOperatorHandler(request: NextRequest) {
 
     // Atualizar campos extras (website, registros) - se existirem na tabela
     // TODO: Adicionar campos extras ao CompanyService se necessário
-    const extraFields: any = {}
+    const extraFields: Partial<EmpresasUpdate> = {}
     if (body?.stateRegistration) extraFields.state_registration = body.stateRegistration
     if (body?.municipalRegistration) extraFields.municipal_registration = body.municipalRegistration
     if (body?.website) extraFields.website = body.website
@@ -78,7 +81,7 @@ async function createOperatorHandler(request: NextRequest) {
         })
         userId = newUser.id
         operatorUser = newUser
-      } catch (err: any) {
+      } catch (err: unknown) {
         logError('Erro ao criar usuário operador', { error: err })
         // Não falhar criação da empresa se falhar usuário? 
         // Ou retornar erro parcial? Decisão: Retornar sucesso da empresa mas erro no operador (ou null)

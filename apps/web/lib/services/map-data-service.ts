@@ -27,9 +27,12 @@ export class MapDataService {
             .in('rota_id', routeIds)
             .order('stop_order')
 
-        const stopsByRoute = new Map<string, any[]>()
+        import type { Database } from '@/types/supabase'
+        type GfRotaPlanoRow = Database['public']['Tables']['gf_rota_plano']['Row']
+        
+        const stopsByRoute = new Map<string, Array<{ lat: number; lng: number; order: number }>>()
         if (stopsData) {
-            stopsData.forEach((stop: any) => {
+            stopsData.forEach((stop: GfRotaPlanoRow) => {
                 if (!stopsByRoute.has(stop.rota_id)) stopsByRoute.set(stop.rota_id, [])
                 stopsByRoute.get(stop.rota_id)?.push({
                     lat: stop.latitude,

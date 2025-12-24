@@ -98,7 +98,7 @@ export function ScheduleReportModal({
 
       if (error) throw error
       setCompanies(data || [])
-    } catch (error: any) {
+    } catch (error: unknown) {
       logError("Erro ao carregar empresas", { error }, 'ScheduleReportModal')
       notifyError("Erro ao carregar empresas", undefined, {
         i18n: { ns: 'common', key: 'errors.generic' }
@@ -232,9 +232,10 @@ export function ScheduleReportModal({
         setRecipients("")
         setIsActive(true)
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const err = error as { message?: string }
       logError("Erro ao criar agendamento", { error }, 'ScheduleReportModal')
-      notifyError(error.message || "Erro ao criar agendamento", undefined, {
+      notifyError(err.message || "Erro ao criar agendamento", undefined, {
         i18n: { ns: 'operador', key: 'reports.schedule.errors.createSchedule' }
       })
     } finally {

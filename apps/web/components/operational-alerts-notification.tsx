@@ -102,7 +102,7 @@ export function OperationalAlertsNotification() {
       await resolveAlert(alertId, `Resolvido por ${session.user.email}`)
       await loadAlerts()
       notifySuccess('', { i18n: { ns: 'common', key: 'success.alertResolved' } })
-    } catch (error: any) {
+    } catch (error: unknown) {
       logError('Erro ao resolver alerta', { error }, 'OperationalAlertsNotification')
       notifyError('Erro ao resolver alerta', undefined, { i18n: { ns: 'common', key: 'errors.resolveAlert' } })
     }

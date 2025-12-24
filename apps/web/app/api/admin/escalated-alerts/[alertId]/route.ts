@@ -72,7 +72,10 @@ export async function PATCH(
       }
     }
 
-    const updateData: any = {
+    import type { Database } from '@/types/supabase'
+    type GfEscalatedAlertsUpdate = Database['public']['Tables']['gf_escalated_alerts']['Update']
+    
+    const updateData: GfEscalatedAlertsUpdate = {
       status,
       updated_at: new Date().toISOString()
     }
@@ -80,7 +83,7 @@ export async function PATCH(
     // Se estiver resolvendo, adiciona resolved_at e resolution
     if (status === 'resolved') {
       updateData.resolved_at = new Date().toISOString()
-      updateData.resolved_by = resolvedBy
+      updateData.resolved_by = resolvedBy || null
       if (resolution) {
         updateData.resolution = resolution
       }
@@ -104,10 +107,10 @@ export async function PATCH(
     debug('Alerta escalado atualizado', { id: alertId, status }, 'escalated-alerts-api')
 
     return NextResponse.json({ alert: data }, { status: 200 })
-  } catch (error: any) {
+  } catch (error: unknown) {
     logError('Exceção ao atualizar alerta escalado', { error }, 'escalated-alerts-api')
     return NextResponse.json(
-      { error: 'Erro interno ao atualizar alerta escalado', details: error.message },
+      { error: 'Erro interno ao atualizar alerta escalado', details: error instanceof Error ? error.message : 'Erro desconhecido' },
       { status: 500 }
     )
   }

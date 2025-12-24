@@ -125,7 +125,7 @@ async function createOrUpdateBudgetHandler(request: NextRequest) {
     let validated
     try {
       validated = budgetSchema.parse(body)
-    } catch (zodError: any) {
+    } catch (zodError: unknown) {
       if (zodError instanceof z.ZodError) {
         const missingFields: string[] = []
         const invalidFields: string[] = []

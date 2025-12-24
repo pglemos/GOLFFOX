@@ -17,9 +17,22 @@ import {
 
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card"
 
+interface CategoryDataPoint {
+    category: string
+    amount: number
+    [key: string]: unknown
+}
+
+interface BudgetVsActualDataPoint {
+    month: string
+    budget: number
+    actual: number
+    [key: string]: unknown
+}
+
 interface FinancialChartsProps {
-    categoryData: any[]
-    budgetVsActualData: any[]
+    categoryData: CategoryDataPoint[]
+    budgetVsActualData: BudgetVsActualDataPoint[]
     formatCurrency: (value: number) => string
 }
 
@@ -47,8 +60,8 @@ export function FinancialCharts({ categoryData, budgetVsActualData, formatCurren
                                     paddingAngle={5}
                                     dataKey="value"
                                 >
-                                    {categoryData.map((entry, index) => (
-                                        <Cell key={`cell-${index}`} fill={entry.color} />
+                                    {categoryData.map((entry: CategoryDataPoint & { color?: string }, index: number) => (
+                                        <Cell key={`cell-${index}`} fill={entry.color || '#8884d8'} />
                                     ))}
                                 </Pie>
                                 <Tooltip formatter={(value: number) => formatCurrency(value)} />

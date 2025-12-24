@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
 
     // Extra: ler cookie atual para registro/auditoria mínima e invalidar cache
     const existing = req.cookies.get("golffox-session")?.value
-    let userMeta: any = null
+    let userMeta: Record<string, unknown> | null = null
     let accessToken: string | null = null
     if (existing) {
       try {

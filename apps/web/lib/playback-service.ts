@@ -74,7 +74,20 @@ export class PlaybackService {
     }
 
     // Converter para formato interno
-    this.positions = (data || []).map((p: any) => ({
+    interface PositionData {
+      position_id: string
+      trip_id: string
+      veiculo_id: string
+      motorista_id: string
+      route_id: string
+      lat: number
+      lng: number
+      speed: number | null
+      heading: number | null
+      timestamp: string
+      passenger_count: number
+    }
+    this.positions = (data || []).map((p: PositionData) => ({
       position_id: p.position_id,
       trip_id: p.trip_id,
       veiculo_id: p.veiculo_id,

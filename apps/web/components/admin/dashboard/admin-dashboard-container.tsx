@@ -12,9 +12,14 @@ import type { AdminFilters } from "@/lib/api/admin-api"
 
 import { AdminDashboardPresentational } from "./admin-dashboard-presentational"
 
+import type { Database } from '@/types/supabase'
+
+type KpiRow = Database['public']['Tables']['mv_operator_kpis']['Row']
+type AuditLogRow = Database['public']['Tables']['gf_audit_log']['Row']
+
 export interface AdminDashboardContainerProps {
-  initialKpis?: any[]
-  initialAuditLogs?: any[]
+  initialKpis?: KpiRow[]
+  initialAuditLogs?: AuditLogRow[]
 }
 
 export function AdminDashboardContainer({
