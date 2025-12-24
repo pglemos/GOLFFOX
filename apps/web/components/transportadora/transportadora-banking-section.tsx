@@ -45,7 +45,7 @@ const defaultBankingData: TransportadoraBankingData = {
  * Componente para gerenciar dados bancários de uma transportadora
  */
 export function TransportadoraBankingSection({
-    transportadoraId: carrierId,
+    transportadoraId,
     isEditing,
     initialData,
     onSave,
@@ -56,11 +56,11 @@ export function TransportadoraBankingSection({
 
     // Carregar dados existentes
     const loadBankingData = useCallback(async () => {
-        if (!carrierId) return
+        if (!transportadoraId) return
 
         setLoading(true)
         try {
-            const response = await fetch(`/api/admin/transportadoras/${carrierId}`)
+            const response = await fetch(`/api/admin/transportadoras/${transportadoraId}`)
             if (response.ok) {
                 const data = await response.json()
                 if (data) {
@@ -80,13 +80,13 @@ export function TransportadoraBankingSection({
         } finally {
             setLoading(false)
         }
-    }, [carrierId])
+    }, [transportadoraId])
 
     useEffect(() => {
-        if (carrierId && isEditing && !initialData) {
+        if (transportadoraId && isEditing && !initialData) {
             loadBankingData()
         }
-    }, [carrierId, isEditing, initialData, loadBankingData])
+    }, [transportadoraId, isEditing, initialData, loadBankingData])
 
     useEffect(() => {
         if (initialData) {
@@ -95,14 +95,14 @@ export function TransportadoraBankingSection({
     }, [initialData])
 
     const handleSave = async () => {
-        if (!carrierId) {
+        if (!transportadoraId) {
             notifyError(new Error("Salve a transportadora primeiro"), "Erro")
             return
         }
 
         setSaving(true)
         try {
-            const response = await fetch(`/api/admin/transportadoras/update?id=${carrierId}`, {
+            const response = await fetch(`/api/admin/transportadoras/update?id=${transportadoraId}`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(formData),
@@ -121,7 +121,7 @@ export function TransportadoraBankingSection({
         }
     }
 
-    if (!isEditing || !carrierId) {
+    if (!isEditing || !transportadoraId) {
         return (
             <div className="text-center py-8 text-muted-foreground">
                 <Building2 className="h-12 w-12 mx-auto mb-4 opacity-50" />

@@ -141,14 +141,14 @@ function CustosPageContent() {
   const budgetVsActualData = useMemo(() => {
     return budgets.map(budget => {
       const actual = costs
-        .filter(c => c.category_id === budget.categoryId)
+        .filter(c => c.category_id === budget.category_id)
         .reduce((sum, c) => sum + c.amount, 0)
 
       return {
-        name: budget.category?.name || budget.categoryName || 'Categoria',
-        budgeted: budget.budgetedAmount,
+        name: budget.category?.name || budget.category_name || 'Categoria',
+        budgeted: budget.budgeted_amount,
         actual,
-        variance: actual - budget.budgetedAmount,
+        variance: actual - budget.budgeted_amount,
       }
     })
   }, [budgets, costs])
@@ -461,8 +461,8 @@ function CustosPageContent() {
                         <div>
                           <p className="font-medium">{revenue.description}</p>
                           <p className="text-xs text-muted-foreground">
-                            {revenue.category} • {new Date(revenue.revenueDate).toLocaleDateString('pt-BR')}
-                            {revenue.contractReference && ` • Contrato: ${revenue.contractReference}`}
+                            {revenue.category} • {new Date(revenue.revenue_date).toLocaleDateString('pt-BR')}
+                            {revenue.contract_reference && ` • Contrato: ${revenue.contract_reference}`}
                           </p>
                         </div>
                         <div className="flex items-center gap-2">

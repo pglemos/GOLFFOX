@@ -36,7 +36,7 @@ const defaultLegalRepData: TransportadoraLegalRepData = {
  * Componente para gerenciar dados do representante legal da transportadora
  */
 export function TransportadoraLegalRepSection({
-    transportadoraId: carrierId,
+    transportadoraId,
     isEditing,
     initialData,
     onSave,
@@ -55,12 +55,12 @@ export function TransportadoraLegalRepSection({
 
     // Carregar dados existentes
     const loadData = useCallback(async () => {
-        if (!carrierId) return
+        if (!transportadoraId) return
 
         setLoading(true)
         try {
             // Carregar dados do representante legal
-            const response = await fetch(`/api/admin/transportadoras/${carrierId}`)
+            const response = await fetch(`/api/admin/transportadoras/${transportadoraId}`)
             if (response.ok) {
                 const data = await response.json()
                 if (data) {
@@ -75,7 +75,7 @@ export function TransportadoraLegalRepSection({
             }
 
             // Carregar CNH do representante legal
-            const docsResponse = await fetch(`/api/admin/transportadoras/${carrierId}/documents`)
+            const docsResponse = await fetch(`/api/admin/transportadoras/${transportadoraId}/documents`)
             if (docsResponse.ok) {
                 const docs = await docsResponse.json()
                 const cnhDoc = docs?.find((d: { document_type: string }) => d.document_type === "legal_rep_cnh")
@@ -88,13 +88,13 @@ export function TransportadoraLegalRepSection({
         } finally {
             setLoading(false)
         }
-    }, [carrierId])
+    }, [transportadoraId])
 
     useEffect(() => {
-        if (carrierId && isEditing && !initialData) {
+        if (transportadoraId && isEditing && !initialData) {
             loadData()
         }
-    }, [carrierId, isEditing, initialData, loadData])
+    }, [transportadoraId, isEditing, initialData, loadData])
 
     useEffect(() => {
         if (initialData) {
@@ -103,14 +103,14 @@ export function TransportadoraLegalRepSection({
     }, [initialData])
 
     const processUpload = async (): Promise<boolean> => {
-        if (!fileToUpload || !carrierId) return true
+        if (!fileToUpload || !transportadoraId) return true
 
         setUploading(true)
         try {
-            const result = await upload(fileToUpload, carrierId, "legal_rep_cnh")
+            const result = await upload(fileToUpload, transportadoraId, "legal_rep_cnh")
             if (!result) return false
 
-            const response = await fetch(`/api/admin/transportadoras/${carrierId}/documents`, {
+            const response = await fetch(`/api/admin/transportadoras/${transportadoraId}/documents`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -140,7 +140,7 @@ export function TransportadoraLegalRepSection({
     }
 
     const handleSave = async () => {
-        if (!carrierId) {
+        if (!transportadoraId) {
             notifyError(new Error("Salve a transportadora primeiro"), "Erro")
             return
         }
@@ -157,7 +157,7 @@ export function TransportadoraLegalRepSection({
             }
 
             // 2. Salvar dados cadastrais
-            const response = await fetch(`/api/admin/transportadoras/update?id=${carrierId}`, {
+            const response = await fetch(`/api/admin/transportadoras/update?id=${transportadoraId}`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(formData),
@@ -194,7 +194,7 @@ export function TransportadoraLegalRepSection({
             .replace(/(-\d{4})\d+?$/, '$1')
     }
 
-    if (!isEditing || !carrierId) {
+    if (!isEditing || !transportadoraId) {
         return (
             <div className="text-center py-8 text-muted-foreground">
                 <User className="h-12 w-12 mx-auto mb-4 opacity-50" />

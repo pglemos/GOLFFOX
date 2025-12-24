@@ -100,22 +100,22 @@ export async function GET(request: NextRequest) {
             )
         }
 
-        // Transformar para camelCase
-        const budgets: Budget[] = (data || []).map((row: Record<string, unknown>) => ({
-            id: row.id as string,
-            companyId: row.company_id as string | null,
-            carrierId: row.transportadora_id as string | null,
-            categoryId: row.category_id as string | null,
-            categoryName: row.category_name as string | null,
-            periodYear: row.period_year as number,
-            periodMonth: row.period_month as number,
-            budgetedAmount: parseFloat(row.budgeted_amount as string),
-            alertThresholdPercent: row.alert_threshold_percent as number,
-            notes: row.notes as string | null,
-            createdBy: row.created_by as string | null,
-            createdAt: row.created_at as string,
-            updatedAt: row.updated_at as string,
-            category: row.category as Budget['category'],
+        // Transformar para o tipo Budget (snake_case)
+        const budgets: Budget[] = (data || []).map((row: any) => ({
+            id: row.id,
+            company_id: row.company_id,
+            transportadora_id: row.transportadora_id,
+            category_id: row.category_id,
+            category_name: row.category_name,
+            period_year: row.period_year,
+            period_month: row.period_month,
+            budgeted_amount: parseFloat(row.budgeted_amount),
+            alert_threshold_percent: row.alert_threshold_percent,
+            notes: row.notes,
+            created_by: row.created_by,
+            created_at: row.created_at,
+            updated_at: row.updated_at,
+            category: row.category,
         }))
 
         return NextResponse.json({ success: true, data: budgets })
@@ -168,29 +168,29 @@ export async function POST(request: NextRequest) {
             notes: body.notes,
             ...body
         })
-        
+
         if (!validation.success) {
             return NextResponse.json(
-                { 
-                    success: false, 
-                    error: 'Dados inválidos', 
-                    details: validation.error.errors 
+                {
+                    success: false,
+                    error: 'Dados inválidos',
+                    details: validation.error.errors
                 },
                 { status: 400 }
             )
         }
-        
+
         const validated = validation.data
 
         // Definir tenant baseado no papel
         let companyId = body.companyId
-        let carrierId = body.carrierId
+        let transportadoraId = body.carrierId || body.transportadoraId || body.transportadora_id
 
         if (profile?.role === 'gestor_empresa' || profile?.role === 'gestor_empresa') {
             companyId = profile.company_id
-            carrierId = null
+            transportadoraId = null
         } else if (profile?.role === 'gestor_transportadora' || profile?.role === 'gestor_transportadora' || profile?.role === 'gestor_empresa') {
-            carrierId = profile.transportadora_id
+            transportadoraId = profile.transportadora_id
             companyId = null
         }
 
@@ -199,7 +199,7 @@ export async function POST(request: NextRequest) {
             .from('gf_budgets')
             .upsert({
                 company_id: companyId,
-                transportadora_id: carrierId,
+                transportadora_id: transportadoraId,
                 category_id: body.categoryId,
                 category_name: body.categoryName,
                 period_year: body.periodYear,
@@ -225,21 +225,21 @@ export async function POST(request: NextRequest) {
             )
         }
 
-        // Mapear retorno para camelCase
+        // Mapear retorno para ManualCost
         const newBudget: Budget = {
             id: data.id,
-            companyId: data.company_id,
-            carrierId: data.transportadora_id,
-            categoryId: data.category_id,
-            categoryName: data.category_name,
-            periodYear: data.period_year,
-            periodMonth: data.period_month,
-            budgetedAmount: parseFloat(data.budgeted_amount),
-            alertThresholdPercent: data.alert_threshold_percent,
+            company_id: data.company_id,
+            transportadora_id: data.transportadora_id,
+            category_id: data.category_id,
+            category_name: data.category_name,
+            period_year: data.period_year,
+            period_month: data.period_month,
+            budgeted_amount: parseFloat(data.budgeted_amount),
+            alert_threshold_percent: data.alert_threshold_percent,
             notes: data.notes,
-            createdBy: data.created_by,
-            createdAt: data.created_at,
-            updatedAt: data.updated_at,
+            created_by: data.created_by,
+            created_at: data.created_at,
+            updated_at: data.updated_at,
             category: data.category,
         }
 

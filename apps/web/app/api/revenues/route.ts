@@ -58,12 +58,12 @@ export async function GET(request: NextRequest) {
         // Filtros
         const filters: RevenueFilters = {
             category: searchParams.get('category') || undefined,
-            contractReference: searchParams.get('contract_reference') || undefined,
+            contract_reference: searchParams.get('contract_reference') || undefined,
             status: (searchParams.get('status') as RevenueFilters['status']) || undefined,
-            dateFrom: searchParams.get('date_from') || undefined,
-            dateTo: searchParams.get('date_to') || undefined,
-            amountMin: searchParams.get('amount_min') ? parseFloat(searchParams.get('amount_min')!) : undefined,
-            amountMax: searchParams.get('amount_max') ? parseFloat(searchParams.get('amount_max')!) : undefined,
+            date_from: searchParams.get('date_from') || undefined,
+            date_to: searchParams.get('date_to') || undefined,
+            amount_min: searchParams.get('amount_min') ? parseFloat(searchParams.get('amount_min')!) : undefined,
+            amount_max: searchParams.get('amount_max') ? parseFloat(searchParams.get('amount_max')!) : undefined,
             search: searchParams.get('search') || undefined,
         }
 
@@ -77,7 +77,7 @@ export async function GET(request: NextRequest) {
             .select(`
         *,
         company:companies(id, name),
-        transportadora:carriers(id, name)
+        transportadora:transportadoras(id, name)
       `, { count: 'exact' })
 
         // Aplicar filtro de tenant baseado no papel
@@ -91,23 +91,23 @@ export async function GET(request: NextRequest) {
         if (filters.category) {
             query = query.eq('category', filters.category)
         }
-        if (filters.contractReference) {
-            query = query.ilike('contract_reference', `%${filters.contractReference}%`)
+        if (filters.contract_reference) {
+            query = query.ilike('contract_reference', `%${filters.contract_reference}%`)
         }
         if (filters.status) {
             query = query.eq('status', filters.status)
         }
-        if (filters.dateFrom) {
-            query = query.gte('revenue_date', filters.dateFrom)
+        if (filters.date_from) {
+            query = query.gte('revenue_date', filters.date_from)
         }
-        if (filters.dateTo) {
-            query = query.lte('revenue_date', filters.dateTo)
+        if (filters.date_to) {
+            query = query.lte('revenue_date', filters.date_to)
         }
-        if (filters.amountMin !== undefined) {
-            query = query.gte('amount', filters.amountMin)
+        if (filters.amount_min !== undefined) {
+            query = query.gte('amount', filters.amount_min)
         }
-        if (filters.amountMax !== undefined) {
-            query = query.lte('amount', filters.amountMax)
+        if (filters.amount_max !== undefined) {
+            query = query.lte('amount', filters.amount_max)
         }
         if (filters.search) {
             query = query.ilike('description', `%${filters.search}%`)
@@ -140,27 +140,27 @@ export async function GET(request: NextRequest) {
             )
         }
 
-        // Transformar para camelCase
-        const revenues: ManualRevenue[] = (data || []).map((row: Record<string, unknown>) => ({
-            id: row.id as string,
-            companyId: row.company_id as string | null,
-            carrierId: row.transportadora_id as string | null,
-            category: row.category as string,
-            description: row.description as string,
-            amount: parseFloat(row.amount as string),
-            revenueDate: row.revenue_date as string,
-            contractReference: row.contract_reference as string | null,
-            invoiceNumber: row.invoice_number as string | null,
-            isRecurring: row.is_recurring as boolean,
-            recurringInterval: row.recurring_interval as ManualRevenue['recurringInterval'],
-            attachmentUrl: row.attachment_url as string | null,
-            notes: row.notes as string | null,
-            status: row.status as 'pending' | 'confirmed' | 'cancelled',
-            createdBy: row.created_by as string | null,
-            createdAt: row.created_at as string,
-            updatedAt: row.updated_at as string,
-            company: row.company as ManualRevenue['company'],
-            transportadora: row.transportadora as ManualRevenue['gestor_transportadora'],
+        // Transformar para o tipo ManualRevenue (snake_case)
+        const revenues: ManualRevenue[] = (data || []).map((row: any) => ({
+            id: row.id,
+            company_id: row.company_id,
+            transportadora_id: row.transportadora_id,
+            category: row.category,
+            description: row.description,
+            amount: parseFloat(row.amount),
+            revenue_date: row.revenue_date,
+            contract_reference: row.contract_reference,
+            invoice_number: row.invoice_number,
+            is_recurring: row.is_recurring,
+            recurring_interval: row.recurring_interval,
+            attachment_url: row.attachment_url,
+            notes: row.notes,
+            status: row.status,
+            created_by: row.created_by,
+            created_at: row.created_at,
+            updated_at: row.updated_at,
+            company: row.company,
+            transportadora: row.transportadora,
         }))
 
         const totalPages = count ? Math.ceil(count / pageSize) : 0
@@ -241,13 +241,13 @@ export async function POST(request: NextRequest) {
 
         // Definir tenant baseado no papel
         let companyId = body.companyId
-        let carrierId = body.carrierId
+        let transportadoraId = body.carrierId || body.transportadoraId || body.transportadora_id
 
         if (profile?.role === 'gestor_empresa' || profile?.role === 'gestor_empresa') {
             companyId = profile.company_id
-            carrierId = null
+            transportadoraId = null
         } else if (profile?.role === 'gestor_transportadora' || profile?.role === 'gestor_transportadora' || profile?.role === 'gestor_empresa') {
-            carrierId = profile.transportadora_id
+            transportadoraId = profile.transportadora_id
             companyId = null
         }
 
@@ -256,16 +256,16 @@ export async function POST(request: NextRequest) {
             .from('gf_manual_revenues')
             .insert({
                 company_id: companyId,
-                transportadora_id: carrierId,
+                transportadora_id: transportadoraId,
                 category: body.category,
                 description: body.description,
                 amount: body.amount,
-                revenue_date: body.revenueDate,
-                contract_reference: body.contractReference,
-                invoice_number: body.invoiceNumber,
-                is_recurring: body.isRecurring ?? false,
-                recurring_interval: body.recurringInterval,
-                attachment_url: body.attachmentUrl,
+                revenue_date: body.revenueDate || body.revenue_date,
+                contract_reference: body.contractReference || body.contract_reference,
+                invoice_number: body.invoiceNumber || body.invoice_number,
+                is_recurring: body.isRecurring ?? body.is_recurring ?? false,
+                recurring_interval: body.recurringInterval || body.recurring_interval,
+                attachment_url: body.attachmentUrl || body.attachment_url,
                 notes: body.notes,
                 status: body.status ?? 'confirmed',
                 created_by: userId,
@@ -273,7 +273,7 @@ export async function POST(request: NextRequest) {
             .select(`
         *,
         company:companies(id, name),
-        transportadora:carriers(id, name)
+        transportadora:transportadoras(id, name)
       `)
             .single()
 
@@ -285,25 +285,25 @@ export async function POST(request: NextRequest) {
             )
         }
 
-        // Mapear retorno para camelCase
+        // Mapear retorno para ManualRevenue
         const newRevenue: ManualRevenue = {
             id: data.id,
-            companyId: data.company_id,
-            carrierId: data.transportadora_id,
+            company_id: data.company_id,
+            transportadora_id: data.transportadora_id,
             category: data.category,
             description: data.description,
             amount: parseFloat(data.amount),
-            revenueDate: data.revenue_date,
-            contractReference: data.contract_reference,
-            invoiceNumber: data.invoice_number,
-            isRecurring: data.is_recurring,
-            recurringInterval: data.recurring_interval,
-            attachmentUrl: data.attachment_url,
+            revenue_date: data.revenue_date,
+            contract_reference: data.contract_reference,
+            invoice_number: data.invoice_number,
+            is_recurring: data.is_recurring,
+            recurring_interval: data.recurring_interval,
+            attachment_url: data.attachment_url,
             notes: data.notes,
             status: data.status,
-            createdBy: data.created_by,
-            createdAt: data.created_at,
-            updatedAt: data.updated_at,
+            created_by: data.created_by,
+            created_at: data.created_at,
+            updated_at: data.updated_at,
             company: data.company,
             transportadora: data.transportadora,
         }

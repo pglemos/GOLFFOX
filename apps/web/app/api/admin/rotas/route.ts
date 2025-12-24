@@ -51,17 +51,17 @@ export async function POST(request: NextRequest) {
       destination: body?.destination || body?.destination_address,
       ...body
     })
-    
+
     if (!validation.success) {
       return NextResponse.json(
-        { 
-          error: 'Dados inválidos', 
-          details: validation.error.errors 
+        {
+          error: 'Dados inválidos',
+          details: validation.error.errors
         },
         { status: 400 }
       )
     }
-    
+
     const validated = validation.data
     const name = validated.name || 'Rota Teste'
     const companyId = validated.company_id
@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
     // Em modo de teste/desenvolvimento, criar empresa automaticamente se não existir
     const isTestMode = request.headers.get('x-test-mode') === 'true'
     const isDevelopment = process.env.NODE_ENV === 'development'
-    
+
     let finalCompanyId = companyId
     if (!finalCompanyId) {
       const { data: companies } = await supabaseAdmin
@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
         .select('id')
         .eq('is_active', true)
         .limit(1)
-      
+
       if (companies && companies.length > 0) {
         finalCompanyId = companies[0].id
       } else if (isTestMode || isDevelopment) {
@@ -96,7 +96,7 @@ export async function POST(request: NextRequest) {
             } as any)
             .select('id')
             .single()
-          
+
           if (!createCompanyError && newCompany) {
             finalCompanyId = newCompany.id
             logger.log(`✅ Empresa de teste criada automaticamente: ${finalCompanyId}`)
@@ -124,7 +124,7 @@ export async function POST(request: NextRequest) {
       company_id: finalCompanyId,
       is_active: true
     }
-    
+
     // Adicionar origin e destination apenas se a coluna existir (tentar com ambos primeiro)
     // Se a coluna destination não existir, o Supabase retornará erro, então tentaremos sem ela
     try {
@@ -135,8 +135,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Campos opcionais
-    if (body.transportadora_id || body.carrierId) {
-      routeData.transportadora_id = body.transportadora_id
+    if (body.transportadora_id || body.transportadoraId || body.carrierId) {
+      routeData.transportadora_id = body.transportadora_id || body.transportadoraId || body.carrierId
     }
     if (body.distance !== undefined) {
       routeData.distance = body.distance
@@ -146,7 +146,7 @@ export async function POST(request: NextRequest) {
     }
 
     let { data: newRoute, error: createError } = await supabaseAdmin
-      .from('routes')
+      .from('rotas')
       .insert(routeData)
       .select()
       .single()
@@ -159,25 +159,25 @@ export async function POST(request: NextRequest) {
         company_id: finalCompanyId,
         is_active: true,
       }
-      
+
       // Tentar adicionar origin se a coluna existir
       if (origin) {
         routeDataWithoutDestination['origin'] = origin
       }
-      
+
       const result = await supabaseAdmin
-        .from('routes')
+        .from('rotas')
         .insert(routeDataWithoutDestination)
         .select()
         .single()
-      
+
       newRoute = result.data
       createError = result.error
     }
 
     if (createError) {
       logError('Erro ao criar rota', { error: createError }, 'RoutesAPI')
-      
+
       // Em modo de teste/desenvolvimento, se a tabela não existe, retornar resposta simulada
       if ((isTestMode || isDevelopment) && (
         createError.message?.includes('does not exist') ||
@@ -198,9 +198,9 @@ export async function POST(request: NextRequest) {
           id: `00000000-0000-0000-0000-${Date.now().toString().slice(-12).padStart(12, '0')}`
         }, { status: 201 })
       }
-      
+
       return NextResponse.json(
-        { 
+        {
           error: 'Erro ao criar rota',
           message: createError.message || 'Erro desconhecido ao criar rota',
           details: process.env.NODE_ENV === 'development' ? createError : undefined
@@ -218,7 +218,7 @@ export async function POST(request: NextRequest) {
     logError('Erro ao criar rota', { error: err }, 'RoutesAPI')
     const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'
     return NextResponse.json(
-      { 
+      {
         error: 'Erro ao criar rota',
         message: errorMessage,
         details: process.env.NODE_ENV === 'development' ? String(err) : undefined
@@ -242,14 +242,14 @@ export async function GET(request: NextRequest) {
 
     const supabaseAdmin = getSupabaseAdmin()
     const searchParams = request.nextUrl.searchParams
-    
+
     const companyId = searchParams.get('company_id')
     const limit = parseInt(searchParams.get('limit') || '100')
     const offset = parseInt(searchParams.get('offset') || '0')
 
     // Selecionar apenas colunas necessárias para listagem (otimização de performance)
     const routeColumns = 'id,name,company_id,transportadora_id,origin,destination,origin_lat,origin_lng,destination_lat,destination_lng,polyline,is_active,created_at,updated_at'
-    let query = supabaseAdmin.from('routes').select(routeColumns, { count: 'exact' })
+    let query = supabaseAdmin.from('rotas').select(routeColumns, { count: 'exact' })
 
     if (companyId) {
       query = query.eq('company_id', companyId)

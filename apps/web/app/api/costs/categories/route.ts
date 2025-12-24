@@ -75,20 +75,20 @@ export async function GET(request: NextRequest) {
         )
       }
 
-      // Transformar para camelCase
-      const categories: CostCategory[] = (data || []).map((row: Record<string, unknown>) => ({
-        id: row.id as string,
-        name: row.name as string,
-        profileType: row.profile_type as ProfileType,
-        parentId: row.parent_id as string | null,
-        icon: row.icon as string | null,
-        color: row.color as string | null,
-        keywords: (row.keywords as string[]) || [],
-        isOperational: row.is_operational as boolean,
-        isActive: row.is_active as boolean,
-        displayOrder: row.display_order as number,
-        createdAt: row.created_at as string,
-        updatedAt: row.updated_at as string,
+      // Transformar para o tipo CostCategory (snake_case)
+      const categories: CostCategory[] = (data || []).map((row: any) => ({
+        id: row.id,
+        name: row.name,
+        profile_type: row.profile_type,
+        parent_id: row.parent_id,
+        icon: row.icon,
+        color: row.color,
+        keywords: row.keywords || [],
+        is_operational: row.is_operational,
+        is_active: row.is_active,
+        display_order: row.display_order,
+        created_at: row.created_at,
+        updated_at: row.updated_at,
       }))
 
       return NextResponse.json({ success: true, data: categories })
@@ -157,7 +157,7 @@ export async function POST(request: NextRequest) {
     const body: CostCategoryInsert = await request.json()
 
     // Validação
-    if (!body.name || !body.profileType) {
+    if (!body.name || (!body.profile_type && !body.profileType)) {
       return NextResponse.json(
         { success: false, error: 'Nome e tipo de perfil são obrigatórios' },
         { status: 400 }
@@ -168,13 +168,13 @@ export async function POST(request: NextRequest) {
       .from('gf_cost_categories')
       .insert({
         name: body.name,
-        profile_type: body.profileType,
-        parent_id: body.parentId,
+        profile_type: body.profile_type || body.profileType,
+        parent_id: body.parent_id || body.parentId,
         icon: body.icon,
         color: body.color,
         keywords: body.keywords || [],
-        is_operational: body.isOperational ?? false,
-        display_order: body.displayOrder ?? 0,
+        is_operational: body.is_operational ?? body.isOperational ?? false,
+        display_order: body.display_order ?? body.displayOrder ?? 0,
       })
       .select()
       .single()

@@ -15,7 +15,7 @@ export interface FinancialFilters {
   year?: number
   month?: number
   company_id?: string
-  carrier_id?: string
+  transportadora_id?: string
 }
 
 export interface CostsResponse {
@@ -94,13 +94,13 @@ export async function getFinancialData(
 export async function getCosts(filters: FinancialFilters = {}): Promise<CostsResponse> {
   try {
     const params = new URLSearchParams()
-    
+
     if (filters.page) params.append('page', filters.page.toString())
     if (filters.page_size) params.append('page_size', filters.page_size.toString())
     if (filters.date_from) params.append('date_from', filters.date_from)
     if (filters.date_to) params.append('date_to', filters.date_to)
     if (filters.company_id) params.append('company_id', filters.company_id)
-    if (filters.carrier_id) params.append('carrier_id', filters.carrier_id)
+    if (filters.transportadora_id) params.append('transportadora_id', filters.transportadora_id)
 
     const queryString = params.toString()
     const url = `/api/costs/manual-v2${queryString ? `?${queryString}` : ''}`
@@ -139,13 +139,13 @@ export async function getCosts(filters: FinancialFilters = {}): Promise<CostsRes
 export async function getRevenues(filters: FinancialFilters = {}): Promise<RevenuesResponse> {
   try {
     const params = new URLSearchParams()
-    
+
     if (filters.page) params.append('page', filters.page.toString())
     if (filters.page_size) params.append('page_size', filters.page_size.toString())
     if (filters.date_from) params.append('date_from', filters.date_from)
     if (filters.date_to) params.append('date_to', filters.date_to)
     if (filters.company_id) params.append('company_id', filters.company_id)
-    if (filters.carrier_id) params.append('carrier_id', filters.carrier_id)
+    if (filters.transportadora_id) params.append('transportadora_id', filters.transportadora_id)
 
     const queryString = params.toString()
     const url = `/api/revenues${queryString ? `?${queryString}` : ''}`
@@ -184,11 +184,11 @@ export async function getRevenues(filters: FinancialFilters = {}): Promise<Reven
 export async function getBudgets(filters: FinancialFilters = {}): Promise<BudgetsResponse> {
   try {
     const params = new URLSearchParams()
-    
+
     if (filters.year) params.append('year', filters.year.toString())
     if (filters.month) params.append('month', filters.month.toString())
     if (filters.company_id) params.append('company_id', filters.company_id)
-    if (filters.carrier_id) params.append('carrier_id', filters.carrier_id)
+    if (filters.transportadora_id) params.append('transportadora_id', filters.transportadora_id)
 
     const queryString = params.toString()
     const url = `/api/budgets${queryString ? `?${queryString}` : ''}`

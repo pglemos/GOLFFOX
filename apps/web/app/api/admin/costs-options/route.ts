@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
 
     // Buscar todas as opções em paralelo
     const [routesRes, vehiclesRes, driversRes, carriersRes] = await Promise.all([
-      supabaseAdmin.from('routes').select('id, name').order('name'),
+      supabaseAdmin.from('rotas').select('id, name').order('name'),
       supabaseAdmin.from('veiculos').select('id, plate').order('plate'),
       supabaseAdmin.from('users').select('id, email').eq('role', 'motorista').order('email'),
       supabaseAdmin.from('transportadoras').select('id, name').order('name')
@@ -35,10 +35,10 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      routes: routesRes.data || [],
+      rotas: routesRes.data || [],
       veiculos: vehiclesRes.data || [],
       motoristas: driversRes.data || [],
-      carriers: carriersRes.data || []
+      transportadoras: carriersRes.data || []
     })
   } catch (error: unknown) {
     logError('Erro ao buscar opções de custos', { error }, 'CostsOptionsAPI')

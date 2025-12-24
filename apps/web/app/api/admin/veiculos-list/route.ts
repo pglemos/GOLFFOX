@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
     // Buscar veículos com relacionamento carriers via transportadora_id
     const { data, error } = await supabaseAdmin
       .from('veiculos')
-      .select('*, carriers:transportadora_id(id, name)')
+      .select('*, transportadora:transportadoras(id, name)')
       .order('created_at', { ascending: false })
 
     if (error) {
@@ -40,15 +40,15 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // Mapear para incluir carrier_name de forma plana
-    const vehiclesWithCarrier = (data || []).map((v: { [key: string]: unknown; carriers?: { name?: string } }) => ({
+    // Mapear para incluir transportadora_name de forma plana
+    const vehiclesWithTransportadora = (data || []).map((v: { [key: string]: unknown; transportadora?: { name?: string } }) => ({
       ...v,
-      carrier_name: v.carriers?.name || null,
-      carriers: undefined  // Remover objeto aninhado para manter resposta limpa
+      transportadora_name: v.transportadora?.name || null,
+      transportadora: undefined  // Remover objeto aninhado para manter resposta limpa
     }))
 
-    // Retornar array com carrier_name mapeado
-    return NextResponse.json(vehiclesWithCarrier)
+    // Retornar array com transportadora_name mapeado
+    return NextResponse.json(vehiclesWithTransportadora)
   } catch (error: unknown) {
     logError('Erro ao listar veículos', { error }, 'VehiclesListAPI')
     const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido'

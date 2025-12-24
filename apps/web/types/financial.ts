@@ -33,16 +33,16 @@ export type ForecastMethod =
 export interface CostCategory {
     id: string;
     name: string;
-    profileType: ProfileType;
-    parentId?: string | null;
+    profile_type: ProfileType;
+    parent_id?: string | null;
     icon?: string | null;
     color?: string | null;
     keywords: string[];
-    isOperational: boolean;
-    isActive: boolean;
-    displayOrder: number;
-    createdAt: string;
-    updatedAt: string;
+    is_operational: boolean;
+    is_active: boolean;
+    display_order: number;
+    created_at: string;
+    updated_at: string;
     // Relacionamentos (quando join)
     parent?: CostCategory | null;
     children?: CostCategory[];
@@ -50,13 +50,13 @@ export interface CostCategory {
 
 export interface CostCategoryInsert {
     name: string;
-    profileType: ProfileType;
-    parentId?: string | null;
+    profile_type: ProfileType;
+    parent_id?: string | null;
     icon?: string | null;
     color?: string | null;
     keywords?: string[];
-    isOperational?: boolean;
-    displayOrder?: number;
+    is_operational?: boolean;
+    display_order?: number;
 }
 
 export interface CostCategoryUpdate {
@@ -64,9 +64,9 @@ export interface CostCategoryUpdate {
     icon?: string | null;
     color?: string | null;
     keywords?: string[];
-    isOperational?: boolean;
-    isActive?: boolean;
-    displayOrder?: number;
+    is_operational?: boolean;
+    is_active?: boolean;
+    display_order?: number;
 }
 
 // ============================================================
@@ -150,39 +150,39 @@ export interface ManualCostUpdate {
 
 export interface ManualRevenue {
     id: string;
-    companyId?: string | null;
-    carrierId?: string | null;
+    company_id?: string | null;
+    transportadora_id?: string | null;
     category: string;
     description: string;
     amount: number;
-    revenueDate: string;
-    contractReference?: string | null;
-    invoiceNumber?: string | null;
-    isRecurring: boolean;
-    recurringInterval?: RecurringInterval | null;
-    attachmentUrl?: string | null;
+    revenue_date: string;
+    contract_reference?: string | null;
+    invoice_number?: string | null;
+    is_recurring: boolean;
+    recurring_interval?: RecurringInterval | null;
+    attachment_url?: string | null;
     notes?: string | null;
     status: CostStatus;
-    createdBy?: string | null;
-    createdAt: string;
-    updatedAt: string;
+    created_by?: string | null;
+    created_at: string;
+    updated_at: string;
     // Relacionamentos
     company?: { id: string; name: string } | null;
     transportadora?: { id: string; name: string } | null;
 }
 
 export interface ManualRevenueInsert {
-    companyId?: string | null;
-    carrierId?: string | null;
+    company_id?: string | null;
+    transportadora_id?: string | null;
     category: string;
     description: string;
     amount: number;
-    revenueDate: string;
-    contractReference?: string | null;
-    invoiceNumber?: string | null;
-    isRecurring?: boolean;
-    recurringInterval?: RecurringInterval | null;
-    attachmentUrl?: string | null;
+    revenue_date: string;
+    contract_reference?: string | null;
+    invoice_number?: string | null;
+    is_recurring?: boolean;
+    recurring_interval?: RecurringInterval | null;
+    attachment_url?: string | null;
     notes?: string | null;
     status?: CostStatus;
 }
@@ -191,12 +191,12 @@ export interface ManualRevenueUpdate {
     category?: string;
     description?: string;
     amount?: number;
-    revenueDate?: string;
-    contractReference?: string | null;
-    invoiceNumber?: string | null;
-    isRecurring?: boolean;
-    recurringInterval?: RecurringInterval | null;
-    attachmentUrl?: string | null;
+    revenue_date?: string;
+    contract_reference?: string | null;
+    invoice_number?: string | null;
+    is_recurring?: boolean;
+    recurring_interval?: RecurringInterval | null;
+    attachment_url?: string | null;
     notes?: string | null;
     status?: CostStatus;
 }
@@ -207,37 +207,37 @@ export interface ManualRevenueUpdate {
 
 export interface Budget {
     id: string;
-    companyId?: string | null;
-    carrierId?: string | null;
-    categoryId?: string | null;
-    categoryName?: string | null;
-    periodYear: number;
-    periodMonth: number;
-    budgetedAmount: number;
-    alertThresholdPercent: number;
+    company_id?: string | null;
+    transportadora_id?: string | null;
+    category_id?: string | null;
+    category_name?: string | null;
+    period_year: number;
+    period_month: number;
+    budgeted_amount: number;
+    alert_threshold_percent: number;
     notes?: string | null;
-    createdBy?: string | null;
-    createdAt: string;
-    updatedAt: string;
+    created_by?: string | null;
+    created_at: string;
+    updated_at: string;
     // Relacionamentos
     category?: CostCategory | null;
 }
 
 export interface BudgetInsert {
-    companyId?: string | null;
-    carrierId?: string | null;
-    categoryId?: string | null;
-    categoryName?: string | null;
-    periodYear: number;
-    periodMonth: number;
-    budgetedAmount: number;
-    alertThresholdPercent?: number;
+    company_id?: string | null;
+    transportadora_id?: string | null;
+    category_id?: string | null;
+    category_name?: string | null;
+    period_year: number;
+    period_month: number;
+    budgeted_amount: number;
+    alert_threshold_percent?: number;
     notes?: string | null;
 }
 
 export interface BudgetUpdate {
-    budgetedAmount?: number;
-    alertThresholdPercent?: number;
+    budgeted_amount?: number;
+    alert_threshold_percent?: number;
     notes?: string | null;
 }
 
@@ -247,18 +247,18 @@ export interface BudgetUpdate {
 
 export interface FinancialForecast {
     id: string;
-    companyId?: string | null;
-    carrierId?: string | null;
-    forecastType: 'cost' | 'revenue';
-    categoryId?: string | null;
-    periodYear: number;
-    periodMonth: number;
-    projectedAmount: number;
-    actualAmount?: number | null;
-    confidenceLevel: number;
-    calculationMethod: ForecastMethod;
-    basePeriodMonths: number;
-    generatedAt: string;
+    company_id?: string | null;
+    transportadora_id?: string | null;
+    forecast_type: 'cost' | 'revenue';
+    category_id?: string | null;
+    period_year: number;
+    period_month: number;
+    projected_amount: number;
+    actual_amount?: number | null;
+    confidence_level: number;
+    calculation_method: ForecastMethod;
+    base_period_months: number;
+    generated_at: string;
     notes?: string | null;
     // Relacionamentos
     category?: CostCategory | null;
@@ -270,23 +270,23 @@ export interface FinancialForecast {
 
 export interface FinancialAlert {
     id: string;
-    companyId?: string | null;
-    carrierId?: string | null;
-    alertType: FinancialAlertType;
+    company_id?: string | null;
+    transportadora_id?: string | null;
+    alert_type: FinancialAlertType;
     severity: AlertSeverity;
     title: string;
     message: string;
-    costId?: string | null;
-    budgetId?: string | null;
-    categoryId?: string | null;
-    thresholdValue?: number | null;
-    actualValue?: number | null;
-    variancePercent?: number | null;
-    isRead: boolean;
-    isDismissed: boolean;
-    dismissedBy?: string | null;
-    dismissedAt?: string | null;
-    createdAt: string;
+    cost_id?: string | null;
+    budget_id?: string | null;
+    category_id?: string | null;
+    threshold_value?: number | null;
+    actual_value?: number | null;
+    variance_percent?: number | null;
+    is_read: boolean;
+    is_dismissed: boolean;
+    dismissed_by?: string | null;
+    dismissed_at?: string | null;
+    created_at: string;
     // Relacionamentos
     cost?: ManualCost | null;
     budget?: Budget | null;
@@ -294,10 +294,10 @@ export interface FinancialAlert {
 }
 
 export interface FinancialAlertUpdate {
-    isRead?: boolean;
-    isDismissed?: boolean;
-    dismissedBy?: string | null;
-    dismissedAt?: string | null;
+    is_read?: boolean;
+    is_dismissed?: boolean;
+    dismissed_by?: string | null;
+    dismissed_at?: string | null;
 }
 
 // ============================================================
@@ -305,37 +305,37 @@ export interface FinancialAlertUpdate {
 // ============================================================
 
 export interface BudgetVsActual {
-    tenantId: string;
-    tenantType: 'empresa' | 'transportadora';
-    periodYear: number;
-    periodMonth: number;
-    categoryName: string;
-    categoryId?: string | null;
-    totalCost: number;
-    budgetedAmount: number;
-    variancePercent?: number | null;
+    tenant_id: string;
+    tenant_type: 'empresa' | 'transportadora';
+    period_year: number;
+    period_month: number;
+    category_name: string;
+    category_id?: string | null;
+    total_cost: number;
+    budgeted_amount: number;
+    variance_percent?: number | null;
 }
 
 export interface AdminFinancialKPIs {
-    totalCosts30d: number;
-    totalRevenues30d: number;
-    margin30d: number;
-    costEntries30d: number;
-    revenueEntries30d: number;
-    criticalAlerts: number;
-    warningAlerts: number;
-    recurringCostsCount: number;
+    total_costs_30d: number;
+    total_revenues_30d: number;
+    margin_30d: number;
+    cost_entries_30d: number;
+    revenue_entries_30d: number;
+    critical_alerts: number;
+    warning_alerts: number;
+    recurring_costs_count: number;
 }
 
 export interface VeiculoCostSummary {
-    carrierId: string;
-    vehicleId: string;
-    vehiclePlate: string;
-    vehicleModel?: string | null;
-    periodYear: number;
-    periodMonth: number;
-    totalCost: number;
-    entriesCount: number;
+    transportadora_id: string;
+    veiculo_id: string;
+    veiculo_plate: string;
+    veiculo_model?: string | null;
+    period_year: number;
+    period_month: number;
+    total_cost: number;
+    entries_count: number;
     categories: string[];
 }
 
@@ -344,15 +344,15 @@ export interface VeiculoCostSummary {
 // ============================================================
 
 export interface CostFormData {
-    categoryId: string;
+    category_id: string;
     description: string;
     amount: string; // String para input controlado
-    costDate: Date;
-    isRecurring: boolean;
-    recurringInterval?: RecurringInterval;
-    recurringEndDate?: Date;
-    vehicleId?: string;
-    routeId?: string;
+    cost_date: Date;
+    is_recurring: boolean;
+    recurring_interval?: RecurringInterval;
+    recurring_end_date?: Date;
+    veiculo_id?: string;
+    route_id?: string;
     notes?: string;
     attachment?: File;
 }
@@ -361,21 +361,21 @@ export interface RevenueFormData {
     category: string;
     description: string;
     amount: string;
-    revenueDate: Date;
-    contractReference?: string;
-    invoiceNumber?: string;
-    isRecurring: boolean;
-    recurringInterval?: RecurringInterval;
+    revenue_date: Date;
+    contract_reference?: string;
+    invoice_number?: string;
+    is_recurring: boolean;
+    recurring_interval?: RecurringInterval;
     notes?: string;
     attachment?: File;
 }
 
 export interface BudgetFormData {
-    categoryId: string;
-    periodYear: number;
-    periodMonth: number;
-    budgetedAmount: string;
-    alertThresholdPercent: number;
+    category_id: string;
+    period_year: number;
+    period_month: number;
+    budgeted_amount: string;
+    alert_threshold_percent: number;
     notes?: string;
 }
 
@@ -436,11 +436,11 @@ export interface CostFilters {
 
 export interface RevenueFilters {
     category?: string;
-    contractReference?: string;
+    contract_reference?: string;
     status?: CostStatus;
-    dateFrom?: string;
-    dateTo?: string;
-    amountMin?: number;
-    amountMax?: number;
+    date_from?: string;
+    date_to?: string;
+    amount_min?: number;
+    amount_max?: number;
     search?: string;
 }

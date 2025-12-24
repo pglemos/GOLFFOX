@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
 
     // Selecionar apenas colunas necessárias para listagem (otimização de performance)
     const tripColumns = 'id,route_id,veiculo_id,motorista_id,status,scheduled_date,scheduled_start_time,start_time,end_time,actual_start_time,actual_end_time,distance_km,notes,created_at,updated_at'
-    let query = supabaseAdmin.from('trips').select(tripColumns, { count: 'exact' })
+    let query = supabaseAdmin.from('viagens').select(tripColumns, { count: 'exact' })
 
     // Aplicar filtros
     if (vehicleId) {
@@ -70,7 +70,7 @@ export async function GET(request: NextRequest) {
     }
     if (companyId) {
       // Filtrar por company via route
-      const routesQuery = supabaseAdmin.from('routes').select('id').eq('company_id', companyId)
+      const routesQuery = supabaseAdmin.from('rotas').select('id').eq('company_id', companyId)
       const { data: routes } = await routesQuery
       if (routes && routes.length > 0) {
         query = query.in('route_id', routes.map((r: any) => r.id))
@@ -179,7 +179,7 @@ export async function POST(request: NextRequest) {
     // Verificar se route existe
     let route = null
     const { data: existingRoute, error: routeError } = await supabaseAdmin
-      .from('routes')
+      .from('rotas')
       .select('id, company_id')
       .eq('id', routeId)
       .single()
@@ -220,7 +220,7 @@ export async function POST(request: NextRequest) {
         if (companyIdForRoute) {
           // Criar route automaticamente
           const { data: newRoute, error: createRouteError } = await supabaseAdmin
-            .from('routes')
+            .from('rotas')
             .insert({
               id: routeId, // Usar o ID fornecido
               name: 'Rota Teste Automática',
@@ -316,7 +316,7 @@ export async function POST(request: NextRequest) {
     if (endTime && !tripData.actual_end_time) tripData.actual_end_time = endTime
 
     const { data: newTrip, error: createError } = await supabaseAdmin
-      .from('trips')
+      .from('viagens')
       .insert(tripData)
       .select()
       .single()

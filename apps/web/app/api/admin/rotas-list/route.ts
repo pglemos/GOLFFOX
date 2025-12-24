@@ -25,9 +25,9 @@ export async function GET(request: NextRequest) {
     }
 
     const supabaseAdmin = getSupabaseAdmin()
-    
+
     const { data, error } = await supabaseAdmin
-      .from('routes')
+      .from('rotas')
       .select('*, companies(id, name)')
       .order('created_at', { ascending: false })
 

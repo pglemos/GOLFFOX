@@ -30,7 +30,7 @@ export async function GET(req: NextRequest) {
       .order('name', { ascending: true }))
 
     if (error) {
-      logError('Erro ao buscar carriers', { error }, 'TransportadorasListAPI')
+      logError('Erro ao buscar transportadoras', { error }, 'TransportadorasListAPI')
       return NextResponse.json(
         { success: false, error: 'Erro ao buscar transportadoras', message: error.message },
         { status: 500 }

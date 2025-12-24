@@ -73,7 +73,7 @@ export async function GET(request: NextRequest) {
         *,
         category:gf_cost_categories(id, name, icon, color),
         veiculo:veiculos(id, plate, model),
-        route:routes(id, name),
+        route:rotas(id, name),
         company:companies(id, name),
         transportadora:transportadoras(id, name)
       `, { count: 'exact' })
