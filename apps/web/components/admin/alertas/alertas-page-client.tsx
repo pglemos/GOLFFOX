@@ -312,8 +312,8 @@ export function AlertasPageClient({ initialAlertas }: AlertasPageClientProps) {
               </div>
               <select
                 className="min-h-[48px] px-4 py-3 rounded-md border border-input bg-background text-sm w-full sm:w-auto ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 touch-manipulation"
-                value={tempFilterSeverity}
-                onChange={(e) => setTempFilterSeverity(e.target.value)}
+                value={filtersState.temp.severity}
+                onChange={(e) => filtersDispatch({ type: 'UPDATE_TEMP_SEVERITY', payload: e.target.value })}
               >
                 <option value="all">Todas Severidades</option>
                 <option value="critical">Crítico</option>

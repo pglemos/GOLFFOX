@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 
 import { requireAuth } from '@/lib/api-auth'
 import { getSupabaseAdmin } from '@/lib/supabase-client'
+import { logError } from '@/lib/logger'
 
 export async function POST(request: NextRequest) {
   // Verificar autenticação (admin ou empresa)

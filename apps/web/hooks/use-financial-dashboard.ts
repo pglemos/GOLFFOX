@@ -3,7 +3,8 @@
  * Usa React Query para cache e estado
  */
 
-import { useQuery, useMemo } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
+import { useMemo } from 'react'
 
 import {
   getFinancialData,

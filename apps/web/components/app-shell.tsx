@@ -139,7 +139,7 @@ export const AppShell = memo(function AppShell({ user, children, panel }: AppShe
           aria-label="Fechar menu lateral"
           role="button"
           tabIndex={0}
-          onKeyDown={(e) => e.key === 'Escape' && setIsSidebarOpen(false)}
+          onKeyDown={(e: React.KeyboardEvent) => e.key === 'Escape' && setIsSidebarOpen(false)}
           style={{ pointerEvents: 'auto' }}
         />
       )}

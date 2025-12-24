@@ -12,11 +12,11 @@ export interface CostFilters {
   page_size?: number
   date_from?: string
   date_to?: string
-  company_id?: string
+  empresa_id?: string
   transportadora_id?: string
   category_id?: string
   veiculo_id?: string
-  route_id?: string
+  rota_id?: string
 }
 
 export interface CostsResponse {
@@ -86,6 +86,7 @@ export async function getCostCategories(): Promise<CostCategoriesResponse> {
       const errorData = await response.json().catch(() => ({})) as any
       return {
         success: false,
+        data: [],
         error: errorData.error || 'Erro ao buscar categorias',
       }
     }
@@ -116,11 +117,11 @@ export async function getCosts(filters: CostFilters = {}): Promise<CostsResponse
     if (filters.page_size) params.append('page_size', filters.page_size.toString())
     if (filters.date_from) params.append('date_from', filters.date_from)
     if (filters.date_to) params.append('date_to', filters.date_to)
-    if (filters.company_id) params.append('company_id', filters.company_id)
+    if (filters.empresa_id) params.append('empresa_id', filters.empresa_id)
     if (filters.transportadora_id) params.append('transportadora_id', filters.transportadora_id)
     if (filters.category_id) params.append('category_id', filters.category_id)
     if (filters.veiculo_id) params.append('veiculo_id', filters.veiculo_id)
-    if (filters.route_id) params.append('route_id', filters.route_id)
+    if (filters.rota_id) params.append('rota_id', filters.rota_id)
 
     const queryString = params.toString()
     const url = `/api/costs/manual-v2${queryString ? `?${queryString}` : ''}`

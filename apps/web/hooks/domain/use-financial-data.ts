@@ -40,6 +40,7 @@ export function useFinancialData(period: string) {
         const totalRevenues = revenues.reduce((sum, r) => sum + r.amount, 0)
         const margin = totalRevenues - totalCosts
         const marginPercent = totalRevenues > 0 ? ((margin / totalRevenues) * 100).toFixed(1) : '0'
+        const recurringCostsCount = costs.filter(c => c.is_recurring === true).length
 
         return {
             totalCosts,
@@ -48,6 +49,7 @@ export function useFinancialData(period: string) {
             marginPercent,
             costEntries: costs.length,
             revenueEntries: revenues.length,
+            recurring_costs_count: recurringCostsCount,
         }
     }, [costs, revenues])
 

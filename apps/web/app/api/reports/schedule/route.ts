@@ -86,11 +86,11 @@ async function schedulePostHandler(request: NextRequest) {
 
     if (!finalCompanyId) {
       if (authenticatedUser && authenticatedUser.role === 'admin') {
-        // Admin pode criar agendamentos sem companyId (global)
+        // Admin pode criar agendamentos sem company_id (global)
         finalCompanyId = null
-      } else if (authenticatedUser && authenticatedUser.companyId) {
-        // Usar companyId do usuário autenticado
-        finalCompanyId = authenticatedUser.companyId
+      } else if (authenticatedUser && authenticatedUser.company_id) {
+        // Usar company_id do usuário autenticado
+        finalCompanyId = authenticatedUser.company_id
       } else {
         // Em modo de teste, permitir criar sem companyId
         if (allowAuthBypass) {

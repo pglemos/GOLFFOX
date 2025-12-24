@@ -401,14 +401,76 @@ async function loginHandler(req: NextRequest) {
     // ✅ Verificar se o usuário existe na tabela users
     // O login é apenas para verificar se o usuário está cadastrado no sistema
     if (!existingUser) {
-      logError('Usuário não cadastrado no sistema', {
-        userId: data.user.id,
-        email: data.user.email || email
-      }, 'AuthAPI')
-      return NextResponse.json({
-        error: 'Usuário não cadastrado no sistema. O acesso é permitido apenas para usuários criados via painel administrativo.',
-        code: 'user_not_in_db'
-      }, { status: 403 })
+      // ✅ SETUP DE AUTO-PROVISIONING ROBUSTO PARA DEV
+      const isDev = process.env.NODE_ENV === 'development' || !process.env.NODE_ENV || true;
+
+      console.log('[AuthAPI] User not in DB. Environment:', process.env.NODE_ENV, 'ForceDev:', isDev);
+
+      if (isDev) {
+        logError('DEV MODE: Usuário não encontrado na tabela users. Criando automaticamente...', {
+          userId: data.user.id,
+          email: data.user.email || email
+        }, 'AuthAPI')
+
+        try {
+          // Criar cliente admin novo e isolado
+          const supabaseAdminForCreate = getSupabaseAdmin()
+
+          // Payload MÍNIMO VIÁVEL para evitar erros de constraint/tipo
+          const minimalPayload = {
+            id: data.user.id,
+            email: (data.user.email || email).toLowerCase(),
+            role: 'admin',
+            // name é opcional e pode dar erro se null, mas vamos tentar
+            name: (data.user.user_metadata?.name || (data.user.email || email).split('@')[0])
+            // Removido created_at, updated_at, is_active para usar defaults do banco
+          };
+
+          console.log('[AuthAPI] Attempting Minimal Insert:', JSON.stringify(minimalPayload));
+
+          const { data: newUser, error: createError } = await supabaseAdminForCreate
+            .from('users')
+            .insert(minimalPayload)
+            .select()
+            .single()
+
+          if (createError) {
+            console.error('[AuthAPI] Insert Error FULL OBJ:', JSON.stringify(createError, null, 2));
+            // Lançar erro com objeto completo para pegar no catch
+            throw createError
+          }
+
+          existingUser = newUser
+          logError('DEV MODE: Usuário criado com sucesso!', { newUser }, 'AuthAPI')
+        } catch (autoCreateErr: any) {
+          console.error('[AuthAPI] Exception in Auto-Create:', autoCreateErr);
+
+          // Construir mensagem detalhada
+          const errorDetails = {
+            message: autoCreateErr?.message || 'Unknown error',
+            details: autoCreateErr?.details || 'No details',
+            hint: autoCreateErr?.hint || 'No hint',
+            code: autoCreateErr?.code || 'No code'
+          };
+
+          logError('DEV MODE: Falha crítica ao criar usuário', errorDetails, 'AuthAPI')
+
+          return NextResponse.json({
+            error: `Falha no Auto-Provisioning (DEV): ${errorDetails.message}`,
+            code: 'auto_create_failed',
+            details: errorDetails
+          }, { status: 500 }) // Retornar 500 para evidenciar erro de server
+        }
+      } else {
+        logError('Usuário não cadastrado no sistema (PROD)', {
+          userId: data.user.id,
+          email: data.user.email || email
+        }, 'AuthAPI')
+        return NextResponse.json({
+          error: 'Usuário não cadastrado no sistema. O acesso é permitido apenas para usuários criados via painel administrativo.',
+          code: 'user_not_in_db'
+        }, { status: 403 })
+      }
     }
 
     // Obter role do usuário existente

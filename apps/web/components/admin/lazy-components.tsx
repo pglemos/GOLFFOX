@@ -33,7 +33,7 @@ export const LazyRouteModal = lazy(() =>
 
 // StopGenerator - gerador de paradas
 export const LazyStopGenerator = lazy(() =>
-  import('@/components/stop-generation/stop-generator').then(mod => ({ default: mod.StopGenerator }))
+  import('@/components/stop-generation/stop-generator')
 )
 
 // FinancialDashboard - dashboard financeiro

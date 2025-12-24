@@ -42,7 +42,7 @@ type CostFormValues = z.infer<typeof costFormSchema>
 export interface CostFormContainerProps {
     profileType: ProfileType
     companyId?: string
-    carrierId?: string
+    transportadoraId?: string
     veiculos?: { id: string; plate: string; model?: string }[]
     routes?: { id: string; name: string }[]
     onSuccess?: () => void
@@ -53,7 +53,7 @@ export interface CostFormContainerProps {
 export function CostFormContainer({
     profileType,
     companyId,
-    carrierId,
+    transportadoraId,
     veiculos = [],
     routes = [],
     onSuccess,
@@ -144,8 +144,8 @@ export function CostFormContainer({
 
             // Montar payload
             const payload: ManualCostInsert = {
-                company_id: companyId,
-                transportadora_id: carrierId,
+                empresa_id: companyId,
+                transportadora_id: transportadoraId,
                 category_id: data.categoryId,
                 description: data.description,
                 amount: parseFloat(data.amount.replace(',', '.')),
@@ -156,7 +156,7 @@ export function CostFormContainer({
                     ? format(data.recurringEndDate, 'yyyy-MM-dd')
                     : undefined,
                 veiculo_id: data.vehicleId || undefined,
-                route_id: data.routeId || undefined,
+                rota_id: data.routeId || undefined,
                 notes: data.notes,
                 attachment_url: attachmentUrl,
                 attachment_name: attachmentName,
@@ -175,7 +175,7 @@ export function CostFormContainer({
         } finally {
             setUploadProgress(0)
         }
-    }, [form, attachment, companyId, carrierId, createCostMutation, onSuccess])
+    }, [form, attachment, companyId, transportadoraId, createCostMutation, onSuccess])
 
     const handleSaveAndAdd = useCallback(async () => {
         await onSubmit(new Event('submit') as any)

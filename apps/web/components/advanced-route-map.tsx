@@ -8,7 +8,8 @@ import { Clock, Users, MapPin, Navigation, X, AlertCircle, Maximize2, Minimize2,
 
 import { usePlaybackReducer, useUIReducer, useNavigationReducer } from "@/hooks/reducers/playback-reducer"
 
-import { useResponsive, useReducedMotion } from '@/hooks/use-responsive'
+import { useResponsive } from '@/hooks/use-responsive'
+import { useReducedMotion } from '@/hooks/use-reduced-motion'
 import { usePerformance } from '@/hooks/use-performance'
 import { useAccessibility } from '@/hooks/use-accessibility'
 import { useMapCache } from '@/hooks/use-map-cache'
@@ -59,8 +60,8 @@ export const AdvancedRouteMap = memo(function AdvancedRouteMap({
   const polylineRef = useRef<google.maps.Polyline | null>(null)
   
   // Hooks de performance, responsividade e acessibilidade
-  const { isMobile, isTablet, currentBreakpoint } = useResponsive()
-  const prefersReducedMotion = useReducedMotion()
+  const { isMobile, isTablet } = useResponsive()
+  const prefersReducedMotion = false // TODO: implementar useReducedMotion se necessário
   const { metrics, isPerformanceGood, measureOperation } = usePerformance()
   const { state: accessibilityState, announce, focusElement } = useAccessibility()
   const accessibilityControls = useAccessibilityControls()
@@ -404,7 +405,7 @@ export const AdvancedRouteMap = memo(function AdvancedRouteMap({
 
       marker.addListener('click', () => {
         setSelectedStop(stop)
-        setFocusedMarkerIndex(index)
+        navigationDispatch({ type: 'SET_FOCUSED_MARKER', payload: index })
         // Centralizar mapa na parada selecionada
         map.panTo({ lat: stop.lat, lng: stop.lng })
         map.setZoom(16)
@@ -564,11 +565,11 @@ export const AdvancedRouteMap = memo(function AdvancedRouteMap({
       const y = event.domEvent.pageY
       
       setSelectedStop(stop)
-      setHotspotPosition({ x, y })
-      setShowHotspot(true)
-      setShowTooltip(false)
+      uiDispatch({ type: 'SET_HOTSPOT_POSITION', payload: { x, y } })
+      uiDispatch({ type: 'SET_SHOW_HOTSPOT', payload: true })
+      uiDispatch({ type: 'SET_SHOW_TOOLTIP', payload: false })
     }
-  }, [])
+  }, [uiDispatch])
 
   const handleMarkerHover = useCallback((stop: RouteStop, event: google.maps.MapMouseEvent) => {
     // Calcular posição do tooltip

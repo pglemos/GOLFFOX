@@ -33,7 +33,7 @@ import type { CostCategory, ProfileType } from "@/types/financial"
 
 interface SmartCategorySelectProps {
     value?: string
-    onValueChange: (categoryId: string, category?: CostCategory) => void
+    onValueChange: (categoryId: string, category?: CostCategory | null) => void
     profileType: ProfileType
     placeholder?: string
     disabled?: boolean

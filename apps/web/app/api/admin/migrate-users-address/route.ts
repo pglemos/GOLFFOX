@@ -131,7 +131,7 @@ ALTER TABLE users ADD COLUMN IF NOT EXISTS address_state VARCHAR(2);
     return NextResponse.json({
       success: false,
       error: 'Erro ao executar migração',
-      message: error.message,
+      message: errorMessage,
       sql: `
 -- Execute este SQL manualmente no Supabase Dashboard (SQL Editor):
 

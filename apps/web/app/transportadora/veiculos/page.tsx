@@ -540,7 +540,20 @@ export default function TransportadoraVeiculosPage() {
                     </Card>
                   ) : (
                     <MaintenanceTimeline
-                      maintenances={maintenances}
+                      maintenances={maintenances.map(m => ({
+                        id: m.id,
+                        maintenance_type: m.maintenance_type,
+                        status: m.status,
+                        description: m.description,
+                        scheduled_date: m.scheduled_date,
+                        completed_date: m.completed_date,
+                        next_maintenance_date: undefined,
+                        odometer_km: m.odometer_km ?? undefined,
+                        workshop_name: m.workshop_name,
+                        mechanic_name: m.mechanic_name,
+                        cost_parts_brl: m.cost_parts_brl,
+                        cost_labor_brl: m.cost_labor_brl,
+                      }))}
                       formatCurrency={formatCurrency}
                     />
                   )}
@@ -633,7 +646,7 @@ export default function TransportadoraVeiculosPage() {
               {selectedVeiculo && (
                 <DocumentUpload
                   vehicleId={selectedVeiculo}
-                  folder="veiculo-documents"
+                  folder="vehicle-documents"
                   documentType={documentType}
                   onSuccess={() => {
                     setIsUploadModalOpen(false)

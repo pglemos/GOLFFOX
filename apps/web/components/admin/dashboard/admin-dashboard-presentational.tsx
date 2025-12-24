@@ -62,7 +62,11 @@ export function AdminDashboardPresentational({
         transition={{ delay: 0.2 }}
       >
         <AdminFilters
-          initialFilters={filters}
+          initialFilters={{
+            empresa: filters.empresa || '',
+            data: filters.data || new Date().toISOString().split('T')[0],
+            turno: filters.turno || ''
+          }}
           onFiltersChange={onFiltersChange}
         />
       </motion.div>

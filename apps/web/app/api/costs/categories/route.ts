@@ -154,10 +154,22 @@ export async function POST(request: NextRequest) {
     if (authResponse) return authResponse
 
     const supabaseAdmin = getSupabaseAdmin()
-    const body: CostCategoryInsert = await request.json()
+    const bodyRaw = await request.json()
+    
+    // Mapear camelCase para snake_case
+    const body: CostCategoryInsert = {
+      name: bodyRaw.name,
+      profile_type: bodyRaw.profile_type || bodyRaw.profileType,
+      parent_id: bodyRaw.parent_id || bodyRaw.parentId || null,
+      icon: bodyRaw.icon || null,
+      color: bodyRaw.color || null,
+      keywords: bodyRaw.keywords || [],
+      is_operational: bodyRaw.is_operational ?? bodyRaw.isOperational ?? false,
+      display_order: bodyRaw.display_order ?? bodyRaw.displayOrder ?? 0,
+    }
 
     // Validação
-    if (!body.name || (!body.profile_type && !body.profileType)) {
+    if (!body.name || !body.profile_type) {
       return NextResponse.json(
         { success: false, error: 'Nome e tipo de perfil são obrigatórios' },
         { status: 400 }
@@ -168,13 +180,13 @@ export async function POST(request: NextRequest) {
       .from('gf_cost_categories')
       .insert({
         name: body.name,
-        profile_type: body.profile_type || body.profileType,
-        parent_id: body.parent_id || body.parentId,
+        profile_type: body.profile_type,
+        parent_id: body.parent_id,
         icon: body.icon,
         color: body.color,
-        keywords: body.keywords || [],
-        is_operational: body.is_operational ?? body.isOperational ?? false,
-        display_order: body.display_order ?? body.displayOrder ?? 0,
+        keywords: body.keywords,
+        is_operational: body.is_operational,
+        display_order: body.display_order,
       })
       .select()
       .single()

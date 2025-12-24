@@ -175,18 +175,18 @@ export async function loadVehicles(companyId?: string): Promise<Veiculo[]> {
     // Buscar trips ativas (mas não restringir veículos apenas a esses)
     const vehicleIds = finalVeiculosData.map((v) => v.id)
     const { data: activeTrips } = await (supabase
-      .from('trips')
+      .from('viagens')
       .select(`
         id,
         veiculo_id,
         motorista_id,
-        route_id,
+        rota_id,
         status,
-        routes(name),
+        rotas(name),
         users!trips_driver_id_fkey(id, name)
       `)
       .in('veiculo_id', vehicleIds)
-      .eq('status', 'inProgress') as any)
+      .eq('status', 'in_progress') as any)
 
     const tripsByVehicle = new Map<string, SupabaseTrip>()
     if (activeTrips) {
@@ -202,7 +202,7 @@ export async function loadVehicles(companyId?: string): Promise<Veiculo[]> {
     // Primeiro, buscar trips recentes (últimas 24h) para ter mais chances de encontrar posições
     const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
     const { data: recentTrips } = await (supabase
-      .from('trips')
+      .from('viagens')
       .select('id, veiculo_id')
       .in('veiculo_id', vehicleIds)
       .gte('created_at', oneDayAgo)
@@ -215,8 +215,8 @@ export async function loadVehicles(companyId?: string): Promise<Veiculo[]> {
       const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString()
       const { data: recentPositions } = await (supabase
         .from('motorista_positions')
-        .select('trip_id, latitude, longitude, speed, timestamp')
-        .in('trip_id', tripIds)
+        .select('viagem_id, lat, lng, speed, timestamp')
+        .in('viagem_id', tripIds)
         .gte('timestamp', fiveMinutesAgo)
         .order('timestamp', { ascending: false }) as any)
 
@@ -224,16 +224,17 @@ export async function loadVehicles(companyId?: string): Promise<Veiculo[]> {
         const tripToVehicle = new Map(
           recentTrips?.map((t: any) => [t.id, t.veiculo_id]) || []
         )
-        lastPositions = (recentPositions || []).map((pos: SupabasePosition) => ({
+        lastPositions = (recentPositions || []).map((pos: any) => ({
           ...pos,
-          veiculo_id: tripToVehicle.get(pos.trip_id),
+          trip_id: pos.viagem_id, // Alias para compatibilidade
+          veiculo_id: tripToVehicle.get(pos.viagem_id),
         }))
       } else {
         // Buscar últimas posições conhecidas se não há recentes
         const { data: allPositions } = await supabase
           .from('motorista_positions')
-          .select('trip_id, latitude, longitude, speed, timestamp')
-          .in('trip_id', tripIds)
+          .select('viagem_id, lat, lng, speed, timestamp')
+          .in('viagem_id', tripIds)
           .order('timestamp', { ascending: false })
           .limit(tripIds.length * 10)
 
@@ -243,7 +244,8 @@ export async function loadVehicles(companyId?: string): Promise<Veiculo[]> {
           )
           lastPositions = (allPositions || []).map((pos: any) => ({
             ...pos,
-            veiculo_id: tripToVehicle.get(pos.trip_id),
+            trip_id: pos.viagem_id, // Alias para compatibilidade
+            veiculo_id: tripToVehicle.get(pos.viagem_id),
           }))
         }
       }
@@ -280,18 +282,19 @@ export async function loadVehicles(companyId?: string): Promise<Veiculo[]> {
         vehicleStatus = 'stopped_long'
       }
 
-      const lat = lastPos?.latitude || null
-      const lng = lastPos?.longitude || null
+      const lat = lastPos?.lat || null
+      const lng = lastPos?.lng || null
 
       return {
+        id: v.id,
         veiculo_id: v.id,
         plate: v.plate,
         model: v.model || '',
         company_id: v.company_id || '',
         company_name: v.companies?.name || '',
         trip_id: trip?.id || '',
-        route_id: trip?.route_id || '',
-        route_name: trip?.routes?.name || 'Sem rota ativa',
+        route_id: trip?.rota_id || '',
+        route_name: trip?.rotas?.name || 'Sem rota ativa',
         motorista_id: trip?.motorista_id || '',
         motorista_name: trip?.users?.name || 'Sem motorista',
         lat,

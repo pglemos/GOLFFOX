@@ -40,7 +40,7 @@ export default function CustosEmpresaPage() {
     >
       <div className="space-y-4 sm:space-y-6 w-full overflow-x-hidden">
         <FinancialDashboardExpanded
-          profileType="empresa"
+          profileType="gestor_empresa"
         />
       </div>
     </AppShell>

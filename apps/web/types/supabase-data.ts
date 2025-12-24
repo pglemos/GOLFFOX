@@ -28,9 +28,9 @@ export interface SupabaseTrip {
   id: string
   veiculo_id: string
   motorista_id: string
-  route_id: string
+  rota_id: string
   status: string
-  routes?: { name: string } | null
+  rotas?: { name: string } | null
   users?: { id: string; name: string } | null
 }
 
@@ -38,11 +38,13 @@ export interface SupabaseTrip {
  * Dados brutos de posição do Supabase
  */
 export interface SupabasePosition {
-  trip_id: string
+  viagem_id: string | null
   lat: number
   lng: number
   speed?: number | null
   timestamp: string
+  veiculo_id?: string // Adicionado para mapeamento
+  trip_id?: string // Alias para viagem_id para compatibilidade
 }
 
 /**

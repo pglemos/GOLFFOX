@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
     if (error) {
       const res = await supabaseAdmin
         .from('gf_alerts')
-        .select('id')
+        .select('id, severity, is_resolved')
         .eq('is_resolved', false)
         .eq('severity', 'critical')
         .limit(1)

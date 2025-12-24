@@ -23,7 +23,7 @@ export async function GET(req: NextRequest) {
 
     // Buscar rotas da transportadora
     const { data: routes, error: routesError } = await supabase
-      .from('routes')
+      .from('rotas')
       .select('id, name, transportadora_id')
       .eq('transportadora_id', transportadoraId)
 
@@ -33,18 +33,18 @@ export async function GET(req: NextRequest) {
 
     // Buscar viagens
     let tripsQuery = supabase
-      .from('trips')
+      .from('viagens')
       .select(`
         id,
-        route_id,
+        rota_id,
         motorista_id,
         created_at,
         completed_at,
         status,
-        routes(name),
+        rotas(name),
         users!trips_driver_id_fkey(name, email)
       `)
-      .in('route_id', routeIds)
+      .in('rota_id', routeIds)
 
     if (startDate) {
       tripsQuery = tripsQuery.gte('created_at', startDate)
@@ -60,22 +60,22 @@ export async function GET(req: NextRequest) {
     // Buscar passageiros por viagem
     const tripIds = trips?.map((t: any) => t.id) || []
     const { data: passengers, error: passengersError } = await supabase
-      .from('trip_passageiros')
-      .select('trip_id')
-      .in('trip_id', tripIds)
+      .from('viagem_passageiros')
+      .select('viagem_id')
+      .in('viagem_id', tripIds)
 
     if (passengersError) throw passengersError
 
     // Contar passageiros por viagem
     const passengersByTrip = passengers?.reduce((acc: any, p) => {
-      acc[p.trip_id] = (acc[p.trip_id] || 0) + 1
+      acc[p.viagem_id] = (acc[p.viagem_id] || 0) + 1
       return acc
     }, {}) || {}
 
     // Formatar dados das viagens
     const tripsData = trips?.map((trip: any) => ({
       trip_id: trip.id,
-      route_name: (trip.routes as any)?.name || 'N/A',
+      route_name: (trip.rotas as any)?.name || 'N/A',
       motorista_name: (trip.users as any)?.name || 'N/A',
       driver_email: (trip.users as any)?.email || 'N/A',
       created_at: trip.created_at,

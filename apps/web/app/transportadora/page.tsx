@@ -62,7 +62,7 @@ export default function TransportadoraDashboard() {
   }, [loading, user, router])
 
   // Obter transportadora_id do usuário (pode vir em vários formatos dependendo da fonte/cookie/me api)
-  const transportadoraId = user?.transportadora_id || user?.transportadoraId || user?.companyId || user?.company_id || null
+  const transportadoraId = user?.transportadora_id || null
 
   const [fleet, setFleet] = useState<any[]>([])
   const [motoristas, setMotoristas] = useState<any[]>([])

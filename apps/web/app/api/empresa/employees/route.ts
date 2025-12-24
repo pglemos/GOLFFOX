@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
       hasUser: !!authenticatedUser,
       userId: authenticatedUser?.id,
       role: authenticatedUser?.role,
-      companyId: authenticatedUser?.companyId
+      company_id: authenticatedUser?.company_id
     })
     
     if (!authenticatedUser) {
@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
     // Se é operador, usar o company_id dele se não fornecido
     let finalCompanyId = companyId
     if (!finalCompanyId && (authenticatedUser.role === 'gestor_transportadora' || authenticatedUser.role === 'gestor_empresa')) {
-      finalCompanyId = authenticatedUser.companyId || null
+      finalCompanyId = authenticatedUser.company_id || null
       
       // Se ainda não tem, buscar do banco
       if (!finalCompanyId && authenticatedUser.id) {

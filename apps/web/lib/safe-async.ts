@@ -140,7 +140,6 @@ export async function safeAsyncOrNull<T>(
 ): Promise<T | null> {
   const result = await safeAsync(operation, {
     ...options,
-    showToast: false, // Não mostrar toast para operações não críticas
   })
 
   return result.success ? result.data! : null

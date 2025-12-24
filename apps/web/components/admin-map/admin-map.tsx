@@ -70,6 +70,7 @@ export interface AdminMapProps {
 // Re-exportar tipos para compatibilidade
 export type veiculo = Veiculo
 export type Alert = MapAlert
+export { RoutePolyline } from '@/types/map'
 
 export function AdminMap({
   companyId,

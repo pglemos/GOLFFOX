@@ -269,7 +269,7 @@ function UsuariosPageContent() {
                         setIsCreateUserModalOpen(false)
                         await loadUsuarios()
                     }}
-                    company_id="" // Passando vazio para indicar criação global
+                    companyId="" // Passando vazio para indicar criação global
                     companyName="Sistema"
                 />
             </div>

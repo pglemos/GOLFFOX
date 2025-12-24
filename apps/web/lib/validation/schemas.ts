@@ -24,7 +24,7 @@ export const createUserSchema = z.object({
   password: passwordSchema,
   name: nameSchema,
   role: z.enum(['admin', 'gestor_empresa', 'gestor_transportadora', 'motorista', 'passageiro']),
-  company_id: uuidSchema.optional().nullable(),
+  empresa_id: uuidSchema.optional().nullable(),
   transportadora_id: uuidSchema.optional().nullable(),
   phone: z.string().optional().nullable(),
   cpf: z.string().optional().nullable(),
@@ -105,7 +105,7 @@ export const createVehicleSchema = z.object({
   prefix: z.string().optional().nullable(),
   year: z.number().int().min(1900).max(2100).optional().nullable(),
   capacity: z.number().int().min(1).optional().nullable(),
-  company_id: uuidSchema.optional().nullable(),
+  empresa_id: uuidSchema.optional().nullable(),
   transportadora_id: uuidSchema.optional().nullable(),
   is_active: z.boolean().default(true),
 })
@@ -120,7 +120,7 @@ export const updateVehicleSchema = createVehicleSchema.partial().extend({
 
 export const createRouteSchema = z.object({
   name: nameSchema,
-  company_id: uuidSchema.optional().nullable(),
+  empresa_id: uuidSchema.optional().nullable(),
   transportadora_id: uuidSchema.optional().nullable(),
   origin: z.string().min(1, 'Origem é obrigatória'),
   destination: z.string().min(1, 'Destino é obrigatório'),
@@ -172,7 +172,7 @@ export const createCostSchema = z.object({
   description: z.string().min(1, 'Descrição é obrigatória'),
   amount: z.number().min(0, 'Valor deve ser positivo'),
   cost_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Data inválida (use YYYY-MM-DD)'),
-  route_id: uuidSchema.optional().nullable(),
+  rota_id: uuidSchema.optional().nullable(),
   veiculo_id: uuidSchema.optional().nullable(),
   motorista_id: uuidSchema.optional().nullable(),
   is_recurring: z.boolean().default(false),
@@ -191,7 +191,7 @@ export const updateCostSchema = createCostSchema.partial().extend({
 // ============================================
 
 export const budgetSchema = z.object({
-  company_id: uuidSchema.optional().nullable(),
+  empresa_id: uuidSchema.optional().nullable(),
   transportadora_id: uuidSchema.optional().nullable(),
   category_id: uuidSchema.optional().nullable(),
   period_month: z.number().min(1).max(12),
@@ -228,7 +228,7 @@ export const updateRevenueSchema = createRevenueSchema.partial().extend({
 // ============================================
 
 export const createTripSchema = z.object({
-  route_id: uuidSchema,
+  rota_id: uuidSchema,
   veiculo_id: uuidSchema.optional().nullable(),
   motorista_id: uuidSchema.optional().nullable(),
   scheduled_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Data inválida (use YYYY-MM-DD)').optional(),

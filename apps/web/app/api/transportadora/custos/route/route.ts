@@ -8,8 +8,8 @@ import { supabaseServiceRole } from '@/lib/supabase-server'
 export const runtime = 'nodejs'
 
 const routeCostSchema = z.object({
-  route_id: z.string().uuid(),
-  trip_id: z.string().uuid().optional().nullable(),
+  rota_id: z.string().uuid(),
+  viagem_id: z.string().uuid().optional().nullable(),
   cost_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   fuel_cost_brl: z.number().min(0).default(0),
   labor_cost_brl: z.number().min(0).default(0),
@@ -42,8 +42,8 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
     }
 
-    const routeId = req.nextUrl.searchParams.get('route_id')
-    const tripId = req.nextUrl.searchParams.get('trip_id')
+    const routeId = req.nextUrl.searchParams.get('route_id') || req.nextUrl.searchParams.get('rota_id')
+    const tripId = req.nextUrl.searchParams.get('trip_id') || req.nextUrl.searchParams.get('viagem_id')
     const startDate = req.nextUrl.searchParams.get('start_date')
     const endDate = req.nextUrl.searchParams.get('end_date')
 
@@ -55,17 +55,17 @@ export async function GET(req: NextRequest) {
       .single()
 
     let query = supabaseServiceRole
-      .from('route_costs')
+      .from('rota_custos')
       .select(`
         *,
-        routes(name, transportadora_id)
+        rotas(name, transportadora_id)
       `)
 
     // Nota: O filtro será feito após o join através da relação route_id
     // Verificar se a rota pertence à transportadora ao processar resultados
 
-    if (routeId) query = query.eq('route_id', routeId)
-    if (tripId) query = query.eq('trip_id', tripId)
+    if (routeId) query = query.eq('rota_id', routeId)
+    if (tripId) query = query.eq('viagem_id', tripId)
     if (startDate) query = query.gte('cost_date', startDate)
     if (endDate) query = query.lte('cost_date', endDate)
 
@@ -81,7 +81,7 @@ export async function GET(req: NextRequest) {
     // Filtrar apenas rotas da transportadora do usuário após buscar
     const filteredData = (data || []).filter((cost: any) => {
       if (!userData?.transportadora_id) return false
-      const route = cost.routes
+      const route = cost.rotas
       if (!route) return false
       return route.transportadora_id === userData.transportadora_id
     })
@@ -106,13 +106,17 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json()
-    const validated = routeCostSchema.parse(body)
+    const validated = routeCostSchema.parse({
+      ...body,
+      rota_id: body.rota_id || body.route_id,
+      viagem_id: body.viagem_id || body.trip_id
+    })
 
     // Verificar se a rota pertence à transportadora do usuário
     const { data: route } = await supabaseServiceRole
-      .from('routes')
+      .from('rotas')
       .select('transportadora_id')
-      .eq('id', validated.route_id)
+      .eq('id', validated.rota_id)
       .single()
 
     if (!route) {
@@ -136,7 +140,7 @@ export async function POST(req: NextRequest) {
     }
 
     const { data, error } = await supabaseServiceRole
-      .from('route_costs')
+      .from('rota_custos')
       .insert(validated)
       .select()
       .single()

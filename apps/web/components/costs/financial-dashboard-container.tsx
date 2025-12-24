@@ -49,19 +49,6 @@ export function FinancialDashboardContainer({
             profileType={profileType}
             companyId={companyId}
             carrierId={carrierId}
-            costs={costs}
-            revenues={revenues}
-            budgets={budgets}
-            kpis={kpis}
-            categoryData={categoryData}
-            budgetVsActualData={budgetVsActualData}
-            loading={loading}
-            activeTab={activeTab}
-            period={period}
-            showCostForm={showCostForm}
-            onTabChange={setActiveTab}
-            onPeriodChange={setPeriod}
-            onShowCostFormChange={setShowCostForm}
         />
     )
 }

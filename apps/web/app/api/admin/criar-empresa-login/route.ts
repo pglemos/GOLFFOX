@@ -144,7 +144,7 @@ export async function POST(request: NextRequest) {
       name: sanitizedName,
       role: 'gestor_empresa',
       company_id: company_id
-    }, { message: 'Login de operador criado com sucesso' })
+    }, 201, { message: 'Login de operador criado com sucesso' })
 
   } catch (error: any) {
     logError('Erro ao criar login de operador', { error })

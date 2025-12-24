@@ -19,9 +19,9 @@ import { cn } from "@/lib/utils"
 
 interface AdminFiltersProps {
   initialFilters?: {
-    empresa: string
-    data: string
-    turno: string
+    empresa?: string
+    data?: string
+    turno?: string
   }
   onFiltersChange: (filters: { empresa: string; data: string; turno: string }) => void
 }

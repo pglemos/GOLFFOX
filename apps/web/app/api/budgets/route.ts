@@ -225,10 +225,10 @@ export async function POST(request: NextRequest) {
             )
         }
 
-        // Mapear retorno para ManualCost
+        // Mapear retorno para Budget
         const newBudget: Budget = {
             id: data.id,
-            company_id: data.company_id,
+            empresa_id: data.empresa_id,
             transportadora_id: data.transportadora_id,
             category_id: data.category_id,
             category_name: data.category_name,

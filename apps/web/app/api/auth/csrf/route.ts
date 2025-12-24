@@ -3,7 +3,7 @@ import { randomBytes } from "crypto"
 import { NextRequest, NextResponse } from "next/server"
 
 import { successResponse, errorResponse } from '@/lib/api-response'
-import { logError } from '@/lib/logger'
+import { logError, debug } from '@/lib/logger'
 import { applyRateLimit } from '@/lib/rate-limit'
 
 function generateToken(length = 32) {

@@ -75,7 +75,7 @@ export interface CostCategoryUpdate {
 
 export interface ManualCost {
     id: string;
-    company_id?: string | null;
+    empresa_id?: string | null;
     transportadora_id?: string | null;
     category_id?: string | null;
     description: string;
@@ -86,7 +86,7 @@ export interface ManualCost {
     recurring_end_date?: string | null;
     parent_recurring_id?: string | null;
     veiculo_id?: string | null;
-    route_id?: string | null;
+    rota_id?: string | null;
     motorista_id?: string | null;
     attachment_url?: string | null;
     attachment_name?: string | null;
@@ -100,14 +100,14 @@ export interface ManualCost {
     // Relacionamentos (quando join)
     category?: CostCategory | null;
     veiculo?: { id: string; plate: string; model?: string } | null;
-    route?: { id: string; name: string } | null;
+    rota?: { id: string; name: string } | null;
     motorista?: { id: string; name?: string; email: string } | null;
     empresa?: { id: string; name: string } | null;
     transportadora?: { id: string; name: string } | null;
 }
 
 export interface ManualCostInsert {
-    company_id?: string | null;
+    empresa_id?: string | null;
     transportadora_id?: string | null;
     category_id?: string | null;
     description: string;
@@ -117,7 +117,7 @@ export interface ManualCostInsert {
     recurring_interval?: RecurringInterval | null;
     recurring_end_date?: string | null;
     veiculo_id?: string | null;
-    route_id?: string | null;
+    rota_id?: string | null;
     motorista_id?: string | null;
     attachment_url?: string | null;
     attachment_name?: string | null;
@@ -134,7 +134,7 @@ export interface ManualCostUpdate {
     recurring_interval?: RecurringInterval | null;
     recurring_end_date?: string | null;
     veiculo_id?: string | null;
-    route_id?: string | null;
+    rota_id?: string | null;
     motorista_id?: string | null;
     attachment_url?: string | null;
     attachment_name?: string | null;
@@ -150,7 +150,7 @@ export interface ManualCostUpdate {
 
 export interface ManualRevenue {
     id: string;
-    company_id?: string | null;
+    empresa_id?: string | null;
     transportadora_id?: string | null;
     category: string;
     description: string;
@@ -172,7 +172,7 @@ export interface ManualRevenue {
 }
 
 export interface ManualRevenueInsert {
-    company_id?: string | null;
+    empresa_id?: string | null;
     transportadora_id?: string | null;
     category: string;
     description: string;
@@ -207,7 +207,7 @@ export interface ManualRevenueUpdate {
 
 export interface Budget {
     id: string;
-    company_id?: string | null;
+    empresa_id?: string | null;
     transportadora_id?: string | null;
     category_id?: string | null;
     category_name?: string | null;
@@ -224,7 +224,7 @@ export interface Budget {
 }
 
 export interface BudgetInsert {
-    company_id?: string | null;
+    empresa_id?: string | null;
     transportadora_id?: string | null;
     category_id?: string | null;
     category_name?: string | null;
@@ -247,7 +247,7 @@ export interface BudgetUpdate {
 
 export interface FinancialForecast {
     id: string;
-    company_id?: string | null;
+    empresa_id?: string | null;
     transportadora_id?: string | null;
     forecast_type: 'cost' | 'revenue';
     category_id?: string | null;
@@ -270,7 +270,7 @@ export interface FinancialForecast {
 
 export interface FinancialAlert {
     id: string;
-    company_id?: string | null;
+    empresa_id?: string | null;
     transportadora_id?: string | null;
     alert_type: FinancialAlertType;
     severity: AlertSeverity;
@@ -352,7 +352,7 @@ export interface CostFormData {
     recurring_interval?: RecurringInterval;
     recurring_end_date?: Date;
     veiculo_id?: string;
-    route_id?: string;
+    rota_id?: string;
     notes?: string;
     attachment?: File;
 }
@@ -424,7 +424,7 @@ export interface FinancialDashboardData {
 export interface CostFilters {
     category_id?: string;
     veiculo_id?: string;
-    route_id?: string;
+    rota_id?: string;
     status?: CostStatus;
     is_recurring?: boolean;
     date_from?: string;

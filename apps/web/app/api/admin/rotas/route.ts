@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
 
     const validated = validation.data
     const name = validated.name || 'Rota Teste'
-    const companyId = validated.company_id
+    const companyId = validated.empresa_id
     const origin = validated.origin || 'Origem'
     const destination = validated.destination || 'Destino'
 
@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
     let finalCompanyId = companyId
     if (!finalCompanyId) {
       const { data: companies } = await supabaseAdmin
-        .from('companies')
+        .from('empresas')
         .select('id')
         .eq('is_active', true)
         .limit(1)
@@ -88,7 +88,7 @@ export async function POST(request: NextRequest) {
         try {
           const testCompanyId = '00000000-0000-0000-0000-000000000001'
           const { data: newCompany, error: createCompanyError } = await supabaseAdmin
-            .from('companies')
+            .from('empresas')
             .insert({
               id: testCompanyId,
               name: 'Empresa Teste Padrão',
@@ -121,7 +121,7 @@ export async function POST(request: NextRequest) {
     // Criar rota - tentar inserir com destination, se falhar, tentar sem
     const routeData: Record<string, any> = {
       name: name,
-      company_id: finalCompanyId,
+      empresa_id: finalCompanyId,
       is_active: true
     }
 
@@ -156,7 +156,7 @@ export async function POST(request: NextRequest) {
       logger.warn('⚠️ Coluna destination não existe, tentando criar rota sem destination')
       const routeDataWithoutDestination: Record<string, any> = {
         name: name,
-        company_id: finalCompanyId,
+        empresa_id: finalCompanyId,
         is_active: true,
       }
 
@@ -248,11 +248,12 @@ export async function GET(request: NextRequest) {
     const offset = parseInt(searchParams.get('offset') || '0')
 
     // Selecionar apenas colunas necessárias para listagem (otimização de performance)
-    const routeColumns = 'id,name,company_id,transportadora_id,origin,destination,origin_lat,origin_lng,destination_lat,destination_lng,polyline,is_active,created_at,updated_at'
+    // Selecionar apenas colunas necessárias para listagem (otimização de performance)
+    const routeColumns = 'id,name,empresa_id,transportadora_id,origin,destination,origin_lat,origin_lng,destination_lat,destination_lng,polyline,is_active,created_at,updated_at'
     let query = supabaseAdmin.from('rotas').select(routeColumns, { count: 'exact' })
 
     if (companyId) {
-      query = query.eq('company_id', companyId)
+      query = query.eq('empresa_id', companyId)
     }
 
     query = query.order('created_at', { ascending: false }).range(offset, offset + limit - 1)

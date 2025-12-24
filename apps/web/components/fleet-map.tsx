@@ -33,6 +33,7 @@ import { Input } from "./ui/input"
 import { InteractiveMarkerHotspot } from "./interactive-marker-hotspot"
 
 import { useRouter, useSearchParams } from "@/lib/next-navigation"
+import { useUrlFilters } from "@/hooks/use-url-filters"
 
 
 interface Bus {
@@ -590,9 +591,7 @@ export const FleetMap = memo(function FleetMap({ companyId, transportadoraId, ro
 
   // Atualizar filtros e URL
   const handleFilterChange = (key: keyof typeof filters, value: string) => {
-    const newFilters = { ...filters, [key]: value }
-    setFilters(newFilters)
-    updateUrlFilters(newFilters)
+    setFilters({ [key]: value })
   }
 
   // Calcular paradas formatadas para a barra temporal
@@ -722,7 +721,7 @@ export const FleetMap = memo(function FleetMap({ companyId, transportadoraId, ro
 
       {/* Ações flutuantes */}
       <div className="absolute bottom-6 right-6 z-10 flex flex-col gap-2">
-        <Button size="icon" onClick={loadMapData} className="bg-white hover:bg-bg-hover shadow-lg">
+        <Button size="icon" onClick={() => loadMapData()} className="bg-white hover:bg-bg-hover shadow-lg">
           <RefreshCw className="h-4 w-4" />
         </Button>
         <Button size="icon" variant="outline" className="bg-white shadow-lg">

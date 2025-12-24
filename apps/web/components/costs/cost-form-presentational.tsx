@@ -109,7 +109,7 @@ export function CostFormPresentational({
                         <Label>Categoria</Label>
                         <SmartCategorySelect
                             value={form.watch("categoryId")}
-                            onValueChange={onCategoryChange}
+                            onValueChange={(id, category) => onCategoryChange(id, category || null)}
                             profileType={profileType}
                             placeholder="Selecione uma categoria..."
                         />

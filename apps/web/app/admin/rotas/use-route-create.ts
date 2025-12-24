@@ -112,7 +112,7 @@ export function useRouteCreate(isOpen: boolean) {
             console.error("Erro ao carregar empresas:", error)
             try {
                 const { data, error: supabaseError } = await supabase
-                    .from("companies")
+                    .from("empresas")
                     .select("id, name")
                     .order("name", { ascending: true })
 
@@ -203,7 +203,7 @@ export function useRouteCreate(isOpen: boolean) {
 
         try {
             const { data } = await supabase
-                .from("companies")
+                .from("empresas")
                 .select("address")
                 .eq("id", formData.company_id)
                 .maybeSingle()

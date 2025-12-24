@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
     const offset = parseInt(searchParams.get('offset') || '0')
 
     // Selecionar apenas colunas necessárias para listagem (otimização de performance)
-    const tripColumns = 'id,route_id,veiculo_id,motorista_id,status,scheduled_date,scheduled_start_time,start_time,end_time,actual_start_time,actual_end_time,distance_km,notes,created_at,updated_at'
+    const tripColumns = 'id,rota_id,veiculo_id,motorista_id,status,scheduled_date,scheduled_start_time,start_time,end_time,actual_start_time,actual_end_time,distance_km,notes,created_at,updated_at'
     let query = supabaseAdmin.from('viagens').select(tripColumns, { count: 'exact' })
 
     // Aplicar filtros
@@ -54,7 +54,7 @@ export async function GET(request: NextRequest) {
       query = query.eq('veiculo_id', vehicleId)
     }
     if (routeId) {
-      query = query.eq('route_id', routeId)
+      query = query.eq('rota_id', routeId)
     }
     if (driverId) {
       query = query.eq('motorista_id', driverId)
@@ -70,12 +70,12 @@ export async function GET(request: NextRequest) {
     }
     if (companyId) {
       // Filtrar por company via route
-      const routesQuery = supabaseAdmin.from('rotas').select('id').eq('company_id', companyId)
+      const routesQuery = supabaseAdmin.from('rotas').select('id').eq('empresa_id', companyId)
       const { data: routes } = await routesQuery
       if (routes && routes.length > 0) {
-        query = query.in('route_id', routes.map((r: any) => r.id))
+        query = query.in('rota_id', routes.map((r: any) => r.id))
       } else {
-        query = query.eq('route_id', '00000000-0000-0000-0000-000000000000') // Never matches
+        query = query.eq('rota_id', '00000000-0000-0000-0000-000000000000') // Never matches
       }
     }
 
@@ -127,7 +127,7 @@ export async function POST(request: NextRequest) {
 
     // Validar com Zod (aceitar tanto snake_case quanto camelCase)
     const validation = createTripSchema.safeParse({
-      route_id: body?.route_id || body?.routeId,
+      rota_id: body?.route_id || body?.routeId || body?.rota_id,
       veiculo_id: body?.veiculo_id || body?.vehicleId,
       motorista_id: body?.motorista_id || body?.driverId,
       scheduled_date: body?.scheduled_date || body?.scheduledDate,
@@ -151,7 +151,7 @@ export async function POST(request: NextRequest) {
     }
 
     const validated = validation.data
-    const routeId = validated.route_id
+    const routeId = validated.rota_id
     const vehicleId = validated.veiculo_id
     const driverId = validated.motorista_id
     const scheduledDate = validated.scheduled_date
@@ -177,10 +177,10 @@ export async function POST(request: NextRequest) {
     }
 
     // Verificar se route existe
-    let route = null
+    let route: { id: string; empresa_id: string | null } | null = null
     const { data: existingRoute, error: routeError } = await supabaseAdmin
       .from('rotas')
-      .select('id, company_id')
+      .select('id, empresa_id')
       .eq('id', routeId)
       .single()
 
@@ -195,19 +195,19 @@ export async function POST(request: NextRequest) {
         if (vehicleId) {
           const { data: veiculo } = await supabaseAdmin
             .from('veiculos')
-            .select('company_id')
+            .select('empresa_id')
             .eq('id', vehicleId)
             .single()
 
-          if (veiculo?.company_id) {
-            companyIdForRoute = veiculo.company_id
+          if (veiculo?.empresa_id) {
+            companyIdForRoute = veiculo.empresa_id
           }
         }
 
         // Se não tem company_id do veículo, buscar primeira empresa ativa
         if (!companyIdForRoute) {
           const { data: companies } = await supabaseAdmin
-            .from('companies')
+            .from('empresas')
             .select('id')
             .eq('is_active', true)
             .limit(1)
@@ -224,12 +224,12 @@ export async function POST(request: NextRequest) {
             .insert({
               id: routeId, // Usar o ID fornecido
               name: 'Rota Teste Automática',
-              company_id: companyIdForRoute,
+              empresa_id: companyIdForRoute,
               origin: 'Origem',
               destination: 'Destino',
               is_active: true
             } as any)
-            .select('id, company_id')
+            .select('id, empresa_id')
             .single()
 
           if (!createRouteError && newRoute) {
@@ -298,7 +298,7 @@ export async function POST(request: NextRequest) {
 
     // Criar viagem
     const tripData: any = {
-      route_id: routeId,
+      rota_id: routeId,
       scheduled_date: finalScheduledDate,
       status: status
     }

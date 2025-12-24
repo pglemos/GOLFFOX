@@ -92,7 +92,7 @@ async function createOperatorHandler(request: NextRequest) {
       company,
       operador: operatorUser,
       userId
-    }, { status: 201 })
+    }, 201)
 
   } catch (err) {
     logError('Erro ao criar empresa/operador', { error: err })

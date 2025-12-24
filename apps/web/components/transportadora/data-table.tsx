@@ -21,7 +21,7 @@ export interface Column<T> {
   key: string
   label: string
   sortable?: boolean
-  render?: (value: any, row: T) => React.ReactNode
+  render?: (value: any, row: T, index: number) => React.ReactNode
   filterable?: boolean
   filterType?: "text" | "select" | "date"
   filterOptions?: { label: string; value: string }[]
@@ -41,7 +41,7 @@ interface DataTableProps<T> {
   title?: string
   description?: string
   emptyMessage?: string
-  onRowClick?: (row: T) => void
+  onRowClick?: (row: T, index: number) => void
   className?: string
   showFilters?: boolean
   filterConfig?: {
@@ -352,7 +352,7 @@ function DataTableComponent<T extends Record<string, any>>({
                       "mobile-table-card cursor-pointer touch-manipulation",
                       isSelected && "ring-2 ring-primary"
                     )}
-                    onClick={() => onRowClick?.(row)}
+                    onClick={() => onRowClick?.(row, actualIndex)}
                   >
                     <div className="flex items-start justify-between gap-3">
                       {/* Checkbox */}
@@ -444,7 +444,7 @@ function DataTableComponent<T extends Record<string, any>>({
                               <span className="text-xs font-medium text-muted-foreground uppercase">{column.label}</span>
                               <span className="text-sm font-medium text-right flex-1 ml-2">
                                 {column.render
-                                  ? column.render(row[column.key], row)
+                                  ? column.render(row[column.key], row, actualIndex)
                                   : row[column.key]?.toString() || "-"}
                               </span>
                             </div>
@@ -512,11 +512,11 @@ function DataTableComponent<T extends Record<string, any>>({
                           isSelected && "bg-muted/30",
                           onRowClick && "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                         )}
-                        onClick={() => onRowClick?.(row)}
+                        onClick={() => onRowClick?.(row, actualIndex)}
                         onKeyDown={(e) => {
                           if (onRowClick && (e.key === 'Enter' || e.key === ' ')) {
                             e.preventDefault()
-                            onRowClick(row)
+                            onRowClick(row, actualIndex)
                           }
                         }}
                         role={onRowClick ? "button" : undefined}
@@ -636,7 +636,7 @@ function DataTableComponent<T extends Record<string, any>>({
                             <TableCell key={column.key} className="px-3 sm:px-6 py-3 text-xs sm:text-sm">
                               <div className="truncate max-w-[200px] sm:max-w-none">
                                 {column.render
-                                  ? column.render(row[column.key], row)
+                                  ? column.render(row[column.key], row, actualIndex)
                                   : row[column.key]?.toString() || "-"}
                               </div>
                             </TableCell>

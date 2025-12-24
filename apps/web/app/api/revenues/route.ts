@@ -288,7 +288,7 @@ export async function POST(request: NextRequest) {
         // Mapear retorno para ManualRevenue
         const newRevenue: ManualRevenue = {
             id: data.id,
-            company_id: data.company_id,
+            empresa_id: data.empresa_id,
             transportadora_id: data.transportadora_id,
             category: data.category,
             description: data.description,

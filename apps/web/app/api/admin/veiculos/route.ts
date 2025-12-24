@@ -85,9 +85,9 @@ export async function POST(request: NextRequest) {
     }
     const validated = validation.data
 
-    // Se company_id não foi fornecido, buscar primeira empresa ativa
+    // Se empresa_id não foi fornecido, buscar primeira empresa ativa
     // Em modo de teste/desenvolvimento, criar empresa automaticamente se não existir
-    let finalCompanyId = validated.company_id
+    let finalCompanyId = validated.empresa_id
     if (!finalCompanyId) {
       const { data: companies } = await supabaseServiceRole
         .from('companies')

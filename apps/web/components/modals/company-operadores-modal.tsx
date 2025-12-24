@@ -210,7 +210,6 @@ export function CompanyUsersModal({
                             setIsEditModalOpen(true)
                           }}
                           className="flex-1 sm:flex-none text-xs"
-                          size="sm"
                         >
                           <Edit className="h-3.5 w-3.5 mr-1.5" />
                           Editar

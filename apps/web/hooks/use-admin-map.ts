@@ -167,13 +167,23 @@ export function useAdminMap(options: UseAdminMapOptions = {}): UseAdminMapReturn
       if (alertsError) {
         logError('Erro ao carregar alertas', { error: alertsError }, 'useAdminMap')
       } else if (alertsData) {
-        setAlerts(alertsData.map(a => ({
+        interface AlertRecord {
+          id: string
+          company_id: string
+          route_id?: string
+          veiculo_id?: string
+          vehicle_id?: string
+          severity?: 'low' | 'medium' | 'high' | 'critical'
+          description: string
+          created_at: string
+        }
+        setAlerts(alertsData.map((a: AlertRecord) => ({
           alert_id: a.id,
-          alert_type: 'incident',
+          alert_type: 'incident' as const,
           company_id: a.company_id,
           route_id: a.route_id,
-          veiculo_id: (a as any).veiculo_id || (a as any).vehicle_id,
-          severity: (a.severity as any) || 'medium',
+          veiculo_id: a.veiculo_id || a.vehicle_id,
+          severity: a.severity || 'medium' as const,
           description: a.description,
           created_at: a.created_at
         })))
@@ -398,7 +408,7 @@ export function useAdminMap(options: UseAdminMapOptions = {}): UseAdminMapReturn
       // Buscar rota planejada se disponível
       const plannedRoute: PlannedRoutePoint[] = []
       if (vehicle.route_id) {
-        const route = routes.find(r => r.id === vehicle.route_id)
+        const route = routes.find(r => r.route_id === vehicle.route_id)
         if (route && (route as any).polyline) {
           // Decodificar polyline para pontos
           // plannedRoute = decodePolyline((route as any).polyline)

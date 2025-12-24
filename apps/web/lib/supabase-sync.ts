@@ -150,7 +150,7 @@ function validateSyncData(
     case 'motorista':
       if (!data.name) errors.push('Nome é obrigatório')
       if (!data.email) errors.push('Email é obrigatório')
-      if (data.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
+      if (data.email && typeof data.email === 'string' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
         errors.push('Email inválido')
       }
       break
@@ -177,7 +177,7 @@ function validateSyncData(
 
     case 'operador':
       if (!data.email) errors.push('Email é obrigatório')
-      if (data.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
+      if (data.email && typeof data.email === 'string' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
         errors.push('Email inválido')
       }
       break

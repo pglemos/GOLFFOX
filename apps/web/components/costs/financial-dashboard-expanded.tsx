@@ -328,7 +328,7 @@ export function FinancialDashboardExpanded({
                                 <CostForm
                                     profileType={profileType}
                                     companyId={companyId}
-                                    carrierId={carrierId}
+                                    transportadoraId={carrierId}
                                     onSuccess={() => {
                                         setShowCostForm(false)
                                         // Recarregar dados

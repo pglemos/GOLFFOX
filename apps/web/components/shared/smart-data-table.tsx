@@ -50,7 +50,7 @@ export function SmartDataTable<T extends Record<string, unknown>>({
       key: col.key,
       label: col.label,
       sortable: col.sortable,
-      render: col.render
+      render: col.render ? (value: any, row: T) => col.render!(value, row, 0) : undefined
     }))
   }, [columns])
 
@@ -64,7 +64,7 @@ export function SmartDataTable<T extends Record<string, unknown>>({
         title={props.title}
         description={props.description}
         emptyMessage={props.emptyMessage}
-        onRowClick={props.onRowClick}
+        onRowClick={props.onRowClick ? (row: T) => props.onRowClick!(row, 0) : undefined}
         className={props.className}
       />
     )
@@ -81,7 +81,7 @@ export function SmartDataTable<T extends Record<string, unknown>>({
       emptyMessage={props.emptyMessage}
       pagination={props.pagination}
       pageSize={props.pageSize}
-      onRowClick={props.onRowClick}
+      onRowClick={props.onRowClick ? (row: T) => props.onRowClick!(row, 0) : undefined}
       className={props.className}
     />
   )

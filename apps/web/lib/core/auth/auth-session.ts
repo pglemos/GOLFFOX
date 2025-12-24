@@ -83,10 +83,10 @@ async function syncSupabaseSession(
         debug('Sessão Supabase sincronizada', {}, 'AuthSession')
       }
     } catch (setSessionErr: unknown) {
-      const err = setSessionErr as Error
+      const err = setSessionErr instanceof Error ? setSessionErr : new Error(String(setSessionErr))
       if (
         err?.message?.includes('initializePromise') ||
-        setSessionErr?.message?.includes('Cannot read properties of undefined')
+        (setSessionErr instanceof Error && setSessionErr?.message?.includes('Cannot read properties of undefined'))
       ) {
         debug('Supabase ainda inicializando durante setSession', {
           error: err?.message

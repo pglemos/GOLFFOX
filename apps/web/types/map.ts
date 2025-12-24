@@ -8,6 +8,7 @@
  * Veículo no mapa
  */
 export interface Veiculo {
+  id: string
   veiculo_id: string
   trip_id: string
   route_id: string
@@ -18,12 +19,13 @@ export interface Veiculo {
   company_name: string
   plate: string
   model: string
-  lat: number
-  lng: number
+  lat: number | null
+  lng: number | null
   speed: number | null
   heading: number | null
   vehicle_status: 'moving' | 'stopped_short' | 'stopped_long' | 'garage'
   passenger_count: number
+  is_active?: boolean
   last_position_time?: string
 }
 

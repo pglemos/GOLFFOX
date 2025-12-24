@@ -296,7 +296,7 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
         veiculo_id: selectedVeiculo.id,
         polyline: optimizationResult?.polyline || null,
       } as any
-      const insertQuery = supabase.from("routes").insert(insertPayload) as any
+      const insertQuery = supabase.from("rotas").insert(insertPayload) as any
       const { data: routeData, error: routeError } = await insertQuery.select("*").single()
 
       if (routeError) throw routeError
@@ -324,7 +324,15 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
         }
       })
 
-      const { error: stopsError } = await supabase.from("route_stops").insert(stops as any)
+      const { error: stopsError } = await supabase.from("gf_route_plan").insert(stops.map(s => ({
+        rota_id: s.route_id,
+        employee_id: s.employee_id,
+        stop_order: s.seq,
+        latitude: s.lat,
+        longitude: s.lng,
+        stop_name: s.name,
+        address: s.address
+      })) as any)
 
       if (stopsError) throw stopsError
 

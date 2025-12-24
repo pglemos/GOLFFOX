@@ -342,7 +342,7 @@ function CustosPageContent() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-purple-900 dark:text-purple-100">
-                  {kpis.recurringCount}
+                  {kpis.recurring_costs_count}
                 </div>
                 <p className="text-xs text-purple-600 dark:text-purple-400 mt-1">
                   lançamentos automáticos ativos
