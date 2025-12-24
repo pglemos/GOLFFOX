@@ -154,19 +154,28 @@ async function loginHandler(req: NextRequest) {
       logError('CSRF validation failed - invalid token in header', {
         hasHeader: !!csrfHeader,
         hasCookie: !!csrfCookie,
+        headerValue: csrfHeader?.substring(0, 5) + '...',
+        cookieValue: csrfCookie?.substring(0, 5) + '...',
         headerMatch: csrfHeader === csrfCookie,
         isVercel: process.env.VERCEL === '1',
         vercelEnv: process.env.VERCEL_ENV,
-        isProduction: !isDevelopment
+        isProduction: !isDevelopment,
+        headers: Object.fromEntries(req.headers.entries()),
+        cookies: req.cookies.getAll().map(c => c.name)
       }, 'AuthAPI')
-      return NextResponse.json({ error: 'invalid_csrf' }, { status: 403 })
+      return NextResponse.json({
+        error: 'invalid_csrf',
+        details: 'Mismatch between header and cookie'
+      }, { status: 403 })
     }
     debug('CSRF - Token validado via header', {}, 'AuthAPI')
   } else if (csrfCookie) {
     // ✅ RELAXAMENTO DE SEGURANÇA SEGURO: Se não há header mas há cookie CSRF, 
     // consideramos que o navegador enviou o cookie corretamente.
     // Isso resolve problemas onde o axios/fetch não anexa o header automaticamente.
-    debug('CSRF - Token validado via cookie (header ausente)', {}, 'AuthAPI')
+    debug('CSRF - Token validado via cookie (header ausente)', {
+      cookieValue: csrfCookie?.substring(0, 5) + '...'
+    }, 'AuthAPI')
   } else {
     // Sem header E sem cookie CSRF - permitir bypass apenas em modo de teste/desenvolvimento
     // ✅ CRÍTICO: Em produção, pelo menos o cookie é obrigatório
@@ -176,11 +185,14 @@ async function loginHandler(req: NextRequest) {
         hasHeader: false,
         hasCookie: false,
         isVercel: process.env.VERCEL === '1',
-        vercelEnv: process.env.VERCEL_ENV
+        vercelEnv: process.env.VERCEL_ENV,
+        headers: Object.fromEntries(req.headers.entries()),
+        cookies: req.cookies.getAll().map(c => c.name)
       }, 'AuthAPI')
       return NextResponse.json({
         error: 'invalid_csrf',
-        message: 'CSRF token é obrigatório em produção'
+        message: 'CSRF token é obrigatório em produção',
+        details: 'Missing both header and cookie'
       }, { status: 403 })
     }
   }

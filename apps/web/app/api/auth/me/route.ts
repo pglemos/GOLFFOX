@@ -37,8 +37,8 @@ async function meHandler(request: NextRequest) {
     }, 'AuthMeAPI')
     userData = tryDecode(cookie)
     if (userData && userData.id && userData.role) {
-      debug('[AuthMeAPI] Usuário encontrado no cookie golffox-session', { 
-        userId: userData.id, 
+      debug('[AuthMeAPI] Usuário encontrado no cookie golffox-session', {
+        userId: userData.id,
         role: userData.role,
         email: userData.email?.substring(0, 3) + '***'
       }, 'AuthMeAPI')
@@ -57,31 +57,31 @@ async function meHandler(request: NextRequest) {
   // Mas apenas se realmente não houver cookie - não bloquear se cookie existir mas estiver inválido
   if (!userData) {
     debug('[AuthMeAPI] Cookie golffox-session não encontrado ou inválido, tentando requireAuth...', {}, 'AuthMeAPI')
-    
+
     // Se não há cookie, retornar erro imediatamente (não tentar requireAuth que pode ser lento)
     if (!cookie) {
-      debug('[AuthMeAPI] Nenhum cookie golffox-session encontrado, retornando erro', {}, 'AuthMeAPI')
+      debug('[AuthMeAPI] Nenhum cookie golffox-session encontrado, retornando sucesso falso (silencioso)', {}, 'AuthMeAPI')
       return NextResponse.json({
         success: false,
-        error: 'Não autorizado',
-        message: 'Sessão não encontrada. Faça login novamente.'
-      }, { status: 401 })
+        user: null,
+        message: 'No session'
+      }, { status: 200 }) // Retornar 200 para evitar erro no console do navegador
     }
 
     // Se há cookie mas está inválido, tentar requireAuth como último recurso
     try {
       const authError = await requireAuth(request)
       if (authError) {
-        debug('[AuthMeAPI] requireAuth falhou', { 
+        debug('[AuthMeAPI] requireAuth falhou', {
           status: authError.status,
           statusText: authError.statusText
         }, 'AuthMeAPI')
         // Retornar erro mais informativo
         return NextResponse.json({
           success: false,
-          error: 'Não autorizado',
-          message: 'Sessão inválida. Faça login novamente.'
-        }, { status: 401 })
+          user: null,
+          message: 'Invalid session'
+        }, { status: 200 }) // Retornar 200 para evitar erro no console do navegador
       }
       // Se requireAuth passou, buscar dados do cookie novamente ou usar dados validados
       const cookieRetry = request.cookies.get('golffox-session')?.value
@@ -95,9 +95,9 @@ async function meHandler(request: NextRequest) {
         debug('[AuthMeAPI] Nenhum dado de usuário encontrado após requireAuth', {}, 'AuthMeAPI')
         return NextResponse.json({
           success: false,
-          error: 'Sessão não encontrada',
-          message: 'Não foi possível obter dados do usuário. Faça login novamente.'
-        }, { status: 401 })
+          user: null,
+          message: 'User data missing'
+        }, { status: 200 }) // Retornar 200 para evitar erro no console do navegador
       }
     } catch (error) {
       logError('Erro ao executar requireAuth', { error }, 'AuthMeAPI')
@@ -114,15 +114,15 @@ async function meHandler(request: NextRequest) {
   try {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL
     const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-    
+
     // #region agent log
-    logger.log('[DEBUG H2] /api/auth/me - Query params:', { 
-      userId: userData.id, 
+    logger.log('[DEBUG H2] /api/auth/me - Query params:', {
+      userId: userData.id,
       hasServiceKey: !!supabaseServiceKey,
-      hasUrl: !!supabaseUrl 
+      hasUrl: !!supabaseUrl
     });
     // #endregion
-    
+
     if (supabaseUrl && supabaseServiceKey) {
       const { createClient } = await import('@supabase/supabase-js')
       // Usar service_role_key para bypassar RLS na tabela users

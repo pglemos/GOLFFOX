@@ -30,7 +30,7 @@ function LoginContent() {
 
   useEffect(() => {
     // Buscar CSRF token ao montar o componente
-    fetch('/api/auth/csrf')
+    fetch('/api/auth/csrf', { cache: 'no-store' })
       .then(res => res.json())
       .then(data => {
         if (data?.token) {

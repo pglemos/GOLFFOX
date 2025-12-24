@@ -17,17 +17,32 @@ export async function GET(req: NextRequest) {
   try {
     const token = generateToken(32)
     const url = new URL(req.url)
-    const isSecure = url.protocol === 'https:'
+
+    // Melhor detecção de HTTPS para proxies (Vercel)
+    const protoHeader = req.headers.get('x-forwarded-proto')
+    const isSecure = protoHeader ? protoHeader.split(',')[0]?.trim() === 'https' : url.protocol === 'https:'
+
+    debug('Gerando token CSRF', {
+      isSecure,
+      proto: protoHeader,
+      ua: req.headers.get('user-agent')
+    }, 'CSRFAPI')
 
     // Retornar token diretamente no objeto raiz para compatibilidade com código existente
     // E também dentro de 'data' para compatibilidade com successResponse
-    const res = NextResponse.json({ 
+    const res = NextResponse.json({
       token, // Compatibilidade direta
       csrfToken: token, // Formato esperado pelos testes
       success: true,
       data: {
         token,
         csrfToken: token
+      }
+    }, {
+      headers: {
+        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
       }
     })
     // ✅ CORREÇÃO: Usar 'lax' ao invés de 'strict' para funcionar corretamente na Vercel
@@ -46,9 +61,9 @@ export async function GET(req: NextRequest) {
     return res
   } catch (error: unknown) {
     logError('Erro ao gerar token CSRF', { error }, 'CSRFAPI')
-    return NextResponse.json({ 
+    return NextResponse.json({
       error: 'Erro ao gerar token CSRF',
-      success: false 
+      success: false
     }, { status: 500 })
   }
 }
