@@ -132,9 +132,9 @@ export function MotoristaModal({ motorista, isOpen, onClose, onSave, carriers = 
     try {
       // Carregar documentos do motorista
       const { data: docs } = await supabase
-        .from("gf_motorista_documents")
+        .from("gf_driver_documents")
         .select("*")
-        .eq("motorista_id", motoristaId)
+        .eq("driver_id", motoristaId)
         .order("created_at", { ascending: false })
 
       if (docs) setDocuments(docs as any)
@@ -272,9 +272,9 @@ export function MotoristaModal({ motorista, isOpen, onClose, onSave, carriers = 
       const publicUrl = result.url
 
       const { error: docError } = await (supabase as any)
-        .from("gf_motorista_documents")
+        .from("gf_driver_documents")
         .insert({
-          motorista_id: motorista.id,
+          driver_id: motorista.id,
           document_type: type,
           file_url: publicUrl,
           file_name: file.name

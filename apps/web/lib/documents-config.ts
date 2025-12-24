@@ -93,8 +93,8 @@ export const DOCUMENTS_CONFIG: Record<EntityType, DocumentConfig> = {
     motorista: {
         bucket: "documentos-motorista",
         endpoint: "/api/admin/motoristas",
-        table: "gf_motorista_documents",
-        foreignKey: "motorista_id",
+        table: "gf_driver_documents",
+        foreignKey: "driver_id",
         paramName: "driverId",
         documentTypes: Object.keys(MOTORISTA_DOCUMENT_LABELS) as MotoristaDocumentType[],
         documentLabels: MOTORISTA_DOCUMENT_LABELS as Record<string, string>,

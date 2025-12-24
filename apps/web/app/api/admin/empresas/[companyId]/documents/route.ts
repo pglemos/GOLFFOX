@@ -4,7 +4,7 @@ const handlers = createDocumentsHandler({
     entityType: 'company',
     paramName: 'companyId',
     entityName: 'Empresa',
-    entityTable: 'empresas',
+    entityTable: 'companies',
 })
 
 export const GET = handlers.GET
