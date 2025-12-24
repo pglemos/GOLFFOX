@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 
 import { requireAuth } from '@/lib/api-auth'
+import { successResponse, errorResponse } from '@/lib/api-response'
 import { logError } from '@/lib/logger'
 import { supabaseServiceRole } from '@/lib/supabase-server'
 
