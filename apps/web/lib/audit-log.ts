@@ -94,7 +94,7 @@ export async function logAudit(params: LogAuditParams): Promise<void> {
           .eq('id', actorId)
           .single()
 
-        companyId = (userData as any)?.empresa_id || null
+        companyId = (userData as { empresa_id?: string | null })?.empresa_id || null
       } catch (error) {
         // Ignorar erro, usar null
       }
@@ -103,7 +103,7 @@ export async function logAudit(params: LogAuditParams): Promise<void> {
     // Sanitizar detalhes removendo PII
     const sanitizedDetails = sanitizeDetails(params.details)
 
-  await (supabase as any).from('gf_audit_log').insert({
+  await supabase.from('gf_audit_log').insert({
       actor_id: actorId,
       company_id: companyId,
       action_type: params.action,

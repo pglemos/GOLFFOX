@@ -68,10 +68,11 @@ export async function DELETE(request: NextRequest) {
       success: true,
       message: 'Veículo excluído com sucesso'
     })
-  } catch (error: any) {
-    logError('Erro ao excluir veículo', { error, vehicleId: request.nextUrl.searchParams.get('id') }, 'VehiclesDeleteAPI')
+  } catch (error: unknown) {
+    const err = error as { message?: string }
+    logError('Erro ao excluir veículo', { error: err, vehicleId: request.nextUrl.searchParams.get('id') }, 'VehiclesDeleteAPI')
     return NextResponse.json(
-      { error: 'Erro ao excluir veículo', message: error.message },
+      { error: 'Erro ao excluir veículo', message: err.message },
       { status: 500 }
     )
   }

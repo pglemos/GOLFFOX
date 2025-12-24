@@ -673,7 +673,7 @@ export default function TransportadoraVeiculosPage() {
                 <Label>Tipo de Manutenção</Label>
                 <Select
                   value={maintenanceForm.maintenance_type}
-                  onValueChange={(value: any) => setMaintenanceForm({ ...maintenanceForm, maintenance_type: value })}
+                  onValueChange={(value: string) => setMaintenanceForm({ ...maintenanceForm, maintenance_type: value })}
                 >
                   <SelectTrigger>
                     <SelectValue />
@@ -768,7 +768,7 @@ export default function TransportadoraVeiculosPage() {
                 <Label>Status</Label>
                 <Select
                   value={maintenanceForm.status}
-                  onValueChange={(value: any) => setMaintenanceForm({ ...maintenanceForm, status: value })}
+                  onValueChange={(value: string) => setMaintenanceForm({ ...maintenanceForm, status: value })}
                 >
                   <SelectTrigger>
                     <SelectValue />

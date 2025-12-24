@@ -110,7 +110,8 @@ export async function GET(request: NextRequest) {
       page,
       pageSize
     })
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const err = error as { message?: string }
     logError('[API /api/operador/employees] Erro inesperado', { error }, 'EmployeesAPI')
     return NextResponse.json(
       { error: error.message || 'Erro desconhecido' },

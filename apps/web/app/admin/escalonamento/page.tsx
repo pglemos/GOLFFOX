@@ -135,9 +135,10 @@ export default function EscalonamentoPage() {
             notifySuccess('Alerta resolvido com sucesso!')
             setSelectedAlert(null)
             setResolution("")
-        } catch (error: any) {
-            logError('Erro ao resolver alerta', { error }, 'EscalonamentoPage')
-            notifyError(error.message || 'Erro ao resolver alerta')
+        } catch (error: unknown) {
+            const err = error as { message?: string }
+            logError('Erro ao resolver alerta', { error: err }, 'EscalonamentoPage')
+            notifyError(err.message || 'Erro ao resolver alerta')
         }
     }
 

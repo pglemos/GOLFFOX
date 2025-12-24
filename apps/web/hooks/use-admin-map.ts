@@ -161,7 +161,7 @@ export function useAdminMap(options: UseAdminMapOptions = {}): UseAdminMapReturn
         .select('id, company_id, route_id, veiculo_id, severity, description, created_at')
         .eq('status', 'open')
         .order('created_at', { ascending: false })
-        .limit(50) as any)
+        .limit(50))
 
       if (signal.aborted) return
       if (alertsError) {
@@ -389,7 +389,7 @@ export function useAdminMap(options: UseAdminMapOptions = {}): UseAdminMapReturn
         .select('*')
         .eq('veiculo_id', vehicleId)
         .order('timestamp', { ascending: true })
-        .limit(500) as any)
+        .limit(500))
 
       if (error) throw error
 
@@ -409,9 +409,9 @@ export function useAdminMap(options: UseAdminMapOptions = {}): UseAdminMapReturn
       const plannedRoute: PlannedRoutePoint[] = []
       if (vehicle.route_id) {
         const route = routes.find(r => r.route_id === vehicle.route_id)
-        if (route && (route as any).polyline) {
+        if (route && (route as { polyline?: string }).polyline) {
           // Decodificar polyline para pontos
-          // plannedRoute = decodePolyline((route as any).polyline)
+          // plannedRoute = decodePolyline((route as { polyline: string }).polyline)
         }
       }
 

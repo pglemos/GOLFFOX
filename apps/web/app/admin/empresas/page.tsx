@@ -39,7 +39,7 @@ export default function EmpresasPage() {
   const [isCreateOperatorModalOpen, setIsCreateOperatorModalOpen] = useState(false)
   const [selectedCompanyForUsers, setSelectedCompanyForUsers] = useState<{ id: string; name: string } | null>(null)
   const [isUsersModalOpen, setIsUsersModalOpen] = useState(false)
-  const [selectedCompanyForEdit, setSelectedCompanyForEdit] = useState<any>(null)
+  const [selectedCompanyForEdit, setSelectedCompanyForEdit] = useState<{ id: string; name?: string; [key: string]: unknown } | null>(null)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
   const debouncedSearchQuery = useDebounce(searchQuery, 300)
@@ -55,8 +55,9 @@ export default function EmpresasPage() {
     try {
       const data = await CompanyService.listCompanies()
       setEmpresas(data)
-    } catch (error: any) {
-      setErrorEmpresas(error.message || "Erro ao carregar empresas")
+    } catch (error: unknown) {
+      const err = error as { message?: string }
+      setErrorEmpresas(err.message || "Erro ao carregar empresas")
     } finally {
       setLoadingEmpresas(false)
     }
@@ -71,7 +72,7 @@ export default function EmpresasPage() {
         notifySuccess('Empresa excluída com sucesso')
         loadEmpresas()
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       notifyError(error, 'Erro ao excluir empresa')
     }
   }

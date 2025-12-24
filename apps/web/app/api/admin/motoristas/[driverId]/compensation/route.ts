@@ -86,7 +86,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         }
 
         return NextResponse.json(compensation || null)
-    } catch (error: any) {
+    } catch (error: unknown) {
         const { driverId: errorDriverId } = await params
         logError('Erro na API de compensação', { error, driverId: errorDriverId, method: 'GET' }, 'DriverCompensationAPI')
         return NextResponse.json(
@@ -197,7 +197,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         }
 
         return NextResponse.json(created, { status: 201 })
-    } catch (error: any) {
+    } catch (error: unknown) {
         const { driverId: errorDriverId } = await params
         logError('Erro na API de compensação', { error, driverId: errorDriverId, method: 'POST' }, 'DriverCompensationAPI')
         return NextResponse.json(
@@ -245,7 +245,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
         }
 
         return NextResponse.json({ success: true })
-    } catch (error: any) {
+    } catch (error: unknown) {
         const { driverId: errorDriverId } = await params
         logError('Erro na API de compensação', { error, driverId: errorDriverId, method: 'DELETE' }, 'DriverCompensationAPI')
         return NextResponse.json(

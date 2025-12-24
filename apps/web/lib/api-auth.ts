@@ -414,7 +414,7 @@ export async function requireCompanyAccess(
 
   if (!user) {
     return {
-      user: null as any,
+      user: null,
       error: NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
   }
@@ -434,7 +434,7 @@ export async function requireCompanyAccess(
   } catch {
     // Variáveis não configuradas - retornar erro
     return {
-      user: null as any,
+      user: null,
       error: NextResponse.json(
         { error: 'Server configuration error' },
         { status: 500 }
@@ -465,7 +465,7 @@ export async function requireCompanyAccess(
 
       if (!mapping) {
         return {
-          user: null as any,
+          user: null,
           error: NextResponse.json(
             { error: 'Forbidden - No access to this company' },
             { status: 403 }

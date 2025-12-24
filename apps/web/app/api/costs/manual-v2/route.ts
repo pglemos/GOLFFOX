@@ -192,7 +192,8 @@ export async function GET(request: NextRequest) {
             pageSize,
             totalPages,
         })
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const err = error as { message?: string }
         logError('[API] Erro interno', { error }, 'CostsManualV2API')
         return NextResponse.json(
             {

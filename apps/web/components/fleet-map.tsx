@@ -141,7 +141,7 @@ export const FleetMap = memo(function FleetMap({ companyId, transportadoraId, ro
   // Carregar dados do mapa
   const loadMapData = useCallback(async (signal?: AbortSignal) => {
     try {
-      const { data, error } = await (supabase as any).rpc('gf_map_snapshot_full', {
+      const { data, error } = await supabase.rpc('gf_map_snapshot_full', {
         p_company_id: filters.company || null,
         p_transportadora_id: filters.transportadora || null,
         p_route_id: filters.route || null
@@ -170,9 +170,9 @@ export const FleetMap = memo(function FleetMap({ companyId, transportadoraId, ro
           return null
         }
 
-        const rawBuses: any[] = Array.isArray((data as any).buses) ? (data as any).buses : []
+        const rawBuses: unknown[] = Array.isArray(data?.buses) ? data.buses : []
         const normalizedBuses = rawBuses
-          .map((bus: any) => {
+          .map((bus: Record<string, unknown>) => {
             const lat = toNumber(bus?.lat)
             const lng = toNumber(bus?.lng)
             return {
@@ -185,23 +185,23 @@ export const FleetMap = memo(function FleetMap({ companyId, transportadoraId, ro
               capacity: Number.isFinite(Number(bus?.capacity)) ? Number(bus?.capacity) : undefined,
             }
           })
-          .filter((bus: any) => typeof bus?.lat === 'number' && typeof bus?.lng === 'number')
+          .filter((bus: { lat?: number; lng?: number }) => typeof bus?.lat === 'number' && typeof bus?.lng === 'number')
 
-        const rawStops: any[] = Array.isArray((data as any).stops) ? (data as any).stops : []
+        const rawStops: unknown[] = Array.isArray(data?.stops) ? data.stops : []
         const normalizedStops = rawStops
-          .map((stop: any) => {
+          .map((stop: Record<string, unknown>) => {
             const lat = toNumber(stop?.lat)
             const lng = toNumber(stop?.lng)
             return { ...stop, lat, lng }
           })
-          .filter((stop: any) => typeof stop?.lat === 'number' && typeof stop?.lng === 'number')
+          .filter((stop: { lat?: number; lng?: number }) => typeof stop?.lat === 'number' && typeof stop?.lng === 'number')
 
-        const rawRoutes: any[] = Array.isArray((data as any).routes) ? (data as any).routes : []
-        const normalizedRoutes = rawRoutes.map((route: any) => {
-          const points: any[] = Array.isArray(route?.polyline_points) ? route.polyline_points : []
+        const rawRoutes: unknown[] = Array.isArray(data?.routes) ? data.routes : []
+        const normalizedRoutes = rawRoutes.map((route: Record<string, unknown>) => {
+          const points: Array<Record<string, unknown>> = Array.isArray(route?.polyline_points) ? route.polyline_points : []
           const normalizedPoints = points
-            .map((p: any) => ({ lat: toNumber(p?.lat), lng: toNumber(p?.lng) }))
-            .filter((p: any) => typeof p.lat === 'number' && typeof p.lng === 'number')
+            .map((p: Record<string, unknown>) => ({ lat: toNumber(p?.lat), lng: toNumber(p?.lng) }))
+            .filter((p: { lat?: number; lng?: number }) => typeof p.lat === 'number' && typeof p.lng === 'number')
           return { ...route, polyline_points: normalizedPoints }
         })
 
@@ -547,7 +547,7 @@ export const FleetMap = memo(function FleetMap({ companyId, transportadoraId, ro
           schema: 'public',
           table: 'motorista_positions'
         },
-        (payload: any) => {
+        (payload: { eventType?: string; new?: Record<string, unknown>; old?: Record<string, unknown> }) => {
           // Recarregar dados ao receber mudança na posição
           loadMapData()
         }
@@ -559,7 +559,7 @@ export const FleetMap = memo(function FleetMap({ companyId, transportadoraId, ro
           schema: 'public',
           table: 'trips'
         },
-        (payload: any) => {
+        (payload: { eventType?: string; new?: Record<string, unknown>; old?: Record<string, unknown> }) => {
           // Recarregar dados ao receber mudança no status da viagem
           loadMapData()
         }
@@ -571,7 +571,7 @@ export const FleetMap = memo(function FleetMap({ companyId, transportadoraId, ro
           schema: 'public',
           table: 'trip_passageiros'
         },
-        (payload: any) => {
+        (payload: { eventType?: string; new?: Record<string, unknown>; old?: Record<string, unknown> }) => {
           // Recarregar dados ao receber mudança nos passageiros
           loadMapData()
         }
@@ -584,7 +584,7 @@ export const FleetMap = memo(function FleetMap({ companyId, transportadoraId, ro
     }, 30000) // 30 segundos como fallback
 
     return () => {
-      supabase.removeChannel(channel as any)
+      supabase.removeChannel(channel)
       clearInterval(interval)
     }
   }, [loadMapData])

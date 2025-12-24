@@ -31,7 +31,7 @@ export async function GET(req: NextRequest) {
     const { data: users, error: listError } = await supabaseAdmin.auth.admin.listUsers()
     if (listError) throw listError
 
-    let existing = users?.users?.find((u: any) => u.email?.toLowerCase() === testUserEmail)
+    let existing = users?.users?.find((u: { email?: string }) => u.email?.toLowerCase() === testUserEmail)
     let userId = existing?.id
 
     if (!existing) {
@@ -79,7 +79,8 @@ export async function GET(req: NextRequest) {
     }
 
     return NextResponse.json({ ok: true, email: testUserEmail, userId, message: "Usuario de transportadora configurado com sucesso" })
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const err = error as { message?: string }
     return NextResponse.json({ error: error?.message || 'Erro ao configurar usuário de transportadora' }, { status: 500 })
   }
 }

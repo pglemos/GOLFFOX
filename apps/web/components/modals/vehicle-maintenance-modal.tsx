@@ -116,9 +116,9 @@ export function VehicleMaintenanceModal({
 
       if (maintenance?.id) {
         // Atualizar
-        const { error } = await (supabase as any)
+        const { error } = await supabase
           .from("gf_vehicle_maintenance")
-          .update(maintenanceData)
+          .update(maintenanceData as GfVehicleMaintenanceUpdate)
           .eq("id", maintenance.id)
 
         if (error) throw error

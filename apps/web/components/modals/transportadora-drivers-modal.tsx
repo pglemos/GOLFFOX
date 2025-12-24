@@ -137,8 +137,9 @@ export function TransportadoraDriversModal({ transportadora, isOpen, onClose }: 
       notifySuccess('Motorista criado com sucesso')
       await loadMotoristas()
       resetForm()
-    } catch (error: any) {
-      notifyError(error, error.message || 'Erro ao criar motorista')
+    } catch (error: unknown) {
+      const err = error as { message?: string }
+      notifyError(error, err.message || 'Erro ao criar motorista')
     } finally {
       setLoading(false)
     }
@@ -166,8 +167,9 @@ export function TransportadoraDriversModal({ transportadora, isOpen, onClose }: 
       notifySuccess('Motorista atualizado com sucesso')
       await loadMotoristas()
       resetForm()
-    } catch (error: any) {
-      notifyError(error, error.message || 'Erro ao atualizar motorista')
+    } catch (error: unknown) {
+      const err = error as { message?: string }
+      notifyError(error, err.message || 'Erro ao atualizar motorista')
     } finally {
       setLoading(false)
     }
@@ -193,14 +195,15 @@ export function TransportadoraDriversModal({ transportadora, isOpen, onClose }: 
 
       notifySuccess('Motorista excluído com sucesso')
       await loadMotoristas()
-    } catch (error: any) {
-      notifyError(error, error.message || 'Erro ao excluir motorista')
+    } catch (error: unknown) {
+      const err = error as { message?: string }
+      notifyError(error, err.message || 'Erro ao excluir motorista')
     } finally {
       setLoading(false)
     }
   }
 
-  const handleEditClick = (motorista: any) => {
+  const handleEditClick = (motorista: UserRow) => {
     setEditingDriver(motorista)
     setFormData({
       name: motorista.name || "",

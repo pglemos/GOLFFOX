@@ -114,7 +114,8 @@ export async function GET(req: NextRequest) {
       userId: existing.id,
       message: 'Usuário de teste configurado com sucesso'
     })
-  } catch (err: any) {
+    } catch (err: unknown) {
+      const error = err as { message?: string }
     logError('Erro ao configurar usuário de teste', { error: err }, 'FixTestUserAPI')
     return NextResponse.json({
       error: err?.message || 'Erro ao configurar usuário de teste',

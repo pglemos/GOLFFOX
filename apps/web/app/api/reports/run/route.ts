@@ -329,7 +329,8 @@ async function runReportHandler(request: NextRequest): Promise<NextResponse> {
             { status: 400 }
           )
       }
-    } catch (formatError: any) {
+    } catch (formatError: unknown) {
+      const err = formatError as { message?: string }
       logError('Erro ao gerar arquivo', { error: formatError, format, reportKey: finalReportKey }, 'ReportsRunAPI')
       // Sempre retornar formato correto baseado no parâmetro format, não usar CSV como fallback
       // O teste espera Content-Type correto baseado no formato solicitado
@@ -362,13 +363,13 @@ async function runReportHandler(request: NextRequest): Promise<NextResponse> {
       return NextResponse.json(
         {
           error: 'Erro ao gerar relatório',
-          message: formatError.message || 'Erro desconhecido ao gerar arquivo',
+          message: err.message || 'Erro desconhecido ao gerar arquivo',
           format: format
         },
         { status: 500 }
       )
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     logError('Erro ao gerar relatório', { error }, 'ReportsRunAPI')
     try {
       // Sempre retornar formato correto baseado no parâmetro format
@@ -593,7 +594,7 @@ async function generateExcel(data: Record<string, unknown>[], columns: string[],
   }
 }
 
-async function generatePDF(data: any[], columns: string[], reportKey: string) {
+async function generatePDF(data: Record<string, unknown>[], columns: string[], reportKey: string) {
   try {
     // Dynamic import para PDFKit
     let PDFDocument

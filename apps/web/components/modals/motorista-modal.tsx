@@ -133,7 +133,7 @@ export function MotoristaModal({ motorista, isOpen, onClose, onSave, carriers = 
     try {
       // Carregar documentos do motorista
       const { data: docs } = await supabase
-        .from("gf_driver_documents" as any)
+        .from("gf_driver_documents")
         .select("*")
         .eq("driver_id", motoristaId)
         .order("created_at", { ascending: false })

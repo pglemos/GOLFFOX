@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { useAuth } from "@/components/providers/auth-provider"
 
-const Link: any = require("next/link")
+import Link from "next/link"
 
 export default function AdminMin() {
   const { user, loading } = useAuth()

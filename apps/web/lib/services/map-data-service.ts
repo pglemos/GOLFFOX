@@ -22,7 +22,7 @@ export class MapDataService {
 
         const routeIds = routesData.map(r => r.id)
         const { data: stopsData } = await supabase
-            .from('gf_route_plan' as any)
+            .from('gf_rota_plano')
             .select('rota_id, latitude, longitude, stop_order, stop_name')
             .in('rota_id', routeIds)
             .order('stop_order')

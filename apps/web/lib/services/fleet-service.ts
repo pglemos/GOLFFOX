@@ -16,7 +16,7 @@ export class FleetService extends BaseService {
         .from('veiculos')
         .select('*')
         .eq('transportadora_id', transportadoraId)
-        .order('plate', { ascending: true }) as any
+        .order('plate', { ascending: true })
     )
     return data || []
   }
@@ -31,7 +31,7 @@ export class FleetService extends BaseService {
         .select('*')
         .eq('transportadora_id', transportadoraId)
         .eq('role', 'motorista')
-        .eq('is_active', true) as any
+        .eq('is_active', true)
     )
     return data || []
   }

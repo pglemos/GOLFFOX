@@ -102,9 +102,9 @@ async function importHandler(request: NextRequest) {
       .select('id, email')
       .eq('role', 'motorista')
 
-    const routeMap = new Map(routes?.map((r: any) => [r.name, r.id]) || [])
-    const vehicleMap = new Map(veiculos?.map((v: any) => [v.plate, v.id]) || [])
-    const driverMap = new Map(motoristas?.map((d: any) => [d.email, d.id]) || [])
+    const routeMap = new Map(routes?.map((r: { id: string; name?: string }) => [r.name || '', r.id]) || [])
+    const vehicleMap = new Map(veiculos?.map((v: { id: string; plate?: string }) => [v.plate || '', v.id]) || [])
+    const driverMap = new Map(motoristas?.map((d: { id: string; email?: string }) => [d.email || '', d.id]) || [])
 
     // Processar e inserir custos
     const costsToInsert = []
@@ -153,7 +153,8 @@ async function importHandler(request: NextRequest) {
           source: 'import',
           created_by: request.headers.get('x-user-id') || null
         })
-      } catch (err: any) {
+      } catch (err: unknown) {
+        const error = err as { message?: string }
         errors.push({
           row,
           error: err.message || 'Erro ao processar linha'

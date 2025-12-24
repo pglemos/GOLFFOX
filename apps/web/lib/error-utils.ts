@@ -8,9 +8,9 @@ export type SupabaseLikeError = {
 } | any
 
 // Extrai uma mensagem segura de qualquer objeto de erro
-export function formatError(error: any, fallbackMessage?: string): string {
+export function formatError(error: unknown, fallbackMessage?: string): string {
   if (!error) return fallbackMessage || 'Erro desconhecido'
-  const e = (error as any).error ?? error
+  const e = (error as { error?: unknown })?.error ?? error
   if (typeof e === 'string') return e || (fallbackMessage || 'Erro desconhecido')
   if (typeof e?.message === 'string' && e.message.length > 0) return e.message
   try {
@@ -24,7 +24,7 @@ export function formatError(error: any, fallbackMessage?: string): string {
 
 // Retorna metadados seguros (evita acesso a propriedades inexistentes)
 export function getErrorMeta(error: SupabaseLikeError): Record<string, unknown> {
-  const e: any = (error as any)?.error ?? error
+  const e = (error as { error?: unknown })?.error ?? error
   const meta: Record<string, unknown> = {}
   if (typeof e?.message === 'string') meta.message = e.message
   if (typeof e?.code === 'string') meta.code = e.code

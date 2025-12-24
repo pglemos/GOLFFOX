@@ -1,11 +1,17 @@
 import { useReducer } from 'react'
 
+import type { Database } from '@/types/supabase'
+
+type RotasRow = Database['public']['Tables']['rotas']['Row']
+type UserRow = Database['public']['Tables']['users']['Row']
+type VeiculosRow = Database['public']['Tables']['veiculos']['Row']
+
 // Estado de formulário de despacho
 export interface DispatchFormState {
   resources: {
-    routes: any[]
-    drivers: any[]
-    vehicles: any[]
+    routes: RotasRow[]
+    drivers: UserRow[]
+    vehicles: VeiculosRow[]
   }
   selections: {
     routeId: string
@@ -20,10 +26,10 @@ export interface DispatchFormState {
 
 // Ações do formulário
 type DispatchFormAction =
-  | { type: 'SET_ROUTES'; payload: any[] }
-  | { type: 'SET_DRIVERS'; payload: any[] }
-  | { type: 'SET_VEHICLES'; payload: any[] }
-  | { type: 'SET_ALL_RESOURCES'; payload: { routes: any[]; drivers: any[]; vehicles: any[] } }
+  | { type: 'SET_ROUTES'; payload: RotasRow[] }
+  | { type: 'SET_DRIVERS'; payload: UserRow[] }
+  | { type: 'SET_VEHICLES'; payload: VeiculosRow[] }
+  | { type: 'SET_ALL_RESOURCES'; payload: { routes: RotasRow[]; drivers: UserRow[]; vehicles: VeiculosRow[] } }
   | { type: 'SET_ROUTE_ID'; payload: string }
   | { type: 'SET_DRIVER_ID'; payload: string }
   | { type: 'SET_VEHICLE_ID'; payload: string }

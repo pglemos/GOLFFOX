@@ -107,8 +107,9 @@ export function TransportadoraVehiclesModal({ transportadora, isOpen, onClose }:
       notifySuccess('Veículo criado com sucesso')
       await loadVeiculos()
       resetForm()
-    } catch (error: any) {
-      notifyError(error, error.message || 'Erro ao criar veículo')
+    } catch (error: unknown) {
+      const err = error as { message?: string }
+      notifyError(error, err.message || 'Erro ao criar veículo')
     } finally {
       setLoading(false)
     }
@@ -140,8 +141,9 @@ export function TransportadoraVehiclesModal({ transportadora, isOpen, onClose }:
       notifySuccess('Veículo atualizado com sucesso')
       await loadVeiculos()
       resetForm()
-    } catch (error: any) {
-      notifyError(error, error.message || 'Erro ao atualizar veículo')
+    } catch (error: unknown) {
+      const err = error as { message?: string }
+      notifyError(error, err.message || 'Erro ao atualizar veículo')
     } finally {
       setLoading(false)
     }
@@ -167,14 +169,15 @@ export function TransportadoraVehiclesModal({ transportadora, isOpen, onClose }:
 
       notifySuccess('Veículo excluído com sucesso')
       await loadVeiculos()
-    } catch (error: any) {
-      notifyError(error, error.message || 'Erro ao excluir veículo')
+    } catch (error: unknown) {
+      const err = error as { message?: string }
+      notifyError(error, err.message || 'Erro ao excluir veículo')
     } finally {
       setLoading(false)
     }
   }
 
-  const handleEditClick = (veiculo: any) => {
+  const handleEditClick = (veiculo: VeiculosRow) => {
     setEditingVehicle(veiculo)
     setFormData({
       plate: veiculo.plate || "",

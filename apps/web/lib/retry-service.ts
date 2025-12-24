@@ -49,7 +49,7 @@ function isRetryableError(error: Error, retryableErrors: string[]): boolean {
   return retryableErrors.some(retryableError => 
     errorMessage.includes(retryableError.toLowerCase()) ||
     errorName.includes(retryableError.toLowerCase()) ||
-    (error as any).code === retryableError
+    (error as { code?: string }).code === retryableError
   )
 }
 

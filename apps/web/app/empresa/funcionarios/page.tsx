@@ -52,8 +52,7 @@ function FuncionariosPageContent() {
   const router = useRouter()
   const { tenantCompanyId, companyName, loading: tenantLoading, error: tenantError } = useOperatorTenant()
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [user, setUser] = useState<any>(null)
+  const [user, setUser] = useState<{ id: string; email?: string; name?: string; avatar_url?: string | null } | null>(null)
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState("")
   const [currentPage, setCurrentPage] = useState(1)
@@ -132,8 +131,7 @@ function FuncionariosPageContent() {
       queryClient.invalidateQueries({ queryKey: ["employees", tenantCompanyId] })
       notifySuccess("Funcionário desativado com sucesso")
     },
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    onError: (error: any) => {
+    onError: (error: Error | { message?: string }) => {
       notifyError(`Erro ao desativar funcionário: ${error.message}`)
     },
   })
@@ -283,7 +281,7 @@ function FuncionariosPageContent() {
             {funcionarios.length > 0 ? (
               <>
                 <div className="grid gap-3 sm:gap-4">
-                  {funcionarios.map((funcionario: any, index: number) => (
+                  {funcionarios.map((funcionario: Funcionario, index: number) => (
                     <motion.div
                       key={funcionario.id}
                       initial={{ opacity: 0, y: 20 }}

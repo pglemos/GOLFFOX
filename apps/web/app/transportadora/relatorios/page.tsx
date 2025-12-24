@@ -35,8 +35,8 @@ interface ReportConfig {
 
 export default function TransportadoraRelatoriosPage() {
   const router = useRouter()
-  const [user, setUser] = useState<any>(null)
-  const [userData, setUserData] = useState<any>(null)
+  const [user, setUser] = useState<{ id: string; email?: string; [key: string]: unknown } | null>(null)
+  const [userData, setUserData] = useState<{ transportadora_id?: string; [key: string]: unknown } | null>(null)
   const [loading, setLoading] = useState(true)
   const [dateStart, setDateStart] = useState(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0])
   const [dateEnd, setDateEnd] = useState(new Date().toISOString().split('T')[0])
@@ -113,8 +113,8 @@ export default function TransportadoraRelatoriosPage() {
     try {
       let apiUrl = ''
       let headers: string[] = []
-      let rows: any[][] = []
-      let summary: any = null
+      let rows: string[][] = []
+      let summary: Record<string, unknown> | null = null
 
       // Buscar dados da API
       switch (report.id) {
@@ -124,7 +124,7 @@ export default function TransportadoraRelatoriosPage() {
           const fleetData = await fleetRes.json()
           if (fleetData.success) {
             headers = ['Placa', 'Modelo', 'Status', 'Total de Viagens', 'Viagens no Período', 'Taxa de Utilização (%)']
-            rows = fleetData.data.map((v: any) => [
+            rows = fleetData.data.map((v: { plate?: string; model?: string; status?: string; total_trips?: number; period_trips?: number; utilization_rate?: number }) => [
               v.plate,
               v.model || 'N/A',
               v.is_active ? 'Ativo' : 'Inativo',
@@ -141,7 +141,7 @@ export default function TransportadoraRelatoriosPage() {
           const driversData = await driversRes.json()
           if (driversData.success) {
             headers = ['Nome', 'Email', 'Total de Viagens', 'Viagens no Período', 'Pontuação', 'Avaliação', 'Pontualidade (%)']
-            rows = driversData.data.map((d: any) => [
+            rows = driversData.data.map((d: { name?: string; email?: string; total_trips?: number; period_trips?: number; score?: number; rating?: number; punctuality?: number }) => [
               d.name,
               d.email || 'N/A',
               d.total_trips,
@@ -159,7 +159,7 @@ export default function TransportadoraRelatoriosPage() {
           const tripsData = await tripsRes.json()
           if (tripsData.success) {
             headers = ['Rota', 'Motorista', 'Data de Criação', 'Data de Conclusão', 'Status', 'Passageiros', 'Duração (min)']
-            rows = tripsData.data.map((t: any) => [
+            rows = tripsData.data.map((t: { route_name?: string; motorista_name?: string; created_at?: string; completed_at?: string; status?: string; passengers?: number; duration_minutes?: number }) => [
               t.route_name,
               t.motorista_name,
               new Date(t.created_at).toLocaleDateString('pt-BR'),
@@ -182,7 +182,7 @@ export default function TransportadoraRelatoriosPage() {
           
           headers = ['Tipo', 'Veículo/Rota', 'Categoria', 'Data', 'Valor (R$)', 'Descrição']
           rows = [
-            ...(costsVehicleData || []).map((c: any) => [
+            ...(costsVehicleData || []).map((c: { veiculos?: { plate?: string }; category?: string; date?: string; amount_brl?: number | string; total_cost_brl?: number | string; description?: string }) => [
               'Veículo',
               c.veiculos?.plate || 'N/A',
               c.cost_category || 'N/A',
@@ -190,7 +190,7 @@ export default function TransportadoraRelatoriosPage() {
               parseFloat(c.amount_brl?.toString() || '0').toFixed(2),
               c.description || 'N/A'
             ]),
-            ...(costsRouteData || []).map((r: any) => [
+            ...(costsRouteData || []).map((r: { routes?: { name?: string }; category?: string; date?: string; amount_brl?: number | string; total_cost_brl?: number | string; description?: string }) => [
               'Rota',
               r.routes?.name || 'N/A',
               'Rota',
@@ -199,13 +199,13 @@ export default function TransportadoraRelatoriosPage() {
               'Custos da rota'
             ])
           ]
-          const totalCosts = [...(costsVehicleData || []), ...(costsRouteData || [])].reduce((sum: number, item: any) => 
+          const totalCosts = [...(costsVehicleData || []), ...(costsRouteData || [])].reduce((sum: number, item: { amount_brl?: number | string; total_cost_brl?: number | string }) => 
             sum + parseFloat(item.amount_brl?.toString() || item.total_cost_brl?.toString() || '0'), 0
           )
           summary = {
             total_costs: totalCosts,
-            vehicle_costs: (costsVehicleData || []).reduce((sum: number, c: any) => sum + parseFloat(c.amount_brl?.toString() || '0'), 0),
-            route_costs: (costsRouteData || []).reduce((sum: number, r: any) => sum + parseFloat(r.total_cost_brl?.toString() || '0'), 0)
+            vehicle_costs: (costsVehicleData || []).reduce((sum: number, c: { amount_brl?: number | string }) => sum + parseFloat(c.amount_brl?.toString() || '0'), 0),
+            route_costs: (costsRouteData || []).reduce((sum: number, r: { total_cost_brl?: number | string }) => sum + parseFloat(r.total_cost_brl?.toString() || '0'), 0)
           }
           break
         case 'maintenances':
@@ -221,7 +221,7 @@ export default function TransportadoraRelatoriosPage() {
             .lte('scheduled_date', dateEnd)
           
           headers = ['Veículo', 'Tipo', 'Status', 'Data Agendada', 'Data Concluída', 'Custo Total (R$)', 'Oficina', 'Descrição']
-          rows = (maintenancesData || []).map((m: any) => [
+          rows = (maintenancesData || []).map((m: { veiculos?: { plate?: string }; maintenance_type?: string; status?: string; scheduled_date?: string; completed_date?: string; cost_parts_brl?: number | string; cost_labor_brl?: number | string; workshop_name?: string; description?: string }) => [
             m.veiculos?.plate || 'N/A',
             m.maintenance_type || 'N/A',
             m.status === 'completed' ? 'Concluída' : m.status === 'in_progress' ? 'Em Andamento' : m.status === 'scheduled' ? 'Agendada' : 'Cancelada',
@@ -231,12 +231,12 @@ export default function TransportadoraRelatoriosPage() {
             m.workshop_name || 'N/A',
             m.description || 'N/A'
           ])
-          const totalMaintenanceCosts = (maintenancesData || []).reduce((sum: number, m: any) => 
+          const totalMaintenanceCosts = (maintenancesData || []).reduce((sum: number, m: { cost_parts_brl?: number | string; cost_labor_brl?: number | string }) => 
             sum + parseFloat(m.cost_parts_brl?.toString() || '0') + parseFloat(m.cost_labor_brl?.toString() || '0'), 0
           )
           summary = {
             total_maintenances: maintenancesData?.length || 0,
-            completed: (maintenancesData || []).filter((m: any) => m.status === 'completed').length,
+            completed: (maintenancesData || []).filter((m: { status?: string }) => m.status === 'completed').length,
             total_costs: totalMaintenanceCosts
           }
           break
@@ -250,7 +250,7 @@ export default function TransportadoraRelatoriosPage() {
             .lte('expiry_date', dateEnd)
           
           headers = ['Tipo', 'Entidade', 'Documento', 'Nível de Alerta', 'Data de Vencimento', 'Dias Restantes']
-          rows = (documentsData || []).map((d: any) => [
+          rows = (documentsData || []).map((d: { item_type?: string; entity_name?: string; document_name?: string; alert_level?: string; expiration_date?: string; days_remaining?: number }) => [
             d.item_type === 'motorista_document' ? 'Motorista' : d.item_type === 'veiculo_document' ? 'Veículo' : 'Exame',
             d.entity_name || 'N/A',
             d.document_type || 'N/A',
@@ -260,9 +260,9 @@ export default function TransportadoraRelatoriosPage() {
           ])
           summary = {
             total_documents: documentsData?.length || 0,
-            expired: (documentsData || []).filter((d: any) => d.alert_level === 'expired').length,
-            critical: (documentsData || []).filter((d: any) => d.alert_level === 'critical').length,
-            warning: (documentsData || []).filter((d: any) => d.alert_level === 'warning').length
+            expired: (documentsData || []).filter((d: { alert_level?: string }) => d.alert_level === 'expired').length,
+            critical: (documentsData || []).filter((d: { alert_level?: string }) => d.alert_level === 'critical').length,
+            warning: (documentsData || []).filter((d: { alert_level?: string }) => d.alert_level === 'warning').length
           }
           break
       }
@@ -274,7 +274,7 @@ export default function TransportadoraRelatoriosPage() {
       }
 
       // Adicionar resumo ao início
-      const summaryRows: any[][] = []
+      const summaryRows: string[][] = []
       if (summary) {
         summaryRows.push(['Resumo do Relatório'])
         summaryRows.push([])
@@ -309,9 +309,10 @@ export default function TransportadoraRelatoriosPage() {
           notifySuccess('', { i18n: { ns: 'common', key: 'success.exportGenerated', params: { format: 'PDF' } } })
           break
       }
-    } catch (error: any) {
-      logError("Erro ao exportar", { error }, 'TransportadoraRelatoriosPage')
-      notifyError(error, `Erro ao exportar: ${error.message}`, { i18n: { ns: 'common', key: 'errors.export' } })
+    } catch (error: unknown) {
+      const err = error as { message?: string }
+      logError("Erro ao exportar", { error: err }, 'TransportadoraRelatoriosPage')
+      notifyError(err, `Erro ao exportar: ${err.message}`, { i18n: { ns: 'common', key: 'errors.export' } })
     } finally {
       setLoadingReport(null)
     }

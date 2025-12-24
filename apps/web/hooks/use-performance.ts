@@ -71,7 +71,7 @@ export function usePerformance(config: Partial<PerformanceConfig> = {}): {
   const measureMemory = useCallback(() => {
     if (!finalConfig.enableMemoryMonitoring || !('memory' in performance)) return
 
-    const memory = (performance as any).memory
+    const memory = (performance as { memory?: { usedJSHeapSize?: number } }).memory
     if (memory) {
       const memoryUsage = memory.usedJSHeapSize
       setMetrics(prev => ({ ...prev, memoryUsage }))

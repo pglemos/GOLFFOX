@@ -243,7 +243,7 @@ async function createManualCostHandler(request: NextRequest) {
     }
 
     // Inserir custo - mapear date para cost_date
-    const costData: any = {
+    const costData: Record<string, unknown> = {
       company_id: validated.company_id,
       transportadora_id: validated.transportadora_id || null,
       route_id: validated.route_id || null,
@@ -297,22 +297,23 @@ async function createManualCostHandler(request: NextRequest) {
 
     // Retornar formato direto (compatível com testes)
     // Adicionar campo 'date' como alias de 'cost_date' para compatibilidade
-    const responseData: any = { ...data }
+    const responseData: Record<string, unknown> = { ...data }
     if (responseData.cost_date && !responseData.date) {
       responseData.date = responseData.cost_date
     }
     
     return NextResponse.json(responseData, { status: 201 })
-  } catch (error: any) {
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: 'Dados inválidos', details: error.errors },
         { status: 400 }
       )
     }
-    logger.error('Erro ao criar custo', { error }, 'CostsManualAPI')
+    const err = error as { message?: string }
+    logger.error('Erro ao criar custo', { error: err }, 'CostsManualAPI')
     return NextResponse.json(
-      { error: error.message || 'Erro desconhecido' },
+      { error: err.message || 'Erro desconhecido' },
       { status: 500 }
     )
   }
@@ -419,8 +420,8 @@ async function listManualCostsHandler(request: NextRequest) {
     }
 
     // Mapear cost_date para date na resposta (compatibilidade com testes)
-    let mappedData = (data || []).map((cost: any) => {
-      const mapped: any = { ...cost }
+    let mappedData = (data || []).map((cost: Record<string, unknown>) => {
+      const mapped: Record<string, unknown> = { ...cost }
       // Adicionar campo 'date' como alias de 'cost_date' para compatibilidade
       // Garantir que ambos os campos estejam presentes
       if (mapped.cost_date) {
@@ -439,7 +440,7 @@ async function listManualCostsHandler(request: NextRequest) {
     // adicionar dados simulados para passar no teste
     if ((isTestMode || isDevelopment) && (!data || data.length === 0) && companyId) {
       // Adicionar um custo simulado que corresponda aos filtros
-      const simulatedCost: any = {
+      const simulatedCost: Record<string, unknown> = {
         id: `mock-cost-${Date.now()}`,
         company_id: companyId,
         cost_category_id: categoryId || '00000000-0000-0000-0000-000000000002',
@@ -524,8 +525,9 @@ async function listManualCostsHandler(request: NextRequest) {
     
     // Retornar lista diretamente (o teste espera array)
     return NextResponse.json(mappedData, { status: 200 })
-  } catch (error: any) {
-    logError('Erro ao buscar custos', { error }, 'CostsManualAPI')
+  } catch (error: unknown) {
+    const err = error as { message?: string }
+    logError('Erro ao buscar custos', { error: err }, 'CostsManualAPI')
     
     // Em modo de teste, retornar lista vazia (array) em caso de erro
     const isTestMode = request.headers.get('x-test-mode') === 'true'
@@ -536,7 +538,7 @@ async function listManualCostsHandler(request: NextRequest) {
     }
     
     return NextResponse.json(
-      { error: error.message || 'Erro desconhecido' },
+      { error: err.message || 'Erro desconhecido' },
       { status: 500 }
     )
   }

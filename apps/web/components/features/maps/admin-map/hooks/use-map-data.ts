@@ -77,7 +77,7 @@ export function useMapData({ companyFilter }: UseMapDataOptions = {}) {
           const { data: routesData, error: routesError } = await routesQuery
 
           if (!routesError && routesData && routesData.length > 0) {
-            const routeIds = routesData.map((r: any) => r.id)
+            const routeIds = routesData.map((r: RotasRow) => r.id)
 
             const { data: stopsData } = await supabase
               .from('v_route_stops')
@@ -87,24 +87,25 @@ export function useMapData({ companyFilter }: UseMapDataOptions = {}) {
               .order('seq')
 
             // Agrupar stops por route_id
-            const stopsByRoute = new Map()
+            const stopsByRoute = new Map<string, Array<{ lat: number; lng: number; order: number }>>()
             if (stopsData) {
-              stopsData.forEach((stop: any) => {
-                if (!stopsByRoute.has(stop.route_id)) {
-                  stopsByRoute.set(stop.route_id, [])
+              stopsData.forEach((stop: GfRoutePlanRow) => {
+                const routeId = stop.route_id || ''
+                if (!stopsByRoute.has(routeId)) {
+                  stopsByRoute.set(routeId, [])
                 }
-                stopsByRoute.get(stop.route_id).push({
-                  lat: stop.lat,
-                  lng: stop.lng,
-                  order: stop.seq
+                stopsByRoute.get(routeId)?.push({
+                  lat: stop.lat || 0,
+                  lng: stop.lng || 0,
+                  order: stop.seq || 0
                 })
               })
             }
 
-            const formattedRoutes = (routesData || []).map((r: any) => ({
+            const formattedRoutes = (routesData || []).map((r: RotasRow) => ({
               route_id: r.id,
-              route_name: r.name,
-              company_id: r.company_id,
+              route_name: r.name || '',
+              company_id: r.empresa_id || '',
               polyline_points: stopsByRoute.get(r.id) || [],
               stops_count: stopsByRoute.get(r.id)?.length || 0
             }))
@@ -203,7 +204,7 @@ export function useMapData({ companyFilter }: UseMapDataOptions = {}) {
 
           if (!stopsError && stopsData) {
             setRouteStops(
-              (stopsData || []).map((stop: any) => ({
+              (stopsData || []).map((stop: GfRoutePlanRow) => ({
                 id: stop.id || '',
                 route_id: stop.rota_id || '',
                 route_name: stop.route_name || '',

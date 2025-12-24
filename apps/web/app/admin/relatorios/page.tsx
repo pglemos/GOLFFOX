@@ -46,7 +46,7 @@ interface ReportConfig {
   description: string
   icon: typeof FileText
   viewName?: string
-  formatter?: (rows: any[]) => any
+  formatter?: (rows: Record<string, unknown>[]) => Record<string, unknown>[]
 }
 
 export default function RelatoriosPage() {
@@ -78,10 +78,10 @@ export default function RelatoriosPage() {
     setSelectedCompany("")
     setFiltersExpanded(false)
   }
-  const [schedules, setSchedules] = useState<any[]>([])
+  const [schedules, setSchedules] = useState<Array<{ id: string; [key: string]: unknown }>>([])
   const [showScheduleModal, setShowScheduleModal] = useState(false)
   const [selectedReportForSchedule, setSelectedReportForSchedule] = useState<string | null>(null)
-  const [selectedSchedule, setSelectedSchedule] = useState<any>(null)
+  const [selectedSchedule, setSelectedSchedule] = useState<{ id: string; [key: string]: unknown } | null>(null)
 
   // Memoizar reports para evitar recriação
   const reports: ReportConfig[] = useMemo(() => [
@@ -414,8 +414,9 @@ export default function RelatoriosPage() {
                               if (!response.ok) throw new Error('Erro ao deletar')
                               notifySuccess('Agendamento deletado com sucesso!')
                               loadSchedules()
-                            } catch (error: any) {
-                              notifyError(`Erro: ${error.message}`, undefined, {
+                            } catch (error: unknown) {
+                              const err = error as { message?: string }
+                              notifyError(`Erro: ${err.message}`, undefined, {
                                 i18n: { ns: 'common', key: 'errors.generic' }
                               })
                             }

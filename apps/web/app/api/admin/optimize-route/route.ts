@@ -69,7 +69,7 @@ async function optimizeWithGoogle(
       totalDistanceMeters: leg.distance.value,
       totalDurationSeconds: leg.duration_in_traffic?.value || leg.duration.value,
       usedLiveTraffic: !!leg.duration_in_traffic,
-      warnings: data.geocoded_waypoints?.filter((w: any) => w.geocoder_status !== 'OK').map((w: any) => w.geocoder_status)
+      warnings: data.geocoded_waypoints?.filter((w: { geocoder_status: string }) => w.geocoder_status !== 'OK').map((w: { geocoder_status: string }) => w.geocoder_status)
     }
   } else {
     // Para >25 pontos: Distance Matrix + TSP heurístico
@@ -154,8 +154,8 @@ async function optimizeWithTSP(
   }
 
   const route = data.routes[0]
-  const totalDistance = route.legs.reduce((sum: number, leg: any) => sum + leg.distance.value, 0)
-  const totalDuration = route.legs.reduce((sum: number, leg: any) => 
+  const totalDistance = route.legs.reduce((sum: number, leg: { distance: { value: number } }) => sum + leg.distance.value, 0)
+  const totalDuration = route.legs.reduce((sum: number, leg: { distance: { value: number }; duration: { value: number }; duration_in_traffic?: { value: number } }) => 
     sum + (leg.duration_in_traffic?.value || leg.duration.value), 0)
 
   return {
@@ -163,7 +163,7 @@ async function optimizeWithTSP(
     polyline: route.overview_polyline.points,
     totalDistanceMeters: totalDistance,
     totalDurationSeconds: totalDuration,
-    usedLiveTraffic: route.legs.some((leg: any) => leg.duration_in_traffic),
+    usedLiveTraffic: route.legs.some((leg: { duration_in_traffic?: { value: number } }) => leg.duration_in_traffic),
     warnings: []
   }
 }

@@ -158,7 +158,7 @@ export abstract class BaseRepository<T> {
     try {
       const { data: created, error } = await this.supabase
         .from(this.tableName)
-        .insert(data as any)
+        .insert(data as Record<string, unknown>)
         .select()
         .single()
 
@@ -181,7 +181,7 @@ export abstract class BaseRepository<T> {
     try {
       const { data: updated, error } = await this.supabase
         .from(this.tableName)
-        .update(data as any)
+        .update(data as Record<string, unknown>)
         .eq('id', id)
         .select()
         .single()
@@ -221,7 +221,7 @@ export abstract class BaseRepository<T> {
         // Soft delete
         const { error } = await this.supabase
           .from(this.tableName)
-          .update({ is_active: false, updated_at: new Date().toISOString() } as any)
+          .update({ is_active: false, updated_at: new Date().toISOString() } as Record<string, unknown>)
           .eq('id', id)
 
         if (error) {

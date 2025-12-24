@@ -225,7 +225,7 @@ export function useFileUpload(options: UseFileUploadOptions): UseFileUploadRetur
      */
     const remove = useCallback(async (filePath: string): Promise<boolean> => {
         try {
-            const { error: removeError } = await (supabase as any).storage
+            const { error: removeError } = await supabase.storage
                 .from(bucket)
                 .remove([filePath])
 
@@ -249,7 +249,7 @@ export function useFileUpload(options: UseFileUploadOptions): UseFileUploadRetur
         expiresIn: number = 3600
     ): Promise<string | null> => {
         try {
-            const { data, error: signError } = await (supabase as any).storage
+            const { data, error: signError } = await supabase.storage
                 .from(bucket)
                 .createSignedUrl(filePath, expiresIn)
 

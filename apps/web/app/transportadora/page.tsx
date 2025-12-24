@@ -68,8 +68,8 @@ export default function TransportadoraDashboard() {
   // Obter transportadora_id do usuário (pode vir em vários formatos dependendo da fonte/cookie/me api)
   const transportadoraId = user?.transportadora_id || null
 
-  const [fleet, setFleet] = useState<any[]>([])
-  const [motoristas, setMotoristas] = useState<any[]>([])
+  const [fleet, setFleet] = useState<Array<{ id: string; status?: string; [key: string]: unknown }>>([])
+  const [motoristas, setMotoristas] = useState<Array<{ id: string; name?: string; [key: string]: unknown }>>([])
   const [period, setPeriod] = useState<"today" | "week" | "month" | "custom">("month")
   const [kpis, setKpis] = useState({
     totalFleet: 0,
@@ -89,10 +89,10 @@ export default function TransportadoraDashboard() {
     totalCostsThisMonth: 0,
     totalTrips: 0
   })
-  const [chartData, setChartData] = useState<any[]>([])
-  const [fleetStatusData, setFleetStatusData] = useState<any[]>([])
-  const [topDrivers, setTopDrivers] = useState<any[]>([])
-  const [recentActivities, setRecentActivities] = useState<any[]>([])
+  const [chartData, setChartData] = useState<Array<{ name: string; [key: string]: unknown }>>([])
+  const [fleetStatusData, setFleetStatusData] = useState<Array<{ name: string; value: number; [key: string]: unknown }>>([])
+  const [topDrivers, setTopDrivers] = useState<Array<{ id: string; name?: string; [key: string]: unknown }>>([])
+  const [recentActivities, setRecentActivities] = useState<Array<{ id: string; type: string; [key: string]: unknown }>>([])
 
   const loadFleetData = useCallback(async () => {
     try {
@@ -175,7 +175,7 @@ export default function TransportadoraDashboard() {
         .eq('role', 'motorista')
         .eq('transportadora_id', transportadoraId)
 
-      let driversWithStats: any[] = []
+      let driversWithStats: Array<{ id: string; name?: string; score?: number; [key: string]: unknown }> = []
 
       if (driversData?.length) {
         // Buscar dados de ranking/gamificação
@@ -192,7 +192,7 @@ export default function TransportadoraDashboard() {
           .select('*')
           .in('motorista_id', driverIds)
 
-        driversWithStats = (driversData || []).map((motorista: any) => {
+        driversWithStats = (driversData || []).map((motorista: { id: string; name?: string; [key: string]: unknown }) => {
           const ranking = rankings?.find((r) => r.motorista_id === motorista.id)
           return {
             id: motorista.id,
@@ -240,7 +240,7 @@ export default function TransportadoraDashboard() {
         .select('id')
         .eq('transportadora_id', transportadoraId)
 
-      const routeIds = routes?.map((r: any) => r.id) || []
+      const routeIds = routes?.map((r: { id: string; [key: string]: unknown }) => r.id) || []
 
       // Buscar total de viagens do mês (já temos currentMonthStart definido acima)
       let tripsCount = 0
@@ -255,13 +255,13 @@ export default function TransportadoraDashboard() {
       }
 
       // Calcular custos totais
-      const vehicleCostsTotal = vehicleCosts?.reduce((sum: number, item: any) => sum + (parseFloat(item.total_cost_brl) || 0), 0) || 0
-      const routeCostsTotal = routeCosts?.reduce((sum: number, item: any) => sum + (parseFloat(item.total_cost_brl) || 0), 0) || 0
+      const vehicleCostsTotal = vehicleCosts?.reduce((sum: number, item: { total_cost_brl?: number | string }) => sum + (parseFloat(String(item.total_cost_brl)) || 0), 0) || 0
+      const routeCostsTotal = routeCosts?.reduce((sum: number, item: { total_cost_brl?: number | string }) => sum + (parseFloat(String(item.total_cost_brl)) || 0), 0) || 0
       const totalCostsThisMonth = vehicleCostsTotal + routeCostsTotal
 
       // Atualizar KPIs
-      const onRouteCount = fleetData.filter((v: any) => v.status === 'on-route').length
-      const criticalAlertsCount = alerts?.filter((a: any) => a.alert_level === 'critical' || a.alert_level === 'expired').length || 0
+      const onRouteCount = fleetData.filter((v: { status?: string }) => v.status === 'on-route').length
+      const criticalAlertsCount = alerts?.filter((a: { alert_level?: string }) => a.alert_level === 'critical' || a.alert_level === 'expired').length || 0
 
       const newKpis = {
         totalFleet: fleetData.length,
@@ -301,8 +301,8 @@ export default function TransportadoraDashboard() {
           : Promise.resolve({ count: 0 })
       ])
 
-      const prevVehicleCostsTotal = prevVehicleCosts.data?.reduce((sum: number, item: any) => sum + (parseFloat(item.total_cost_brl) || 0), 0) || 0
-      const prevRouteCostsTotal = prevRouteCosts.data?.reduce((sum: number, item: any) => sum + (parseFloat(item.total_cost_brl) || 0), 0) || 0
+      const prevVehicleCostsTotal = prevVehicleCosts.data?.reduce((sum: number, item: { total_cost_brl?: number | string }) => sum + (parseFloat(String(item.total_cost_brl)) || 0), 0) || 0
+      const prevRouteCostsTotal = prevRouteCosts.data?.reduce((sum: number, item: { total_cost_brl?: number | string }) => sum + (parseFloat(String(item.total_cost_brl)) || 0), 0) || 0
       const prevTotalCosts = prevVehicleCostsTotal + prevRouteCostsTotal
 
       setPreviousKpis({
@@ -327,7 +327,7 @@ export default function TransportadoraDashboard() {
       setChartData(lineChartData)
 
       // Gráfico de pizza: Distribuição de status da frota
-      const statusCounts = fleetData.reduce((acc: any, v: any) => {
+      const statusCounts = fleetData.reduce((acc: Record<string, number>, v: { status?: string }) => {
         acc[v.status] = (acc[v.status] || 0) + 1
         return acc
       }, {})
@@ -344,7 +344,7 @@ export default function TransportadoraDashboard() {
 
       // Atividades recentes (simulado - em produção viria de uma tabela de logs)
       const activities = [
-        ...(alerts?.slice(0, 3).map((a: any) => ({
+        ...(alerts?.slice(0, 3).map((a: { id: string; message?: string; alert_level?: string; [key: string]: unknown }) => ({
           id: `alert-${a.id}`,
           type: 'alert' as const,
           title: `${t('transportadora', 'activity_alert')}: ${a.document_type}`,
@@ -352,7 +352,7 @@ export default function TransportadoraDashboard() {
           timestamp: new Date().toISOString(),
           status: a.alert_level === 'expired' ? 'error' as const : 'warning' as const
         })) || []),
-        ...fleetData.slice(0, 2).map((v: any) => ({
+        ...fleetData.slice(0, 2).map((v: { id: string; plate?: string; [key: string]: unknown }) => ({
           id: `veiculo-${v.id}`,
           type: 'veiculo' as const,
           title: `${t('transportadora', 'activity_vehicle')} ${v.plate} ${v.status === 'on-route' ? t('transportadora', 'activity_on_route') : t('transportadora', 'activity_available')}`,

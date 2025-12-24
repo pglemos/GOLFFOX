@@ -88,7 +88,7 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
         .then(res => res.json())
         .then(result => {
           if (result.success) {
-            setMotoristas((result.motoristas || []).map((d: any) => ({
+            setMotoristas((result.motoristas || []).map((d: { id: string; name?: string; cpf?: string }) => ({
               id: d.id,
               name: d.name || "Sem nome",
               cpf: d.cpf || "",
@@ -110,7 +110,7 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
         .then(res => res.json())
         .then(result => {
           if (result.success) {
-            setVeiculos((result.vehicles || []).map((d: any) => ({
+            setVeiculos((result.vehicles || []).map((d: { id: string; plate?: string; capacity?: number; model?: string }) => ({
               id: d.id,
               name: d.plate || "Sem placa",
               plate: d.plate,
@@ -244,8 +244,9 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
       }
 
       setWarnings([...(result.warnings || []), ...newWarnings])
-    } catch (error: any) {
-      notifyError(error, error.message || "Erro ao otimizar rota")
+    } catch (error: unknown) {
+      const err = error as { message?: string }
+      notifyError(err, err.message || "Erro ao otimizar rota")
     } finally {
       setOptimizing(false)
     }
@@ -349,10 +350,11 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
       notifySuccess("Rota criada com sucesso!")
       onSave()
       onClose()
-    } catch (error: any) {
+    } catch (error: unknown) {
       if (error instanceof z.ZodError) {
         notifyError(error, error.errors[0].message)
       } else {
+        const err = error as { message?: string }
         notifyError(error, "Erro ao salvar rota")
       }
     } finally {

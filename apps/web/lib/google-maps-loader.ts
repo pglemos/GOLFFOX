@@ -2,11 +2,11 @@ declare global {
   interface Window {
     google?: {
       maps: {
-        Map: new (element: HTMLElement, options: any) => {
-          fitBounds: (bounds: any) => void
+        Map: new (element: HTMLElement, options: google.maps.MapOptions) => {
+          fitBounds: (bounds: google.maps.LatLngBounds | google.maps.LatLngBoundsLiteral) => void
         }
-        Marker: new (options: any) => any
-        Polyline: new (options: any) => any
+        Marker: new (options: google.maps.MarkerOptions) => google.maps.Marker
+        Polyline: new (options: google.maps.PolylineOptions) => google.maps.Polyline
         LatLngBounds: new () => {
           extend: (point: { lat: number; lng: number }) => void
           getNorthEast: () => { lat: () => number; lng: () => number }

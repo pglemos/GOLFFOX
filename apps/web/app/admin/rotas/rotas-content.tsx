@@ -41,15 +41,15 @@ import { logError } from "@/lib/logger"
 import { RouteCreateModal } from "./route-create-modal"
 
 
-const Link: any = require("next/link")
+import Link from "next/link"
 
 export function RotasPageContent() {
   const router = useRouter()
   const { TransitionOverlay } = useAdvancedNavigation()
   const { user, loading } = useAuth()
-  const [rotas, setRotas] = useState<any[]>([])
+  const [rotas, setRotas] = useState<Array<{ id: string; name: string; [key: string]: unknown }>>([])
   const [searchQuery, setSearchQuery] = useState("")
-  const [selectedRoute, setSelectedRoute] = useState<any>(null)
+  const [selectedRoute, setSelectedRoute] = useState<{ id: string; name: string; [key: string]: unknown } | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [filterValues, setFilterValues] = useState<Record<string, string>>({
     company: "",
@@ -162,9 +162,10 @@ export function RotasPageContent() {
         setRotas(snapshot)
         throw new Error(result.error || 'Erro ao excluir rota')
       }
-    } catch (error: any) {
-      logError('Erro ao excluir rota', { error }, 'RotasPageContent')
-      const errorMessage = error.message || 'Erro desconhecido ao excluir rota'
+    } catch (error: unknown) {
+      const err = error as { message?: string }
+      logError('Erro ao excluir rota', { error: err }, 'RotasPageContent')
+      const errorMessage = err.message || 'Erro desconhecido ao excluir rota'
       notifyError(error, errorMessage)
     }
   }
@@ -349,8 +350,9 @@ export function RotasPageContent() {
                               if (!resp.ok) throw new Error(data?.error || 'Erro ao gerar pontos')
                               notifySuccess('', { i18n: { ns: 'common', key: 'success.pointsGeneratedSaved' } })
                               await loadRotas()
-                            } catch (error: any) {
-                              notifyError(error, `Erro: ${error.message}`, { i18n: { ns: 'common', key: 'errors.generatePoints' } })
+                            } catch (error: unknown) {
+                              const err = error as { message?: string }
+                              notifyError(err, `Erro: ${err.message || 'Erro desconhecido'}`, { i18n: { ns: 'common', key: 'errors.generatePoints' } })
                             }
                           }}
                         >

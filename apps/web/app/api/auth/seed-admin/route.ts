@@ -74,8 +74,9 @@ export async function GET(req: NextRequest) {
     }
 
     return NextResponse.json({ ok: true, email: adminEmail })
-  } catch (error: any) {
-    return NextResponse.json({ error: error?.message || 'Erro ao criar admin' }, { status: 500 })
+  } catch (error: unknown) {
+    const err = error as { message?: string }
+    return NextResponse.json({ error: err?.message || 'Erro ao criar admin' }, { status: 500 })
   }
 }
 

@@ -176,10 +176,11 @@ export async function geocodeBatch(
         } else {
           break
         }
-      } catch (error: any) {
+      } catch (error: unknown) {
+        const err = error as { message?: string }
         warn(`Erro ao geocodificar endereço (tentativa ${attempts + 1}/${maxAttempts})`, {
           address,
-          error: error.message || error
+          error: err.message || error
         }, 'EmployeeCSVImporter')
 
         if (attempts < maxAttempts - 1) {
@@ -255,9 +256,10 @@ export async function importEmployees(
 
       let userId: string
 
-      if ((existingEmployee as any)?.employee_id) {
+      const existing = existingEmployee as { employee_id?: string } | null
+      if (existing?.employee_id) {
         // Funcionário já existe, usar employee_id existente
-        userId = (existingEmployee as any).employee_id
+        userId = existing.employee_id
 
         // Atualizar dados do usuário se necessário
         try {
@@ -311,7 +313,7 @@ export async function importEmployees(
       if (emp.cep) fullAddress += ` - CEP: ${emp.cep}`
 
       // 4. Upsert em gf_employee_company
-      const employeeData: any = {
+      const employeeData: GfEmployeeCompanyInsert = {
         employee_id: userId,
         company_id: companyId,
         name: emp.nome,
@@ -338,7 +340,8 @@ export async function importEmployees(
 
       if (upsertError) {
         // Se erro de constraint única, tentar update
-        if ((upsertError as any).code === '23505' || upsertError.message?.includes('duplicate')) {
+        const errorCode = (upsertError as { code?: string }).code
+        if (errorCode === '23505' || upsertError.message?.includes('duplicate')) {
           const { error: updateError } = await supabase
             .from('gf_employee_company')
             .update(employeeData)
@@ -357,10 +360,11 @@ export async function importEmployees(
       processedEmails.add(emp.email)
       processedCPFs.add(emp.cpf)
       success++
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const err = error as { message?: string }
       errors.push({
         employee: emp.nome,
-        error: error.message || 'Erro desconhecido'
+        error: err.message || 'Erro desconhecido'
       })
       logError(`Erro ao importar funcionário`, { employeeName: emp.nome, error }, 'EmployeeCSVImporter')
     }

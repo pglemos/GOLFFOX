@@ -12,7 +12,7 @@ import { warn, error as logError } from "@/lib/logger"
 import { supabase } from "@/lib/supabase"
 import { notifySuccess, notifyError, notifyInfo, notifyWarning } from "@/lib/toast"
 
-const operatorI18n: any = {
+const operatorI18n: Record<string, Record<string, string>> = {
   csv_import: {
     title: 'Importar Funcionários via CSV',
     select_file: 'Selecionar Arquivo',
@@ -171,9 +171,10 @@ export function CSVImportModal({ isOpen, onClose, onSave, empresaId }: CSVImport
       }
 
       onSave()
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const err = error as { message?: string }
       logError("Erro na importação", { error }, 'CSVImportModal')
-      notifyError('', undefined, { i18n: { ns: 'operador', key: 'csv_import.error', params: { message: error?.message || 'Erro desconhecido' } } })
+      notifyError('', undefined, { i18n: { ns: 'operador', key: 'csv_import.error', params: { message: err?.message || 'Erro desconhecido' } } })
     } finally {
       setImporting(false)
     }

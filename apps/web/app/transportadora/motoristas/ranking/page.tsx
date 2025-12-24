@@ -25,7 +25,7 @@ import { Input } from "@/components/ui/input"
 import { useAuth } from "@/hooks/use-auth"
 import { notifyError } from "@/lib/toast"
 
-const Link: any = require("next/link")
+import Link from "next/link"
 
 interface MotoristaMetrics {
   id: string

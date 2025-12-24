@@ -80,8 +80,8 @@ export function AssistanceModal({ request, isOpen, onClose, onSave }: Assistance
           .select("motorista_id")
           .eq("status", "inProgress")
 
-        const activeDriverIds = new Set(activeTrips?.map((t: any) => t.motorista_id) || [])
-        setAvailableDrivers(motoristas.filter((d: any) => !activeDriverIds.has(d.id)))
+        const activeDriverIds = new Set(activeTrips?.map((t: { motorista_id: string | null }) => t.motorista_id) || [])
+        setAvailableDrivers(motoristas.filter((d: { id: string }) => !activeDriverIds.has(d.id)))
       }
 
       // Carregar veículos disponíveis (sem viagem em andamento)
@@ -96,8 +96,8 @@ export function AssistanceModal({ request, isOpen, onClose, onSave }: Assistance
           .select("veiculo_id")
           .eq("status", "inProgress")
 
-        const activeVehicleIds = new Set(activeTrips?.map((t: any) => t.veiculo_id) || [])
-        setAvailableVehicles(veiculos.filter((v: any) => !activeVehicleIds.has(v.id)))
+        const activeVehicleIds = new Set(activeTrips?.map((t: { veiculo_id: string | null }) => t.veiculo_id) || [])
+        setAvailableVehicles(veiculos.filter((v: { id: string }) => !activeVehicleIds.has(v.id)))
       }
     } catch (error) {
       logError("Erro ao carregar recursos", { error }, 'AssistanceModal')
@@ -141,7 +141,7 @@ export function AssistanceModal({ request, isOpen, onClose, onSave }: Assistance
       notifySuccess("Socorro despachado com sucesso!", { i18n: { ns: 'common', key: 'success.assistanceDispatched' } })
       onSave()
       onClose()
-    } catch (error: any) {
+    } catch (error: unknown) {
       logError("Erro ao despachar", { error }, 'AssistanceModal')
       notifyError(formatError(error, "Erro ao despachar socorro"))
     } finally {

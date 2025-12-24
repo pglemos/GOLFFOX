@@ -216,14 +216,14 @@ export class RealtimeService {
                 .from('viagens')
                 .select('id, veiculo_id, route_id, motorista_id, status')
                 .eq('id', position.trip_id)
-                .single() as any)
+                .maybeSingle())
 
               if (tripError || !data) {
                 warn('Erro ao buscar trip para posição', { error: tripError }, 'RealtimeService')
                 return
               }
 
-              tripData = data as any
+              tripData = data as { id: string; veiculo_id: string; route_id: string; motorista_id: string | null; status: string }
               if (tripData?.id) {
                 this.tripCache.set(tripData.id, tripData)
               }
@@ -240,7 +240,7 @@ export class RealtimeService {
               data: {
                 veiculo_id: tripData.veiculo_id,
                 trip_id: position.trip_id,
-                motorista_id: tripData.motorista_id || (position as any).motorista_id || '',
+                motorista_id: tripData?.motorista_id || (position as { motorista_id?: string }).motorista_id || '',
                 route_id: tripData.route_id || '',
                 lat: position.latitude,
                 lng: position.longitude,
@@ -251,7 +251,7 @@ export class RealtimeService {
                 passenger_count: 0,
               },
             })
-          } catch (err: any) {
+          } catch (err: unknown) {
             error('Erro ao processar atualização de posição', { error: err }, 'RealtimeService')
             this.options.onError?.(err instanceof Error ? err : new Error(String(err)))
           }
@@ -412,7 +412,7 @@ export class RealtimeService {
           .gte('timestamp', fiveMinutesAgo)
           .eq('trips.status', 'inProgress')
           .order('timestamp', { ascending: false })
-          .limit(100) as any)
+          .limit(100))
 
         if (error) {
           // Se der erro, apenas logar (não quebrar o polling)
@@ -427,10 +427,10 @@ export class RealtimeService {
               this.queueUpdate({
                 type: 'position',
                 data: {
-                  veiculo_id: (trip as any).veiculo_id || (trip as any).vehicle_id,
+                  veiculo_id: (trip as { veiculo_id?: string; vehicle_id?: string }).veiculo_id || (trip as { veiculo_id?: string; vehicle_id?: string }).vehicle_id || '',
                   trip_id: pos.trip_id,
-                  motorista_id: (trip as any).motorista_id,
-                  route_id: (trip as any).route_id,
+                  motorista_id: (trip as { motorista_id?: string }).motorista_id || '',
+                  route_id: (trip as { route_id?: string }).route_id || '',
                   lat: pos.latitude,
                   lng: pos.longitude,
                   speed: pos.speed || null,

@@ -15,10 +15,10 @@ import { warn, logError } from "@/lib/logger"
 
 export default function SincronizarPage() {
   const router = useRouter()
-  const [user, setUser] = useState<any>(null)
+  const [user, setUser] = useState<{ id: string; email?: string; name?: string; avatar_url?: string | null } | null>(null)
   const [loading, setLoading] = useState(true)
   const [sincronizando, setSincronizando] = useState(false)
-  const [resultado, setResultado] = useState<any>(null)
+  const [resultado, setResultado] = useState<{ sucesso: boolean; processadas?: number; erros?: number; mensagem: string } | null>(null)
 
   useEffect(() => {
     const getUser = async () => {
@@ -131,10 +131,11 @@ export default function SincronizarPage() {
         erros,
         mensagem: `Processadas ${processadas} rotas. ${erros} erros.`
       })
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const err = error as { message?: string }
       setResultado({
         sucesso: false,
-        mensagem: `Erro: ${error.message}`
+        mensagem: `Erro: ${err.message || 'Erro desconhecido'}`
       })
     } finally {
       setSincronizando(false)

@@ -220,7 +220,8 @@ async function exportHandler(request: NextRequest) {
         message: 'Para PDF, use a biblioteca do cliente ou endpoint específico'
       })
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const err = error as { message?: string }
     logError('Erro ao exportar custos', { error, companyId: request.nextUrl.searchParams.get('company_id') }, 'CostsExportAPI')
     return NextResponse.json(
       { error: error.message || 'Erro desconhecido' },

@@ -50,7 +50,7 @@ export default function HistoricoRotasPage() {
             const data = await response.json()
 
             // Convert strings to Date objects
-            const apiExecutions = data.executions.map((exec: any) => ({
+            const apiExecutions = data.executions.map((exec: { date: string | Date; [key: string]: unknown }) => ({
                 ...exec,
                 date: new Date(exec.date)
             }))

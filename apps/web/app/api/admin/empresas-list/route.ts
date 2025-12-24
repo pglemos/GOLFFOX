@@ -55,13 +55,13 @@ export async function GET(request: NextRequest) {
     // Filtrar empresas inativas se a coluna existir (sem usar .eq() na query)
     if (data && !error) {
       // Tentar filtrar is_active se existir na resposta
-      const activeCompanies = data.filter((c: any) => {
+      const activeCompanies = data.filter((c: EmpresasRow) => {
         // Se não tem campo is_active ou se is_active é true/null/undefined, incluir
         return c.is_active !== false
       })
       
       // Ordenar por nome manualmente
-      activeCompanies.sort((a: any, b: any) => {
+      activeCompanies.sort((a: EmpresasRow, b: EmpresasRow) => {
         const nameA = (a.name || '').toLowerCase()
         const nameB = (b.name || '').toLowerCase()
         return nameA.localeCompare(nameB)
@@ -94,10 +94,11 @@ export async function GET(request: NextRequest) {
       success: true,
       companies: formattedCompanies
     })
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const err = error as { message?: string }
     logError('Erro ao listar empresas', { error }, 'CompaniesListAPI')
     return NextResponse.json(
-      { success: false, error: 'Erro ao listar empresas', message: error.message },
+      { success: false, error: 'Erro ao listar empresas', message: err.message },
       { status: 500 }
     )
   }

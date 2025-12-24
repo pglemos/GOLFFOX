@@ -59,8 +59,9 @@ export async function createRoute(data: RouteFormData) {
     if (routeError) throw routeError
 
     return { success: true, routeId: route.id }
-  } catch (error: any) {
-    return { success: false, error: error.message }
+  } catch (error: unknown) {
+    const err = error as { message?: string }
+    return { success: false, error: err.message || 'Erro desconhecido' }
   }
 }
 

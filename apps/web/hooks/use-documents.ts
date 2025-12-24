@@ -65,7 +65,7 @@ export function useDocuments({
     const [uploading, setUploading] = useState(false)
 
     const { upload } = useFileUpload({
-        bucket: config.bucket as any,
+        bucket: config.bucket,
         maxSize: 10,
     })
 

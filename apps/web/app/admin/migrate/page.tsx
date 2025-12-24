@@ -43,8 +43,7 @@ AND column_name LIKE 'address_%';`
 export default function MigratePage() {
   const [copied, setCopied] = useState(false)
   const [checking, setChecking] = useState(false)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [status, setStatus] = useState<any>(null)
+  const [status, setStatus] = useState<{ results?: Array<{ status: string; [key: string]: unknown }>; [key: string]: unknown } | null>(null)
 
   const copyToClipboard = async () => {
     try {
@@ -64,8 +63,7 @@ export default function MigratePage() {
       const data = await response.json()
       setStatus(data)
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const needsCreation = data.results?.filter((r: any) => r.status === "needs_creation") || []
+      const needsCreation = data.results?.filter((r: { status: string }) => r.status === "needs_creation") || []
       if (needsCreation.length === 0) {
         notifySuccess("Todas as colunas já existem! ✅")
       } else {
@@ -137,8 +135,7 @@ export default function MigratePage() {
                   Resultado:
                 </h3>
                 <div className="grid grid-cols-2 gap-2 text-sm">
-                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                  {status.results?.map((r: any, i: number) => (
+                  {status.results?.map((r: { status: string; [key: string]: unknown }, i: number) => (
                     <motion.div
                       key={i}
                       initial={{ opacity: 0, x: -10 }}

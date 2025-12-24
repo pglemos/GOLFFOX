@@ -156,8 +156,7 @@ class AlertManager {
         return
       }
 
-      // Usar 'as any' porque gf_operational_alerts pode não estar nos tipos
-      const { error } = await (supabase.from('gf_operational_alerts') as any).insert({
+      const { error } = await supabase.from('gf_operational_alerts').insert({
         type: 'metric',
         severity: alert.severity,
         title: alert.name,

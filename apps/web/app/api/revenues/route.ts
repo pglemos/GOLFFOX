@@ -173,7 +173,8 @@ export async function GET(request: NextRequest) {
             pageSize,
             totalPages,
         })
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const err = error as { message?: string }
         logError('Erro interno ao processar receitas', { error }, 'RevenuesAPI')
         return NextResponse.json(
             {

@@ -200,7 +200,7 @@ export function useVehicleForm(options: UseVehicleFormOptions = {}) {
       }
     }
 
-    const vehicleData: any = {
+    const vehicleData: VeiculosInsert = {
       plate: formData.plate?.trim().toUpperCase() || null,
       model: formData.model?.trim() || null,
       year: yearValue,
@@ -234,8 +234,8 @@ export function useVehicleForm(options: UseVehicleFormOptions = {}) {
       if (!vehicleData.company_id && initialData.company_id) {
         vehicleData.company_id = initialData.company_id
       }
-      if (!vehicleData.transportadora_id && (initialData as any).transportadora_id) {
-        vehicleData.transportadora_id = (initialData as any).transportadora_id
+      if (!vehicleData.transportadora_id && initialData?.transportadora_id) {
+        vehicleData.transportadora_id = initialData.transportadora_id
       }
     }
 
@@ -294,7 +294,7 @@ export function useVehicleForm(options: UseVehicleFormOptions = {}) {
                 photoUrl = uploadedUrl
                 vehicleData.photo_url = photoUrl
               }
-            } catch (uploadError: any) {
+            } catch (uploadError: unknown) {
               warn('Erro no upload da foto (continuando sem foto)', { error: uploadError }, 'UseVehicleForm')
             }
           }
@@ -321,7 +321,7 @@ export function useVehicleForm(options: UseVehicleFormOptions = {}) {
                   payload: { photo_url: uploadedUrl },
                 })
               }
-            } catch (uploadError: any) {
+            } catch (uploadError: unknown) {
               warn('Erro no upload da foto após criar', { error: uploadError }, 'UseVehicleForm')
             }
           }

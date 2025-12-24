@@ -143,7 +143,7 @@ export async function GET(request: NextRequest) {
     })
 
     // Buscar nomes das empresas separadamente
-    const companyIds = [...new Set((finalData || []).map((emp: any) => emp.company_id).filter(Boolean))]
+    const companyIds = [...new Set((finalData || []).map((emp: UserRow) => emp.company_id).filter(Boolean))]
     const companiesMap = new Map<string, string>()
     
     if (companyIds.length > 0) {
@@ -153,14 +153,14 @@ export async function GET(request: NextRequest) {
         .in('id', companyIds)
       
       if (companiesData) {
-        companiesData.forEach((c: any) => {
-          companiesMap.set(c.id, c.name)
+        companiesData.forEach((c: EmpresasRow) => {
+          companiesMap.set(c.id, c.name || '')
         })
       }
     }
 
     // Transformar para o formato esperado pela página
-    const employees = (finalData || []).map((emp: any) => ({
+    const employees = (finalData || []).map((emp: UserRow) => ({
       id: emp.id,
       employee_id: emp.id,
       company_id: emp.company_id,

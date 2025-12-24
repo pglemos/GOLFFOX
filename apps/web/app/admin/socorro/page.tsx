@@ -133,9 +133,10 @@ export default function SocorroPage() {
       // Recarregar recursos e ocorrências
       await loadEmergencyResources()
       await loadOcorrencias()
-    } catch (error: any) {
-      logError('Erro ao despachar socorro', { error }, 'SocorroPage')
-      notifyError(error.message || 'Erro ao despachar socorro')
+    } catch (error: unknown) {
+      const err = error as { message?: string }
+      logError('Erro ao despachar socorro', { error: err }, 'SocorroPage')
+      notifyError(err.message || 'Erro ao despachar socorro')
     } finally {
       dispatchFormDispatch({ type: 'SET_DISPATCHING', payload: false })
     }
@@ -193,9 +194,10 @@ export default function SocorroPage() {
       } else {
         throw new Error(result.error || 'Erro ao excluir solicitação de socorro')
       }
-    } catch (error: any) {
-      logError('Erro ao excluir solicitação de socorro', { error }, 'SocorroPage')
-      const errorMessage = error.message || 'Erro desconhecido ao excluir solicitação de socorro'
+    } catch (error: unknown) {
+      const err = error as { message?: string }
+      logError('Erro ao excluir solicitação de socorro', { error: err }, 'SocorroPage')
+      const errorMessage = err.message || 'Erro desconhecido ao excluir solicitação de socorro'
       notifyError(error, errorMessage)
     }
   }
@@ -555,8 +557,9 @@ export default function SocorroPage() {
 
                               notifySuccess('', { i18n: { ns: 'common', key: 'success.assistanceResolvedSLA', params: { response: Math.floor(responseTime / 60000), total: Math.floor(resolutionTime / 60000) } } })
                               loadOcorrencias()
-                            } catch (error: any) {
-                              notifyError(error, `Erro: ${error.message}`, { i18n: { ns: 'common', key: 'errors.assistanceResolve', params: { message: error.message } } })
+                            } catch (error: unknown) {
+                              const err = error as { message?: string }
+                              notifyError(err, `Erro: ${err.message}`, { i18n: { ns: 'common', key: 'errors.assistanceResolve', params: { message: err.message || 'Erro desconhecido' } } })
                             }
                           }}
                         >

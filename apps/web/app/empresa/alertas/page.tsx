@@ -82,8 +82,9 @@ function AlertasOperatorPageInner() {
           return
         }
         setUser({ ...session.user })
-      } catch (err: any) {
-        logError('Erro ao obter usuário', { error: err }, 'AlertasPage')
+      } catch (err: unknown) {
+        const error = err as { message?: string }
+        logError('Erro ao obter usuário', { error }, 'AlertasPage')
         setError('Erro ao carregar dados do usuário')
       } finally {
         setLoading(false)

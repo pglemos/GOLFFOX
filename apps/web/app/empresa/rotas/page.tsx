@@ -21,7 +21,7 @@ import { logError } from "@/lib/logger"
 
 
 
-const operatorI18n: any = operatorI18nData ?? {
+const operatorI18n: { routes_title?: string; routes_subtitle?: string } = operatorI18nData ?? {
   routes_title: "Rotas",
   routes_subtitle: "Gerencie as rotas da sua empresa"
 }
@@ -29,7 +29,7 @@ const operatorI18n: any = operatorI18nData ?? {
 export default function OperatorRotasPage() {
   const router = useRouter()
   const { tenantCompanyId, companyName, loading: tenantLoading, error: tenantError } = useOperatorTenant()
-  const [user, setUser] = useState<any>(null)
+  const [user, setUser] = useState<{ id: string; email?: string; name?: string; avatar_url?: string | null } | null>(null)
   const [authLoading, setAuthLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState("")
   const debouncedSearchQuery = useDebounce(searchQuery, 300)
@@ -256,8 +256,8 @@ export default function OperatorRotasPage() {
                       <h4 className="font-semibold mb-2 text-sm text-ink-strong">Funcionários nesta rota:</h4>
                       <div className="space-y-2 max-h-40 overflow-y-auto">
                         {rota.gf_route_plan
-                          .filter((stop: any) => stop && stop.gf_employee_company)
-                          .map((stop: any, idx: number) => (
+                          .filter((stop: { gf_employee_company?: { name?: string; cpf?: string } | null }) => stop && stop.gf_employee_company)
+                          .map((stop: { gf_employee_company?: { name?: string; cpf?: string } | null; stop_order?: number }, idx: number) => (
                             <div key={idx} className="p-2 bg-bg-soft rounded-lg flex items-center gap-2">
                               <Users className="h-4 w-4 text-ink-light flex-shrink-0" />
                               <div className="min-w-0 flex-1">

@@ -42,7 +42,7 @@ export function AdvancedNavigationButton({
   const fetchRoutePoints = useCallback(async (id: string): Promise<RoutePoint[]> => {
     try {
       const { data, error } = await supabase
-        .from('gf_route_plan' as any)
+        .from('gf_rota_plano')
         .select(`
           latitude,
           longitude,

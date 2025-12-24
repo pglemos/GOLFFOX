@@ -35,7 +35,7 @@ export function OperationalAlertsBadge() {
     const interval = setInterval(loadAlerts, 30000)
 
     // Escutar mudanças em tempo real
-    const channel = (supabase as any)
+    const channel = supabase
       .channel('operational_alerts')
       .on(
         'postgres_changes',

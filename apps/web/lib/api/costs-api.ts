@@ -84,7 +84,7 @@ export async function getCostCategories(): Promise<CostCategoriesResponse> {
     })
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({})) as any
+      const errorData = await response.json().catch(() => ({})) as Record<string, unknown>
       return {
         success: false,
         data: [],

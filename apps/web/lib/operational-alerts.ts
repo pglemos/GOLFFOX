@@ -92,7 +92,7 @@ export async function createAlert(alert: OperationalAlert): Promise<void> {
       return
     }
 
-    await (supabase as any).from('gf_alerts').insert({
+    await supabase.from('gf_alerts').insert({
       type: alert.type,
       severity: alert.severity,
       title: alert.title,
@@ -307,7 +307,7 @@ export async function resolveAlert(alertId: string, notes?: string): Promise<voi
       return
     }
 
-    await (supabase as any)
+    await supabase
       .from('gf_alerts')
       .update({
         is_resolved: true,

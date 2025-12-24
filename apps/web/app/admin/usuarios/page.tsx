@@ -89,7 +89,7 @@ function UsuariosPageContent() {
                 notifySuccess('Usuário excluído com sucesso')
                 loadUsuarios()
             }
-        } catch (error: any) {
+        } catch (error: unknown) {
             notifyError(error, 'Erro ao excluir usuário')
         }
     }

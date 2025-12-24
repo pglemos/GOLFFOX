@@ -250,9 +250,10 @@ async function loginHandler(req: NextRequest) {
       let supabaseAdmin
       try {
         supabaseAdmin = getSupabaseAdmin()
-      } catch (adminErr: any) {
+      } catch (adminErr: unknown) {
+        const err = adminErr as { message?: string }
         logError('Erro ao criar cliente Supabase Admin', {
-          error: adminErr instanceof Error ? adminErr.message : String(adminErr)
+          error: err instanceof Error ? err.message : String(err)
         }, 'AuthAPI')
         return NextResponse.json({
           error: 'Erro de configuração do servidor. Entre em contato com o suporte.',
@@ -297,9 +298,10 @@ async function loginHandler(req: NextRequest) {
             userId: data.user.id
           }, 'AuthAPI')
         }
-      } catch (rpcErr: any) {
+      } catch (rpcErr: unknown) {
+        const err = rpcErr as { message?: string }
         debug('⚠️ Exceção ao chamar RPC (tentando fallback):', {
-          error: rpcErr?.message,
+          error: err?.message,
           userId: data.user.id
         }, 'AuthAPI')
       }
@@ -345,9 +347,10 @@ async function loginHandler(req: NextRequest) {
               }, 'AuthAPI')
             }
           }
-        } catch (fetchErr: any) {
+        } catch (fetchErr: unknown) {
+          const err = fetchErr as { message?: string }
           debug('⚠️ Exceção ao chamar RPC via fetch (tentando fallback):', {
-            error: fetchErr?.message,
+            error: err?.message,
             userId: data.user.id
           }, 'AuthAPI')
         }
@@ -380,13 +383,14 @@ async function loginHandler(req: NextRequest) {
 
         existingUser = resultByEmail.data
       }
-    } catch (err: any) {
-      userCheckError = err
+    } catch (err: unknown) {
+      const error = err as { message?: string; code?: string; stack?: string }
+      userCheckError = error
       logError('Erro ao buscar usuário na tabela users', {
-        error: err,
-        errorMessage: err?.message,
-        errorCode: err?.code,
-        errorStack: err?.stack?.substring(0, 500),
+        error: error,
+        errorMessage: error?.message,
+        errorCode: error?.code,
+        errorStack: error?.stack?.substring(0, 500),
         userId: data.user.id,
         email: data.user.email || email
       }, 'AuthAPI')
@@ -440,15 +444,16 @@ async function loginHandler(req: NextRequest) {
 
           existingUser = newUser
           logError('DEV MODE: Usuário criado com sucesso!', { newUser }, 'AuthAPI')
-        } catch (autoCreateErr: any) {
-          logError('[AuthAPI] Exception in Auto-Create', { error: autoCreateErr }, 'AuthAPI');
+        } catch (autoCreateErr: unknown) {
+          const err = autoCreateErr as { message?: string; details?: string; hint?: string; code?: string }
+          logError('[AuthAPI] Exception in Auto-Create', { error: err }, 'AuthAPI');
 
           // Construir mensagem detalhada
           const errorDetails = {
-            message: autoCreateErr?.message || 'Unknown error',
-            details: autoCreateErr?.details || 'No details',
-            hint: autoCreateErr?.hint || 'No hint',
-            code: autoCreateErr?.code || 'No code'
+            message: err?.message || 'Unknown error',
+            details: err?.details || 'No details',
+            hint: err?.hint || 'No hint',
+            code: err?.code || 'No code'
           };
 
           logError('DEV MODE: Falha crítica ao criar usuário', errorDetails, 'AuthAPI')
@@ -522,9 +527,10 @@ async function loginHandler(req: NextRequest) {
             hasAvatar: !!profileData.avatar_url
           }, 'AuthAPI')
         }
-      } catch (profileErr: any) {
+      } catch (profileErr: unknown) {
+        const err = profileErr as { message?: string }
         debug('⚠️ Erro ao buscar dados de perfil (name, avatar_url)', {
-          error: profileErr?.message
+          error: err?.message
         }, 'AuthAPI')
       }
     }
@@ -542,9 +548,10 @@ async function loginHandler(req: NextRequest) {
         let supabaseAdminForCheck
         try {
           supabaseAdminForCheck = getSupabaseAdmin()
-        } catch (adminErr: any) {
+        } catch (adminErr: unknown) {
+          const err = adminErr as { message?: string }
           logError('Erro ao criar cliente Supabase Admin para verificar empresa', {
-            error: adminErr?.message || adminErr
+            error: err?.message || err
           }, 'AuthAPI')
           return NextResponse.json({
             error: 'Erro de configuração do servidor. Entre em contato com o suporte.',
@@ -655,9 +662,10 @@ async function loginHandler(req: NextRequest) {
 
     debug('Login API concluído', { role, emailHash: email.replace(/^(.{2}).+(@.*)$/, '$1***$2') }, 'AuthAPI')
     return response
-  } catch (err: any) {
-    const errorMessage = err?.message || 'Erro interno do servidor'
-    const errorStack = err?.stack ? err.stack.substring(0, 500) : undefined
+  } catch (err: unknown) {
+    const error = err as { message?: string; stack?: string }
+    const errorMessage = error?.message || 'Erro interno do servidor'
+    const errorStack = error?.stack ? error.stack.substring(0, 500) : undefined
     logError('Falha inesperada no login API', {
       error: errorMessage,
       stack: errorStack,

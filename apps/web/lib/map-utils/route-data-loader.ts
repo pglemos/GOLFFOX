@@ -57,7 +57,7 @@ export async function loadRouteData(routeId: string): Promise<RouteData> {
 
   // Buscar pontos de parada com informações dos passageiros
   const { data: stops, error: stopsError } = await supabase
-    .from('gf_route_plan' as any)
+    .from('gf_rota_plano')
     .select(`
       *,
       gf_employee_company!inner(name, photo_url, phone, email, type, observations)
@@ -96,9 +96,9 @@ export async function loadRouteData(routeId: string): Promise<RouteData> {
   return {
     id: route.id,
     name: route.name,
-    description: (route as any).description || '',
-    totalDistance: (route as any).distance || 0,
-    estimatedDuration: (route as any).estimated_duration || 0,
+    description: (route as { description?: string | null }).description || '',
+    totalDistance: (route as { distance?: number | null }).distance || 0,
+    estimatedDuration: (route as { estimated_duration?: number | null }).estimated_duration || 0,
     stops: processedStops,
   }
 }

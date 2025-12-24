@@ -47,10 +47,11 @@ async function syncSupabaseSession(
         isReady = true
       } catch (initCheckErr: unknown) {
         const err = initCheckErr as Error
+        const errMessage = err?.message || ''
         if (
-          err?.message?.includes('initializePromise') ||
-          (initCheckErr as any)?.message?.includes('undefined') ||
-          (initCheckErr as any)?.message === 'timeout'
+          errMessage.includes('initializePromise') ||
+          errMessage.includes('undefined') ||
+          errMessage === 'timeout'
         ) {
           debug('Supabase ainda inicializando, pulando setSession', {
             error: err?.message

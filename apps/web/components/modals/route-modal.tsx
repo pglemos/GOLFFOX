@@ -153,7 +153,7 @@ export function RouteModal({
 
       if (error) throw error
       setCompanies(data || [])
-    } catch (error: any) {
+    } catch (error: unknown) {
       logError('Erro ao carregar empresas', { error }, 'RouteModal')
       notifyError(error, t('common', 'errors.loadCompanies'))
     }
@@ -238,7 +238,7 @@ export function RouteModal({
 
       onSave()
       onClose()
-    } catch (error: any) {
+    } catch (error: unknown) {
       logError('Erro ao salvar rota', { error }, 'RouteModal')
       notifyError(error, t('common', 'errors.saveRoute'))
     } finally {
@@ -273,7 +273,7 @@ export function RouteModal({
       if (!resp.ok) throw new Error(data?.error || 'Falha ao gerar pontos')
       notifySuccess('', { i18n: { ns: 'common', key: 'success.pointsGeneratedSaved' } })
       if (onGenerateStops) await onGenerateStops(routeId)
-    } catch (error: any) {
+    } catch (error: unknown) {
       logError('Erro ao gerar pontos', { error }, 'RouteModal')
       notifyError(error, t('common', 'errors.generatePoints'))
     } finally {
@@ -306,7 +306,7 @@ export function RouteModal({
       if (onOptimize) {
         await onOptimize(routeId)
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       logError('Erro ao otimizar rota', { error }, 'RouteModal')
       notifyError(error, t('common', 'errors.optimizeRoute'))
     } finally {

@@ -398,8 +398,8 @@ async function executeSyncWithRetry(
       // Status HTTP fora do intervalo 200-299
       throw new Error(`HTTP ${httpStatus}: ${JSON.stringify(response)}`)
     }
-  } catch (err: any) {
-    const error = err as any
+  } catch (err: unknown) {
+    const error = err as { message?: string; code?: string | number; status?: number; response?: { data?: unknown }; body?: unknown }
     const errorMessage = error.message || 'Erro desconhecido'
     const errorCode = error.code || error.status || 500
     const errorBody = error.response?.data || error.body || error

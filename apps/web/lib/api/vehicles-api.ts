@@ -184,9 +184,9 @@ export async function getUserInfo(): Promise<{
     }
 
     return {
-      role: (userData as any).role,
-      company_id: (userData as any).company_id,
-      transportadora_id: (userData as any).transportadora_id,
+      role: (userData as { role?: string }).role || '',
+      company_id: (userData as { empresa_id?: string | null }).empresa_id || undefined,
+      transportadora_id: (userData as { transportadora_id?: string | null }).transportadora_id || undefined,
     }
   } catch (error) {
     logError('Erro ao buscar informações do usuário', { error }, 'VehiclesAPI')

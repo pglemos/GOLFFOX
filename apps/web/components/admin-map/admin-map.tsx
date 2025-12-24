@@ -438,7 +438,7 @@ export function AdminMap({
 
         if (!routesError && routesData && routesData.length > 0) {
           // Buscar route_stops para cada rota
-          const routeIds = routesData.map((r: any) => r.id)
+          const routeIds = routesData.map((r: RotasRow) => r.id)
           
           const { data: stopsData, error: stopsError } = await supabase
             .from('v_route_stops')
@@ -448,26 +448,26 @@ export function AdminMap({
             .order('stop_order')
           
           // Agrupar stops por route_id
-          const stopsByRoute = new Map()
+          const stopsByRoute = new Map<string, Array<{ lat: number; lng: number; order: number }>>()
           if (stopsData) {
-            (stopsData || []).forEach((stop: any) => {
-              const routeId = stop.rota_id
+            (stopsData || []).forEach((stop: GfRoutePlanRow) => {
+              const routeId = stop.rota_id || ''
               if (!stopsByRoute.has(routeId)) {
                 stopsByRoute.set(routeId, [])
               }
-              stopsByRoute.get(routeId).push({
-                lat: stop.latitude,
-                lng: stop.longitude,
-                order: stop.stop_order
+              stopsByRoute.get(routeId)?.push({
+                lat: stop.latitude || 0,
+                lng: stop.longitude || 0,
+                order: stop.stop_order || 0
               })
             })
           }
           
           // Converter dados da tabela para o formato esperado
-          const formattedRoutes = (routesData || []).map((r: any) => ({
+          const formattedRoutes = (routesData || []).map((r: RotasRow) => ({
             route_id: r.id,
-            route_name: r.name,
-            company_id: r.empresa_id,
+            route_name: r.name || '',
+            company_id: r.empresa_id || '',
             polyline_points: stopsByRoute.get(r.id) || [],
             stops_count: stopsByRoute.get(r.id)?.length || 0
           }))
@@ -794,7 +794,7 @@ export function AdminMap({
           .order('stop_order', { ascending: true })
 
         if (!stopsError && stopsData) {
-          setRouteStops(stopsData.map((stop: any) => ({
+          setRouteStops(stopsData.map((stop: GfRoutePlanRow) => ({
             id: stop.id || '',
             route_id: stop.rota_id || '',
             route_name: stop.route_name || '',
@@ -1238,7 +1238,7 @@ export function AdminMap({
   // Carregar trajeto quando veículo selecionado
   useEffect(() => {
     if (selection.selectedVeiculo && playback.mode === 'live') {
-      loadVeiculoTrajectory(selection.selectedVeiculo as any)
+      loadVeiculoTrajectory(selection.selectedVeiculo)
     } else if (!selection.selectedVeiculo && playback.mode === 'live') {
       setHistoricalTrajectories([])
       playback.setShowTrajectories(false)
@@ -1656,20 +1656,20 @@ export function AdminMap({
             }}
             onViewHistory={async () => {
               if (selection.selectedVeiculo) {
-                await handleViewVehicleHistory(selection.selectedVeiculo as any)
+                await handleViewVehicleHistory(selection.selectedVeiculo)
               }
             }}
           />
         )}
         {selection.selectedRoute && (
           <RoutePanel
-            route={selection.selectedRoute as any}
+            route={selection.selectedRoute}
             onClose={() => selection.setSelectedRoute(null)}
           />
         )}
         {selection.selectedAlert && (
           <AlertsPanel
-            alerts={[selection.selectedAlert as any]}
+            alerts={selection.selectedAlert ? [selection.selectedAlert] : []}
             onClose={() => selection.setSelectedAlert(null)}
           />
         )}
@@ -1677,7 +1677,7 @@ export function AdminMap({
           <TrajectoryPanel
             analysis={trajectoryAnalysis}
             vehiclePlate={selection.selectedVeiculo?.plate || ''}
-            routeName={(selection.selectedVeiculo as any)?.route_name || ''}
+            routeName={selection.selectedVeiculo?.route_name || ''}
             onClose={() => {
               playback.setShowTrajectoryAnalysis(false)
               setTrajectoryAnalysis(null)
@@ -1694,11 +1694,11 @@ export function AdminMap({
             veiculos={veiculos}
             routes={routes}
             alerts={alerts}
-            selectedVeiculo={selection.selectedVeiculo as any}
+            selectedVeiculo={selection.selectedVeiculo}
             onVehicleClick={selection.setSelectedVeiculo}
             onRouteClick={selection.setSelectedRoute}
             onAlertClick={(alert) => {
-              selection.setSelectedAlert(alert as any)
+              selection.setSelectedAlert(alert)
               // Navegar para localização do alerta no mapa
               if (alert.lat && alert.lng && mapInstanceRef.current) {
                 mapInstanceRef.current.setCenter({ lat: alert.lat, lng: alert.lng })

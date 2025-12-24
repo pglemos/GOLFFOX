@@ -101,8 +101,8 @@ export const MapLayers = memo(function MapLayers({
 
       // Converter polyline_points para array de LatLng
       const points = validPoints
-        .sort((a: any, b: any) => (a.order || 0) - (b.order || 0))
-        .map((p: any) => {
+        .sort((a: { order?: number }, b: { order?: number }) => (a.order || 0) - (b.order || 0))
+        .map((p: { lat: number; lng: number }) => {
           try {
             return new google.maps.LatLng(p.lat, p.lng)
           } catch (error) {
@@ -110,7 +110,7 @@ export const MapLayers = memo(function MapLayers({
             return null
           }
         })
-        .filter((p: any) => p !== null) as google.maps.LatLng[]
+        .filter((p: google.maps.LatLng | null): p is google.maps.LatLng => p !== null)
 
       if (points.length < 2) return
 
@@ -366,7 +366,7 @@ export const MapLayers = memo(function MapLayers({
             return null
           }
         })
-        .filter((p: any) => p !== null) as google.maps.LatLng[]
+        .filter((p: google.maps.LatLng | null): p is google.maps.LatLng => p !== null)
       
       if (points.length < 2) return
 

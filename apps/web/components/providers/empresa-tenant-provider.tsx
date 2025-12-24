@@ -55,8 +55,8 @@ function OperatorTenantProviderInner({ children }: { children: ReactNode }) {
       debug('Carregando empresas do operador', {}, 'EmpresaTenantProvider')
 
       // ✅ PRIMEIRO: Tentar buscar da view v_my_companies
-      let data: any[] | null = null
-      let queryError: any = null
+      let data: Array<{ id: string; name?: string; logo_url?: string | null; primary_hex?: string | null; accent_hex?: string | null; branding_name?: string | null }> | null = null
+      let queryError: { message?: string; code?: string; [key: string]: unknown } | null = null
 
       try {
         const result = await supabase
@@ -64,9 +64,10 @@ function OperatorTenantProviderInner({ children }: { children: ReactNode }) {
           .select('id, name, logo_url, primary_hex, accent_hex, branding_name')
         data = result.data
         queryError = result.error
-      } catch (viewErr: any) {
-        warn('Erro ao buscar da view v_my_companies, tentando método alternativo', { error: viewErr }, 'EmpresaTenantProvider')
-        queryError = viewErr
+      } catch (viewErr: unknown) {
+        const err = viewErr as { message?: string; code?: string; [key: string]: unknown }
+        warn('Erro ao buscar da view v_my_companies, tentando método alternativo', { error: err }, 'EmpresaTenantProvider')
+        queryError = err
       }
 
       // ✅ FALLBACK: Se a view falhar, buscar empresas via tabela gf_user_company_map
@@ -88,25 +89,25 @@ function OperatorTenantProviderInner({ children }: { children: ReactNode }) {
 
           if (!mapError && mapData && mapData.length > 0) {
             data = mapData
-              .map((item: any) => {
+              .map((item: { company_id?: string; companies?: { id?: string; name?: string; logo_url?: string | null } | null }) => {
                 const company = item.companies
                 if (company && typeof company === 'object' && !Array.isArray(company)) {
                   return {
-                    id: company.id,
+                    id: company.id || '',
                     name: company.name || 'Empresa',
                     logo_url: company.logo_url || null
                   }
                 }
                 return null
               })
-              .filter((c: any) => c !== null)
+              .filter((c): c is { id: string; name: string; logo_url: string | null } => c !== null)
 
             debug(`${data.length} empresas encontradas via gf_user_company_map`, { count: data.length }, 'EmpresaTenantProvider')
             queryError = null
           } else if (mapError) {
             warn('Erro ao buscar via gf_user_company_map', { error: mapError }, 'EmpresaTenantProvider')
           }
-        } catch (fallbackErr: any) {
+        } catch (fallbackErr: unknown) {
           warn('Erro no método alternativo', { error: fallbackErr }, 'EmpresaTenantProvider')
         }
 
@@ -145,7 +146,7 @@ function OperatorTenantProviderInner({ children }: { children: ReactNode }) {
                 }
               }
             }
-          } catch (userErr: any) {
+          } catch (userErr: unknown) {
             warn('Erro ao buscar via users.company_id', { error: userErr }, 'EmpresaTenantProvider')
           }
         }
@@ -241,9 +242,10 @@ function OperatorTenantProviderInner({ children }: { children: ReactNode }) {
           setError('Nenhuma empresa encontrada. Entre em contato com o administrador para associar seu usuário a uma empresa cadastrada.')
         }
       }
-    } catch (err: any) {
-      logError('Erro ao carregar empresas', { error: err }, 'EmpresaTenantProvider')
-      setError(`Erro inesperado: ${err?.message || 'Erro desconhecido'}`)
+    } catch (err: unknown) {
+      const error = err as { message?: string }
+      logError('Erro ao carregar empresas', { error }, 'EmpresaTenantProvider')
+      setError(`Erro inesperado: ${error?.message || 'Erro desconhecido'}`)
       setCompanies([])
     } finally {
       setLoading(false)

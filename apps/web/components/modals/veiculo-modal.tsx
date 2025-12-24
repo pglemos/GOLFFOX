@@ -36,6 +36,8 @@ import { warn, logError } from "@/lib/logger"
 import type { Database } from "@/types/supabase"
 
 type UserRow = Database['public']['Tables']['users']['Row']
+type VeiculosInsert = Database['public']['Tables']['veiculos']['Insert']
+type VeiculosUpdate = Database['public']['Tables']['veiculos']['Update']
 
 // Lazy load seção de documentos
 const VeiculoDocumentsSection = dynamic(() => import("@/components/veiculo/veiculo-documents-section"), { ssr: false })
@@ -164,9 +166,10 @@ export function VeiculoModal({ veiculo, isOpen, onClose, onSave, carriers }: Vei
 
       const result = await response.json()
       return result.url
-    } catch (error: any) {
-      logError("Erro ao fazer upload", { error }, 'VeiculoModal')
-      notifyError(formatError(error, "Erro ao fazer upload da foto"))
+    } catch (error: unknown) {
+      const err = error as { message?: string }
+      logError("Erro ao fazer upload", { error: err }, 'VeiculoModal')
+      notifyError(formatError(err, "Erro ao fazer upload da foto"))
       return null
     }
   }
@@ -194,7 +197,7 @@ export function VeiculoModal({ veiculo, isOpen, onClose, onSave, carriers }: Vei
           if (uploadedUrl) {
             photoUrl = uploadedUrl
           }
-        } catch (uploadError: any) {
+        } catch (uploadError: unknown) {
           warn('Erro no upload da foto (continuando sem foto)', { error: uploadError }, 'VeiculoModal')
           // Continuar sem foto se houver erro no upload
         }
@@ -217,7 +220,7 @@ export function VeiculoModal({ veiculo, isOpen, onClose, onSave, carriers }: Vei
         }
       }
 
-      const vehicleDataRaw: any = {
+      const vehicleDataRaw: Partial<VeiculosInsert> = {
         plate: formData.plate?.trim().toUpperCase() || null,
         model: formData.model?.trim() || null,
         year: yearValue,
@@ -262,8 +265,8 @@ export function VeiculoModal({ veiculo, isOpen, onClose, onSave, carriers }: Vei
         if (!vehicleDataRaw.company_id && veiculo.company_id) {
           vehicleDataRaw.company_id = veiculo.company_id
         }
-        if (!vehicleDataRaw.transportadora_id && (veiculo as any).transportadora_id) {
-          vehicleDataRaw.transportadora_id = (veiculo as any).transportadora_id
+        if (!vehicleDataRaw.transportadora_id && veiculo.transportadora_id) {
+          vehicleDataRaw.transportadora_id = veiculo.transportadora_id
         }
       }
 
@@ -287,7 +290,7 @@ export function VeiculoModal({ veiculo, isOpen, onClose, onSave, carriers }: Vei
       // Preparar dados finais: incluir todos os campos válidos
       // Para update, incluir apenas campos que foram alterados
       // Para create, incluir todos os campos necessários
-      const finalVehicleData: any = {}
+      const finalVehicleData: Partial<VeiculosUpdate> = {}
       Object.keys(vehicleDataRaw).forEach(key => {
         const value = vehicleDataRaw[key]
         // Incluir:
@@ -333,15 +336,16 @@ export function VeiculoModal({ veiculo, isOpen, onClose, onSave, carriers }: Vei
             body: JSON.stringify(finalVehicleData),
             signal: controller.signal,
           })
-        } catch (err: any) {
+        } catch (err: unknown) {
+          const error = err as { name?: string; message?: string }
           clearTimeout(timeout)
-          const msg = err?.name === 'AbortError' ? 'Timeout na atualização (30s)' : (err?.message || 'Falha de rede')
+          const msg = error?.name === 'AbortError' ? 'Timeout na atualização (30s)' : (error?.message || 'Falha de rede')
           throw new Error(`Erro de conexão: ${msg}`)
         }
         clearTimeout(timeout)
 
         if (!resp.ok) {
-          let errBody: any = null
+          let errBody: { message?: string } | null = null
           try { errBody = await resp.json() } catch { }
           const message = errBody?.message || 'Erro ao atualizar veículo'
           throw new Error(message)
@@ -376,15 +380,16 @@ export function VeiculoModal({ veiculo, isOpen, onClose, onSave, carriers }: Vei
             body: JSON.stringify(finalVehicleData),
             signal: controller.signal,
           })
-        } catch (err: any) {
+        } catch (err: unknown) {
+          const error = err as { name?: string; message?: string }
           clearTimeout(timeout)
-          const msg = err?.name === 'AbortError' ? 'Timeout na criação (30s)' : (err?.message || 'Falha de rede')
+          const msg = error?.name === 'AbortError' ? 'Timeout na criação (30s)' : (error?.message || 'Falha de rede')
           throw new Error(`Erro de conexão: ${msg}`)
         }
         clearTimeout(timeout)
 
         if (!resp.ok) {
-          let errBody: any = null
+          let errBody: { message?: string } | null = null
           try { errBody = await resp.json() } catch { }
           const message = errBody?.message || 'Erro ao cadastrar veículo'
           throw new Error(message)
@@ -436,8 +441,9 @@ export function VeiculoModal({ veiculo, isOpen, onClose, onSave, carriers }: Vei
 
       onSave()
       onClose()
-    } catch (error: any) {
-      logError("Erro ao salvar veículo", { error }, 'VeiculoModal')
+    } catch (error: unknown) {
+      const err = error as { message?: string; toString?: () => string }
+      logError("Erro ao salvar veículo", { error: err }, 'VeiculoModal')
 
       // Extrair mensagem de erro de forma mais robusta
       let errorMessage = "Erro ao salvar veículo"

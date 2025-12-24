@@ -169,7 +169,7 @@ export function useSupabaseQuery<T>(
       const result = await queryFnRef.current()
 
       if (result.error) {
-        throw new Error((result.error as any).message || 'Erro na consulta')
+        throw new Error((result.error as { message?: string }).message || 'Erro na consulta')
       }
 
       // Salvar no cache
@@ -292,7 +292,7 @@ export function useSupabaseCount(
 
   const queryFn = useCallback(async () => {
     // @ts-expect-error Supabase type inference issue with select options
-    let query: any = (supabase.from(table).select('*', { count: 'exact', head: true }) as any)
+    let query = supabase.from(table).select('*', { count: 'exact', head: true })
     
     // Aplicar filtros
     Object.entries(filters).forEach(([key, value]) => {
@@ -300,7 +300,7 @@ export function useSupabaseCount(
         if (typeof value === 'object' && value !== null && 'operador' in value && 'value' in value) {
           // Filtros complexos como gte, eq, etc.
           const filterValue = value as { operador: string; value: unknown }
-          const queryBuilder = query as any
+          const queryBuilder = query as { [key: string]: (col: string, val: unknown) => typeof query }
           query = queryBuilder[filterValue.operador](key, filterValue.value)
         } else {
           // Filtro simples de igualdade

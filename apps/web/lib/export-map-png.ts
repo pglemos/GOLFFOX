@@ -56,14 +56,15 @@ export async function exportMapPNG(containerId: string = 'map-container'): Promi
       setTimeout(() => {
         document.body.removeChild(successToast)
       }, 3000)
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const err = error as { message?: string }
       // Remover loading
       document.body.removeChild(loadingToast)
       
       // Mostrar erro
       const errorToast = document.createElement('div')
       errorToast.className = 'fixed top-4 right-4 bg-error text-white px-4 py-2 rounded-lg shadow-lg z-50'
-      errorToast.textContent = `Erro ao exportar: ${error.message}`
+      errorToast.textContent = `Erro ao exportar: ${err.message || 'Erro desconhecido'}`
       document.body.appendChild(errorToast)
       setTimeout(() => {
         document.body.removeChild(errorToast)
@@ -71,7 +72,7 @@ export async function exportMapPNG(containerId: string = 'map-container'): Promi
       
       throw error
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     const { error: logError } = await import('./logger')
     logError('Erro ao exportar mapa como PNG', { error }, 'ExportMapPNG')
     throw error
@@ -153,7 +154,7 @@ export async function exportMapPNGWithLegends(
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
-  } catch (error: any) {
+  } catch (error: unknown) {
     const { error: logError } = await import('./logger')
     logError('Erro ao exportar mapa com legendas', { error }, 'ExportMapPNG')
     throw error

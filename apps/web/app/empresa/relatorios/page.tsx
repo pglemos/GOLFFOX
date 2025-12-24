@@ -24,7 +24,7 @@ import { logError } from "@/lib/logger"
 export default function RelatoriosOperatorPage() {
   const router = useRouter()
   const { tenantCompanyId, companyName, loading: tenantLoading } = useOperatorTenant()
-  const [user, setUser] = useState<any>(null)
+  const [user, setUser] = useState<{ id: string; email?: string; name?: string; avatar_url?: string | null } | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -38,7 +38,7 @@ export default function RelatoriosOperatorPage() {
     run()
   }, [router])
 
-  const handleExport = async (report: any, format: 'csv' | 'excel' | 'pdf') => {
+  const handleExport = async (report: { id: string; title: string; desc?: string; viewName?: string; formatter?: (data: unknown[]) => ReportData }, format: 'csv' | 'excel' | 'pdf') => {
     try {
       let reportData: ReportData = {
         title: report.title,
@@ -62,7 +62,7 @@ export default function RelatoriosOperatorPage() {
         } else {
           // Formato genérico
           reportData.headers = Object.keys(data[0] || {})
-          reportData.rows = data.map((row: any) => Object.values(row))
+          reportData.rows = data.map((row: Record<string, unknown>) => Object.values(row))
         }
       } else {
         // Dados mockados para relatórios sem view
@@ -79,8 +79,9 @@ export default function RelatoriosOperatorPage() {
       }
 
       notifySuccess('', { i18n: { ns: 'operador', key: 'reports.exportSuccess', params: { title: report.title } } })
-    } catch (error: any) {
-      logError("Erro ao exportar relatório", { error }, 'RelatoriosPage')
+    } catch (error: unknown) {
+      const err = error as { message?: string }
+      logError("Erro ao exportar relatório", { error: err }, 'RelatoriosPage')
       notifyError('Erro ao exportar', undefined, { i18n: { ns: 'operador', key: 'reports.exportError', params: { message: error.message || 'Erro desconhecido' } } })
     }
   }

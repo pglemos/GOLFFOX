@@ -6,7 +6,7 @@ import { exportToCSV, exportToExcel, exportToPDF } from "@/lib/export-utils"
 
 export interface ExportData {
   headers: string[]
-  rows: any[][]
+  rows: (string | number | boolean | null)[][]
   title?: string
   description?: string
 }
@@ -20,18 +20,24 @@ export async function exportOperatorData(
 
   switch (format) {
     case "csv":
-      exportToCSV(data as any, filename || `${defaultFilename}.csv`)
+      exportToCSV(data, filename || `${defaultFilename}.csv`)
       break
     case "excel":
-      exportToExcel(data as any, filename || `${defaultFilename}.xlsx`)
+      exportToExcel(data, filename || `${defaultFilename}.xlsx`)
       break
     case "pdf":
-      exportToPDF(data as any, filename || `${defaultFilename}.pdf`)
+      exportToPDF(data, filename || `${defaultFilename}.pdf`)
       break
   }
 }
 
-export function prepareEmployeesExport(employees: any[]): ExportData {
+import type { Database } from '@/types/supabase'
+
+type UserRow = Database['public']['Tables']['users']['Row']
+type GfAlertsRow = Database['public']['Tables']['gf_alerts']['Row']
+type RotasRow = Database['public']['Tables']['rotas']['Row']
+
+export function prepareEmployeesExport(employees: UserRow[]): ExportData {
   return {
     title: "Funcionários",
     description: "Lista de funcionários da empresa",
@@ -47,7 +53,7 @@ export function prepareEmployeesExport(employees: any[]): ExportData {
   }
 }
 
-export function prepareAlertsExport(alerts: any[]): ExportData {
+export function prepareAlertsExport(alerts: GfAlertsRow[]): ExportData {
   return {
     title: "Alertas",
     description: "Lista de alertas do sistema",
@@ -62,7 +68,7 @@ export function prepareAlertsExport(alerts: any[]): ExportData {
   }
 }
 
-export function prepareRoutesExport(routes: any[]): ExportData {
+export function prepareRoutesExport(routes: RotasRow[]): ExportData {
   return {
     title: "Rotas",
     description: "Lista de rotas da empresa",

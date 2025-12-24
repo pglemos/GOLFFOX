@@ -142,7 +142,7 @@ export async function sendWebVitalsToServer(report: WebVitalsReport) {
     // Preferir envio não-bloqueante com Beacon quando disponível
     if (typeof navigator !== 'undefined' && 'sendBeacon' in navigator) {
       const blob = new Blob([payload], { type: 'application/json' })
-      const ok = (navigator as any).sendBeacon(url, blob)
+      const ok = (navigator as { sendBeacon?: (url: string, blob: Blob) => boolean }).sendBeacon?.(url, blob) ?? false
       if (ok) return
       // Fallback caso Beacon retorne false
     }

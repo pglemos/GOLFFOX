@@ -206,7 +206,7 @@ export function GenericPickerModal<T extends PickerItem>({
       loadItems()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [modalOpen, loadItems, fetchItems, itemsProp, ...deps as any[]])
+  }, [modalOpen, loadItems, fetchItems, itemsProp, ...(deps || [])])
 
   // Filtrar itens
   const filteredItems = useMemo(() => {
@@ -255,7 +255,7 @@ export function GenericPickerModal<T extends PickerItem>({
         value = value?.[part]
       }
     } else {
-      value = (item as any)[key]
+      value = (item as Record<string, unknown>)[key]
     }
 
     if (column.render) {

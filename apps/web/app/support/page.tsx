@@ -1,5 +1,6 @@
 "use client"
 
+import React from "react"
 import { PageShell } from "@/components/landing/page-shell"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { Button } from "@/components/ui/button"
@@ -80,7 +81,7 @@ export default function SupportPage() {
     )
 }
 
-function ContactMethod({ icon: Icon, label, value }: { icon: any, label: string, value: string }) {
+function ContactMethod({ icon: Icon, label, value }: { icon: React.ComponentType<{ className?: string }>, label: string, value: string }) {
     return (
         <div className="flex flex-col items-center text-center p-3 rounded-lg hover:bg-white/5 transition-colors cursor-pointer group">
             <Icon className="h-6 w-6 text-slate-400 group-hover:text-brand mb-2 transition-colors" />

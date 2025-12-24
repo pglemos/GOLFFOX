@@ -14,7 +14,7 @@ export class DriverService extends BaseService {
             { credentials: 'include' }
         )
 
-        const response = data as any
+        const response = data as Driver[] | { motoristas?: Driver[] }
         return Array.isArray(response) ? response : response.motoristas || []
     }
 

@@ -58,7 +58,7 @@ export function createDocumentsHandler(config: DocumentHandlerConfig) {
 
             // Verificar se entidade existe
             const { data: entity, error: entityError } = await supabaseAdmin
-                .from(config.entityTable as any)
+                .from(config.entityTable)
                 .select('id')
                 .eq('id', entityId)
                 .single()
@@ -72,7 +72,7 @@ export function createDocumentsHandler(config: DocumentHandlerConfig) {
 
             // Buscar documentos
             const { data: documents, error } = await supabaseAdmin
-                .from(docConfig.table as any)
+                .from(docConfig.table)
                 .select('*')
                 .eq(docConfig.foreignKey, entityId)
                 .order('document_type', { ascending: true })
@@ -136,7 +136,7 @@ export function createDocumentsHandler(config: DocumentHandlerConfig) {
 
             // Verificar se entidade existe
             const { data: entity, error: entityError } = await supabaseAdmin
-                .from(config.entityTable as any)
+                .from(config.entityTable)
                 .select('id')
                 .eq('id', entityId)
                 .single()
@@ -150,7 +150,7 @@ export function createDocumentsHandler(config: DocumentHandlerConfig) {
 
             // Verificar se já existe documento do mesmo tipo
             const { data: existing } = await supabaseAdmin
-                .from(docConfig.table as any)
+                .from(docConfig.table)
                 .select('id')
                 .eq(docConfig.foreignKey, entityId)
                 .eq('document_type', documentData.document_type)
@@ -159,8 +159,8 @@ export function createDocumentsHandler(config: DocumentHandlerConfig) {
             if (existing) {
                 // Atualizar documento existente
                 const existingId = (existing as unknown as { id: string }).id
-                const { data: updated, error: updateError } = await (supabaseAdmin
-                    .from(docConfig.table as any) as any)
+                const { data: updated, error: updateError } = await supabaseAdmin
+                    .from(docConfig.table)
                     .update({
                         ...documentData,
                         updated_at: new Date().toISOString(),
@@ -185,8 +185,8 @@ export function createDocumentsHandler(config: DocumentHandlerConfig) {
             }
 
             // Criar novo documento
-            const { data: created, error: createError } = await (supabaseAdmin
-                .from(docConfig.table as any) as any)
+            const { data: created, error: createError } = await supabaseAdmin
+                .from(docConfig.table)
                 .insert({
                     [docConfig.foreignKey]: entityId,
                     ...documentData,
@@ -243,7 +243,7 @@ export function createDocumentsHandler(config: DocumentHandlerConfig) {
 
             // Verificar se documento existe e pertence à entidade
             const { data: document, error: docError } = await supabaseAdmin
-                .from(docConfig.table as any)
+                .from(docConfig.table)
                 .select('id, file_url')
                 .eq('id', documentId)
                 .eq(docConfig.foreignKey, entityId)
@@ -258,7 +258,7 @@ export function createDocumentsHandler(config: DocumentHandlerConfig) {
 
             // Remover do banco
             const { error: deleteError } = await supabaseAdmin
-                .from(docConfig.table as any)
+                .from(docConfig.table)
                 .delete()
                 .eq('id', documentId)
 

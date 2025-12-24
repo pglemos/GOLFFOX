@@ -254,7 +254,8 @@ async function createOrUpdateBudgetHandler(request: NextRequest) {
     }
 
     return NextResponse.json({ success: true, data: result }, { status: existing ? 200 : 201 })
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const err = error as { message?: string }
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: 'Dados inválidos', details: error.errors },

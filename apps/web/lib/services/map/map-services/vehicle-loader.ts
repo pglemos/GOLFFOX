@@ -103,7 +103,7 @@ export async function loadVehicles(companyId?: string): Promise<Veiculo[]> {
         }
       }
     } else {
-      finalVeiculosData = (veiculosData as any) || []
+      finalVeiculosData = (veiculosData as SupabaseVeiculo[]) || []
       debug(`Query principal retornou ${finalVeiculosData.length} veículos`, {
         companyId,
         total: finalVeiculosData.length,
@@ -154,11 +154,11 @@ export async function loadVehicles(companyId?: string): Promise<Veiculo[]> {
         users!trips_driver_id_fkey(id, name)
       `)
       .in('veiculo_id', vehicleIds)
-      .eq('status', 'in_progress') as any)
+      .eq('status', 'in_progress'))
 
     const tripsByVehicle = new Map<string, SupabaseTrip>()
     if (activeTrips) {
-      activeTrips.forEach((trip: any) => {
+      activeTrips.forEach((trip: ViagensRow) => {
         const typedTrip: SupabaseTrip = {
           id: trip.id,
           veiculo_id: trip.veiculo_id,
@@ -183,7 +183,7 @@ export async function loadVehicles(companyId?: string): Promise<Veiculo[]> {
       .select('id, veiculo_id')
       .in('veiculo_id', vehicleIds)
       .gte('created_at', oneDayAgo)
-      .order('created_at', { ascending: false }) as any)
+      .order('created_at', { ascending: false }))
 
     const tripIds = recentTrips?.map((t: { id: string }) => t.id) || []
     let lastPositions: SupabasePosition[] = []
@@ -195,13 +195,13 @@ export async function loadVehicles(companyId?: string): Promise<Veiculo[]> {
         .select('viagem_id, lat, lng, speed, timestamp')
         .in('viagem_id', tripIds)
         .gte('timestamp', fiveMinutesAgo)
-        .order('timestamp', { ascending: false }) as any)
+        .order('timestamp', { ascending: false }))
 
       if (recentPositions && recentPositions.length > 0) {
         const tripToVehicle = new Map(
-          recentTrips?.map((t: any) => [t.id, t.veiculo_id]) || []
+          recentTrips?.map((t: ViagensRow) => [t.id, t.veiculo_id]) || []
         )
-        lastPositions = (recentPositions || []).map((pos: any): SupabasePosition => ({
+        lastPositions = (recentPositions || []).map((pos: MotoristaPositionsRow): SupabasePosition => ({
           viagem_id: pos.viagem_id,
           lat: pos.lat,
           lng: pos.lng,
@@ -221,9 +221,9 @@ export async function loadVehicles(companyId?: string): Promise<Veiculo[]> {
 
         if (allPositions) {
           const tripToVehicle = new Map(
-            recentTrips?.map((t: any) => [t.id, t.veiculo_id]) || []
+            recentTrips?.map((t: ViagensRow) => [t.id, t.veiculo_id]) || []
           )
-          lastPositions = (allPositions || []).map((pos: any): SupabasePosition => ({
+          lastPositions = (allPositions || []).map((pos: MotoristaPositionsRow): SupabasePosition => ({
             viagem_id: pos.viagem_id,
             lat: pos.lat,
             lng: pos.lng,

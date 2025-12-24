@@ -17,7 +17,7 @@ if (typeof window === 'undefined') {
   
   module.exports = {
     getSupabaseAdmin: stub,
-    supabaseServiceRole: new Proxy({} as any, {
+    supabaseServiceRole: new Proxy({} as Record<string, never>, {
       get() {
         throw new Error('supabaseServiceRole não pode ser usado no cliente. Use apenas em Server Components ou API routes.')
       }

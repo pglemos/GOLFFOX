@@ -4,13 +4,13 @@
 
 export interface ReportData {
   headers: string[]
-  rows: any[][]
+  rows: (string | number | boolean | null)[][]
   title: string
   description?: string
 }
 
 // Formatar número para separador decimal BR (vírgula)
-function formatNumberBR(value: any): string {
+function formatNumberBR(value: string | number | null | undefined): string {
   if (value === null || value === undefined) return ''
   const num = typeof value === 'number' ? value : parseFloat(value)
   if (isNaN(num)) return String(value)
@@ -155,7 +155,7 @@ export function exportToPDF(data: ReportData, filename: string = 'relatorio.pdf'
 }
 
 // Formatar dados de relatório de atrasos
-export function formatDelaysReport(rows: any[]): ReportData {
+export function formatDelaysReport(rows: Record<string, unknown>[]): ReportData {
   return {
     title: 'Relatório de Atrasos',
     description: `Total de ${rows.length} registros de atrasos`,
@@ -174,7 +174,7 @@ export function formatDelaysReport(rows: any[]): ReportData {
 }
 
 // Formatar dados de relatório de ocupação
-export function formatOccupancyReport(rows: any[]): ReportData {
+export function formatOccupancyReport(rows: Record<string, unknown>[]): ReportData {
   return {
     title: 'Relatório de Ocupação',
     description: 'Análise de ocupação por rota e horário',
@@ -191,7 +191,7 @@ export function formatOccupancyReport(rows: any[]): ReportData {
 }
 
 // Formatar dados de relatório de não embarcados
-export function formatNotBoardedReport(rows: any[]): ReportData {
+export function formatNotBoardedReport(rows: Record<string, unknown>[]): ReportData {
   return {
     title: 'Relatório de Passageiros Não Embarcados',
     description: `Total de ${rows.length} passageiros não embarcados`,

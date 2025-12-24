@@ -22,13 +22,13 @@ import { logError } from "@/lib/logger"
 export default function TransportadorasPage() {
   const router = useRouter()
   const { user, loading: authLoading } = useAuth()
-  const [carriers, setCarriers] = useState<any[]>([])
+  const [carriers, setCarriers] = useState<Array<{ id: string; name?: string; address?: string; phone?: string; [key: string]: unknown }>>([])
   const [loadingCarriers, setLoadingCarriers] = useState(true)
   const [errorCarriers, setErrorCarriers] = useState<Error | null>(null)
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   const [selectedCarrierForUsers, setSelectedCarrierForUsers] = useState<{ id: string; name: string } | null>(null)
   const [isUsersModalOpen, setIsUsersModalOpen] = useState(false)
-  const [selectedCarrierForEdit, setSelectedCarrierForEdit] = useState<any>(null)
+  const [selectedCarrierForEdit, setSelectedCarrierForEdit] = useState<{ id: string; name?: string; [key: string]: unknown } | null>(null)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
   const debouncedSearchQuery = useDebounce(searchQuery, 300)
@@ -49,8 +49,9 @@ export default function TransportadorasPage() {
       } else {
         throw new Error(result.error || 'Erro ao carregar transportadoras')
       }
-    } catch (error: any) {
-      logError('Erro ao carregar transportadoras', { error }, 'TransportadorasPage')
+    } catch (error: unknown) {
+      const err = error as { message?: string }
+      logError('Erro ao carregar transportadoras', { error: err }, 'TransportadorasPage')
       setErrorCarriers(error)
       setCarriers([])
     } finally {
@@ -83,9 +84,10 @@ export default function TransportadorasPage() {
       } else {
         throw new Error(result.error || 'Erro ao excluir transportadora')
       }
-    } catch (error: any) {
-      logError('Erro ao excluir transportadora', { error }, 'TransportadorasPage')
-      const errorMessage = error.message || 'Erro desconhecido ao excluir transportadora'
+    } catch (error: unknown) {
+      const err = error as { message?: string }
+      logError('Erro ao excluir transportadora', { error: err }, 'TransportadorasPage')
+      const errorMessage = err.message || 'Erro desconhecido ao excluir transportadora'
       notifyError(error, errorMessage)
     }
   }
@@ -200,7 +202,7 @@ export default function TransportadorasPage() {
   const filteredCarriers = useMemo(() => {
     if (!debouncedSearchQuery) return carriers
     const query = debouncedSearchQuery.toLowerCase()
-    return carriers.filter((c: any) =>
+    return carriers.filter((c: { name?: string; address?: string; phone?: string }) =>
       c.name?.toLowerCase().includes(query) ||
       c.address?.toLowerCase().includes(query) ||
       c.phone?.includes(query)

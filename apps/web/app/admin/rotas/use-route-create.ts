@@ -109,8 +109,9 @@ export function useRouteCreate(isOpen: boolean) {
             } else {
                 throw new Error(result.error || 'Erro ao carregar empresas')
             }
-        } catch (error: any) {
-            logError("Erro ao carregar empresas", { error }, 'useRouteCreate')
+        } catch (error: unknown) {
+            const err = error as { message?: string }
+            logError("Erro ao carregar empresas", { error: err }, 'useRouteCreate')
             try {
                 const { data, error: supabaseError } = await supabase
                     .from("empresas")
@@ -119,13 +120,14 @@ export function useRouteCreate(isOpen: boolean) {
 
                 if (supabaseError) throw supabaseError
 
-                const formatted = (data || []).map((c: any) => ({
-                    id: c.id,
-                    name: c.name || 'Sem nome'
-                })).filter((c: any) => c.id && c.name)
+                const formatted = (data || []).map((c: { id?: string; name?: string | null }) => ({
+                  id: c.id || '',
+                  name: c.name || 'Sem nome'
+                })).filter((c: { id: string; name: string }) => c.id && c.name)
 
                 setCompanies(formatted)
-            } catch (fallbackError: any) {
+            } catch (fallbackError: unknown) {
+              const fallbackErr = fallbackError as { message?: string }
                 logError("Erro no fallback", { error: fallbackError }, 'useRouteCreate')
                 setCompanies([])
             }
@@ -192,8 +194,9 @@ export function useRouteCreate(isOpen: boolean) {
             }
 
             setEmployees((data || []) as unknown as EmployeeLite[])
-        } catch (error: any) {
-            logError("Erro ao carregar funcionários", { error }, 'useRouteCreate')
+        } catch (error: unknown) {
+          const err = error as { message?: string }
+          logError("Erro ao carregar funcionários", { error: err }, 'useRouteCreate')
             notifyError(error, "Erro ao carregar funcionários")
         } finally {
             setLoadingEmployees(false)

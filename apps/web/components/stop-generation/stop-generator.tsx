@@ -54,7 +54,10 @@ export default function StopGenerator({ routeId }: { routeId: string }) {
     if (!mapRef.current || !('google' in window)) return
     const center = { lat: -23.55052, lng: -46.633308 }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    mapObj.current = new (window as any).google.maps.Map(mapRef.current, { zoom: 11, center })
+    const googleMaps = (window as { google?: { maps?: { Map?: new (el: HTMLElement, opts: { zoom: number; center: { lat: number; lng: number } }) => unknown } } }).google?.maps
+    if (googleMaps?.Map && mapRef.current) {
+      mapObj.current = new googleMaps.Map(mapRef.current, { zoom: 11, center })
+    }
   }
 
   async function generate() {
@@ -85,7 +88,7 @@ export default function StopGenerator({ routeId }: { routeId: string }) {
     if (!mapObj.current || !json?.stops) return
     clearMarkers()
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const g = (window as any).google
+    const g = (window as { google?: { maps?: { Marker?: new (opts: unknown) => unknown } } }).google
     // Origem
     markers.current.push(new g.maps.Marker({ position: json.origin, map: mapObj.current, icon: process.env.NEXT_PUBLIC_DESTINATION_ICON || undefined }))
     // Pontos
@@ -107,8 +110,8 @@ export default function StopGenerator({ routeId }: { routeId: string }) {
   const downloads = useMemo(() => {
     if (!data) return null
     return {
-      json: toJSON(data.stops as any),
-      csv: toCSV(data.stops as any),
+      json: toJSON(data.stops),
+      csv: toCSV(data.stops),
     }
   }, [data])
 

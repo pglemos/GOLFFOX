@@ -6,6 +6,9 @@ import { requireAuth } from '@/lib/api-auth'
 import { logger, logError } from '@/lib/logger'
 import { supabaseServiceRole } from '@/lib/supabase-server'
 import { createVehicleSchema, validateWithSchema } from '@/lib/validation/schemas'
+import type { Database } from '@/types/supabase'
+
+type VeiculosInsert = Database['public']['Tables']['veiculos']['Insert']
 
 export const runtime = 'nodejs'
 
@@ -127,7 +130,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const veiculoData: any = {
+    const veiculoData: Partial<VeiculosInsert> = {
       plate: validated.plate,
       model: validated.model,
       is_active: validated.is_active,
@@ -147,7 +150,7 @@ export async function POST(request: NextRequest) {
       veiculoData.capacity = validated.capacity
     }
     if (finalCompanyId) {
-      veiculoData.company_id = finalCompanyId
+      veiculoData.empresa_id = finalCompanyId
     }
     if (validated.transportadora_id) {
       veiculoData.transportadora_id = validated.transportadora_id

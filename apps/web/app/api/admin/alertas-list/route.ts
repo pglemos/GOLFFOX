@@ -1,10 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 
 import { createClient } from '@supabase/supabase-js'
+import type { SupabaseClient } from '@supabase/supabase-js'
 
 import { requireAuth } from '@/lib/api-auth'
 import { redisCacheService, createCacheKey } from '@/lib/cache/redis-cache.service'
 import { logError } from '@/lib/logger'
+import type { Database } from '@/types/supabase'
+
+type GfAlertsRow = Database['public']['Tables']['gf_alerts']['Row']
+type EmpresasRow = Database['public']['Tables']['empresas']['Row']
 
 export const runtime = 'nodejs'
 
@@ -103,11 +108,17 @@ export async function GET(request: NextRequest) {
   }
 }
 
+import type { Database } from '@/types/supabase'
+import type { SupabaseClient } from '@supabase/supabase-js'
+
+type GfAlertsRow = Database['public']['Tables']['gf_alerts']['Row']
+type EmpresasRow = Database['public']['Tables']['empresas']['Row']
+
 // Função auxiliar para formatar resposta e lidar com mapeamento de colunas (empresa_id vs company_id)
-async function getFormattedAlertsArray(alertsData: any[], supabaseAdmin: any) {
+async function getFormattedAlertsArray(alertsData: GfAlertsRow[], supabaseAdmin: SupabaseClient<Database>) {
   // Buscar empresas manualmente para enriquecer (evita erro de FK inexistente)
   // Suporte para ambos empresa_id (schema BR) e company_id (legacy/mixed)
-  const companyIds = Array.from(new Set(alertsData.map((a: any) => a.empresa_id || a.company_id).filter(Boolean)))
+  const companyIds = Array.from(new Set(alertsData.map((a: GfAlertsRow) => a.empresa_id || (a as { company_id?: string }).company_id).filter(Boolean)))
 
   let companyMap: Record<string, string> = {}
 
@@ -119,8 +130,8 @@ async function getFormattedAlertsArray(alertsData: any[], supabaseAdmin: any) {
         .in('id', companyIds)
 
       if (companies) {
-        companyMap = companies.reduce((acc: any, curr: any) => {
-          acc[curr.id] = curr.name
+        companyMap = companies.reduce((acc: Record<string, string>, curr: EmpresasRow) => {
+          acc[curr.id] = curr.name || ''
           return acc
         }, {})
       }
@@ -130,7 +141,7 @@ async function getFormattedAlertsArray(alertsData: any[], supabaseAdmin: any) {
   }
 
   // Mapear dados para compatibilidade com o frontend
-  return alertsData.map((alert: any) => {
+  return alertsData.map((alert: GfAlertsRow) => {
     // Tentar extrair informações de detalhes se existirem
     const details = alert.details || {}
     const metadata = alert.metadata || {}

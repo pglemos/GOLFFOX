@@ -42,8 +42,7 @@ class AuditEventHandler {
       const userId = (event.metadata?.userId as string) || 'system'
 
       // Criar log de auditoria
-      // Usar 'as any' porque gf_audit_log pode não estar nos tipos gerados do Supabase
-      const { error } = await (supabase.from('gf_audit_log') as any).insert({
+      const { error } = await supabase.from('gf_audit_log').insert({
         actor_id: userId,
         action_type: event.eventType,
         resource_type: event.aggregateType,

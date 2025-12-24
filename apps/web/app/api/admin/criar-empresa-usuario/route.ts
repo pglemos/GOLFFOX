@@ -6,6 +6,9 @@ import { requireAuth } from '@/lib/api-auth'
 import { logError, logger } from '@/lib/logger'
 import { CompanyService } from '@/lib/services/server/company-service'
 import { UserService } from '@/lib/services/server/user-service'
+import type { Database } from '@/types/supabase'
+
+type EmpresasRow = Database['public']['Tables']['empresas']['Row']
 
 export const runtime = 'nodejs'
 
@@ -59,7 +62,7 @@ export async function POST(request: NextRequest) {
     const isTestMode = request.headers.get('x-test-mode') === 'true'
     const isDevelopment = process.env.NODE_ENV === 'development'
 
-    let company: any = null
+    let company: EmpresasRow | null = null
 
     // 1. Obter ou Criar Empresa
     if (companyId) {
@@ -102,18 +105,19 @@ export async function POST(request: NextRequest) {
           address_city: body.address_city || body.city,
           address_state: body.address_state || body.state
         })
-      } catch (err: any) {
+      } catch (err: unknown) {
+        const error = err as { message?: string }
         return NextResponse.json({
           error: 'Erro ao criar empresa',
-          message: err.message
+          message: error.message
         }, { status: 400 })
       }
     }
 
     // 2. Criar Usuário Operador (se email fornecido)
     const shouldCreateUser = !!operatorEmail
-    let userId = null
-    let operatorUser = null
+    let userId: string | null = null
+    let operatorUser: { id: string; email: string } | null = null
 
     if (shouldCreateUser) {
       // Em modo de teste, simular sucesso se usuário já existe
@@ -145,16 +149,17 @@ export async function POST(request: NextRequest) {
         })
         userId = newUser.id
         operatorUser = newUser
-      } catch (err: any) {
+      } catch (err: unknown) {
+        const error = err as { message?: string }
         // Rollback da empresa APENAS se foi criada nesta requisição e não é teste
         if (!companyId && !isTestMode) {
           await CompanyService.deleteCompany(company.id, true).catch(() => { })
         }
 
-        logError('Erro ao criar operador', { error: err })
+        logError('Erro ao criar operador', { error })
         return NextResponse.json({
           error: 'Erro ao criar usuário operador',
-          message: err.message
+          message: error.message
         }, { status: 500 })
       }
     }
@@ -176,11 +181,12 @@ export async function POST(request: NextRequest) {
       message: shouldCreateUser ? undefined : 'Empresa criada com sucesso. Usuário não criado (email não fornecido).'
     }, { status: 201 })
 
-  } catch (err: any) {
-    logError('Erro geral em criar-empresa-usuario', { error: err })
+  } catch (err: unknown) {
+    const error = err as { message?: string }
+    logError('Erro geral em criar-empresa-usuario', { error })
     return NextResponse.json({
-      error: err.message || 'Erro interno do servidor',
-      details: process.env.NODE_ENV === 'development' ? err : undefined
+      error: error.message || 'Erro interno do servidor',
+      details: process.env.NODE_ENV === 'development' ? error : undefined
     }, { status: 500 })
   }
 }

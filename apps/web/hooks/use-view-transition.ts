@@ -25,7 +25,7 @@ export function useViewTransition() {
     (href: string, options?: { replace?: boolean }) => {
       // Verificar se View Transitions API está disponível
       if (typeof document !== 'undefined' && 'startViewTransition' in document) {
-        const transition = (document as any).startViewTransition(() => {
+        const transition = (document as { startViewTransition?: (callback: () => void) => { finished: Promise<void> } }).startViewTransition?.(() => {
           startTransition(() => {
             if (options?.replace) {
               router.replace(href)

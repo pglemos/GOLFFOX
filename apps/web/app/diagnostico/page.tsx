@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 
 export default function DiagnosticoPage() {
-  const [resultado, setResultado] = useState<any>(null)
+  const [resultado, setResultado] = useState<{ session?: { cookies?: { list?: Array<{ name: string; [key: string]: unknown }>; [key: string]: unknown }; [key: string]: unknown }; browser?: Record<string, unknown>; [key: string]: unknown } | null>(null)
   const [loading, setLoading] = useState(false)
   const [erro, setErro] = useState<string | null>(null)
 
@@ -37,8 +37,9 @@ export default function DiagnosticoPage() {
         session: sessionData,
         browser: browserInfo,
       })
-    } catch (e: any) {
-      setErro(e.message)
+    } catch (e: unknown) {
+      const err = e as { message?: string }
+      setErro(err.message || 'Erro desconhecido')
     } finally {
       setLoading(false)
     }
@@ -157,7 +158,7 @@ export default function DiagnosticoPage() {
                   <div>
                     <p className="font-semibold text-ink-strong">Lista de todos os cookies:</p>
                     <div className="mt-2 space-y-1">
-                      {resultado.session.cookies.list.map((c: any, i: number) => (
+                      {resultado.session.cookies.list.map((c: { name: string; [key: string]: unknown }, i: number) => (
                         <div key={i} className="p-2 bg-bg-soft rounded text-sm">
                           <span className="font-mono">{c.name}</span>
                           {' - '}

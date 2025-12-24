@@ -73,14 +73,14 @@ export function useReconciliation(invoiceId: string | null, isOpen: boolean) {
       if (linesError) throw linesError
 
       // Enriquecer com nome da rota
-      const enrichedLines = (linesData || []).map((line: any) => ({
+      const enrichedLines = (linesData || []).map((line: GfInvoiceLinesRow & { routes: RotasRow | null }) => ({
         ...line,
         route_name: line.routes?.name || 'Rota não identificada',
         invoiced_trips: line.trip_count || line.invoiced_trips
       })) as InvoiceLine[]
 
       setInvoiceLines(enrichedLines)
-    } catch (error: any) {
+    } catch (error: unknown) {
       logError('Erro ao carregar dados da fatura', { error }, 'UseReconciliation')
       notifyError(error, 'Erro inesperado')
     } finally {
@@ -143,7 +143,7 @@ export function useReconciliation(invoiceId: string | null, isOpen: boolean) {
       notifySuccess('', { i18n: { ns: 'operador', key: 'reconciliation.approved' } })
       onSuccess?.()
       onClose?.()
-    } catch (error: any) {
+    } catch (error: unknown) {
       logError('Erro ao aprovar fatura', { error }, 'UseReconciliation')
       notifyError(error, 'Erro inesperado')
     } finally {
@@ -179,7 +179,7 @@ export function useReconciliation(invoiceId: string | null, isOpen: boolean) {
       notifySuccess('', { i18n: { ns: 'operador', key: 'reconciliation.rejected' } })
       onSuccess?.()
       onClose?.()
-    } catch (error: any) {
+    } catch (error: unknown) {
       logError('Erro ao rejeitar fatura', { error }, 'UseReconciliation')
       notifyError(error, 'Erro inesperado')
     } finally {
@@ -209,7 +209,7 @@ export function useReconciliation(invoiceId: string | null, isOpen: boolean) {
       setStatus('em_analise')
       notifySuccess('Revisão solicitada')
       onClose?.()
-    } catch (error: any) {
+    } catch (error: unknown) {
       logError('Erro ao solicitar revisão', { error }, 'UseReconciliation')
       notifyError(error, 'Erro ao solicitar revisão')
     } finally {

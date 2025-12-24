@@ -27,7 +27,7 @@ export class FuncionariosErrorBoundary extends Component<Props, State> {
     return { hasError: true, error }
   }
 
-  componentDidCatch(error: Error, errorInfo: any) {
+  componentDidCatch(error: Error, errorInfo: { componentStack?: string }) {
     logError('Erro capturado pelo ErrorBoundary', {
       error: error.message,
       stack: error.stack,

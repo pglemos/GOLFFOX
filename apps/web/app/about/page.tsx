@@ -62,7 +62,7 @@ function Stat({ number, label }: { number: string, label: string }) {
     )
 }
 
-function Card({ icon: Icon, title, text }: { icon: any, title: string, text: string }) {
+function Card({ icon: Icon, title, text }: { icon: React.ComponentType<{ className?: string }>, title: string, text: string }) {
     return (
         <div className="flex gap-6 p-6 rounded-2xl bg-slate-950/50 border border-white/10 hover:border-brand/30 transition-colors">
             <div className="flex-shrink-0 h-12 w-12 rounded-xl bg-brand/10 flex items-center justify-center">

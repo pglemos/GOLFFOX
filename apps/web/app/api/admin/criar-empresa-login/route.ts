@@ -57,18 +57,18 @@ export async function POST(request: NextRequest) {
     if (existingUser) return errorResponse('Este email já está cadastrado na tabela de usuários', 400)
 
     // Verificar se email já existe no Auth
-    let existingAuthUser: any = null
+    let existingAuthUser: { id: string; email?: string; [key: string]: unknown } | null = null
     try {
       const { data: authUsers } = await supabaseServiceRole.auth.admin.listUsers()
-      existingAuthUser = authUsers?.users?.find((u: any) => u.email?.toLowerCase() === sanitizedEmail)
+      existingAuthUser = authUsers?.users?.find((u: { email?: string }) => u.email?.toLowerCase() === sanitizedEmail) as { id: string; email?: string; [key: string]: unknown } | undefined || null
     } catch (listError) {
       logger.warn('⚠️ Não foi possível verificar usuários no Auth:', listError)
     }
 
     logger.log(`🔐 Criando login de operador para empresa ${company.name}...`)
 
-    let authData: any = null
-    let createUserError: any = null
+    let authData: { user?: { id: string; email?: string; [key: string]: unknown } } | null = null
+    let createUserError: { message?: string; [key: string]: unknown } | null = null
 
     // Se usuário já existe no Auth, usar ele
     if (existingAuthUser) {
@@ -90,14 +90,14 @@ export async function POST(request: NextRequest) {
         if (createUserError && !authData?.user) {
           // Verificar se o usuário foi criado mesmo com erro
           const { data: authUsers } = await supabaseServiceRole.auth.admin.listUsers()
-          const foundUser = authUsers?.users?.find((u: any) => u.email?.toLowerCase() === sanitizedEmail)
+          const foundUser = authUsers?.users?.find((u: { email?: string }) => u.email?.toLowerCase() === sanitizedEmail)
           if (foundUser) {
             authData = { user: foundUser }
             createUserError = null
           }
         }
-      } catch (err: any) {
-        createUserError = err
+      } catch (err: unknown) {
+        createUserError = err as { message?: string; [key: string]: unknown }
       }
     }
 
@@ -146,8 +146,9 @@ export async function POST(request: NextRequest) {
       company_id: company_id
     }, 201, { message: 'Login de operador criado com sucesso' })
 
-  } catch (error: any) {
-    logError('Erro ao criar login de operador', { error })
-    return errorResponse(error.message, 500)
+  } catch (error: unknown) {
+    const err = error as { message?: string }
+    logError('Erro ao criar login de operador', { error: err })
+    return errorResponse(err.message || 'Erro desconhecido', 500)
   }
 }

@@ -79,7 +79,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Filtrar apenas rotas da transportadora do usuário após buscar
-    const filteredData = (data || []).filter((cost: any) => {
+    const filteredData = (data || []).filter((cost: GfCostsRow & { rotas: RotasRow | null }) => {
       if (!userData?.transportadora_id) return false
       const route = cost.rotas
       if (!route) return false
@@ -87,9 +87,10 @@ export async function GET(req: NextRequest) {
     })
 
     return NextResponse.json(filteredData)
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const err = error as { message?: string }
     return NextResponse.json(
-      { error: 'Erro ao processar requisição', message: error.message },
+      { error: 'Erro ao processar requisição', message: err.message },
       { status: 500 }
     )
   }
@@ -153,7 +154,7 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json(data, { status: 201 })
-  } catch (error: any) {
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: 'Dados inválidos', details: error.errors },

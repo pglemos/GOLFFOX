@@ -59,7 +59,7 @@ export function SolicitacaoModal({ isOpen, onClose, onSave, empresaId }: Solicit
       // Reset form
       setTipo("")
       setPayload({})
-    } catch (error: any) {
+    } catch (error: unknown) {
       logError("Erro ao criar solicitação", { error }, 'SolicitacaoModal')
       notifyError(formatError(error, "Erro ao criar solicitação"))
     } finally {
@@ -67,8 +67,8 @@ export function SolicitacaoModal({ isOpen, onClose, onSave, empresaId }: Solicit
     }
   }
 
-  const handlePayloadChange = (key: string, value: any) => {
-    setPayload((prev: any) => ({ ...prev, [key]: value }))
+  const handlePayloadChange = (key: string, value: unknown) => {
+    setPayload((prev: Record<string, unknown>) => ({ ...prev, [key]: value }))
   }
 
   return (

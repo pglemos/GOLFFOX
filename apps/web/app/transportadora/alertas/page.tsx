@@ -67,7 +67,7 @@ export default function AlertasPage() {
     }
   }
 
-  const filteredAlerts = alerts.filter((alert: any) => {
+  const filteredAlerts = alerts.filter((alert: { message?: string; alert_type?: string; severity?: string; is_read?: boolean; is_resolved?: boolean; metadata?: Record<string, unknown> }) => {
     const meta = alert.metadata || {}
     const searchString = `${alert.message} ${alert.alert_type} ${meta.motorista_name || ''} ${meta.plate || ''}`.toLowerCase()
 
@@ -186,7 +186,7 @@ export default function AlertasPage() {
           </Card>
         ) : (
           <div className="space-y-3">
-            {filteredAlerts.map((alert: any, index: number) => {
+            {filteredAlerts.map((alert: { id: string; message?: string; alert_type?: string; severity?: string; [key: string]: unknown }, index: number) => {
               const cfg = getAlertTypeConfig(alert.alert_type, alert.severity)
               const Icon = cfg.icon
               const meta = alert.metadata || {}

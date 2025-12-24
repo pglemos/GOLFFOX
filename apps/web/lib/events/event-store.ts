@@ -47,8 +47,7 @@ class EventStore {
     try {
       const supabase = this.getSupabase()
 
-      // Usar 'as any' porque gf_event_store pode não estar nos tipos gerados do Supabase
-      const { error } = await (supabase.from('gf_event_store') as any).insert({
+      const { error } = await supabase.from('gf_event_store').insert({
         event_id: event.eventId,
         event_type: event.eventType,
         aggregate_id: event.aggregateId,

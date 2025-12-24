@@ -59,9 +59,10 @@ export async function POST(req: NextRequest) {
     })
 
     return res
-  } catch (error: any) {
-    logError('Erro ao limpar sessão', { error }, 'ClearSessionAPI')
-    return errorResponse(error, 500, 'Erro ao limpar sessão')
+  } catch (error: unknown) {
+    const err = error as { message?: string }
+    logError('Erro ao limpar sessão', { error: err }, 'ClearSessionAPI')
+    return errorResponse(err, 500, 'Erro ao limpar sessão')
   }
 }
 

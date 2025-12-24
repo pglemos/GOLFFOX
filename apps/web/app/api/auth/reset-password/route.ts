@@ -79,7 +79,8 @@ export async function POST(req: NextRequest) {
       success: true,
       message: 'Se o e-mail estiver cadastrado, você receberá instruções para redefinir sua senha.',
     })
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const err = error as { message?: string }
     logError('Erro ao processar solicitação de reset de senha', { error }, 'ResetPasswordAPI')
     
     // Sempre retornar sucesso para evitar enumeração de emails

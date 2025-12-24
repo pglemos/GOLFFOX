@@ -72,7 +72,7 @@ async function fetchAlertas(severity?: string, status?: string): Promise<Alerta[
 
     // Buscar nomes das empresas para enriquecer os dados
     const alertsData = data || []
-    const companyIds = Array.from(new Set(alertsData.map((a: any) => a.empresa_id || a.company_id).filter(Boolean)))
+    const companyIds = Array.from(new Set(alertsData.map((a: { empresa_id?: string; company_id?: string }) => a.empresa_id || a.company_id).filter(Boolean)))
 
     let companyMap: Record<string, string> = {}
     if (companyIds.length > 0) {
@@ -83,8 +83,8 @@ async function fetchAlertas(severity?: string, status?: string): Promise<Alerta[
           .in('id', companyIds)
 
         if (companies) {
-          companyMap = companies.reduce((acc: any, curr: any) => {
-            acc[curr.id] = curr.name
+          companyMap = companies.reduce((acc: Record<string, string>, curr: { id: string; name?: string }) => {
+            if (curr.name) acc[curr.id] = curr.name
             return acc
           }, {})
         }
@@ -94,7 +94,7 @@ async function fetchAlertas(severity?: string, status?: string): Promise<Alerta[
     }
 
     // Mapear dados para o formato esperado pelo frontend
-    return alertsData.map((alert: any) => {
+    return alertsData.map((alert: { empresa_id?: string; company_id?: string; details?: Record<string, unknown>; metadata?: Record<string, unknown>; is_resolved?: boolean; created_at: string; [key: string]: unknown }) => {
       const details = alert.details || {}
       const metadata = alert.metadata || {}
 
@@ -122,8 +122,9 @@ async function fetchAlertas(severity?: string, status?: string): Promise<Alerta[
         route_name: routeName,
       }
     }) as Alerta[]
-  } catch (error: any) {
-    logError('Erro ao buscar alertas (catch)', { error: error.message || error }, 'AlertasPage')
+  } catch (error: unknown) {
+    const err = error as { message?: string }
+    logError('Erro ao buscar alertas (catch)', { error: err.message || err }, 'AlertasPage')
     return []
   }
 }
