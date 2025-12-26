@@ -1,14 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server'
 
+import { z } from 'zod'
+
 import { requireAuth, validateAuth } from '@/lib/api-auth'
 import { supabaseServiceRole } from '@/lib/supabase-server'
-import { validateWithSchema, routeCostSchema, routeCostQuerySchema } from '@/lib/validation/schemas'
-import { validationErrorResponse } from '@/lib/api-response'
-import type { Database } from '@/types/supabase'
-
-type RotasRow = Database['public']['Tables']['rotas']['Row']
 
 export const runtime = 'nodejs'
+
+const routeCostSchema = z.object({
+  rota_id: z.string().uuid(),
+  viagem_id: z.string().uuid().optional().nullable(),
+  cost_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  fuel_cost_brl: z.number().min(0).default(0),
+  labor_cost_brl: z.number().min(0).default(0),
+  maintenance_cost_brl: z.number().min(0).default(0),
+  toll_cost_brl: z.number().min(0).default(0),
+  fixed_cost_brl: z.number().min(0).default(0),
+  passengers_transported: z.number().int().min(0).default(0),
+  distance_km: z.number().min(0).optional().nullable(),
+  notes: z.string().optional().nullable(),
+})
 
 export async function OPTIONS() {
   return new NextResponse(null, {
@@ -31,18 +42,10 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
     }
 
-    const { searchParams } = new URL(req.url)
-    const queryParams = Object.fromEntries(searchParams.entries())
-
-    // Validar query params
-    const validation = validateWithSchema(routeCostQuerySchema, queryParams)
-    if (!validation.success) {
-      return validationErrorResponse(validation.error)
-    }
-
-    const { rota_id, route_id, viagem_id, trip_id, start_date, end_date } = validation.data
-    const targetRouteId = rota_id || route_id
-    const targetTripId = viagem_id || trip_id
+    const routeId = req.nextUrl.searchParams.get('route_id') || req.nextUrl.searchParams.get('rota_id')
+    const tripId = req.nextUrl.searchParams.get('trip_id') || req.nextUrl.searchParams.get('viagem_id')
+    const startDate = req.nextUrl.searchParams.get('start_date')
+    const endDate = req.nextUrl.searchParams.get('end_date')
 
     // Buscar transportadora_id do usuário
     const { data: userData } = await supabaseServiceRole
@@ -58,10 +61,13 @@ export async function GET(req: NextRequest) {
         rotas(name, transportadora_id)
       `)
 
-    if (targetRouteId) query = query.eq('rota_id', targetRouteId)
-    if (targetTripId) query = query.eq('viagem_id', targetTripId)
-    if (start_date) query = query.gte('cost_date', start_date)
-    if (end_date) query = query.lte('cost_date', end_date)
+    // Nota: O filtro será feito após o join através da relação route_id
+    // Verificar se a rota pertence à transportadora ao processar resultados
+
+    if (routeId) query = query.eq('rota_id', routeId)
+    if (tripId) query = query.eq('viagem_id', tripId)
+    if (startDate) query = query.gte('cost_date', startDate)
+    if (endDate) query = query.lte('cost_date', endDate)
 
     const { data, error } = await query.order('cost_date', { ascending: false })
 
@@ -73,7 +79,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Filtrar apenas rotas da transportadora do usuário após buscar
-    const filteredData = (data || []).filter((cost: any) => {
+    const filteredData = (data || []).filter((cost: GfCostsRow & { rotas: RotasRow | null }) => {
       if (!userData?.transportadora_id) return false
       const route = cost.rotas
       if (!route) return false
@@ -101,27 +107,17 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json()
-
-    // Suporte a cammelCase fallback antes do Zod
-    const normalizedBody = {
+    const validated = routeCostSchema.parse({
       ...body,
       rota_id: body.rota_id || body.route_id,
       viagem_id: body.viagem_id || body.trip_id
-    }
-
-    // Validar corpo
-    const validation = validateWithSchema(routeCostSchema, normalizedBody)
-    if (!validation.success) {
-      return validationErrorResponse(validation.error)
-    }
-
-    const data = validation.data
+    })
 
     // Verificar se a rota pertence à transportadora do usuário
     const { data: route } = await supabaseServiceRole
       .from('rotas')
       .select('transportadora_id')
-      .eq('id', data.rota_id)
+      .eq('id', validated.rota_id)
       .single()
 
     if (!route) {
@@ -144,9 +140,9 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    const { data: createdData, error } = await supabaseServiceRole
+    const { data, error } = await supabaseServiceRole
       .from('rota_custos')
-      .insert(data)
+      .insert(validated)
       .select()
       .single()
 
@@ -157,11 +153,16 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    return NextResponse.json(createdData, { status: 201 })
+    return NextResponse.json(data, { status: 201 })
   } catch (error: unknown) {
-    const err = error as { message?: string }
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: 'Dados inválidos', details: error.errors },
+        { status: 400 }
+      )
+    }
     return NextResponse.json(
-      { error: 'Erro ao processar requisição', message: err.message },
+      { error: 'Erro ao processar requisição', message: error.message },
       { status: 500 }
     )
   }

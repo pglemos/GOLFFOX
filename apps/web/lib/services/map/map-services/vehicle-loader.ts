@@ -9,25 +9,6 @@ import { supabase } from "@/lib/supabase"
 import type { Veiculo } from "@/types/map"
 import type { SupabaseTrip, SupabasePosition, SupabaseVeiculo } from "@/types/supabase-data"
 
-// Tipos inline para dados brutos do Supabase
-type ViagensRow = {
-  id: string
-  veiculo_id: string | null
-  motorista_id: string | null
-  rota_id: string | null
-  status: string | null
-  rotas?: { name: string } | null
-  users?: { id: string; name: string } | null
-}
-
-type MotoristaPositionsRow = {
-  viagem_id: string | null
-  lat: number
-  lng: number
-  speed: number | null
-  timestamp: string
-}
-
 /**
  * Carrega e processa veículos ativos para exibição no mapa
  * @param companyId ID da empresa para filtrar (opcional)

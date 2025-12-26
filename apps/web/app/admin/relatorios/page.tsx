@@ -46,16 +46,7 @@ interface ReportConfig {
   description: string
   icon: typeof FileText
   viewName?: string
-  formatter?: (rows: any[]) => any[]
-}
-
-interface Schedule {
-  id: string
-  report_key: string
-  recipients?: string[]
-  cron?: string
-  is_active?: boolean
-  [key: string]: unknown
+  formatter?: (rows: Record<string, unknown>[]) => Record<string, unknown>[]
 }
 
 export default function RelatoriosPage() {
@@ -87,10 +78,10 @@ export default function RelatoriosPage() {
     setSelectedCompany("")
     setFiltersExpanded(false)
   }
-  const [schedules, setSchedules] = useState<Schedule[]>([])
+  const [schedules, setSchedules] = useState<Array<{ id: string; [key: string]: unknown }>>([])
   const [showScheduleModal, setShowScheduleModal] = useState(false)
   const [selectedReportForSchedule, setSelectedReportForSchedule] = useState<string | null>(null)
-  const [selectedSchedule, setSelectedSchedule] = useState<Schedule | null>(null)
+  const [selectedSchedule, setSelectedSchedule] = useState<{ id: string; [key: string]: unknown } | null>(null)
 
   // Memoizar reports para evitar recriação
   const reports: ReportConfig[] = useMemo(() => [
@@ -143,7 +134,7 @@ export default function RelatoriosPage() {
     try {
       const response = await fetch('/api/reports/schedule')
       const data = await response.json()
-      setSchedules((data.schedules || []) as Schedule[])
+      setSchedules(data.schedules || [])
     } catch (error) {
       logError('Erro ao carregar agendamentos', { error }, 'AdminRelatoriosPage')
     }

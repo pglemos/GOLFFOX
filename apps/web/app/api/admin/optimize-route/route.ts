@@ -6,24 +6,22 @@ import { requireAuth } from '@/lib/api-auth'
 import { logError } from '@/lib/logger'
 import { calculateHash } from '@/lib/route-optimization'
 import type { OptimizeRouteRequest, OptimizeRouteResponse } from '@/types/routes'
-import { validateWithSchema, optimizeRouteSchema } from '@/lib/validation/schemas'
-import { validationErrorResponse } from '@/lib/api-response'
 
 const RATE_LIMIT = new Map<string, { count: number; resetAt: number }>()
 
 function checkRateLimit(ip: string): boolean {
   const now = Date.now()
   const limit = RATE_LIMIT.get(ip)
-
+  
   if (!limit || now > limit.resetAt) {
     RATE_LIMIT.set(ip, { count: 1, resetAt: now + 60000 }) // 1 min
     return true
   }
-
+  
   if (limit.count >= 10) {
     return false
   }
-
+  
   limit.count++
   return true
 }
@@ -61,7 +59,7 @@ async function optimizeWithGoogle(
     const leg = route.legs[0]
 
     return {
-      ordered: orderedWaypoints.map((wp: { id: string; lat: number; lng: number }, idx: number) => ({
+      ordered: orderedWaypoints.map((wp: typeof waypoints[0], idx: number) => ({
         id: wp.id,
         lat: wp.lat,
         lng: wp.lng,
@@ -122,7 +120,7 @@ async function optimizeWithTSP(
     improved = false
     for (let i = 0; i < ordered.length - 1; i++) {
       for (let j = i + 2; j < ordered.length; j++) {
-        const distBefore =
+        const distBefore = 
           distance(ordered[i], ordered[i + 1]) +
           distance(ordered[j], j < ordered.length - 1 ? ordered[j + 1] : destination)
         const distAfter =
@@ -157,7 +155,7 @@ async function optimizeWithTSP(
 
   const route = data.routes[0]
   const totalDistance = route.legs.reduce((sum: number, leg: { distance: { value: number } }) => sum + leg.distance.value, 0)
-  const totalDuration = route.legs.reduce((sum: number, leg: { distance: { value: number }; duration: { value: number }; duration_in_traffic?: { value: number } }) =>
+  const totalDuration = route.legs.reduce((sum: number, leg: { distance: { value: number }; duration: { value: number }; duration_in_traffic?: { value: number } }) => 
     sum + (leg.duration_in_traffic?.value || leg.duration.value), 0)
 
   return {
@@ -175,8 +173,8 @@ function distance(a: { lat: number; lng: number }, b: { lat: number; lng: number
 }
 
 export async function POST(request: NextRequest) {
-  // Verificar autenticação
-  const authError = await requireAuth(request, ['admin', 'gestor_empresa', 'gestor_transportadora'])
+  // Verificar autenticação (admin ou empresa podem otimizar rotas)
+  const authError = await requireAuth(request, ['admin', 'gestor_empresa', 'gestor_empresa', 'gestor_transportadora', 'gestor_empresa'])
   if (authError) return authError
 
   try {
@@ -188,25 +186,24 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const body = await request.json()
+    const body: OptimizeRouteRequest = await request.json()
+    const { companyId, origin, destination, waypoints } = body
 
-    // Validar corpo
-    const validation = validateWithSchema(optimizeRouteSchema, body)
-    if (!validation.success) {
-      return validationErrorResponse(validation.error)
+    if (!companyId || !origin || !destination || !waypoints || waypoints.length === 0) {
+      return NextResponse.json(
+        { error: 'Dados inválidos' },
+        { status: 400 }
+      )
     }
-
-    const data = validation.data
-    const { companyId } = data
 
     // Verificar cache
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
     const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-
+    
     if (supabaseUrl && supabaseKey) {
       const supabase = createClient(supabaseUrl, supabaseKey)
-      const hash = calculateHash(data)
-
+      const hash = calculateHash(body)
+      
       const { data: cached } = await supabase
         .from('gf_route_optimization_cache')
         .select('response')
@@ -220,7 +217,7 @@ export async function POST(request: NextRequest) {
       }
 
       // Otimizar
-      const result = await optimizeWithGoogle(data)
+      const result = await optimizeWithGoogle(body)
 
       // Salvar no cache
       await supabase
@@ -238,13 +235,12 @@ export async function POST(request: NextRequest) {
     }
 
     // Sem cache, apenas otimizar
-    const result = await optimizeWithGoogle(data)
+    const result = await optimizeWithGoogle(body)
     return NextResponse.json(result)
 
   } catch (error: unknown) {
-    const err = error as { message?: string }
-    logError('Erro ao otimizar rota', { error: err }, 'OptimizeRouteAPI')
-    const errorMessage = err.message || 'Erro ao otimizar rota'
+    logError('Erro ao otimizar rota', { error }, 'OptimizeRouteAPI')
+    const errorMessage = error instanceof Error ? error.message : 'Erro ao otimizar rota'
     return NextResponse.json(
       { error: errorMessage },
       { status: 500 }

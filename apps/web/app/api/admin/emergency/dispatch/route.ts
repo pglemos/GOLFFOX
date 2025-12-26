@@ -1,11 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 
 import { requireAuth } from '@/lib/api-auth'
-import { validationErrorResponse } from '@/lib/api-response'
 import { logError } from '@/lib/logger'
-import { withRateLimit } from '@/lib/rate-limit'
 import { getSupabaseAdmin } from '@/lib/supabase-client'
-import { validateWithSchema, emergencyDispatchSchema } from '@/lib/validation/schemas'
 import type { Database } from '@/types/supabase'
 
 type RotasRow = Database['public']['Tables']['rotas']['Row']
@@ -16,28 +13,28 @@ type IncidentInsert = Database['public']['Tables']['gf_incidents']['Insert']
 
 export const runtime = 'nodejs'
 
-async function postHandler(req: NextRequest) {
+export async function POST(req: NextRequest) {
   // Verificar autenticação admin
   const authError = await requireAuth(req, 'admin')
   if (authError) return authError
 
   try {
     const body = await req.json()
+    const { routeId, driverId, vehicleId } = body
 
-    // Validar corpo
-    const validation = validateWithSchema(emergencyDispatchSchema, body)
-    if (!validation.success) {
-      return validationErrorResponse(validation.error)
+    if (!routeId || !driverId || !vehicleId) {
+      return NextResponse.json(
+        { success: false, error: 'Rota, motorista e veículo são obrigatórios' },
+        { status: 400 }
+      )
     }
-
-    const { routeId, driverId, vehicleId } = validation.data
 
     const supabase = getSupabaseAdmin()
 
     // Buscar informações da rota
     const { data: route, error: routeError } = await supabase
       .from('rotas')
-      .select('id, name, empresa_id')
+      .select('id, name, company_id')
       .eq('id', routeId)
       .single()
 
@@ -54,7 +51,7 @@ async function postHandler(req: NextRequest) {
     const { data: existingRequest, error: checkError } = await supabase
       .from('gf_assistance_requests')
       .select('id, status')
-      .eq('rota_id', routeId)
+      .eq('route_id', routeId)
       .eq('status', 'open')
       .maybeSingle()
 
@@ -111,7 +108,7 @@ async function postHandler(req: NextRequest) {
     const { data: existingIncident } = await supabase
       .from('gf_incidents')
       .select('id')
-      .eq('rota_id', routeId)
+      .eq('route_id', routeId)
       .eq('status', 'open')
       .maybeSingle()
 
@@ -136,18 +133,15 @@ async function postHandler(req: NextRequest) {
       assistanceRequestId
     })
   } catch (error: unknown) {
-    const err = error as { message?: string }
-    logError('Erro ao despachar socorro', { error: err }, 'EmergencyDispatchAPI')
+    logError('Erro ao despachar socorro', { error }, 'EmergencyDispatchAPI')
     return NextResponse.json(
       {
         success: false,
         error: 'Erro ao despachar socorro',
-        message: err.message
+        message: error.message
       },
       { status: 500 }
     )
   }
 }
 
-// ✅ SEGURANÇA: Rate limiting para proteção contra abuso
-export const POST = withRateLimit(postHandler, 'sensitive')

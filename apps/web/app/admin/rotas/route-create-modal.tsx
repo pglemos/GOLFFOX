@@ -286,20 +286,7 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
 
       const insertPayload = {
         name: validated.name,
-        name: validated.name,
-        empresa_id: validated.company_id, // company_id -> empresa_id
-        transportadora_id: validated.company_id, // TODO: verificar se isso é correto. Se o usuário seleciona empresa, transportadora pode ser null ou vice versa. routeSchema pede company_id apenas. Assumindo empresa por enquanto ou transportadora baseado no contexto?
-        // routeSchema chama de company_id, mas a UI mostra "Empresa".
-        // O banco requer empresa_id ou transportadora_id.
-        // Vou assumir empresa_id = company_id e transportadora_id null se não especificado, ou derivado.
-        // Mas a validação pede company_id.
-        // Validando o insertPayload:
-        // Se company_id for empresa, empresa_id = company_id.
-        // Se for transportadora, transportadora_id = company_id.
-        // O generic picker pode estar retornando ID de transportadora tb.
-        // Vou usar empresa_id: validated.company_id por padrão para alinhar com o schema anterior. O ideal seria ter seletor de tipo.
-        // Mas para corrigir o erro imediato de tipo:
-        empresa_id: validated.company_id,
+        company_id: validated.company_id,
         description: formData.description || null,
         origin_address: formData.origin_address || null,
         origin_lat: formData.origin_lat || null,
@@ -316,21 +303,16 @@ export function RouteCreateModal({ isOpen, onClose, onSave }: RouteCreateModalPr
         veiculo_id: selectedVeiculo.id,
         polyline: optimizationResult?.polyline || null,
       }
-
-      // Remover propriedades que não existem no Insert type se necessário
-      // Mas insertPayload construído manualmente parece ok, exceto vehicle_id que deve ser veiculo_id (já está veiculo_id)
-      // E company_id que virou empresa_id.
-
       const { data: routeData, error: routeError } = await supabase
         .from("rotas")
-        .insert(insertPayload as unknown as RotasInsert) // unkown cast para evitar conflito parcial
+        .insert(insertPayload as unknown as RotasInsert)
         .select('id, name, empresa_id, description, origin_address, destination_address, scheduled_time, days_of_week, exceptions, holidays, is_active, shift, motorista_id, veiculo_id, polyline, created_at, updated_at')
         .single()
 
       if (routeError) throw routeError
 
       // .single() retorna o objeto diretamente, não um array
-      const routeId = (routeData as RotasRow)?.id
+      const routeId = (routeData as unknown as RotasRow)?.id
       if (!routeId) {
         debug("Route data", { routeData }, 'RouteCreateModal')
         throw new Error("Erro ao criar rota: ID não retornado")
@@ -607,7 +589,7 @@ function LocalRoutePreviewMap({
     if (result.ordered[0]) {
       new window.google.maps.Marker({
         position: { lat: result.ordered[0].lat, lng: result.ordered[0].lng },
-        map: googleMap,
+        map: googleMap as any,
         label: "O",
         title: origin,
       })
@@ -619,7 +601,7 @@ function LocalRoutePreviewMap({
       const emp = employees.find((e) => e.employee_id === point.id)
       new window.google.maps.Marker({
         position: { lat: point.lat, lng: point.lng },
-        map: googleMap,
+        map: googleMap as any,
         label: String(point.order),
         title: emp ? `${emp.first_name} ${emp.last_name}` : `Parada ${point.order}`,
       })
@@ -632,7 +614,7 @@ function LocalRoutePreviewMap({
         const decoded = window.google.maps.geometry.encoding.decodePath(result.polyline)
         new window.google.maps.Polyline({
           path: decoded,
-          map: googleMap,
+          map: googleMap as any,
           strokeColor: "#10B981",
           strokeWeight: 4,
         })
@@ -642,7 +624,7 @@ function LocalRoutePreviewMap({
     }
 
     try {
-      googleMap.fitBounds(bounds as unknown as google.maps.LatLngBounds)
+      googleMap.fitBounds(bounds as any)
     } catch (e) {
       warn("Erro ao ajustar bounds do mapa", { error: e }, 'RouteCreateModal')
     }

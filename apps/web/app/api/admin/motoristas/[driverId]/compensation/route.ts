@@ -1,12 +1,38 @@
 import { NextRequest, NextResponse } from 'next/server'
 
+import { z } from 'zod'
+
 import { requireAuth } from '@/lib/api-auth'
 import { logError } from '@/lib/logger'
 import { getSupabaseAdmin } from '@/lib/supabase-client'
-import { validateWithSchema, driverCompensationSchema, uuidSchema } from '@/lib/validation/schemas'
-import { validationErrorResponse } from '@/lib/api-response'
 
-export const runtime = 'nodejs'
+
+// Schema de validação
+const compensationSchema = z.object({
+    base_salary: z.number().positive().optional().nullable(),
+    currency: z.string().default('BRL'),
+    payment_frequency: z.enum(['weekly', 'biweekly', 'monthly']).default('monthly'),
+    contract_type: z.enum(['clt', 'pj', 'autonomo', 'temporario']).default('clt'),
+    // Benefits
+    has_meal_allowance: z.boolean().default(false),
+    meal_allowance_value: z.number().optional().nullable(),
+    has_transport_allowance: z.boolean().default(false),
+    transport_allowance_value: z.number().optional().nullable(),
+    has_health_insurance: z.boolean().default(false),
+    health_insurance_value: z.number().optional().nullable(),
+    has_dental_insurance: z.boolean().default(false),
+    dental_insurance_value: z.number().optional().nullable(),
+    has_life_insurance: z.boolean().default(false),
+    life_insurance_value: z.number().optional().nullable(),
+    has_fuel_card: z.boolean().default(false),
+    fuel_card_limit: z.number().optional().nullable(),
+    other_benefits: z.string().optional().nullable(),
+    // Dates
+    start_date: z.string().optional().nullable(),
+    end_date: z.string().optional().nullable(),
+    notes: z.string().optional().nullable(),
+})
+
 
 interface RouteParams {
     params: Promise<{ driverId: string }>
@@ -19,14 +45,14 @@ interface RouteParams {
 export async function GET(request: NextRequest, { params }: RouteParams) {
     try {
         const { driverId } = await params
-
-        // Validar ID
-        const idValidation = uuidSchema.safeParse(driverId)
-        if (!idValidation.success) {
-            return validationErrorResponse('ID do motorista inválido')
-        }
-
         const supabaseAdmin = getSupabaseAdmin()
+
+        if (!driverId) {
+            return NextResponse.json(
+                { error: 'ID do motorista é obrigatório' },
+                { status: 400 }
+            )
+        }
 
         // Verificar se motorista existe
         const { data: motorista, error: driverError } = await supabaseAdmin
@@ -46,7 +72,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         // Buscar compensação ativa
         const { data: compensation, error } = await supabaseAdmin
             .from('gf_motorista_compensation')
-            .select('id, driver_id, base_salary, currency, payment_frequency, contract_type, has_meal_allowance, meal_allowance_value, has_transport_allowance, transport_allowance_value, has_health_insurance, health_insurance_value, has_dental_insurance, dental_insurance_value, has_life_insurance, life_insurance_value, has_fuel_card, fuel_card_limit, other_benefits, start_date, end_date, notes, is_active, created_at, updated_at')
+            .select('id, driver_id, base_salary, currency, payment_frequency, contract_type, has_meal_allowance, meal_allowance_value, has_transport_allowance, transport_allowance_value, has_health_insurance, health_insurance_value, has_dental_insurance, dental_insurance_value, has_life_insurance, life_insurance_value, has_fuel_card, fuel_card_limit, other_benefits, start_date, end_date, is_active, notes, created_at, updated_at')
             .eq('driver_id', driverId)
             .eq('is_active', true)
             .single()
@@ -61,7 +87,8 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
         return NextResponse.json(compensation || null)
     } catch (error: unknown) {
-        logError('Erro na API de compensação', { error, method: 'GET' }, 'DriverCompensationAPI')
+        const { driverId: errorDriverId } = await params
+        logError('Erro na API de compensação', { error, driverId: errorDriverId, method: 'GET' }, 'DriverCompensationAPI')
         return NextResponse.json(
             { error: 'Erro interno do servidor' },
             { status: 500 }
@@ -80,23 +107,27 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
     try {
         const { driverId } = await params
+        const supabaseAdmin = getSupabaseAdmin()
 
-        // Validar ID
-        const idValidation = uuidSchema.safeParse(driverId)
-        if (!idValidation.success) {
-            return validationErrorResponse('ID do motorista inválido')
+        if (!driverId) {
+            return NextResponse.json(
+                { error: 'ID do motorista é obrigatório' },
+                { status: 400 }
+            )
         }
 
         const body = await request.json()
 
-        // Validar dados com Zod centralizado
-        const validation = validateWithSchema(driverCompensationSchema, body)
-        if (!validation.success) {
-            return validationErrorResponse(validation.error)
+        // Validar dados
+        const validationResult = compensationSchema.safeParse(body)
+        if (!validationResult.success) {
+            return NextResponse.json(
+                { error: 'Dados inválidos', details: validationResult.error.flatten() },
+                { status: 400 }
+            )
         }
 
-        const compensationData = validation.data
-        const supabaseAdmin = getSupabaseAdmin()
+        const compensationData = validationResult.data
 
         // Verificar se motorista existe
         const { data: motorista, error: driverError } = await supabaseAdmin
@@ -123,14 +154,14 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
         if (existing) {
             // Atualizar compensação existente
-            const updateData = {
+            const updateData: CompensationUpdate = {
                 ...compensationData,
                 updated_at: new Date().toISOString(),
             }
             const { data: updated, error: updateError } = await supabaseAdmin
                 .from('gf_motorista_compensation')
                 .update(updateData)
-                .eq('id', existing.id)
+                .eq('id', (existing as CompensationRow).id)
                 .select()
                 .single()
 
@@ -146,7 +177,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         }
 
         // Criar nova compensação
-        const insertData = {
+        const insertData: CompensationInsert = {
             driver_id: driverId,
             ...compensationData,
             is_active: true,
@@ -167,7 +198,8 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
         return NextResponse.json(created, { status: 201 })
     } catch (error: unknown) {
-        logError('Erro na API de compensação', { error, method: 'POST' }, 'DriverCompensationAPI')
+        const { driverId: errorDriverId } = await params
+        logError('Erro na API de compensação', { error, driverId: errorDriverId, method: 'POST' }, 'DriverCompensationAPI')
         return NextResponse.json(
             { error: 'Erro interno do servidor' },
             { status: 500 }
@@ -183,16 +215,17 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     try {
         const { driverId } = await params
 
-        // Validar ID
-        const idValidation = uuidSchema.safeParse(driverId)
-        if (!idValidation.success) {
-            return validationErrorResponse('ID do motorista inválido')
+        if (!driverId) {
+            return NextResponse.json(
+                { error: 'ID do motorista é obrigatório' },
+                { status: 400 }
+            )
         }
 
         const supabaseAdmin = getSupabaseAdmin()
 
         // Desativar compensação (soft delete)
-        const updateData = {
+        const updateData: CompensationUpdate = {
             is_active: false,
             end_date: new Date().toISOString().split('T')[0],
             updated_at: new Date().toISOString(),
@@ -213,7 +246,8 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
 
         return NextResponse.json({ success: true })
     } catch (error: unknown) {
-        logError('Erro na API de compensação', { error, method: 'DELETE' }, 'DriverCompensationAPI')
+        const { driverId: errorDriverId } = await params
+        logError('Erro na API de compensação', { error, driverId: errorDriverId, method: 'DELETE' }, 'DriverCompensationAPI')
         return NextResponse.json(
             { error: 'Erro interno do servidor' },
             { status: 500 }

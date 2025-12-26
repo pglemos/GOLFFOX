@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
       return validationErrorResponse(validation.error)
     }
 
-    const { page = 1, limit = 20, user_id, action, resource_type } = validation.data
+    const { page = 1, limit = 20, actor_id, action_type, resource_type } = validation.data
     const offset = (page - 1) * limit
 
     // Selecionar apenas colunas necessárias para listagem
@@ -31,8 +31,8 @@ export async function GET(request: NextRequest) {
       .from('gf_audit_log')
       .select(auditColumns, { count: 'exact' })
 
-    if (user_id) query = query.eq('actor_id', user_id)
-    if (action) query = query.eq('action_type', action)
+    if (actor_id) query = query.eq('actor_id', actor_id)
+    if (action_type) query = query.eq('action_type', action_type)
     if (resource_type) query = query.eq('resource_type', resource_type)
 
     const { data, error, count } = await query

@@ -3,27 +3,40 @@ import { NextRequest } from 'next/server'
 import { requireAuth } from '@/lib/api-auth'
 import { successResponse, errorResponse, validationErrorResponse } from '@/lib/api-response'
 import { logError, logger } from '@/lib/logger'
-import { withRateLimit } from '@/lib/rate-limit'
 import { supabaseServiceRole } from '@/lib/supabase-server'
-import { validateWithSchema, createCompanyLoginSchema } from '@/lib/validation/schemas'
 
 export const runtime = 'nodejs'
 
-async function postHandler(request: NextRequest) {
+export async function POST(request: NextRequest) {
   try {
     const authErrorResponse = await requireAuth(request, 'admin')
     if (authErrorResponse) return authErrorResponse
 
     const body = await request.json()
+    const { company_id, email, password, name, phone } = body
 
-    // Validar dados
-    const validation = validateWithSchema(createCompanyLoginSchema, body)
-    if (!validation.success) {
-      return validationErrorResponse(validation.error)
+    // Validar e sanitizar dados
+    const sanitizedEmail = email?.toString().toLowerCase().trim()
+    const sanitizedPassword = password?.toString()
+    const sanitizedName = name?.toString().trim()
+    const sanitizedPhone = phone?.toString().trim() || null
+
+    // Validações
+    if (!company_id) return validationErrorResponse('company_id é obrigatório')
+    if (!sanitizedEmail) return validationErrorResponse('Email é obrigatório')
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(sanitizedEmail)) return validationErrorResponse('Email inválido')
+
+    if (!sanitizedPassword || sanitizedPassword.length < 6) {
+      return validationErrorResponse('Senha deve ter no mínimo 6 caracteres')
     }
 
-    const { company_id, email, password, name, phone } = validation.data
-    const sanitizedEmail = email.toLowerCase().trim()
+    if (!sanitizedName) return validationErrorResponse('Nome é obrigatório')
+
+    if (sanitizedPassword.length > 72) {
+      return validationErrorResponse('Senha muito longa (máximo 72 caracteres)')
+    }
 
     // Verificar se empresa existe
     const { data: company, error: companyError } = await supabaseServiceRole
@@ -44,18 +57,18 @@ async function postHandler(request: NextRequest) {
     if (existingUser) return errorResponse('Este email já está cadastrado na tabela de usuários', 400)
 
     // Verificar se email já existe no Auth
-    let existingAuthUser: { id: string; email?: string;[key: string]: unknown } | null = null
+    let existingAuthUser: { id: string; email?: string; [key: string]: unknown } | null = null
     try {
       const { data: authUsers } = await supabaseServiceRole.auth.admin.listUsers()
-      existingAuthUser = authUsers?.users?.find((u: { email?: string }) => u.email?.toLowerCase() === sanitizedEmail) as { id: string; email?: string;[key: string]: unknown } | undefined || null
+      existingAuthUser = authUsers?.users?.find((u: { email?: string }) => u.email?.toLowerCase() === sanitizedEmail) as { id: string; email?: string; [key: string]: unknown } | undefined || null
     } catch (listError) {
       logger.warn('⚠️ Não foi possível verificar usuários no Auth:', listError)
     }
 
     logger.log(`🔐 Criando login de operador para empresa ${company.name}...`)
 
-    let authData: { user?: { id: string; email?: string;[key: string]: unknown } } | null = null
-    let createUserError: { message?: string;[key: string]: unknown } | null = null
+    let authData: { user?: { id: string; email?: string; [key: string]: unknown } } | null = null
+    let createUserError: { message?: string; [key: string]: unknown } | null = null
 
     // Se usuário já existe no Auth, usar ele
     if (existingAuthUser) {
@@ -66,9 +79,9 @@ async function postHandler(request: NextRequest) {
       try {
         const createResult = await supabaseServiceRole.auth.admin.createUser({
           email: sanitizedEmail,
-          password: password,
+          password: sanitizedPassword,
           email_confirm: true,
-          user_metadata: { name: name }
+          user_metadata: { name: sanitizedName }
         })
 
         authData = createResult.data
@@ -84,7 +97,7 @@ async function postHandler(request: NextRequest) {
           }
         }
       } catch (err: unknown) {
-        createUserError = err as { message?: string;[key: string]: unknown }
+        createUserError = err as { message?: string; [key: string]: unknown }
       }
     }
 
@@ -103,8 +116,8 @@ async function postHandler(request: NextRequest) {
       .upsert({
         id: userId,
         email: sanitizedEmail,
-        name: name,
-        phone: phone,
+        name: sanitizedName,
+        phone: sanitizedPhone,
         role: 'gestor_empresa',
         company_id: company_id,
         is_active: true
@@ -128,7 +141,7 @@ async function postHandler(request: NextRequest) {
     return successResponse({
       id: userId,
       email: sanitizedEmail,
-      name: name,
+      name: sanitizedName,
       role: 'gestor_empresa',
       company_id: company_id
     }, 201, { message: 'Login de operador criado com sucesso' })
@@ -139,7 +152,3 @@ async function postHandler(request: NextRequest) {
     return errorResponse(err.message || 'Erro desconhecido', 500)
   }
 }
-
-// ✅ SEGURANÇA: Rate limiting para proteção contra abuso
-export const POST = withRateLimit(postHandler, 'admin')
-

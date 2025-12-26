@@ -5,9 +5,7 @@ import { createClient } from '@supabase/supabase-js'
 import { requireAuth } from '@/lib/api-auth'
 import { logger, logError } from '@/lib/logger'
 import { invalidateEntityCache } from '@/lib/next-cache'
-import { createCacheKey, redisCacheService } from '@/lib/cache/redis-cache.service'
-import { validateWithSchema, idQuerySchema } from '@/lib/validation/schemas'
-import { validationErrorResponse } from '@/lib/api-response'
+import { redisCacheService, createCacheKey } from '@/lib/cache/redis-cache.service'
 
 export const runtime = 'nodejs'
 
@@ -23,18 +21,20 @@ function getSupabaseAdmin() {
 export async function DELETE(request: NextRequest) {
   try {
     const authErrorResponse = await requireAuth(request, 'admin')
-    if (authErrorResponse) return authErrorResponse
-
-    const { searchParams } = new URL(request.url)
-    const queryParams = Object.fromEntries(searchParams.entries())
-
-    // Validar query params
-    const validation = validateWithSchema(idQuerySchema, queryParams)
-    if (!validation.success) {
-      return validationErrorResponse(validation.error)
+    if (authErrorResponse) {
+      return authErrorResponse
     }
 
-    const { id: alertId } = validation.data
+    const { searchParams } = new URL(request.url)
+    const alertId = searchParams.get('id')
+
+    if (!alertId) {
+      return NextResponse.json(
+        { error: 'ID do alerta é obrigatório' },
+        { status: 400 }
+      )
+    }
+
     const supabaseAdmin = getSupabaseAdmin()
 
     logger.log(`🗑️ Tentando excluir alerta: ${alertId}`)
@@ -47,7 +47,7 @@ export async function DELETE(request: NextRequest) {
       .select()
 
     if (error) {
-      logError('Erro ao excluir alerta', { error, alertId }, 'AlertsDeleteAPI')
+      logError('Erro ao excluir alerta', { error, alertId, errorDetails: JSON.stringify(error, null, 2) }, 'AlertsDeleteAPI')
       return NextResponse.json(
         {
           error: 'Erro ao excluir alerta',
@@ -60,7 +60,9 @@ export async function DELETE(request: NextRequest) {
     }
 
     // Invalidar cache após exclusão
+    // Cache de lista
     await redisCacheService.del(createCacheKey('alerts_v4', 'all', 'all'))
+    // Outros caches
     await invalidateEntityCache('alert', alertId)
 
     logger.log(`✅ Alerta excluído com sucesso: ${alertId}`, data)
@@ -70,10 +72,9 @@ export async function DELETE(request: NextRequest) {
       message: 'Alerta excluído com sucesso'
     })
   } catch (error: unknown) {
-    logError('Erro ao excluir alerta', { error }, 'AlertsDeleteAPI')
-    const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido'
+    logError('Erro ao excluir alerta', { error, alertId: request.nextUrl.searchParams.get('id') }, 'AlertsDeleteAPI')
     return NextResponse.json(
-      { error: 'Erro ao excluir alerta', message: errorMessage },
+      { error: 'Erro ao excluir alerta', message: error.message },
       { status: 500 }
     )
   }

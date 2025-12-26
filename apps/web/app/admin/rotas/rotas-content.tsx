@@ -21,7 +21,7 @@ import {
 
 import { AdvancedNavigationButton } from "@/components/advanced-navigation-button"
 import { AppShell } from "@/components/app-shell"
-import { RouteModal } from "@/components/modals/route-modal"
+import { RouteModal, RouteData } from "@/components/modals/route-modal"
 import { EmptyState } from "@/components/shared/empty-state"
 import { FilterDrawer } from "@/components/shared/filter-drawer"
 import { LoadingSkeleton } from "@/components/shared/loading-skeleton"
@@ -42,22 +42,6 @@ import { RouteCreateModal } from "./route-create-modal"
 
 
 import Link from "next/link"
-
-interface RouteData {
-  id: string
-  name: string
-  description?: string
-  company_id?: string
-  companies?: { name: string } | null
-  status?: string
-  is_active?: boolean
-  estimated_duration?: number
-  distance?: number
-  stops?: unknown[]
-  origin_lat?: number
-  origin_lng?: number
-  [key: string]: unknown
-}
 
 export function RotasPageContent() {
   const router = useRouter()
@@ -385,7 +369,7 @@ export function RotasPageContent() {
                               : null
                             const zoom = 14
                             const params = new URLSearchParams({
-                              route: rota.id,
+                              route: rota.id!,
                               ...(center ? { lat: center.lat.toString(), lng: center.lng.toString(), zoom: zoom.toString() } : {})
                             })
                             router.push(`/admin/mapa?${params.toString()}`)
@@ -397,7 +381,7 @@ export function RotasPageContent() {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => handleDeleteRota(rota.id, rota.name || 'Rota')}
+                          onClick={() => handleDeleteRota(rota.id!, rota.name || 'Rota')}
                           className="min-h-[44px] touch-manipulation text-destructive hover:bg-destructive/10"
                         >
                           <Trash2 className="h-4 w-4" />

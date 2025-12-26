@@ -1,11 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server'
 
+import { z } from 'zod'
+
 import { requireAuth } from '@/lib/api-auth'
 import { supabaseServiceRole } from '@/lib/supabase-server'
-import { validateWithSchema, driverExamSchema, driverExamQuerySchema, uuidSchema } from '@/lib/validation/schemas'
-import { validationErrorResponse } from '@/lib/api-response'
 
 export const runtime = 'nodejs'
+
+const examSchema = z.object({
+  exam_type: z.enum(['admissional', 'periodico', 'toxicologico', 'demissional', 'retorno_trabalho']),
+  exam_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  expiry_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  result: z.enum(['apto', 'inapto', 'apto_com_restricoes']).optional(),
+  file_url: z.string().url().optional().nullable(),
+  file_name: z.string().optional().nullable(),
+  clinic_name: z.string().optional().nullable(),
+  doctor_name: z.string().optional().nullable(),
+  doctor_crm: z.string().optional().nullable(),
+  notes: z.string().optional().nullable(),
+})
 
 export async function OPTIONS() {
   return new NextResponse(null, {
@@ -23,38 +36,18 @@ export async function GET(
   context: { params: Promise<{ driverId: string }> }
 ) {
   const params = await context.params
-  const { driverId } = params
 
   try {
     const authErrorResponse = await requireAuth(request, 'gestor_transportadora')
     if (authErrorResponse) return authErrorResponse
 
-    // Validar ID
-    const idValidation = uuidSchema.safeParse(driverId)
-    if (!idValidation.success) {
-      return validationErrorResponse('ID do motorista inválido')
-    }
-
-    const { searchParams } = new URL(request.url)
-    const queryParams = Object.fromEntries(searchParams.entries())
-
-    // Validar query params
-    const validation = validateWithSchema(driverExamQuerySchema, queryParams)
-    if (!validation.success) {
-      return validationErrorResponse(validation.error)
-    }
-
-    const { type, result } = validation.data
-
-    let query = supabaseServiceRole
+    // Selecionar apenas colunas necessárias para listagem (otimização de performance)
+    const examColumns = 'id,motorista_id,exam_type,exam_date,expiry_date,result,file_url,file_name,clinic_name,doctor_name,doctor_crm,notes,created_at,updated_at'
+    const { data, error } = await supabaseServiceRole
       .from('driver_medical_exams')
-      .select('id, motorista_id, exam_type, exam_date, expiry_date, result, file_url, file_name, clinic_name, doctor_name, doctor_crm, notes, created_at, updated_at')
-      .eq('motorista_id', driverId)
-
-    if (type) query = query.eq('exam_type', type)
-    if (result) query = query.eq('result', result)
-
-    const { data, error } = await query.order('exam_date', { ascending: false })
+      .select(examColumns)
+      .eq('motorista_id', params.driverId)
+      .order('exam_date', { ascending: false })
 
     if (error) {
       return NextResponse.json(
@@ -78,32 +71,18 @@ export async function POST(
   context: { params: Promise<{ driverId: string }> }
 ) {
   const params = await context.params
-  const { driverId } = params
 
   try {
     const authErrorResponse = await requireAuth(request, 'gestor_transportadora')
     if (authErrorResponse) return authErrorResponse
 
-    // Validar ID
-    const idValidation = uuidSchema.safeParse(driverId)
-    if (!idValidation.success) {
-      return validationErrorResponse('ID do motorista inválido')
-    }
-
     const body = await request.json()
-
-    // Validar corpo
-    const validation = validateWithSchema(driverExamSchema, body)
-    if (!validation.success) {
-      return validationErrorResponse(validation.error)
-    }
-
-    const validated = validation.data
+    const validated = examSchema.parse(body)
 
     const { data, error } = await supabaseServiceRole
       .from('driver_medical_exams')
       .insert({
-        motorista_id: driverId,
+        motorista_id: params.driverId,
         ...validated,
       })
       .select()
@@ -118,6 +97,12 @@ export async function POST(
 
     return NextResponse.json(data, { status: 201 })
   } catch (err) {
+    if (err instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: 'Dados inválidos', details: err.errors },
+        { status: 400 }
+      )
+    }
     const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'
     return NextResponse.json(
       { error: 'Erro ao processar requisição', message: errorMessage },

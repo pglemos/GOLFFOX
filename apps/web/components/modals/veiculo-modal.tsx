@@ -32,6 +32,7 @@ import { debug, logError, warn } from "@/lib/logger"
 import { t } from "@/lib/i18n"
 import { supabase } from "@/lib/supabase"
 import { notifySuccess, notifyError } from "@/lib/toast"
+import { warn, logError } from "@/lib/logger"
 import type { Database } from "@/types/supabase"
 
 type UserRow = Database['public']['Tables']['users']['Row']
@@ -238,19 +239,19 @@ export function VeiculoModal({ veiculo, isOpen, onClose, onSave, carriers }: Vei
       // Para operador: deve usar o company_id do usuário
       // Para transportadora: deve usar o transportadora_id do usuário
       if (userInfo.role === 'admin') {
-        // Admin pode definir empresa_id manualmente se fornecido no formData
+        // Admin pode definir company_id manualmente se fornecido no formData
         if (formData.company_id) {
-          vehicleDataRaw.empresa_id = formData.company_id
+          vehicleDataRaw.company_id = formData.company_id
         }
         if (formData.transportadora_id) {
           vehicleDataRaw.transportadora_id = formData.transportadora_id
         }
       } else if (userInfo.role === 'gestor_transportadora' || userInfo.role === 'operador') {
-        // operador deve usar seu próprio empresa_id
+        // operador deve usar seu próprio company_id
         if (userInfo.company_id) {
-          vehicleDataRaw.empresa_id = userInfo.company_id
+          vehicleDataRaw.company_id = userInfo.company_id
         } else if (formData.company_id) {
-          vehicleDataRaw.empresa_id = formData.company_id
+          vehicleDataRaw.company_id = formData.company_id
         }
       } else if (userInfo.role === 'gestor_transportadora' || userInfo.role === 'transportadora') {
         // Transportadora deve usar seu próprio transportadora_id
@@ -259,10 +260,10 @@ export function VeiculoModal({ veiculo, isOpen, onClose, onSave, carriers }: Vei
         }
       }
 
-      // Se for update, manter empresa_id/transportadora_id existente se não foi alterado
+      // Se for update, manter company_id/transportadora_id existente se não foi alterado
       if (vehicleId && veiculo) {
-        if (!vehicleDataRaw.empresa_id && veiculo.company_id) {
-          vehicleDataRaw.empresa_id = veiculo.company_id
+        if (!vehicleDataRaw.company_id && veiculo.company_id) {
+          vehicleDataRaw.company_id = veiculo.company_id
         }
         if (!vehicleDataRaw.transportadora_id && veiculo.transportadora_id) {
           vehicleDataRaw.transportadora_id = veiculo.transportadora_id
@@ -290,8 +291,7 @@ export function VeiculoModal({ veiculo, isOpen, onClose, onSave, carriers }: Vei
       // Para update, incluir apenas campos que foram alterados
       // Para create, incluir todos os campos necessários
       const finalVehicleData: Partial<VeiculosUpdate> = {}
-      Object.keys(vehicleDataRaw).forEach(k => {
-        const key = k as keyof typeof vehicleDataRaw
+      Object.keys(vehicleDataRaw).forEach(key => {
         const value = vehicleDataRaw[key]
         // Incluir:
         // - Valores não-null e não-undefined
@@ -302,12 +302,11 @@ export function VeiculoModal({ veiculo, isOpen, onClose, onSave, carriers }: Vei
           if (typeof value === 'string') {
             // Para strings, incluir apenas se não for vazia (exceto prefix)
             if (value.trim() !== '' || key === 'prefix') {
-              // Type assertion para insert/update compatibility
-              (finalVehicleData as Record<string, unknown>)[key] = value.trim()
+              finalVehicleData[key] = value.trim()
             }
           } else {
             // Para números e booleans, sempre incluir
-            (finalVehicleData as Record<string, unknown>)[key] = value
+            finalVehicleData[key] = value
           }
         }
       })
@@ -506,184 +505,184 @@ export function VeiculoModal({ veiculo, isOpen, onClose, onSave, carriers }: Vei
             </TabsList>
 
             <TabsContent value="dados" className="!mt-0 !rounded-none bg-transparent border-0 p-0 shadow-none flex-1 min-h-0 overflow-y-auto">
-              <form onSubmit={handleSubmit} className="space-y-8 sm:space-y-10 pb-4 px-4 sm:px-6">
-                {/* Foto do Veículo */}
-                <div className="space-y-2">
-                  <Label>Foto do Veículo</Label>
-                  <div className="flex items-center gap-4">
-                    {photoPreview && (
-                      <div className="relative w-32 h-32 rounded-lg overflow-hidden border border-border">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={photoPreview}
-                          alt="Preview"
-                          className="w-full h-full object-cover"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setPhotoPreview("")
-                            setPhotoFile(null)
-                          }}
-                          className="absolute top-1 right-1 bg-error-light0 text-white rounded-full p-1 hover:bg-error"
-                        >
-                          <X className="h-3 w-3" />
-                        </button>
-                      </div>
-                    )}
-                    <div>
-                      <div>
-                        <input
-                          id="veiculo-photo-input"
-                          type="file"
-                          accept="image/*"
-                          onChange={handleFileChange}
-                          className="hidden"
-                        />
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          className="min-h-[44px] touch-manipulation"
-                          onClick={() => document.getElementById('veiculo-photo-input')?.click()}
-                        >
-                          <Upload className="h-4 w-4 mr-2" />
-                          {photoPreview ? "Trocar Foto" : "Upload Foto"}
-                        </Button>
-                      </div>
-                      <p className="text-xs text-ink-muted mt-1">
-                        Máximo 5MB (JPG, PNG)
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Grid de Campos */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-
-                  {/* Campo Transportadora (apenas se lista de carriers for fornecida) */}
-                  {carriers && carriers.length > 0 && (
-                    <div className="space-y-2 sm:col-span-2">
-                      <Label htmlFor="transportadora">Transportadora</Label>
-                      <Select
-                        value={formData.transportadora_id || ""}
-                        onValueChange={(value) => setFormData({ ...formData, transportadora_id: value })}
+            <form onSubmit={handleSubmit} className="space-y-8 sm:space-y-10 pb-4 px-4 sm:px-6">
+              {/* Foto do Veículo */}
+              <div className="space-y-2">
+                <Label>Foto do Veículo</Label>
+                <div className="flex items-center gap-4">
+                  {photoPreview && (
+                    <div className="relative w-32 h-32 rounded-lg overflow-hidden border border-border">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={photoPreview}
+                        alt="Preview"
+                        className="w-full h-full object-cover"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setPhotoPreview("")
+                          setPhotoFile(null)
+                        }}
+                        className="absolute top-1 right-1 bg-error-light0 text-white rounded-full p-1 hover:bg-error"
                       >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecione a transportadora" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {carriers.map((transportadora) => (
-                            <SelectItem key={transportadora.id} value={transportadora.id}>
-                              {transportadora.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                        <X className="h-3 w-3" />
+                      </button>
                     </div>
                   )}
-                  <div className="space-y-2">
-                    <Label htmlFor="plate">Placa *</Label>
-                    <Input
-                      id="plate"
-                      value={formData.plate}
-                      onChange={(e) => setFormData({ ...formData, plate: e.target.value.toUpperCase() })}
-                      placeholder="ABC-1234"
-                      required
-                    />
+                  <div>
+                    <div>
+                      <input
+                        id="veiculo-photo-input"
+                        type="file"
+                        accept="image/*"
+                        onChange={handleFileChange}
+                        className="hidden"
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="min-h-[44px] touch-manipulation"
+                        onClick={() => document.getElementById('veiculo-photo-input')?.click()}
+                      >
+                        <Upload className="h-4 w-4 mr-2" />
+                        {photoPreview ? "Trocar Foto" : "Upload Foto"}
+                      </Button>
+                    </div>
+                    <p className="text-xs text-ink-muted mt-1">
+                      Máximo 5MB (JPG, PNG)
+                    </p>
                   </div>
+                </div>
+              </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="prefix">Prefixo</Label>
-                    <Input
-                      id="prefix"
-                      value={formData.prefix || ""}
-                      onChange={(e) => setFormData({ ...formData, prefix: e.target.value })}
-                      placeholder="001"
-                    />
-                  </div>
+              {/* Grid de Campos */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
 
-                  <div className="space-y-2">
-                    <Label htmlFor="model">Modelo *</Label>
-                    <Input
-                      id="model"
-                      value={formData.model}
-                      onChange={(e) => setFormData({ ...formData, model: e.target.value })}
-                      placeholder="Mercedes-Benz O500U"
-                      required
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="year">Ano</Label>
-                    <Input
-                      id="year"
-                      type="number"
-                      value={formData.year}
-                      onChange={(e) => setFormData({ ...formData, year: e.target.value })}
-                      placeholder="2023"
-                      min="1900"
-                      max={new Date().getFullYear() + 1}
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="capacity">Capacidade</Label>
-                    <Input
-                      id="capacity"
-                      type="number"
-                      value={formData.capacity || ""}
-                      onChange={(e) => setFormData({ ...formData, capacity: e.target.value || "" })}
-                      placeholder="40"
-                      min="1"
-                    />
-                  </div>
-
-                  <div className="space-y-3">
-                    <Label htmlFor="status" className="text-base font-medium">Status</Label>
+                {/* Campo Transportadora (apenas se lista de carriers for fornecida) */}
+                {carriers && carriers.length > 0 && (
+                  <div className="space-y-2 sm:col-span-2">
+                    <Label htmlFor="transportadora">Transportadora</Label>
                     <Select
-                      value={formData.is_active ? "active" : "inactive"}
-                      onValueChange={(value) => setFormData({ ...formData, is_active: value === "active" })}
+                      value={formData.transportadora_id || ""}
+                      onValueChange={(value) => setFormData({ ...formData, transportadora_id: value })}
                     >
-                      <SelectTrigger id="status">
-                        <SelectValue />
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione a transportadora" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="active">Ativo</SelectItem>
-                        <SelectItem value="inactive">Inativo</SelectItem>
+                        {carriers.map((transportadora) => (
+                          <SelectItem key={transportadora.id} value={transportadora.id}>
+                            {transportadora.name}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   </div>
+                )}
+                <div className="space-y-2">
+                  <Label htmlFor="plate">Placa *</Label>
+                  <Input
+                    id="plate"
+                    value={formData.plate}
+                    onChange={(e) => setFormData({ ...formData, plate: e.target.value.toUpperCase() })}
+                    placeholder="ABC-1234"
+                    required
+                  />
                 </div>
 
-                <DialogFooter className="flex-col sm:flex-row gap-4 pt-6 sm:pt-8 border-t border-white/20 mt-8 sm:mt-10 pb-2 px-4 sm:px-6">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={onClose}
-                    className="w-full sm:w-auto order-2 sm:order-1 min-h-[52px] px-6 py-3 text-base font-medium touch-manipulation"
-                  >
-                    Cancelar
-                  </Button>
-                  <Button
-                    type="submit"
-                    disabled={loading}
-                    className="w-full sm:w-auto order-1 sm:order-2 bg-brand hover:bg-brand-hover min-h-[52px] px-6 py-3 text-base font-medium touch-manipulation"
-                  >
-                    {loading ? "Salvando..." : veiculo ? "Atualizar" : "Cadastrar"}
-                  </Button>
-                </DialogFooter>
-              </form>
-            </TabsContent>
+                <div className="space-y-2">
+                  <Label htmlFor="prefix">Prefixo</Label>
+                  <Input
+                    id="prefix"
+                    value={formData.prefix || ""}
+                    onChange={(e) => setFormData({ ...formData, prefix: e.target.value })}
+                    placeholder="001"
+                  />
+                </div>
 
-            <TabsContent value="documentos" className="!mt-0 !rounded-none bg-transparent border-0 p-0 shadow-none flex-1 min-h-0 overflow-y-auto">
-              <div className="pb-4 px-4 sm:px-6">
-                <VeiculoDocumentsSection
-                  veiculoId={veiculo?.id ?? formData.id}
-                  isEditing={!!veiculo?.id || !!formData.id}
-                />
+                <div className="space-y-2">
+                  <Label htmlFor="model">Modelo *</Label>
+                  <Input
+                    id="model"
+                    value={formData.model}
+                    onChange={(e) => setFormData({ ...formData, model: e.target.value })}
+                    placeholder="Mercedes-Benz O500U"
+                    required
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="year">Ano</Label>
+                  <Input
+                    id="year"
+                    type="number"
+                    value={formData.year}
+                    onChange={(e) => setFormData({ ...formData, year: e.target.value })}
+                    placeholder="2023"
+                    min="1900"
+                    max={new Date().getFullYear() + 1}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="capacity">Capacidade</Label>
+                  <Input
+                    id="capacity"
+                    type="number"
+                    value={formData.capacity || ""}
+                    onChange={(e) => setFormData({ ...formData, capacity: e.target.value || "" })}
+                    placeholder="40"
+                    min="1"
+                  />
+                </div>
+
+                <div className="space-y-3">
+                  <Label htmlFor="status" className="text-base font-medium">Status</Label>
+                  <Select
+                    value={formData.is_active ? "active" : "inactive"}
+                    onValueChange={(value) => setFormData({ ...formData, is_active: value === "active" })}
+                  >
+                    <SelectTrigger id="status">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="active">Ativo</SelectItem>
+                      <SelectItem value="inactive">Inativo</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
-            </TabsContent>
+
+              <DialogFooter className="flex-col sm:flex-row gap-4 pt-6 sm:pt-8 border-t border-white/20 mt-8 sm:mt-10 pb-2 px-4 sm:px-6">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={onClose}
+                  className="w-full sm:w-auto order-2 sm:order-1 min-h-[52px] px-6 py-3 text-base font-medium touch-manipulation"
+                >
+                  Cancelar
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full sm:w-auto order-1 sm:order-2 bg-brand hover:bg-brand-hover min-h-[52px] px-6 py-3 text-base font-medium touch-manipulation"
+                >
+                  {loading ? "Salvando..." : veiculo ? "Atualizar" : "Cadastrar"}
+                </Button>
+              </DialogFooter>
+            </form>
+          </TabsContent>
+
+          <TabsContent value="documentos" className="!mt-0 !rounded-none bg-transparent border-0 p-0 shadow-none flex-1 min-h-0 overflow-y-auto">
+            <div className="pb-4 px-4 sm:px-6">
+              <VeiculoDocumentsSection
+                veiculoId={veiculo?.id ?? formData.id}
+                isEditing={!!veiculo?.id || !!formData.id}
+              />
+            </div>
+          </TabsContent>
           </Tabs>
         </div>
       </DialogContent>

@@ -20,7 +20,7 @@ type UsersUpdate = Database['public']['Tables']['users']['Update']
 
 
 interface FuncionarioModalProps {
-  funcionario: { id?: string; employee_id?: string;[key: string]: unknown } | null
+  funcionario: { id?: string; employee_id?: string; [key: string]: unknown } | null
   isOpen: boolean
   onClose: () => void
   onSave: () => void
@@ -52,45 +52,25 @@ export function FuncionarioModal({ funcionario, isOpen, onClose, onSave, empresa
 
   useEffect(() => {
     if (funcionario && isOpen) {
-      // cast helper
-      const f = funcionario as unknown as {
-        name?: string;
-        email?: string;
-        phone?: string;
-        cpf?: string;
-        address?: string;
-        latitude?: number;
-        longitude?: number;
-        cost_center_id?: string;
-        is_active?: boolean;
-        address_zip_code?: string;
-        address_street?: string;
-        address_number?: string;
-        address_neighborhood?: string;
-        address_complement?: string;
-        address_city?: string;
-        address_state?: string;
-        employee?: { name?: string; email?: string; phone?: string }
-      }
-
+      // Se funcionario tem dados diretos (não nested)
       setFormData({
-        name: f.name || f.employee?.name || "",
-        email: f.email || f.employee?.email || "",
-        phone: f.phone || f.employee?.phone || "",
-        cpf: f.cpf || "",
-        address: f.address || "",
-        latitude: f.latitude || null,
-        longitude: f.longitude || null,
-        cost_center_id: f.cost_center_id || null,
-        is_active: f.is_active ?? true,
+        name: funcionario.name || funcionario.employee?.name || "",
+        email: funcionario.email || funcionario.employee?.email || "",
+        phone: funcionario.phone || funcionario.employee?.phone || "",
+        cpf: funcionario.cpf || "",
+        address: funcionario.address || "",
+        latitude: funcionario.latitude || null,
+        longitude: funcionario.longitude || null,
+        cost_center_id: funcionario.cost_center_id || null,
+        is_active: funcionario.is_active ?? true,
         addressData: {
-          cep: f.address_zip_code || "",
-          street: f.address_street || "",
-          number: f.address_number || "",
-          neighborhood: f.address_neighborhood || "",
-          complement: f.address_complement || "",
-          city: f.address_city || "",
-          state: f.address_state || ""
+          cep: funcionario.address_zip_code || "",
+          street: funcionario.address_street || "",
+          number: funcionario.address_number || "",
+          neighborhood: funcionario.address_neighborhood || "",
+          complement: funcionario.address_complement || "",
+          city: funcionario.address_city || "",
+          state: funcionario.address_state || ""
         }
       })
     } else if (!funcionario && isOpen) {
@@ -152,9 +132,7 @@ export function FuncionarioModal({ funcionario, isOpen, onClose, onSave, empresa
         }
       }
 
-      const f = funcionario as unknown as { id?: string; employee_id?: string }
-
-      if (f?.id) {
+      if (funcionario?.id) {
         // Update
         const { error } = await supabase
           .from("gf_employee_company")
@@ -173,12 +151,12 @@ export function FuncionarioModal({ funcionario, isOpen, onClose, onSave, empresa
             address_city: formData.addressData.city || null,
             address_state: formData.addressData.state || null
           })
-          .eq("id", f.id) as { error: unknown }
+          .eq("id", funcionario.id) as { error: unknown }
 
         if (error) throw error
 
         // Update user if exists
-        if (f.employee_id) {
+        if (funcionario.employee_id) {
           await supabase
             .from("users")
             .update({
@@ -186,7 +164,7 @@ export function FuncionarioModal({ funcionario, isOpen, onClose, onSave, empresa
               email: formData.email,
               phone: formData.phone
             })
-            .eq("id", f.employee_id)
+            .eq("id", funcionario.employee_id)
         }
 
         notifySuccess("Funcionário atualizado com sucesso!", {
@@ -238,8 +216,7 @@ export function FuncionarioModal({ funcionario, isOpen, onClose, onSave, empresa
       onClose()
     } catch (error: unknown) {
       logError("Erro ao salvar funcionário", { error }, 'FuncionarioModal')
-      const message = (error as { message?: string })?.message || 'Erro desconhecido'
-      notifyError(`Erro ao salvar funcionário: ${message}`, undefined, {
+      notifyError(`Erro ao salvar funcionário: ${error?.message || 'Erro desconhecido'}`, undefined, {
         i18n: { ns: 'operador', key: 'employees.saveError' }
       })
     } finally {
@@ -258,104 +235,104 @@ export function FuncionarioModal({ funcionario, isOpen, onClose, onSave, empresa
         </DialogHeader>
         <div className="flex-1 min-h-0 overflow-hidden flex flex-col">
           <form onSubmit={handleSubmit} className="flex-1 min-h-0 overflow-y-auto space-y-8 sm:space-y-10 pb-4 px-4 sm:px-6">
-            <div className="space-y-3">
-              <Label htmlFor="name" className="text-base font-medium">Nome *</Label>
-              <Input
-                id="name"
-                value={formData.name}
-                onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                required
-                placeholder="Digite o nome completo"
-                className="min-h-[48px] px-4 py-3"
-              />
-            </div>
-
-            <div className="space-y-3">
-              <Label htmlFor="email" className="text-base font-medium">Email *</Label>
-              <Input
-                id="email"
-                type="email"
-                value={formData.email}
-                onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                required
-                placeholder="exemplo@email.com"
-                className="min-h-[48px] px-4 py-3"
-              />
-            </div>
-
-            <div className="space-y-3">
-              <Label htmlFor="phone" className="text-base font-medium">Telefone</Label>
-              <Input
-                id="phone"
-                value={formData.phone}
-                onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
-                placeholder="(11) 99999-9999"
-                className="min-h-[48px] px-4 py-3"
-              />
-            </div>
-
-            <div className="space-y-3">
-              <Label htmlFor="cpf" className="text-base font-medium">CPF</Label>
-              <Input
-                id="cpf"
-                value={formData.cpf}
-                onChange={(e) => setFormData(prev => ({ ...prev, cpf: e.target.value }))}
-                placeholder="000.000.000-00"
-                className="min-h-[48px] px-4 py-3"
-              />
-            </div>
-
-            <AddressForm
-              value={formData.addressData}
-              onChange={(addressData) => {
-                setFormData(prev => ({
-                  ...prev,
-                  addressData,
-                  // Construir endereço completo para compatibilidade
-                  address: [
-                    addressData.street,
-                    addressData.number ? `Nº ${addressData.number}` : '',
-                    addressData.neighborhood,
-                    addressData.city,
-                    addressData.state,
-                    addressData.cep
-                  ].filter(Boolean).join(', ')
-                }))
-              }}
-              required={false}
-              disabled={loading}
-              showTitle={true}
+          <div className="space-y-3">
+            <Label htmlFor="name" className="text-base font-medium">Nome *</Label>
+            <Input
+              id="name"
+              value={formData.name}
+              onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+              required
+              placeholder="Digite o nome completo"
+              className="min-h-[48px] px-4 py-3"
             />
+          </div>
 
-            <div className="flex items-center gap-3 py-2 space-y-0">
-              <input
-                type="checkbox"
-                id="is_active"
-                checked={formData.is_active}
-                onChange={(e) => setFormData(prev => ({ ...prev, is_active: e.target.checked }))}
-                className="w-5 h-5 cursor-pointer"
-              />
-              <Label htmlFor="is_active" className="text-base font-medium cursor-pointer">Ativo</Label>
-            </div>
+          <div className="space-y-3">
+            <Label htmlFor="email" className="text-base font-medium">Email *</Label>
+            <Input
+              id="email"
+              type="email"
+              value={formData.email}
+              onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+              required
+              placeholder="exemplo@email.com"
+              className="min-h-[48px] px-4 py-3"
+            />
+          </div>
 
-            <DialogFooter className="flex-col sm:flex-row gap-4 pt-6 sm:pt-8 border-t border-white/20 mt-8 sm:mt-10 pb-2 px-4 sm:px-6">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={onClose}
-                className="w-full sm:w-auto order-2 sm:order-1 min-h-[52px] px-6 py-3 text-base font-medium touch-manipulation"
-              >
-                Cancelar
-              </Button>
-              <Button
-                type="submit"
-                disabled={loading}
-                className="bg-brand hover:bg-brand-hover w-full sm:w-auto order-1 sm:order-2 min-h-[52px] px-6 py-3 text-base font-medium touch-manipulation"
-              >
-                {loading ? "Salvando..." : "Salvar"}
-              </Button>
-            </DialogFooter>
-          </form>
+          <div className="space-y-3">
+            <Label htmlFor="phone" className="text-base font-medium">Telefone</Label>
+            <Input
+              id="phone"
+              value={formData.phone}
+              onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
+              placeholder="(11) 99999-9999"
+              className="min-h-[48px] px-4 py-3"
+            />
+          </div>
+
+          <div className="space-y-3">
+            <Label htmlFor="cpf" className="text-base font-medium">CPF</Label>
+            <Input
+              id="cpf"
+              value={formData.cpf}
+              onChange={(e) => setFormData(prev => ({ ...prev, cpf: e.target.value }))}
+              placeholder="000.000.000-00"
+              className="min-h-[48px] px-4 py-3"
+            />
+          </div>
+
+          <AddressForm
+            value={formData.addressData}
+            onChange={(addressData) => {
+              setFormData(prev => ({
+                ...prev,
+                addressData,
+                // Construir endereço completo para compatibilidade
+                address: [
+                  addressData.street,
+                  addressData.number ? `Nº ${addressData.number}` : '',
+                  addressData.neighborhood,
+                  addressData.city,
+                  addressData.state,
+                  addressData.cep
+                ].filter(Boolean).join(', ')
+              }))
+            }}
+            required={false}
+            disabled={loading}
+            showTitle={true}
+          />
+
+          <div className="flex items-center gap-3 py-2 space-y-0">
+            <input
+              type="checkbox"
+              id="is_active"
+              checked={formData.is_active}
+              onChange={(e) => setFormData(prev => ({ ...prev, is_active: e.target.checked }))}
+              className="w-5 h-5 cursor-pointer"
+            />
+            <Label htmlFor="is_active" className="text-base font-medium cursor-pointer">Ativo</Label>
+          </div>
+
+          <DialogFooter className="flex-col sm:flex-row gap-4 pt-6 sm:pt-8 border-t border-white/20 mt-8 sm:mt-10 pb-2 px-4 sm:px-6">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onClose}
+              className="w-full sm:w-auto order-2 sm:order-1 min-h-[52px] px-6 py-3 text-base font-medium touch-manipulation"
+            >
+              Cancelar
+            </Button>
+            <Button
+              type="submit"
+              disabled={loading}
+              className="bg-brand hover:bg-brand-hover w-full sm:w-auto order-1 sm:order-2 min-h-[52px] px-6 py-3 text-base font-medium touch-manipulation"
+            >
+              {loading ? "Salvando..." : "Salvar"}
+            </Button>
+          </DialogFooter>
+        </form>
         </div>
       </DialogContent>
     </Dialog>

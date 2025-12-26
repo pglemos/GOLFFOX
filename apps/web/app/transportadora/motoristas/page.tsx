@@ -27,7 +27,16 @@ const MotoristaModal = dynamic(
     { ssr: false, loading: () => null }
 )
 
-
+interface motorista {
+    id: string
+    name: string
+    email: string
+    phone?: string
+    cpf?: string
+    role: string
+    transportadora_id?: string
+    is_active?: boolean
+}
 
 export default function TransportadoraMotoristasListPage() {
     const { user } = useAuth()
@@ -88,8 +97,8 @@ export default function TransportadoraMotoristasListPage() {
             name: "",
             email: "",
             role: "motorista",
-            transportadora_id: user?.transportadora_id || ""
-        } as any as Driver)
+            transportadora_id: user?.companyId || ""
+        } as Driver)
         setIsModalOpen(true)
     }
 
@@ -98,13 +107,7 @@ export default function TransportadoraMotoristasListPage() {
     }
 
     return (
-        <AppShell user={{
-            id: user.id,
-            name: user.name || 'Gestor da Transportadora',
-            email: user.email || '',
-            role: user.role || 'gestor_transportadora',
-            avatar_url: user.avatar_url || undefined
-        }}>
+        <AppShell panel="gestor_transportadora" user={{ id: user.id, name: user.name || 'Gestor da Transportadora', email: user.email || '', role: user.role || 'gestor_transportadora', avatar_url: user.avatar_url || undefined }}>
             <div className="space-y-4 sm:space-y-6 w-full overflow-x-hidden">
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">

@@ -6,25 +6,12 @@ type RotasRow = Database['public']['Tables']['rotas']['Row']
 type UserRow = Database['public']['Tables']['users']['Row']
 type VeiculosRow = Database['public']['Tables']['veiculos']['Row']
 
-// Tipos estendidos para recursos da API que incluem displayName
-interface RouteWithDisplayName extends RotasRow {
-  displayName?: string
-}
-
-interface DriverWithDisplayName extends UserRow {
-  displayName?: string
-}
-
-interface VehicleWithDisplayName extends VeiculosRow {
-  displayName?: string
-}
-
 // Estado de formulário de despacho
 export interface DispatchFormState {
   resources: {
-    routes: RouteWithDisplayName[]
-    drivers: DriverWithDisplayName[]
-    vehicles: VehicleWithDisplayName[]
+    routes: RotasRow[]
+    drivers: UserRow[]
+    vehicles: VeiculosRow[]
   }
   selections: {
     routeId: string
@@ -39,10 +26,10 @@ export interface DispatchFormState {
 
 // Ações do formulário
 type DispatchFormAction =
-  | { type: 'SET_ROUTES'; payload: RouteWithDisplayName[] }
-  | { type: 'SET_DRIVERS'; payload: DriverWithDisplayName[] }
-  | { type: 'SET_VEHICLES'; payload: VehicleWithDisplayName[] }
-  | { type: 'SET_ALL_RESOURCES'; payload: { routes: RouteWithDisplayName[]; drivers: DriverWithDisplayName[]; vehicles: VehicleWithDisplayName[] } }
+  | { type: 'SET_ROUTES'; payload: RotasRow[] }
+  | { type: 'SET_DRIVERS'; payload: UserRow[] }
+  | { type: 'SET_VEHICLES'; payload: VeiculosRow[] }
+  | { type: 'SET_ALL_RESOURCES'; payload: { routes: RotasRow[]; drivers: UserRow[]; vehicles: VeiculosRow[] } }
   | { type: 'SET_ROUTE_ID'; payload: string }
   | { type: 'SET_DRIVER_ID'; payload: string }
   | { type: 'SET_VEHICLE_ID'; payload: string }

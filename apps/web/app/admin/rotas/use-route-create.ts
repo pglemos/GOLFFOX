@@ -121,13 +121,13 @@ export function useRouteCreate(isOpen: boolean) {
                 if (supabaseError) throw supabaseError
 
                 const formatted = (data || []).map((c: { id?: string; name?: string | null }) => ({
-                  id: c.id || '',
-                  name: c.name || 'Sem nome'
+                    id: c.id || '',
+                    name: c.name || 'Sem nome'
                 })).filter((c: { id: string; name: string }) => c.id && c.name)
 
                 setCompanies(formatted)
             } catch (fallbackError: unknown) {
-              const fallbackErr = fallbackError as { message?: string }
+                const fallbackErr = fallbackError as { message?: string }
                 logError("Erro no fallback", { error: fallbackError }, 'useRouteCreate')
                 setCompanies([])
             }
@@ -145,7 +145,7 @@ export function useRouteCreate(isOpen: boolean) {
             let { data, error } = await (supabase
                 .from("v_company_employees_secure" as never)
                 .select("employee_id, name, cpf, address, latitude, longitude, type, is_active, company_id")
-                .eq("company_id", formData.company_id) as unknown as ReturnType<typeof supabase.from<"gf_employee_company">>)
+                .eq("company_id", formData.company_id) as any)
 
             if (error && (error.message?.includes("does not exist") || (error as { code?: string }).code === "PGRST205")) {
                 try {
@@ -195,8 +195,8 @@ export function useRouteCreate(isOpen: boolean) {
 
             setEmployees((data || []) as unknown as EmployeeLite[])
         } catch (error: unknown) {
-          const err = error as { message?: string }
-          logError("Erro ao carregar funcionários", { error: err }, 'useRouteCreate')
+            const err = error as { message?: string }
+            logError("Erro ao carregar funcionários", { error: err }, 'useRouteCreate')
             notifyError(error, "Erro ao carregar funcionários")
         } finally {
             setLoadingEmployees(false)

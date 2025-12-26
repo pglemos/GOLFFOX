@@ -5,7 +5,7 @@ import { validationErrorResponse, errorResponse, successResponse } from '@/lib/a
 import { logger, logError } from '@/lib/logger'
 import { withRateLimit } from '@/lib/rate-limit'
 import { UserService } from '@/lib/services/server/user-service'
-import { validateWithSchema, idQuerySchema } from '@/lib/validation/schemas'
+import { getSupabaseAdmin } from '@/lib/supabase-client'
 
 export const runtime = 'nodejs'
 
@@ -20,18 +20,32 @@ export const POST = withRateLimit(deleteHandler, 'sensitive')
 async function handleDelete(request: NextRequest) {
   try {
     const authErrorResponse = await requireAuth(request, 'admin')
-    if (authErrorResponse) return authErrorResponse
-
-    const { searchParams } = new URL(request.url)
-    const queryParams = Object.fromEntries(searchParams.entries())
-
-    // Validar query params
-    const validation = validateWithSchema(idQuerySchema, queryParams)
-    if (!validation.success) {
-      return validationErrorResponse(validation.error)
+    if (authErrorResponse) {
+      return authErrorResponse
     }
 
-    const { id: userId } = validation.data
+    // Aceitar tanto query param quanto body
+    const { searchParams } = new URL(request.url)
+    let userId = searchParams.get('id')
+
+    // Se não estiver na query, tentar no body
+    if (!userId) {
+      try {
+        const body = await request.json()
+        userId = body.id || body.user_id
+      } catch (e) {
+        // Body vazio ou inválido, continuar com null
+      }
+    }
+
+    if (!userId) {
+      return NextResponse.json(
+        { error: 'ID do usuário é obrigatório' },
+        { status: 400 }
+      )
+    }
+
+    const supabaseAdmin = getSupabaseAdmin()
 
     logger.log(`🗑️ Tentando excluir usuário: ${userId}`)
 

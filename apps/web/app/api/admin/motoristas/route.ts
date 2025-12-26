@@ -6,7 +6,6 @@ import { redisCacheService, createCacheKey, withRedisCache } from '@/lib/cache/r
 import { debug, warn, logError } from '@/lib/logger'
 import { UserService } from '@/lib/services/server/user-service'
 import { getSupabaseAdmin } from '@/lib/supabase-client'
-import { validateWithSchema, createDriverSchema, driverListQuerySchema } from '@/lib/validation/schemas'
 
 /**
  * GET /api/admin/motoristas
@@ -19,27 +18,24 @@ export async function GET(request: NextRequest) {
 
   try {
     const supabase = getSupabaseAdmin()
-    const searchParams = Object.fromEntries(request.nextUrl.searchParams)
+    const searchParams = request.nextUrl.searchParams
 
-    // Validar query parameters
-    const queryValidation = validateWithSchema(driverListQuerySchema, searchParams)
-    if (!queryValidation.success) {
-      return validationErrorResponse(queryValidation.error)
-    }
-
-    const { page = 1, page_size = 20, search, transportadora_id, status } = queryValidation.data
-    const limit = page_size
+    // Filtros opcionais
+    const page = parseInt(searchParams.get('page') || '1')
+    const limit = parseInt(searchParams.get('limit') || '100')
     const offset = (page - 1) * limit
-    const isActive = status === 'active' ? true : status === 'inactive' ? false : undefined
+    const search = searchParams.get('search') || undefined
+    const transportadoraId = searchParams.get('transportadora_id') || undefined
+    const isActive = searchParams.get('is_active')
 
-    // ✅ Cache Redis para lista de motoristas (TTL: 3 minutos)
+    // ✅ Cache Redis para lista de motoristas (TTL: 3 minutos - dados mudam mais frequentemente)
     // Criar chave de cache baseada nos filtros para cachear diferentes queries
     const cacheKeyParts = ['motoristas', 'list', page.toString(), limit.toString()]
     if (search) cacheKeyParts.push(`search:${search}`)
-    if (transportadora_id) cacheKeyParts.push(`transportadora:${transportadora_id}`)
-    if (isActive !== undefined) cacheKeyParts.push(`active:${isActive}`)
+    if (transportadoraId) cacheKeyParts.push(`transportadora:${transportadoraId}`)
+    if (isActive) cacheKeyParts.push(`active:${isActive}`)
     const cacheKey = createCacheKey(...cacheKeyParts)
-
+    
     const result = await withRedisCache(
       cacheKey,
       async () => {
@@ -54,12 +50,12 @@ export async function GET(request: NextRequest) {
           query = query.or(`name.ilike.%${search}%,email.ilike.%${search}%,cpf.ilike.%${search}%`)
         }
 
-        if (transportadora_id) {
-          query = query.eq('transportadora_id', transportadora_id)
+        if (transportadoraId) {
+          query = query.eq('transportadora_id', transportadoraId)
         }
 
-        if (isActive !== undefined) {
-          query = query.eq('is_active', isActive)
+        if (isActive !== null && isActive !== undefined) {
+          query = query.eq('is_active', isActive === 'true')
         }
 
         // Paginação
@@ -81,12 +77,12 @@ export async function GET(request: NextRequest) {
           countQuery = countQuery.or(`name.ilike.%${search}%,email.ilike.%${search}%,cpf.ilike.%${search}%`)
         }
 
-        if (transportadora_id) {
-          countQuery = countQuery.eq('transportadora_id', transportadora_id)
+        if (transportadoraId) {
+          countQuery = countQuery.eq('transportadora_id', transportadoraId)
         }
 
-        if (isActive !== undefined) {
-          countQuery = countQuery.eq('is_active', isActive)
+        if (isActive !== null && isActive !== undefined) {
+          countQuery = countQuery.eq('is_active', isActive === 'true')
         }
 
         const { count } = await countQuery
@@ -124,49 +120,61 @@ export async function POST(request: NextRequest) {
   if (authError) return authError
 
   try {
+    const supabase = getSupabaseAdmin()
     const body = await request.json()
 
-    // Validar corpo da requisição
-    const validation = validateWithSchema(createDriverSchema, body)
-    if (!validation.success) {
-      return validationErrorResponse(validation.error)
+    const {
+      name,
+      email,
+      phone,
+      transportadora_id,
+      cpf,
+      cnh,
+      cnh_category,
+      is_active,
+      // Campos de endereço (opcionais)
+      address_zip_code,
+      address_street,
+      address_number,
+      address_neighborhood,
+      address_complement,
+      address_city,
+      address_state
+    } = body
+
+    if (!name) {
+      return validationErrorResponse('Nome é obrigatório')
     }
 
-    const validatedData = validation.data
+    const transportadoraId = transportadora_id
+    if (!transportadoraId) {
+      return validationErrorResponse('Transportadora é obrigatória')
+    }
 
-    // Criar motorista no Auth e Tabela Users
+    // 3. Criar motorista usando UserService
     const newDriver = await UserService.createUser({
-      name: validatedData.name,
-      email: validatedData.email || '', // Email real ou vazio (mas UserService espera string)
-      phone: validatedData.phone,
-      cpf: validatedData.cpf,
+      name,
+      email: email || '', // Email real ou vazio (mas UserService espera string)
+      phone,
+      cpf,
       role: 'motorista',
-      password: validatedData.cpf?.replace(/\D/g, '').slice(-6) || '123456',
+      password: cpf?.replace(/\D/g, '').slice(-6) || '123456',
       company_id: null,
-      transportadora_id: validatedData.transportadora_id,
-      cnh: validatedData.cnh,
-      cnh_category: validatedData.cnh_category,
-      address_zip_code: validatedData.address_zip_code ?? undefined,
-      address_street: validatedData.address_street ?? undefined,
-      address_number: validatedData.address_number ?? undefined,
-      address_neighborhood: validatedData.address_neighborhood ?? undefined,
-      address_complement: validatedData.address_complement ?? undefined,
-      address_city: validatedData.address_city ?? undefined,
-      address_state: validatedData.address_state ?? undefined,
-      is_active: validatedData.is_active
+      transportadora_id: transportadoraId,
+      cnh,
+      cnh_category,
+      address_zip_code,
+      address_street,
+      address_number,
+      address_neighborhood,
+      address_complement,
+      address_city,
+      address_state
     })
 
-    return NextResponse.json({
-      success: true,
-      message: 'Motorista criado com sucesso',
-      data: newDriver
-    }, { status: 201 })
-
+    return successResponse({ motorista: newDriver })
   } catch (error: unknown) {
-    logError('Erro ao criar motorista', { error }, 'DriversAPI')
-    return NextResponse.json(
-      { error: 'Erro ao criar motorista', message: error instanceof Error ? error.message : 'Erro desconhecido' },
-      { status: 500 }
-    )
+    logError('Erro na API de criar motorista', { error }, 'DriversAPI')
+    return errorResponse(error, 500, 'Erro ao criar motorista')
   }
 }
