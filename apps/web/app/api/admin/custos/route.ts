@@ -1,15 +1,16 @@
 "use server"
 
-import { NextRequest, NextResponse } from "next/server"
+import { NextRequest } from "next/server"
 
 import { requireAuth } from '@/lib/api-auth'
+import { successResponse, errorResponse } from '@/lib/api-response'
 import { logError } from '@/lib/logger'
 
 export async function GET(request: NextRequest) {
-  // Verificar autenticação admin
-  const authError = await requireAuth(request, 'admin')
-  if (authError) return authError
     try {
+        const authErrorResponse = await requireAuth(request, 'admin')
+        if (authErrorResponse) return authErrorResponse
+
         // Mock data for cost control
         const kpis = {
             totalRevenue: 1250000,
@@ -19,10 +20,10 @@ export async function GET(request: NextRequest) {
         }
 
         const distribution = [
-            { name: 'Combustível', value: 35, color: '#ef4444' }, // error
-            { name: 'Manutenção', value: 25, color: '#f59e0b' }, // amber-500
-            { name: 'Motoristas', value: 30, color: '#3b82f6' }, // info-light0
-            { name: 'Outros', value: 10, color: '#64748B' }, // ink-muted
+            { name: 'Combustível', value: 35, color: '#ef4444' },
+            { name: 'Manutenção', value: 25, color: '#f59e0b' },
+            { name: 'Motoristas', value: 30, color: '#3b82f6' },
+            { name: 'Outros', value: 10, color: '#64748B' },
         ]
 
         // Monthly trend data for charts
@@ -35,12 +36,9 @@ export async function GET(request: NextRequest) {
             { month: 'Jun', revenue: 140000, cost: 90000 },
         ]
 
-        return NextResponse.json({ kpis, distribution, monthlyTrend })
+        return successResponse({ kpis, distribution, monthlyTrend })
     } catch (error) {
         logError('Erro na rota custos', { error }, 'CustosAPI')
-        return NextResponse.json(
-            { error: 'Erro ao processar requisição' },
-            { status: 500 }
-        )
+        return errorResponse(error, 500, 'Erro ao processar requisição')
     }
 }

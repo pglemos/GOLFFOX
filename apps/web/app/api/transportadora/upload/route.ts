@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 
 import { requireAuth } from '@/lib/api-auth'
+import { withRateLimit } from '@/lib/rate-limit'
 import { supabaseServiceRole } from '@/lib/supabase-server'
 
 export const runtime = 'nodejs'
 
-export async function OPTIONS() {
+async function optionsHandler() {
   return new NextResponse(null, {
     status: 200,
     headers: {
@@ -16,7 +17,7 @@ export async function OPTIONS() {
   })
 }
 
-export async function POST(req: NextRequest) {
+async function uploadHandler(req: NextRequest) {
   try {
     const authErrorResponse = await requireAuth(req, 'gestor_transportadora')
     if (authErrorResponse) return authErrorResponse
@@ -118,4 +119,8 @@ export async function POST(req: NextRequest) {
     )
   }
 }
+
+// Exportar com rate limiting (api: 100 requests per minute)
+export const OPTIONS = optionsHandler
+export const POST = withRateLimit(uploadHandler, 'api')
 

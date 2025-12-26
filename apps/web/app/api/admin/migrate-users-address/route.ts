@@ -4,6 +4,7 @@ import { createClient } from '@supabase/supabase-js'
 
 import { requireAuth } from '@/lib/api-auth'
 import { logger, logError } from '@/lib/logger'
+import { withRateLimit } from '@/lib/rate-limit'
 
 export const runtime = 'nodejs'
 
@@ -16,7 +17,7 @@ function getSupabaseAdmin() {
   return createClient(url, serviceKey)
 }
 
-export async function POST(request: NextRequest) {
+async function migrateUsersAddressHandler(request: NextRequest) {
   try {
     const authErrorResponse = await requireAuth(request, 'admin')
     if (authErrorResponse) {
@@ -146,4 +147,7 @@ ALTER TABLE users ADD COLUMN IF NOT EXISTS address_state VARCHAR(2);
     }, { status: 500 })
   }
 }
+
+// Exportar com rate limiting (sensitive: 10 requests per minute)
+export const POST = withRateLimit(migrateUsersAddressHandler, 'sensitive')
 

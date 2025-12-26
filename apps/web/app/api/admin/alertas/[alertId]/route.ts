@@ -4,40 +4,43 @@ import { requireAuth } from '@/lib/api-auth'
 import { logError } from '@/lib/logger'
 import { invalidateEntityCache } from '@/lib/next-cache'
 import { getSupabaseAdmin } from '@/lib/supabase-client'
+import { validateWithSchema, updateAlertSchema, uuidSchema } from '@/lib/validation/schemas'
+import { validationErrorResponse } from '@/lib/api-response'
 
 export const runtime = 'nodejs'
-
-// Accept any valid UUID format (not just v4)
-const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
 export async function PUT(
   request: NextRequest,
   context: { params: Promise<{ alertId: string }> }
 ) {
   const params = await context.params
+  const { alertId } = params
 
-  const { alertId: alertIdParam } = params
   try {
     const authErrorResponse = await requireAuth(request, 'admin')
-    if (authErrorResponse) {
-      return authErrorResponse
+    if (authErrorResponse) return authErrorResponse
+
+    // Validar ID
+    const idValidation = uuidSchema.safeParse(alertId)
+    if (!idValidation.success) {
+      return validationErrorResponse('ID do alerta inválido')
     }
 
-    const alertId = alertIdParam?.trim()
-    if (!alertId || !UUID_REGEX.test(alertId)) {
-      return NextResponse.json(
-        { error: 'id do alerta deve ser um UUID válido' },
-        { status: 400 }
-      )
-    }
-
-    const supabaseAdmin = getSupabaseAdmin()
     const body = await request.json()
+
+    // Validar corpo
+    const validation = validateWithSchema(updateAlertSchema, body)
+    if (!validation.success) {
+      return validationErrorResponse(validation.error)
+    }
+
+    const data = validation.data
+    const supabaseAdmin = getSupabaseAdmin()
 
     // Verificar se alerta existe
     const { data: existingAlert, error: fetchError } = await supabaseAdmin
       .from('gf_alerts')
-      .select('id, title, message, severity, is_resolved, assigned_to')
+      .select('id')
       .eq('id', alertId)
       .single()
 
@@ -50,37 +53,36 @@ export async function PUT(
 
     // Preparar dados para atualização
     const updateData: Record<string, unknown> = {}
-    // Mapear campos antigos para novos se necessário
-    if (body.description !== undefined) {
-      updateData.message = body.description?.trim() || null
-      if (!updateData.title) updateData.title = body.description?.slice(0, 50) || 'Alerta'
-    } else if (body.message !== undefined) {
-      updateData.message = body.message?.trim() || null
+
+    if (data.message !== undefined) updateData.message = data.message?.trim() || null
+    if (data.description !== undefined && data.message === undefined) {
+      updateData.message = data.description?.trim() || null
     }
 
-    if (body.title !== undefined) updateData.title = body.title?.trim()
+    if (data.title !== undefined) updateData.title = data.title?.trim()
+    else if (data.description !== undefined && !updateData.title) {
+      updateData.title = data.description?.slice(0, 50) || 'Alerta'
+    }
 
-    if (body.severity !== undefined) updateData.severity = body.severity
+    if (data.severity !== undefined) updateData.severity = data.severity
 
     // Status mapping
-    if (body.status !== undefined) {
-      if (body.status === 'resolved') {
+    if (data.status !== undefined) {
+      if (data.status === 'resolved') {
         updateData.is_resolved = true
-      } else if (body.status === 'open') {
+        updateData.resolved_at = new Date().toISOString()
+      } else if (data.status === 'open') {
         updateData.is_resolved = false
         updateData.assigned_to = null
-      } else if (body.status === 'assigned') {
+        updateData.resolved_at = null
+      } else if (data.status === 'assigned') {
         updateData.is_resolved = false
       }
     }
 
-    if (body.assigned_to !== undefined) updateData.assigned_to = body.assigned_to || null
-
-    // gf_alerts geralmente não tem rota_id/veiculo_id diretos na raiz, mas em update precisamos respeitar o schema
-    // Se o user mandar rota_id, podemos tentar jogar em metadata/details se o campo não existir
-    // Mas vamos assumir que o frontend vai parar de mandar rota_id direto se alterarmos.
-    // Se mandar, ignoramos ou salvamos em details se pudermos (mas precisariamos ler details antes).
-    // Como simplificação, focamos nos campos principais.
+    if (data.assigned_to !== undefined) updateData.assigned_to = data.assigned_to || null
+    if (data.resolved_by !== undefined) updateData.resolved_by = data.resolved_by || null
+    if (data.resolution_notes !== undefined) updateData.resolution_notes = data.resolution_notes || null
 
     // Atualizar alerta
     const { data: updatedAlert, error: updateError } = await supabaseAdmin
@@ -109,7 +111,7 @@ export async function PUT(
       alert: updatedAlert
     })
   } catch (err) {
-    logError('Erro ao atualizar alerta', { error: err, alertId: (await context.params).alertId }, 'AlertsUpdateAPI')
+    logError('Erro ao atualizar alerta', { error: err, alertId }, 'AlertsUpdateAPI')
     const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'
     return NextResponse.json(
       {

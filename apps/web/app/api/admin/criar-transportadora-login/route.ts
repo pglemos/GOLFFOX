@@ -5,6 +5,7 @@ import { z } from 'zod'
 import { requireAuth } from '@/lib/api-auth'
 import { successResponse, errorResponse, validationErrorResponse } from '@/lib/api-response'
 import { logError, logger } from '@/lib/logger'
+import { withRateLimit } from '@/lib/rate-limit'
 import { supabaseServiceRole } from '@/lib/supabase-server'
 
 export const runtime = 'nodejs'
@@ -29,7 +30,7 @@ export async function OPTIONS() {
   })
 }
 
-export async function POST(req: NextRequest) {
+async function postHandler(req: NextRequest) {
   try {
     const authErrorResponse = await requireAuth(req, 'admin')
     if (authErrorResponse) return authErrorResponse
@@ -98,3 +99,6 @@ export async function POST(req: NextRequest) {
     return errorResponse(error, 500, 'Erro ao processar requisição')
   }
 }
+
+// ✅ SEGURANÇA: Rate limiting para proteção contra abuso
+export const POST = withRateLimit(postHandler, 'admin')

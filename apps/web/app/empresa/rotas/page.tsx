@@ -41,7 +41,7 @@ export default function OperatorRotasPage() {
       if (!tenantCompanyId) return []
       const { data, error } = await supabase
         .from("v_operador_routes_secure")
-        .select("id, name, description, empresa_id, transportadora_id, is_active, created_at, updated_at")
+        .select("id, name, company_id, transportadora_id, total_trips, completed_trips, avg_delay_minutes, transportadora_name")
         .order("name", { ascending: true })
 
       if (error) throw error
@@ -94,7 +94,7 @@ export default function OperatorRotasPage() {
 
   if (tenantError || rotasError) {
     return (
-      <AppShell user={{ id: user?.id || "", name: user?.name || "Operador", email: user?.email || "", role: "operador", avatar_url: user?.avatar_url }}>
+      <AppShell user={{ id: user?.id || "", name: user?.name || "Operador", email: user?.email || "", role: "operador", avatar_url: user?.avatar_url ?? undefined }}>
         <div className="min-h-screen flex items-center justify-center p-4">
           <Card className="p-8 max-w-md w-full text-center">
             <h2 className="text-xl font-bold mb-2 text-error">Erro ao carregar</h2>
@@ -110,7 +110,7 @@ export default function OperatorRotasPage() {
 
   if (!tenantCompanyId) {
     return (
-      <AppShell user={{ id: user?.id || "", name: user?.name || "Operador", email: user?.email || "", role: "operador", avatar_url: user?.avatar_url }}>
+      <AppShell user={{ id: user?.id || "", name: user?.name || "Operador", email: user?.email || "", role: "operador", avatar_url: user?.avatar_url ?? undefined }}>
         <div className="min-h-screen flex items-center justify-center p-4">
           <Card className="p-8 max-w-md w-full text-center">
             <h2 className="text-xl font-bold mb-2">Nenhuma empresa selecionada</h2>
@@ -125,7 +125,7 @@ export default function OperatorRotasPage() {
   }
 
   return (
-    <AppShell user={{ id: user?.id || "", name: user?.name || "Operador", email: user?.email || "", role: "operador", avatar_url: user?.avatar_url }}>
+    <AppShell user={{ id: user?.id || "", name: user?.name || "Operador", email: user?.email || "", role: "operador", avatar_url: user?.avatar_url ?? undefined }}>
       <div className="space-y-4 sm:space-y-6 w-full overflow-x-hidden">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
           <div className="min-w-0 flex-1">
@@ -169,7 +169,7 @@ export default function OperatorRotasPage() {
               const query = debouncedSearchQuery.toLowerCase()
               return (
                 rota.name?.toLowerCase().includes(query) ||
-                rota.carrier_name?.toLowerCase().includes(query)
+                rota.transportadora_name?.toLowerCase().includes(query)
               )
             })
             .length === 0 && !rotasLoading && (
@@ -196,7 +196,7 @@ export default function OperatorRotasPage() {
               const query = debouncedSearchQuery.toLowerCase()
               return (
                 rota.name?.toLowerCase().includes(query) ||
-                rota.carrier_name?.toLowerCase().includes(query)
+                rota.transportadora_name?.toLowerCase().includes(query)
               )
             })
             .map((rota, index) => (
@@ -222,8 +222,8 @@ export default function OperatorRotasPage() {
                             AO VIVO
                           </Badge>
                         )}
-                        {rota.carrier_name && (
-                          <Badge variant="outline" className="flex-shrink-0">{rota.carrier_name}</Badge>
+                        {rota.transportadora_name && (
+                          <Badge variant="outline" className="flex-shrink-0">{rota.transportadora_name}</Badge>
                         )}
                       </div>
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-3 text-sm">
@@ -251,27 +251,7 @@ export default function OperatorRotasPage() {
                     </a>
                   </div>
 
-                  {rota.gf_route_plan && Array.isArray(rota.gf_route_plan) && rota.gf_route_plan.length > 0 && (
-                    <div className="mt-4 pt-4 border-t border-border-light">
-                      <h4 className="font-semibold mb-2 text-sm text-ink-strong">Funcionários nesta rota:</h4>
-                      <div className="space-y-2 max-h-40 overflow-y-auto">
-                        {rota.gf_route_plan
-                          .filter((stop: { gf_employee_company?: { name?: string; cpf?: string } | null }) => stop && stop.gf_employee_company)
-                          .map((stop: { gf_employee_company?: { name?: string; cpf?: string } | null; stop_order?: number }, idx: number) => (
-                            <div key={idx} className="p-2 bg-bg-soft rounded-lg flex items-center gap-2">
-                              <Users className="h-4 w-4 text-ink-light flex-shrink-0" />
-                              <div className="min-w-0 flex-1">
-                                <p className="text-sm font-medium truncate">{stop.gf_employee_company?.name || "Nome não disponível"}</p>
-                                <p className="text-xs text-ink-muted">
-                                  {stop.gf_employee_company?.cpf && `CPF: ${stop.gf_employee_company.cpf} • `}
-                                  Ordem: {stop.stop_order || idx + 1}
-                                </p>
-                              </div>
-                            </div>
-                          ))}
-                      </div>
-                    </div>
-                  )}
+                  {/* Seção de funcionários removida - coluna gf_route_plan não disponível nesta view */}
                 </Card>
               </motion.div>
             ))}

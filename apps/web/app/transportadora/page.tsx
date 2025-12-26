@@ -36,7 +36,6 @@ import { supabase } from "@/lib/supabase"
 import { useRouter } from "@/lib/next-navigation"
 import { useAuth } from "@/components/providers/auth-provider"
 // Lazy load recharts para reduzir bundle size inicial
-import dynamic from "next/dynamic"
 const LineChart = dynamic(() => import("recharts").then((mod) => mod.LineChart), { ssr: false })
 const BarChart = dynamic(() => import("recharts").then((mod) => mod.BarChart), { ssr: false })
 const PieChart = dynamic(() => import("recharts").then((mod) => mod.PieChart), { ssr: false })
@@ -56,7 +55,45 @@ import { cn } from "@/lib/utils"
 import { debug, logError } from "@/lib/logger"
 import type { Database } from "@/types/supabase"
 
-type GamificationScoreRow = Database['public']['Tables']['gf_gamification_scores']['Row']
+// Tipo para scores de gamificação (tabela pode não existir no schema atual)
+type GamificationScoreRow = {
+  motorista_id: string
+  trips_completed: number | null
+  total_points: number | null
+  routes_completed: number | null
+}
+
+interface FleetMember {
+  id: string;
+  plate: string;
+  motorista: string;
+  status: string;
+  route: string;
+  lat: number | null | undefined;
+  lng: number | null | undefined;
+  passengerCount: number;
+  capacity: number;
+  lastUpdate: string;
+}
+
+interface DriverWithStats {
+  id: string;
+  name?: string;
+  trips: number;
+  rating: string;
+  status: string;
+  score?: number;
+}
+
+interface KPI {
+  totalFleet: number;
+  onRoute: number;
+  activeDrivers: number;
+  delayed: number;
+  criticalAlerts: number;
+  totalCostsThisMonth: number;
+  totalTrips: number;
+}
 
 export default function TransportadoraDashboard() {
   const router = useRouter()
@@ -73,10 +110,10 @@ export default function TransportadoraDashboard() {
   // Obter transportadora_id do usuário (pode vir em vários formatos dependendo da fonte/cookie/me api)
   const transportadoraId = user?.transportadora_id || null
 
-  const [fleet, setFleet] = useState<Array<{ id: string; status?: string; [key: string]: unknown }>>([])
-  const [motoristas, setMotoristas] = useState<Array<{ id: string; name?: string; [key: string]: unknown }>>([])
+  const [fleet, setFleet] = useState<FleetMember[]>([])
+  const [motoristas, setMotoristas] = useState<DriverWithStats[]>([])
   const [period, setPeriod] = useState<"today" | "week" | "month" | "custom">("month")
-  const [kpis, setKpis] = useState({
+  const [kpis, setKpis] = useState<KPI>({
     totalFleet: 0,
     onRoute: 0,
     activeDrivers: 0,
@@ -85,7 +122,7 @@ export default function TransportadoraDashboard() {
     totalCostsThisMonth: 0,
     totalTrips: 0
   })
-  const [previousKpis, setPreviousKpis] = useState({
+  const [previousKpis, setPreviousKpis] = useState<KPI>({
     totalFleet: 0,
     onRoute: 0,
     activeDrivers: 0,
@@ -94,10 +131,17 @@ export default function TransportadoraDashboard() {
     totalCostsThisMonth: 0,
     totalTrips: 0
   })
-  const [chartData, setChartData] = useState<Array<{ name: string; [key: string]: unknown }>>([])
-  const [fleetStatusData, setFleetStatusData] = useState<Array<{ name: string; value: number; [key: string]: unknown }>>([])
-  const [topDrivers, setTopDrivers] = useState<Array<{ id: string; name?: string; [key: string]: unknown }>>([])
-  const [recentActivities, setRecentActivities] = useState<Array<{ id: string; type: string; [key: string]: unknown }>>([])
+  const [chartData, setChartData] = useState<Array<{ hora: string; emRota: number }>>([])
+  const [fleetStatusData, setFleetStatusData] = useState<Array<{ name: string; value: number }>>([])
+  const [topDrivers, setTopDrivers] = useState<DriverWithStats[]>([])
+  const [recentActivities, setRecentActivities] = useState<Array<{
+    id: string;
+    type: 'alert' | 'veiculo';
+    title: string;
+    description: string;
+    timestamp: string;
+    status: 'error' | 'warning' | 'info' | 'success';
+  }>>([])
 
   const loadFleetData = useCallback(async () => {
     try {
@@ -109,28 +153,35 @@ export default function TransportadoraDashboard() {
         return
       }
 
-      // Carregar veículos
+      // Carregar veículos (removido 'brand' que não existe na tabela)
       const { data: veiculos } = await supabase
         .from('veiculos')
-        .select('id, plate, model, brand, year, capacity, prefix, vehicle_type, fuel_type, color, is_active, empresa_id, transportadora_id')
+        .select('id, plate, model, year, capacity, prefix, fuel_type, is_active, empresa_id, transportadora_id')
         .eq('transportadora_id', transportadoraId)
 
       // Carregar posições dos veículos usando RPC do mapa
-      const { data: mapData } = await supabase.rpc('gf_map_snapshot_full', {
+      const { data: mapDataRaw } = await supabase.rpc('gf_map_snapshot_full', {
         p_transportadora_id: transportadoraId,
         p_company_id: undefined,
         p_route_id: undefined
       })
 
+      // Tipar os dados do RPC
+      type MapSnapshotData = {
+        buses?: Array<{ veiculo_id: string; motorista_name?: string; route_name?: string; lat?: number; lng?: number; passenger_count?: number; capacity?: number; last_update?: string }>;
+        garages?: Array<{ veiculo_id: string; last_position?: { lat?: number; lng?: number; timestamp?: string } }>;
+      }
+      const mapData = mapDataRaw as MapSnapshotData | null
+
       // Mapear veículos com posições do RPC
-      const fleetData = (veiculos || []).map((veiculo) => {
-        const bus = mapData?.buses?.find((b: { veiculo_id: string }) => b.veiculo_id === veiculo.id)
-        const garage = mapData?.garages?.find((g: { veiculo_id: string }) => g.veiculo_id === veiculo.id)
+      const fleetData: FleetMember[] = (veiculos || []).map((veiculo) => {
+        const bus = mapData?.buses?.find((b) => b.veiculo_id === veiculo.id)
+        const garage = mapData?.garages?.find((g) => g.veiculo_id === veiculo.id)
 
         if (bus) {
           return {
             id: veiculo.id,
-            plate: veiculo.plate,
+            plate: veiculo.plate || '',
             motorista: bus.motorista_name || 'N/A',
             status: 'on-route',
             route: bus.route_name || 'Livre',
@@ -144,12 +195,12 @@ export default function TransportadoraDashboard() {
         } else if (garage) {
           return {
             id: veiculo.id,
-            plate: veiculo.plate,
+            plate: veiculo.plate || '',
             motorista: 'N/A',
             status: 'available',
             route: 'Livre',
-            lat: garage.last_position?.lat,
-            lng: garage.last_position?.lng,
+            lat: garage.last_position?.lat || null,
+            lng: garage.last_position?.lng || null,
             passengerCount: 0,
             capacity: veiculo.capacity || 0,
             lastUpdate: garage.last_position?.timestamp ?
@@ -158,7 +209,7 @@ export default function TransportadoraDashboard() {
         } else {
           return {
             id: veiculo.id,
-            plate: veiculo.plate,
+            plate: veiculo.plate || '',
             motorista: 'N/A',
             status: veiculo.is_active ? 'available' : 'inactive',
             route: 'Livre',
@@ -180,28 +231,32 @@ export default function TransportadoraDashboard() {
         .eq('role', 'motorista')
         .eq('transportadora_id', transportadoraId)
 
-      let driversWithStats: Array<{ id: string; name?: string; score?: number; [key: string]: unknown }> = []
+      let driversWithStats: DriverWithStats[] = []
 
       if (driversData?.length) {
-        // Buscar dados de ranking/gamificação
-        const driverIds = driversData.map((d: { id: string }) => d.id)
+        // Buscar dados de ranking/gamificação (tabela pode não existir)
+        const driverIds = driversData.map((d) => d.id)
 
-        interface GamificationScore {
-          motorista_id: string
-          trips_completed?: number
-          total_points?: number
+        let rankings: GamificationScoreRow[] = []
+        try {
+          const { data: rankingsData } = await supabase
+            .from('gf_gamification_scores')
+            .select('motorista_id, trips_completed, total_points, routes_completed')
+            .in('motorista_id', driverIds)
+
+          if (rankingsData) {
+            rankings = rankingsData as unknown as GamificationScoreRow[]
+          }
+        } catch {
+          // Tabela de gamificação pode não existir, ignorar silenciosamente
+          debug('Tabela gf_gamification_scores não disponível', {}, 'TransportadoraPage')
         }
 
-        const { data: rankings } = await supabase
-          .from('gf_gamification_scores')
-          .select('motorista_id, trips_completed, total_points, routes_completed, created_at, updated_at')
-          .in('motorista_id', driverIds)
-
-        driversWithStats = (driversData || []).map((motorista: { id: string; name?: string; [key: string]: unknown }) => {
-          const ranking = rankings?.find((r) => r.motorista_id === motorista.id)
+        driversWithStats = (driversData || []).map((motorista) => {
+          const ranking = rankings.find((r) => r.motorista_id === motorista.id)
           return {
             id: motorista.id,
-            name: motorista.name,
+            name: motorista.name || '',
             trips: ranking?.trips_completed || 0,
             rating: ranking?.total_points ? (ranking.total_points / 100).toFixed(1) : '0.0',
             status: 'active'
@@ -214,7 +269,7 @@ export default function TransportadoraDashboard() {
       // Buscar alertas críticos de vencimento
       const { data: alerts } = await supabase
         .from('v_carrier_expiring_documents')
-        .select('id, document_type, document_name, expiry_date, days_to_expiry, alert_level, transportadora_id, entity_id, entity_type, created_at')
+        .select('id, document_type, entity_name, expiry_date, days_to_expiry, alert_level, transportadora_id, entity_id')
         .eq('transportadora_id', transportadoraId)
         .in('alert_level', ['expired', 'critical'])
 
@@ -245,7 +300,7 @@ export default function TransportadoraDashboard() {
         .select('id')
         .eq('transportadora_id', transportadoraId)
 
-      const routeIds = routes?.map((r: { id: string; [key: string]: unknown }) => r.id) || []
+      const routeIds = routes?.map((r: { id: string;[key: string]: unknown }) => r.id) || []
 
       // Buscar total de viagens do mês (já temos currentMonthStart definido acima)
       let tripsCount = 0
@@ -265,8 +320,8 @@ export default function TransportadoraDashboard() {
       const totalCostsThisMonth = vehicleCostsTotal + routeCostsTotal
 
       // Atualizar KPIs
-      const onRouteCount = fleetData.filter((v: { status?: string }) => v.status === 'on-route').length
-      const criticalAlertsCount = alerts?.filter((a: { alert_level?: string }) => a.alert_level === 'critical' || a.alert_level === 'expired').length || 0
+      const onRouteCount = fleetData.filter((v: FleetMember) => v.status === 'on-route').length
+      const criticalAlertsCount = alerts?.filter((a) => a.alert_level === 'critical' || a.alert_level === 'expired').length || 0
 
       const newKpis = {
         totalFleet: fleetData.length,
@@ -332,7 +387,7 @@ export default function TransportadoraDashboard() {
       setChartData(lineChartData)
 
       // Gráfico de pizza: Distribuição de status da frota
-      const statusCounts = fleetData.reduce((acc: Record<string, number>, v: { status?: string }) => {
+      const statusCounts = fleetData.reduce((acc: Record<string, number>, v: FleetMember) => {
         acc[v.status] = (acc[v.status] || 0) + 1
         return acc
       }, {})
@@ -348,16 +403,23 @@ export default function TransportadoraDashboard() {
       setTopDrivers(sortedDrivers)
 
       // Atividades recentes (simulado - em produção viria de uma tabela de logs)
-      const activities = [
-        ...(alerts?.slice(0, 3).map((a: { id: string; message?: string; alert_level?: string; [key: string]: unknown }) => ({
+      const activities: Array<{
+        id: string;
+        type: 'alert' | 'veiculo';
+        title: string;
+        description: string;
+        timestamp: string;
+        status: 'error' | 'warning' | 'info' | 'success';
+      }> = [
+        ...(alerts?.slice(0, 3).map((a) => ({
           id: `alert-${a.id}`,
           type: 'alert' as const,
           title: `${t('transportadora', 'activity_alert')}: ${a.document_type}`,
-          description: `${a.entity_name} - ${a.alert_level === 'expired' ? t('transportadora', 'activity_expired') : t('transportadora', 'activity_expiring')}`,
+          description: `${a.entity_name || a.document_type} - ${a.alert_level === 'expired' ? t('transportadora', 'activity_expired') : t('transportadora', 'activity_expiring')}`,
           timestamp: new Date().toISOString(),
           status: a.alert_level === 'expired' ? 'error' as const : 'warning' as const
         })) || []),
-        ...fleetData.slice(0, 2).map((v: { id: string; plate?: string; [key: string]: unknown }) => ({
+        ...fleetData.slice(0, 2).map((v) => ({
           id: `veiculo-${v.id}`,
           type: 'veiculo' as const,
           title: `${t('transportadora', 'activity_vehicle')} ${v.plate} ${v.status === 'on-route' ? t('transportadora', 'activity_on_route') : t('transportadora', 'activity_available')}`,

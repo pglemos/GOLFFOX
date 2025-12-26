@@ -42,10 +42,10 @@ export async function GET(req: NextRequest) {
         const alertLevel = req.nextUrl.searchParams.get('alert_level') || 'critical,warning'
         const alertLevels = alertLevel.split(',')
 
-        // View materializada - selecionar apenas colunas usadas
+        // View materializada - selecionar apenas colunas existentes
         const { data, error } = await supabaseServiceRole
             .from('v_carrier_expiring_documents')
-            .select('id, document_type, document_name, expiry_date, days_to_expiry, alert_level, transportadora_id, entity_id, entity_type, created_at')
+            .select('id, item_type, entity_id, entity_name, document_type, expiry_date, days_to_expiry, alert_level, status, transportadora_id')
             .eq('transportadora_id', userData.transportadora_id)
             .in('alert_level', alertLevels)
             .order('days_to_expiry', { ascending: true })

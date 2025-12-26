@@ -42,9 +42,13 @@ class MonitoringService {
       this.metrics = this.metrics.slice(-this.maxMetrics)
     }
 
-    // Em produção, enviar para serviço de métricas (Datadog, Prometheus, etc)
+    // Em produção, enviar para serviço de métricas (Datadog)
     if (process.env.NODE_ENV === 'production') {
-      // TODO: Integrar com serviço de métricas
+      import('./apm/datadog').then((datadog) => {
+        datadog.recordMetric(name, value, tags)
+      }).catch(() => {
+        // Ignorar erro se datadog não estiver disponível
+      })
       logger.debug('Metric recorded', { name, value, unit, tags }, 'Monitoring')
     }
   }
@@ -58,8 +62,8 @@ class MonitoringService {
 
     // Verificar variáveis de ambiente
     const envCheck = {
-      status: (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) 
-        ? 'ok' as const 
+      status: (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY)
+        ? 'ok' as const
         : 'error' as const,
       message: (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY)
         ? 'Variáveis de ambiente configuradas'
@@ -74,7 +78,7 @@ class MonitoringService {
       // Simular verificação de conexão
       // Em produção, fazer ping real no Supabase
       const latency = Date.now() - startTime
-      
+
       checks.supabase = {
         status: 'ok',
         message: 'Conexão com Supabase OK',

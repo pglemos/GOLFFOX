@@ -5,22 +5,25 @@ import { validationErrorResponse, errorResponse, successResponse } from '@/lib/a
 import { logger, logError } from '@/lib/logger'
 import { invalidateEntityCache } from '@/lib/next-cache'
 import { UserService } from '@/lib/services/server/user-service'
+import { validateWithSchema, idQuerySchema } from '@/lib/validation/schemas'
 
 export const runtime = 'nodejs'
 
 export async function DELETE(request: NextRequest) {
   try {
     const authErrorResponse = await requireAuth(request, 'admin')
-    if (authErrorResponse) {
-      return authErrorResponse
-    }
+    if (authErrorResponse) return authErrorResponse
 
     const { searchParams } = new URL(request.url)
-    const driverId = searchParams.get('id')
+    const queryParams = Object.fromEntries(searchParams.entries())
 
-    if (!driverId) {
-      return validationErrorResponse('ID do motorista é obrigatório')
+    // Validar query params
+    const validation = validateWithSchema(idQuerySchema, queryParams)
+    if (!validation.success) {
+      return validationErrorResponse(validation.error)
     }
+
+    const { id: driverId } = validation.data
 
     // Excluir permanentemente o motorista usando UserService
     // Isso garante limpeza correta de referências (trips.driver_id) e Auth
@@ -33,8 +36,8 @@ export async function DELETE(request: NextRequest) {
 
     return successResponse(null, 200, { message: 'Motorista excluído com sucesso' })
   } catch (error: unknown) {
-    logError('Erro ao excluir motorista', { error, driverId: request.nextUrl.searchParams.get('id') }, 'DriversDeleteAPI')
+    const driverId = request.nextUrl.searchParams.get('id')
+    logError('Erro ao excluir motorista', { error, driverId }, 'DriversDeleteAPI')
     return errorResponse(error, 500, 'Erro ao excluir motorista')
   }
 }
-

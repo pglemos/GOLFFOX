@@ -3,24 +3,16 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 
 import { requireAuth } from '@/lib/api-auth'
-import { applyRateLimit } from '@/lib/rate-limit'
-import { getSupabaseAdmin } from '@/lib/supabase-client'
+import { successResponse, errorResponse, validationErrorResponse } from '@/lib/api-response'
 import { redisCacheService, createCacheKey } from '@/lib/cache/redis-cache.service'
 import { logError } from '@/lib/logger'
+import { applyRateLimit } from '@/lib/rate-limit'
+import { supabaseServiceRole } from '@/lib/supabase-server'
+import { updateAlertSchema, validateWithSchema } from '@/lib/validation/schemas'
 
 export const runtime = 'nodejs'
 
-const updateAlertSchema = z.object({
-    id: z.string().uuid(),
-    status: z.enum(['open', 'assigned', 'resolved']).optional(),
-    assigned_to: z.string().uuid().optional().nullable(),
-    description: z.string().optional(),
-    message: z.string().optional(),
-    severity: z.enum(['critical', 'warning', 'info', 'error']).optional(),
-    resolved_at: z.string().optional(),
-    resolved_by: z.string().uuid().optional().nullable(),
-    resolution_notes: z.string().optional(),
-})
+
 
 export async function POST(req: NextRequest) {
     try {
@@ -31,7 +23,15 @@ export async function POST(req: NextRequest) {
         if (authErrorResponse) return authErrorResponse
 
         const body = await req.json()
-        const validated = updateAlertSchema.parse(body)
+
+        // Validar com Zod centralizado
+        // Note: o schema centralizado pode não ter o id, então estendemos se necessário
+        const validation = validateWithSchema(updateAlertSchema.extend({ id: z.string().uuid() }), body)
+        if (!validation.success) {
+            return validationErrorResponse(validation.error)
+        }
+
+        const validated = validation.data
 
         // Campos básicos que SEMPRE existem no gf_alerts
         const basicUpdateData: Record<string, unknown> = {}
@@ -55,16 +55,11 @@ export async function POST(req: NextRequest) {
 
         // Se não houver dados para atualizar, retornar erro
         if (Object.keys(basicUpdateData).length === 0) {
-            return NextResponse.json(
-                { success: false, error: 'Nenhum dado para atualizar' },
-                { status: 400 }
-            )
+            return errorResponse('Nenhum dado para atualizar', 400)
         }
 
-        const supabaseAdmin = getSupabaseAdmin()
-
         // Atualizar alerta com campos básicos apenas
-        const { data, error } = await supabaseAdmin
+        const { data, error } = await supabaseServiceRole
             .from('gf_alerts')
             .update(basicUpdateData)
             .eq('id', validated.id)
@@ -72,11 +67,8 @@ export async function POST(req: NextRequest) {
             .single()
 
         if (error) {
-            logError('Erro ao atualizar alerta', { error: error.message, alertId: validated.id, basicUpdateData }, 'AlertUpdateAPI')
-            return NextResponse.json(
-                { success: false, error: 'Erro ao atualizar alerta', message: error.message },
-                { status: 500 }
-            )
+            logError('Erro ao atualizar alerta', { error, alertId: validated.id }, 'AlertUpdateAPI')
+            return errorResponse(error, 500, 'Erro ao atualizar alerta')
         }
 
         // Invalidar cache de lista
@@ -86,25 +78,9 @@ export async function POST(req: NextRequest) {
             // Ignorar erro de cache
         }
 
-        return NextResponse.json({
-            success: true,
-            alert: data
-        })
-    } catch (error: unknown) {
-        if (error instanceof z.ZodError) {
-            return NextResponse.json(
-                { success: false, error: 'Dados inválidos', details: error.errors },
-                { status: 400 }
-            )
-        }
-
-        const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido'
-        logError('Erro ao processar atualização de alerta', { error: errorMessage }, 'AlertUpdateAPI')
-
-        return NextResponse.json(
-            { success: false, error: 'Erro ao processar requisição', message: errorMessage },
-            { status: 500 }
-        )
+        return successResponse(data)
+    } catch (err) {
+        logError('Erro ao processar atualização de alerta', { error: err }, 'AlertUpdateAPI')
+        return errorResponse(err, 500, 'Erro ao processar requisição')
     }
 }
-

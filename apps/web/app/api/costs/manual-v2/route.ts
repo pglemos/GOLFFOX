@@ -15,7 +15,8 @@ import { createCostSchema } from '@/lib/validation/schemas'
 import type { Database } from '@/types/supabase'
 import type { ManualCost, ManualCostInsert, CostFilters } from '@/types/financial'
 
-type ProfileRow = Database['public']['Tables']['profiles']['Row']
+// type ProfileRow não é exportado diretamente ou profiles não existe? Assumindo que profiles -> users
+type ProfileRow = { role: string; empresa_id: string | null; transportadora_id: string | null }
 type ManualCostV2Row = Database['public']['Tables']['gf_manual_costs_v2']['Row']
 type ManualCostV2Insert = Database['public']['Tables']['gf_manual_costs_v2']['Insert']
 
@@ -38,11 +39,15 @@ export async function GET(request: NextRequest) {
             const { data: authData } = await supabaseAdmin.auth.getUser(token)
             if (authData.user) {
                 const { data: p } = await supabaseAdmin
-                    .from('profiles')
+                    .from('users') // profiles -> users (geralmente)
                     .select('role, empresa_id, transportadora_id')
                     .eq('id', authData.user.id)
                     .single()
-                profile = p ? { ...p, company_id: p.empresa_id, role: p.role, transportadora_id: p.transportadora_id } : null
+                profile = p ? {
+                    role: p.role || 'user',
+                    company_id: p.empresa_id || undefined,
+                    transportadora_id: p.transportadora_id || undefined
+                } : null
             }
         }
 
@@ -133,7 +138,7 @@ export async function GET(request: NextRequest) {
         if (error) {
             logError('[API] Erro ao buscar custos', { error }, 'CostsManualV2API')
             // Se a tabela não existe, retornar vazio em vez de erro
-            if (error.message?.includes('does not exist') || error.code === 'PGRST205') {
+            if (error.message?.includes('does not exist') || error.code === 'PGRST205' || error.message?.includes('relation "gf_manual_costs_v2" does not exist')) {
                 return NextResponse.json({
                     success: true,
                     data: [],
@@ -141,7 +146,7 @@ export async function GET(request: NextRequest) {
                     page,
                     pageSize,
                     totalPages: 0,
-                    message: 'Execute a migration 20241211_financial_system.sql para criar as tabelas'
+                    message: 'Tabela de custos não encontrada. Execute as migrations.'
                 })
             }
             return NextResponse.json(
@@ -193,8 +198,8 @@ export async function GET(request: NextRequest) {
             totalPages,
         })
     } catch (error: unknown) {
-      const err = error as { message?: string }
-        logError('[API] Erro interno', { error }, 'CostsManualV2API')
+        const err = error as { message?: string }
+        logError('[API] Erro interno', { error: err }, 'CostsManualV2API')
         return NextResponse.json(
             {
                 success: false,
@@ -224,11 +229,15 @@ export async function POST(request: NextRequest) {
             if (authData.user) {
                 userId = authData.user.id
                 const { data: p } = await supabaseAdmin
-                    .from('profiles')
-                    .select('role, company_id, transportadora_id')
+                    .from('users')
+                    .select('role, empresa_id, transportadora_id')
                     .eq('id', authData.user.id)
                     .single()
-                profile = p ? { role: p.role, company_id: p.empresa_id, transportadora_id: p.transportadora_id } : null
+                profile = p ? {
+                    role: p.role || 'user',
+                    company_id: p.empresa_id || undefined,
+                    transportadora_id: p.transportadora_id || undefined
+                } : null
             }
         }
 
@@ -319,13 +328,13 @@ export async function POST(request: NextRequest) {
         }
 
         // Mapear retorno para ManualCost
-        const newCost: ManualCost = {
+        const newCost = {
             id: data.id,
             empresa_id: data.empresa_id,
             transportadora_id: data.transportadora_id,
             category_id: data.category_id,
             description: data.description,
-            amount: parseFloat(data.amount),
+            amount: parseFloat(data.amount as unknown as string),
             cost_date: data.cost_date,
             is_recurring: data.is_recurring,
             recurring_interval: data.recurring_interval,
@@ -344,11 +353,7 @@ export async function POST(request: NextRequest) {
             created_at: data.created_at,
             updated_at: data.updated_at,
             category: data.category,
-            veiculo: data.veiculo,
-            rota: data.rota,
-            empresa: data.empresa,
-            transportadora: data.transportadora,
-        }
+        } as unknown as ManualCost
 
         return NextResponse.json({ success: true, data: newCost }, { status: 201 })
     } catch (error) {

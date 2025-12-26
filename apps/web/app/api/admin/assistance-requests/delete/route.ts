@@ -4,30 +4,30 @@ import { requireAuth } from '@/lib/api-auth'
 import { logger, logError } from '@/lib/logger'
 import { invalidateEntityCache } from '@/lib/next-cache'
 import { getSupabaseAdmin } from '@/lib/supabase-client'
+import { validateWithSchema, idQuerySchema } from '@/lib/validation/schemas'
+import { validationErrorResponse } from '@/lib/api-response'
 
 export const runtime = 'nodejs'
 
 export async function DELETE(request: NextRequest) {
   try {
     const authErrorResponse = await requireAuth(request, 'admin')
-    if (authErrorResponse) {
-      return authErrorResponse
-    }
+    if (authErrorResponse) return authErrorResponse
 
     const { searchParams } = new URL(request.url)
-    const requestId = searchParams.get('id')
+    const queryParams = Object.fromEntries(searchParams.entries())
 
-    if (!requestId) {
-      return NextResponse.json(
-        { error: 'ID da solicitação é obrigatório' },
-        { status: 400 }
-      )
+    // Validar query params
+    const validation = validateWithSchema(idQuerySchema, queryParams)
+    if (!validation.success) {
+      return validationErrorResponse(validation.error)
     }
 
+    const { id: requestId } = validation.data
     const supabaseAdmin = getSupabaseAdmin()
 
     logger.log(`🗑️ Tentando excluir solicitação de socorro: ${requestId}`)
-    
+
     const { data, error } = await supabaseAdmin
       .from('gf_assistance_requests')
       .delete()
@@ -35,10 +35,10 @@ export async function DELETE(request: NextRequest) {
       .select()
 
     if (error) {
-      logError('Erro ao excluir solicitação de socorro', { error, requestId, details: error.details, hint: error.hint, code: error.code }, 'AssistanceRequestsDeleteAPI')
+      logError('Erro ao excluir solicitação de socorro', { error, requestId }, 'AssistanceRequestsDeleteAPI')
       return NextResponse.json(
-        { 
-          error: 'Erro ao excluir solicitação de socorro', 
+        {
+          error: 'Erro ao excluir solicitação de socorro',
           message: error.message,
           details: error.details || error.hint || 'Sem detalhes adicionais',
           code: error.code
@@ -57,9 +57,10 @@ export async function DELETE(request: NextRequest) {
       message: 'Solicitação de socorro excluída com sucesso'
     })
   } catch (error: unknown) {
-    logError('Erro ao excluir solicitação de socorro', { error, requestId: request.nextUrl.searchParams.get('id') }, 'AssistanceRequestsDeleteAPI')
+    logError('Erro ao excluir solicitação de socorro', { error }, 'AssistanceRequestsDeleteAPI')
+    const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido'
     return NextResponse.json(
-      { error: 'Erro ao excluir solicitação de socorro', message: error instanceof Error ? error.message : 'Erro desconhecido' },
+      { error: 'Erro ao excluir solicitação de socorro', message: errorMessage },
       { status: 500 }
     )
   }

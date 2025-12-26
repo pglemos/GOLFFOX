@@ -4,72 +4,77 @@ import { requireAuth } from '@/lib/api-auth'
 import { logError } from '@/lib/logger'
 import { invalidateEntityCache } from '@/lib/next-cache'
 import { getSupabaseAdmin } from '@/lib/supabase-client'
+import { validateWithSchema, updateAssistanceRequestByIdSchema, uuidSchema } from '@/lib/validation/schemas'
+import { validationErrorResponse } from '@/lib/api-response'
 
 export const runtime = 'nodejs'
-
-const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
 
 export async function PUT(
   request: NextRequest,
   context: { params: Promise<{ requestId: string }> }
 ) {
   const params = await context.params
+  const { requestId } = params
 
-  const { requestId: requestIdParam  } = params
   try {
     const authErrorResponse = await requireAuth(request, 'admin')
-    if (authErrorResponse) {
-      return authErrorResponse
+    if (authErrorResponse) return authErrorResponse
+
+    // Validar ID
+    const idValidation = uuidSchema.safeParse(requestId)
+    if (!idValidation.success) {
+      return validationErrorResponse('ID da solicitação inválido')
     }
 
-    const requestId = requestIdParam?.trim()
-    if (!requestId || !UUID_REGEX.test(requestId)) {
-      return NextResponse.json(
-        { error: 'request_id deve ser um UUID válido' },
-        { status: 400 }
-      )
-    }
-
-    const supabaseAdmin = getSupabaseAdmin()
     const body = await request.json()
 
-    // Verificar se ocorrência existe (selecionar apenas id para verificação)
+    // Validar corpo
+    const validation = validateWithSchema(updateAssistanceRequestByIdSchema, body)
+    if (!validation.success) {
+      return validationErrorResponse(validation.error)
+    }
+
+    const data = validation.data
+    const supabaseAdmin = getSupabaseAdmin()
+
+    // Verificar se ocorrência existe
     const { data: existingRequest, error: fetchError } = await supabaseAdmin
-      .from('gf_service_requests')
+      .from('gf_assistance_requests')
       .select('id')
       .eq('id', requestId)
       .single()
 
     if (fetchError || !existingRequest) {
       return NextResponse.json(
-        { error: 'Ocorrência não encontrada' },
+        { error: 'Solicitação não encontrada' },
         { status: 404 }
       )
     }
 
     // Preparar dados para atualização
     const updateData: Record<string, unknown> = {}
-    if (body.description !== undefined) updateData.description = body.description?.trim() || null
-    if (body.status !== undefined) updateData.status = body.status
-    if (body.request_type !== undefined) updateData.request_type = body.request_type
-    if (body.address !== undefined) updateData.address = body.address?.trim() || null
-    if (body.route_id !== undefined) updateData.route_id = body.route_id || null
-    if (body.dispatched_driver_id !== undefined) updateData.dispatched_driver_id = body.dispatched_driver_id || null
-    if (body.dispatched_vehicle_id !== undefined) updateData.dispatched_vehicle_id = body.dispatched_vehicle_id || null
+    if (data.description !== undefined) updateData.description = data.description?.trim() || null
+    if (data.status !== undefined) updateData.status = data.status
+    if (data.request_type !== undefined) updateData.request_type = data.request_type
+    if (data.address !== undefined) updateData.address = data.address?.trim() || null
+    if (data.route_id !== undefined) updateData.rota_id = data.route_id || null
+    if (data.dispatched_driver_id !== undefined) updateData.dispatched_driver_id = data.dispatched_driver_id || null
+    if (data.dispatched_vehicle_id !== undefined) updateData.dispatched_vehicle_id = data.dispatched_vehicle_id || null
+    if (data.notes !== undefined) updateData.notes = data.notes || null
 
     // Atualizar ocorrência
-    const { data: updatedRequest, error: updateError } = await (supabaseAdmin
-      .from('gf_service_requests'))
+    const { data: updatedRequest, error: updateError } = await supabaseAdmin
+      .from('gf_assistance_requests')
       .update(updateData)
       .eq('id', requestId)
       .select()
       .single()
 
     if (updateError) {
-      logError('Erro ao atualizar ocorrência', { error: updateError, requestId }, 'AssistanceRequestsUpdateAPI')
+      logError('Erro ao atualizar solicitação', { error: updateError, requestId }, 'AssistanceRequestsUpdateAPI')
       return NextResponse.json(
-        { 
-          error: 'Erro ao atualizar ocorrência',
+        {
+          error: 'Erro ao atualizar solicitação',
           message: updateError.message || 'Erro desconhecido',
         },
         { status: 500 }
@@ -84,11 +89,11 @@ export async function PUT(
       request: updatedRequest
     })
   } catch (err) {
-    logError('Erro ao atualizar ocorrência', { error: err, requestId: (await context.params).requestId }, 'AssistanceRequestsUpdateAPI')
+    logError('Erro ao atualizar solicitação', { error: err, requestId }, 'AssistanceRequestsUpdateAPI')
     const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'
     return NextResponse.json(
-      { 
-        error: 'Erro ao atualizar ocorrência',
+      {
+        error: 'Erro ao atualizar solicitação',
         message: errorMessage,
       },
       { status: 500 }

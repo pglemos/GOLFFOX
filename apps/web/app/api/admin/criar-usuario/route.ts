@@ -2,68 +2,54 @@ import { NextRequest, NextResponse } from 'next/server'
 
 import { requireAuth } from '@/lib/api-auth'
 import { logError } from '@/lib/logger'
+import { withRateLimit } from '@/lib/rate-limit'
 import { UserService } from '@/lib/services/server/user-service'
+import { validateWithSchema, createUserSchema } from '@/lib/validation/schemas'
+import { validationErrorResponse, successResponse, errorResponse } from '@/lib/api-response'
 
 export const runtime = 'nodejs'
 
-export async function POST(request: NextRequest) {
+async function postHandler(request: NextRequest) {
     try {
         const authErrorResponse = await requireAuth(request, 'admin')
-        if (authErrorResponse) {
-            return authErrorResponse
-        }
+        if (authErrorResponse) return authErrorResponse
 
         const body = await request.json()
-        const {
-            company_id,
-            email,
-            password,
-            name,
-            phone,
-            role,
-            cpf,
-            address_zip_code,
-            address_street,
-            address_number,
-            address_neighborhood,
-            address_complement,
-            address_city,
-            address_state
-        } = body
 
-        if (!company_id) return NextResponse.json({ error: 'company_id é obrigatório' }, { status: 400 })
-        if (!name) return NextResponse.json({ error: 'Nome é obrigatório' }, { status: 400 })
-        if (!email && !cpf) return NextResponse.json({ error: 'Email ou CPF é obrigatório' }, { status: 400 })
+        // Validar com schema
+        const validation = validateWithSchema(createUserSchema, body)
+        if (!validation.success) {
+            return validationErrorResponse(validation.error)
+        }
+
+        const data = validation.data
 
         const createdUser = await UserService.createUser({
-            company_id,
-            email: email || '', // Service takes care of generating email from CPF if needed, but type expects string
-            password,
-            name,
-            phone,
-            role,
-            cpf,
-            address_zip_code,
-            address_street,
-            address_number,
-            address_neighborhood,
-            address_complement,
-            address_city,
-            address_state
+            company_id: data.company_id || data.empresa_id || null,
+            email: data.email || '',
+            password: data.password || undefined,
+            name: data.name,
+            phone: data.phone,
+            role: data.role,
+            cpf: data.cpf,
+            address_zip_code: data.address_zip_code ?? undefined,
+            address_street: data.address_street ?? undefined,
+            address_number: data.address_number ?? undefined,
+            address_neighborhood: data.address_neighborhood ?? undefined,
+            address_complement: data.address_complement ?? undefined,
+            address_city: data.address_city ?? undefined,
+            address_state: data.address_state ?? undefined
         })
 
-        return NextResponse.json({
-            success: true,
-            message: 'Usuário criado com sucesso',
-            user: createdUser
-        })
-
-    } catch (error: unknown) {
-        logError('Erro ao criar usuário', { error }, 'CreateUserAPI')
-        // Mapear erros conhecidos para status 400
-        const message = error instanceof Error ? error.message : 'Erro desconhecido'
+        return successResponse(createdUser, 201, { message: 'Usuário criado com sucesso' })
+    } catch (err) {
+        logError('Erro ao criar usuário', { error: err }, 'CreateUserAPI')
+        const message = err instanceof Error ? err.message : 'Erro desconhecido'
         const status = message.includes('obrigatório') || message.includes('já está cadastrado') || message.includes('inválido') ? 400 : 500
 
-        return NextResponse.json({ error: 'Erro ao criar usuário', message }, { status })
+        return errorResponse(err, status as any, 'Erro ao criar usuário')
     }
 }
+
+// ✅ SEGURANÇA: Rate limiting para proteção contra abuso
+export const POST = withRateLimit(postHandler, 'admin')

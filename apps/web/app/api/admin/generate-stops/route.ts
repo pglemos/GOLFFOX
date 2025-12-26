@@ -7,69 +7,45 @@ import { geocodeAddress } from '../../../../lib/geocoding'
 import { log, getLogs, clearLogs } from '../../../../lib/logger'
 import { getEmployeesForRoute } from '../../../../lib/stops/employee-source'
 import { sortStops } from '../../../../lib/stops/stop-sorting'
+import { requireAuth } from '@/lib/api-auth'
+import { validateWithSchema, generateStopsSchema } from '@/lib/validation/schemas'
+import { validationErrorResponse } from '@/lib/api-response'
 
 export const runtime = 'nodejs'
 
 export async function POST(req: NextRequest) {
-  // Validar autenticação
-  const authHeader = req.headers.get('authorization')
+  // Validar autenticação (apenas admin ou via flags de teste em dev)
   const isTestMode = req.headers.get('x-test-mode') === 'true'
   const isDevelopment = process.env.NODE_ENV === 'development'
-  
-  // Se não há autenticação e não é modo de teste, retornar 401
-  if (!authHeader && !isTestMode && !isDevelopment) {
-    return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 })
+
+  if (!isTestMode && !isDevelopment) {
+    const authError = await requireAuth(req, 'admin')
+    if (authError) return authError
   }
-  
-  // Se há Basic Auth, aceitar em modo de teste/dev
-  const isBasicAuth = authHeader?.startsWith('Basic ')
-  if (authHeader && !isBasicAuth && !isTestMode && !isDevelopment) {
-    // Tentar validar Bearer token
-    try {
-      const { requireAuth } = await import('../../../../lib/api-auth')
-      const authError = await requireAuth(req, 'admin')
-      if (authError) {
-        return authError
-      }
-    } catch (e) {
-      // Se falhar validação, retornar 401
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 })
-    }
-  }
-  
+
   clearLogs()
   const body = await req.json().catch(() => ({}))
-  // Aceitar tanto route_id (snake_case - preferido) quanto routeId (camelCase - legado)
-  const routeId = (body?.route_id || body?.routeId) as string
-  const employeeDb = (body?.employee_db || body?.employeeDb) as string | undefined
-  const origin = body?.origin as { lat: number; lng: number } | undefined
-  const avgSpeedKmh = (body?.avg_speed_kmh || body?.avgSpeedKmh) as number | undefined
-  const dbSave = (body?.db_save || body?.dbSave) as boolean | undefined
-  const tableName = ((body?.table_name || body?.tableName) as string | undefined) || 'gf_route_plan'
-  const itemsPerPage = ((body?.items_per_page || body?.itemsPerPage) as number | undefined) || undefined
 
-  if (!routeId) {
-    return new Response(JSON.stringify({ error: 'route_id ou routeId é obrigatório' }), { status: 400 })
+  // Validar corpo
+  const validation = validateWithSchema(generateStopsSchema, body)
+  if (!validation.success) {
+    return validationErrorResponse(validation.error)
   }
 
-  // Validar formato UUID - aceitar UUIDs v4 válidos (mais permissivo para testes)
-  // Aceitar formato UUID genérico (não apenas v4) para compatibilidade com testes
-  const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
-  if (routeId && !UUID_REGEX.test(routeId)) {
-    return new Response(JSON.stringify({ error: 'route_id deve ser um UUID válido' }), { status: 400 })
-  }
-
-  // Se route_id é o UUID zero (00000000-0000-0000-0000-000000000000), retornar erro 500
-  if (routeId === '00000000-0000-0000-0000-000000000000') {
-    return new Response(JSON.stringify({ error: 'route_id inválido' }), { status: 500 })
-  }
+  const data = validation.data
+  const routeId = (data.route_id || data.routeId) as string
+  const employeeDb = data.employee_db || data.employeeDb
+  const origin = data.origin
+  const avgSpeedKmh = data.avg_speed_kmh || data.avgSpeedKmh
+  const dbSave = data.db_save || data.dbSave
+  const tableName = data.table_name || data.tableName || 'gf_route_plan'
+  const itemsPerPage = data.items_per_page || data.itemsPerPage
 
   log('info', 'Início da geração de pontos', { routeId })
 
   const employees = await getEmployeesForRoute(routeId, employeeDb, itemsPerPage)
   if (employees.length === 0) {
     log('warn', 'Nenhum funcionário encontrado para a rota', { routeId })
-    // Se não há funcionários e route_id é válido, retornar sucesso vazio (não erro)
     return NextResponse.json({ stops: [], metrics: { count: 0, successRate: 0 }, logs: getLogs() })
   }
 
@@ -149,7 +125,6 @@ export async function POST(req: NextRequest) {
     } else {
       try {
         const supabaseAdmin = createClient(supabaseUrl, adminKey, { auth: { autoRefreshToken: false, persistSession: false } })
-        // Limpeza opcional: apagar plano anterior da rota
         await supabaseAdmin.from(tableName).delete().eq('route_id', routeId)
         if (json.gfRoutePlan.length > 0) {
           const { error } = await supabaseAdmin.from(tableName).insert(json.gfRoutePlan)

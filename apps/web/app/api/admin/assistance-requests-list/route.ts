@@ -4,6 +4,8 @@ import { createClient } from '@supabase/supabase-js'
 
 import { requireAuth } from '@/lib/api-auth'
 import { logError } from '@/lib/logger'
+import { validateWithSchema, assistanceRequestListQuerySchema } from '@/lib/validation/schemas'
+import { validationErrorResponse } from '@/lib/api-response'
 
 export const runtime = 'nodejs'
 
@@ -19,14 +21,20 @@ function getSupabaseAdmin() {
 export async function GET(request: NextRequest) {
   try {
     const authErrorResponse = await requireAuth(request, 'admin')
-    if (authErrorResponse) {
-      return authErrorResponse
+    if (authErrorResponse) return authErrorResponse
+
+    const { searchParams } = new URL(request.url)
+    const queryParams = Object.fromEntries(searchParams.entries())
+
+    // Validar query params
+    const validation = validateWithSchema(assistanceRequestListQuerySchema, queryParams)
+    if (!validation.success) {
+      return validationErrorResponse(validation.error)
     }
 
+    const { status } = validation.data
     const supabaseAdmin = getSupabaseAdmin()
-    const { searchParams } = new URL(request.url)
-    const status = searchParams.get('status')
-    
+
     let query = supabaseAdmin
       .from('gf_assistance_requests')
       .select(`

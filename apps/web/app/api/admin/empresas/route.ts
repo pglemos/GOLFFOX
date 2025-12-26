@@ -1,15 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server'
 
 import { requireAuth } from '@/lib/api-auth'
-import { formatError } from '@/lib/error-utils'
+import { successResponse, errorResponse, validationErrorResponse } from '@/lib/api-response'
+import { CreateCompanyCommand, cqrsBus } from '@/lib/cqrs'
+import '@/lib/cqrs/bus/register-handlers' // Registrar handlers
+import { logError } from '@/lib/logger'
 import { withRateLimit } from '@/lib/rate-limit'
-import { CompanyService, type CompanyFilters, type CreateCompanyData } from '@/lib/services/server/company-service'
-import { createCompanySchema } from '@/lib/validation/schemas'
-// CQRS (opcional - pode usar diretamente o service ou via command)
-// import { CreateCompanyCommand, cqrsBus } from '@/lib/cqrs'
-// import '@/lib/cqrs/bus/register-handlers'
+import { CompanyService, type CompanyFilters } from '@/lib/services/server/company-service'
+import { createCompanySchema, validateWithSchema, companyListQuerySchema } from '@/lib/validation/schemas'
 
 export const runtime = 'nodejs'
+
+// Flag para habilitar CQRS (transição gradual)
+const USE_CQRS = process.env.ENABLE_CQRS === 'true'
 
 // OPTIONS handler para CORS
 export async function OPTIONS(request: NextRequest) {
@@ -29,80 +32,78 @@ export async function OPTIONS(request: NextRequest) {
  */
 async function getCompaniesHandler(request: NextRequest) {
   try {
-    // ✅ Validar autenticação (apenas admin)
     const authErrorResponse = await requireAuth(request, 'admin')
-    if (authErrorResponse) {
-      return authErrorResponse
+    if (authErrorResponse) return authErrorResponse
+
+    const { searchParams } = new URL(request.url)
+    const queryParams = Object.fromEntries(searchParams.entries())
+
+    // Validar query params
+    const validation = validateWithSchema(companyListQuerySchema, queryParams)
+    if (!validation.success) {
+      return validationErrorResponse(validation.error)
     }
 
-    const searchParams = request.nextUrl.searchParams
-
-    // Filtros opcionais com suporte a paginação
-    const page = parseInt(searchParams.get('page') || '1')
-    const limit = parseInt(searchParams.get('limit') || '100')
-    const offset = parseInt(searchParams.get('offset') || String((page - 1) * limit))
+    const { page = 1, limit = 20, search, isActive } = validation.data
+    const offset = (page - 1) * limit
 
     const filters: CompanyFilters = {
-      isActive: searchParams.get('is_active') === 'true' ? true : searchParams.get('is_active') === 'false' ? false : undefined,
-      search: searchParams.get('search') || undefined,
+      isActive,
+      search,
       limit,
       offset
     }
 
     const result = await CompanyService.listCompanies(filters)
 
-    return NextResponse.json({
-      success: true,
-      ...result
+    return successResponse(result.data, 200, {
+      count: result.count,
+      limit,
+      offset
     })
   } catch (err) {
-    const errorMessage = formatError(err, 'Erro ao listar empresas')
-    return NextResponse.json(
-      { error: 'Erro ao listar empresas', message: errorMessage },
-      { status: 500 }
-    )
+    logError('Erro ao listar empresas', { error: err }, 'CompaniesAPI')
+    return errorResponse(err, 500, 'Erro ao listar empresas')
   }
 }
 
 /**
  * POST /api/admin/empresas
  * Criar nova empresa
+ * 
+ * ✅ CQRS: Usa CreateCompanyCommand quando ENABLE_CQRS=true
  */
 async function createCompanyHandler(request: NextRequest) {
   try {
-    // ✅ Validar autenticação (apenas admin)
     const authErrorResponse = await requireAuth(request, 'admin')
-    if (authErrorResponse) {
-      return authErrorResponse
-    }
+    if (authErrorResponse) return authErrorResponse
 
     const body = await request.json()
 
-    // Validar com Zod
-    const validation = createCompanySchema.safeParse(body)
+    // Validar com Zod centralizado
+    const validation = validateWithSchema(createCompanySchema, body)
     if (!validation.success) {
-      return NextResponse.json(
-        {
-          error: 'Dados inválidos',
-          details: validation.error.errors
-        },
-        { status: 400 }
-      )
+      return validationErrorResponse(validation.error)
     }
 
-    const company = await CompanyService.createCompany(validation.data)
+    let company
 
-    return NextResponse.json({ data: company }, { status: 201 })
+    if (USE_CQRS) {
+      // ✅ Usar CQRS Command
+      const command = new CreateCompanyCommand(validation.data)
+      company = await cqrsBus.executeCommand(command)
+    } else {
+      // Fallback: usar CompanyService diretamente
+      company = await CompanyService.createCompany(validation.data)
+    }
+
+    return successResponse(company, 201)
   } catch (err) {
-    const errorMessage = formatError(err, 'Erro ao criar empresa')
-    const status = errorMessage.includes('obrigatório') || errorMessage.includes('já existe') ? 400 : 500
-    return NextResponse.json(
-      { error: 'Erro ao criar empresa', message: errorMessage },
-      { status }
-    )
+    logError('Erro ao criar empresa', { error: err }, 'CompaniesAPI')
+    return errorResponse(err, 500, 'Erro ao criar empresa')
   }
 }
 
 // Exportar com rate limiting
 export const GET = withRateLimit(getCompaniesHandler, 'api');
-export const POST = withRateLimit(createCompanyHandler, 'sensitive');
+export const POST = withRateLimit(createCompanyHandler, 'admin');

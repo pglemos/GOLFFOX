@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 
 import { debug, info, warn, logError } from '@/lib/logger'
-
 import { createClient } from '@supabase/supabase-js'
-
 import { requireAuth } from '@/lib/api-auth'
+import { validateWithSchema, employeeListQuerySchema } from '@/lib/validation/schemas'
+import { validationErrorResponse } from '@/lib/api-response'
 
 export const runtime = 'nodejs'
 
@@ -21,18 +21,22 @@ export async function GET(request: NextRequest) {
   try {
     // Validar autenticação (apenas admin)
     const authErrorResponse = await requireAuth(request, 'admin')
-    if (authErrorResponse) {
-      return authErrorResponse
+    if (authErrorResponse) return authErrorResponse
+
+    const { searchParams } = new URL(request.url)
+    const queryParams = Object.fromEntries(searchParams.entries())
+
+    // Validar query params
+    const validation = validateWithSchema(employeeListQuerySchema, queryParams)
+    if (!validation.success) {
+      return validationErrorResponse(validation.error)
     }
 
-    const supabaseAdmin = getSupabaseAdmin()
-    const { searchParams } = new URL(request.url)
-    const companyId = searchParams.get('company_id')
+    const { empresa_id, company_id: companyIdParam } = validation.data
+    const companyId = empresa_id || companyIdParam
 
-    // Buscar funcionários da tabela gf_employee_company
-    // A tabela existe e tem 57 registros segundo o relatório de análise
-    // Usar service role key que bypassa RLS
-    
+    const supabaseAdmin = getSupabaseAdmin()
+
     // Primeiro, verificar se há dados na tabela gf_employee_company
     let query = supabaseAdmin
       .from('gf_employee_company')
@@ -44,27 +48,27 @@ export async function GET(request: NextRequest) {
     }
 
     const { data, error, count } = await query
-    
+
     // Se não há dados em gf_employee_company, tentar buscar na tabela users
     let finalData = data
     const finalError = error
     let finalCount = count
-    
+
     if ((!data || data.length === 0) && !error) {
       warn('[EmployeesListAPI] Tabela gf_employee_company vazia, tentando buscar na tabela users...', {}, 'EmployeesListAPI')
-      
+
       let usersQuery = supabaseAdmin
         .from('users')
-        .select('id, name, email, phone, company_id, role, is_active', { count: 'exact' })
+        .select('id, name, email, phone, company_id, role, is_active, address, latitude, longitude, cpf, login_cpf', { count: 'exact' })
         .in('role', ['gestor_empresa', 'funcionario'])
         .order('name', { ascending: true })
-      
+
       if (companyId) {
         usersQuery = usersQuery.eq('company_id', companyId)
       }
-      
+
       const { data: usersData, error: usersError, count: usersCount } = await usersQuery
-      
+
       if (!usersError && usersData && usersData.length > 0) {
         info(`[EmployeesListAPI] Encontrados ${usersData.length} funcionários na tabela users`, { count: usersData.length }, 'EmployeesListAPI')
         finalData = usersData
@@ -81,12 +85,6 @@ export async function GET(request: NextRequest) {
       count: finalData?.length || 0,
       totalCount: finalCount,
       error: finalError?.message,
-      errorCode: finalError?.code,
-      errorDetails: finalError?.details,
-      errorHint: finalError?.hint,
-      firstItem: finalData?.[0],
-      hasData: !!finalData,
-      dataIsArray: Array.isArray(finalData),
       source: finalData === data ? 'gf_employee_company' : 'users'
     }, 'EmployeesListAPI')
 
@@ -94,73 +92,38 @@ export async function GET(request: NextRequest) {
       logError('[EmployeesListAPI] Erro na query', {
         error: finalError.message,
         code: finalError.code,
-        details: finalError.details,
-        hint: finalError.hint,
         companyId
       }, 'EmployeesListAPI')
-      logError('Erro ao buscar funcionários no admin API', { error: finalError, companyId }, 'EmployeesListAPI')
-      return NextResponse.json({ 
-        success: false, 
-        error: finalError.message,
-        errorCode: finalError.code,
-        errorDetails: finalError.details,
-        errorHint: finalError.hint
+      return NextResponse.json({
+        success: false,
+        error: finalError.message
       }, { status: 500 })
     }
 
-    // Se não há dados, retornar vazio com informações de debug
+    // Se não há dados, retornar vazio
     if (!finalData || finalData.length === 0) {
-      warn('[EmployeesListAPI] Nenhum funcionário encontrado', {
-        totalCount: finalCount,
-        hasData: !!finalData,
-        dataType: typeof finalData,
-        companyId: companyId || 'todas',
-        checkedTables: ['gf_employee_company', 'users']
-      }, 'EmployeesListAPI')
-      
-      // Retornar informações de debug em desenvolvimento
-      if (process.env.NODE_ENV === 'development') {
-        return NextResponse.json([], {
-          headers: {
-            'X-Debug-Info': JSON.stringify({
-              message: 'Nenhum funcionário encontrado',
-              totalCount: finalCount,
-              companyId: companyId || 'todas',
-              checkedTables: ['gf_employee_company', 'users']
-            })
-          }
-        })
-      }
-      
       return NextResponse.json([])
     }
 
-    info('[EmployeesListAPI] Funcionários encontrados', {
-      count: finalData.length,
-      totalCount: finalCount,
-      firstItem: finalData[0],
-      source: finalData === data ? 'gf_employee_company' : 'users'
-    })
-
     // Buscar nomes das empresas separadamente
-    const companyIds = [...new Set((finalData || []).map((emp: UserRow) => emp.company_id).filter(Boolean))]
+    const companyIds = [...new Set((finalData || []).map((emp: any) => emp.company_id).filter(Boolean))]
     const companiesMap = new Map<string, string>()
-    
+
     if (companyIds.length > 0) {
       const { data: companiesData } = await supabaseAdmin
-        .from('companies')
+        .from('empresas')
         .select('id, name')
         .in('id', companyIds)
-      
+
       if (companiesData) {
-        companiesData.forEach((c: EmpresasRow) => {
+        companiesData.forEach((c: any) => {
           companiesMap.set(c.id, c.name || '')
         })
       }
     }
 
     // Transformar para o formato esperado pela página
-    const employees = (finalData || []).map((emp: UserRow) => ({
+    const employees = (finalData || []).map((emp: any) => ({
       id: emp.id,
       employee_id: emp.id,
       company_id: emp.company_id,
@@ -180,11 +143,6 @@ export async function GET(request: NextRequest) {
       lng: emp.longitude ? parseFloat(emp.longitude.toString()) : null,
       is_active: emp.is_active !== false,
     }))
-
-    debug('Debug - Funcionários transformados:', { 
-      count: employees.length,
-      firstEmployee: employees[0]
-    }, 'EmployeesListAPI')
 
     return NextResponse.json(employees)
   } catch (error: unknown) {

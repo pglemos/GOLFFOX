@@ -2,11 +2,12 @@ import { NextRequest, NextResponse } from 'next/server'
 
 import { requireAuth } from '@/lib/api-auth'
 import { logError } from '@/lib/logger'
+import { withRateLimit } from '@/lib/rate-limit'
 import { UserService } from '@/lib/services/server/user-service'
 
 export const runtime = 'nodejs'
 
-export async function POST(req: NextRequest) {
+async function updateProfileHandler(req: NextRequest) {
   // Verificar autenticação (qualquer usuário autenticado pode atualizar seu próprio perfil)
   const authError = await requireAuth(req)
   if (authError) return authError
@@ -95,3 +96,6 @@ export async function POST(req: NextRequest) {
     )
   }
 }
+
+// Exportar com rate limiting (api: 100 requests per minute)
+export const POST = withRateLimit(updateProfileHandler, 'api')

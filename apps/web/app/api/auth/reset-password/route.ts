@@ -5,6 +5,7 @@ import { createClient } from '@supabase/supabase-js'
 
 import { getSupabaseUrl, getSupabaseAnonKey } from '@/lib/env'
 import { logError, debug } from '@/lib/logger'
+import { withRateLimit } from '@/lib/rate-limit'
 
 const EMAIL_REGEX =
   /^(?:[a-zA-Z0-9_'^&\/+\-])+(?:\.(?:[a-zA-Z0-9_'^&\/+\-])+)*@(?:(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,})$/
@@ -18,7 +19,7 @@ function sanitize(value: unknown): string {
  * Endpoint para solicitar recuperação de senha
  * POST /api/auth/reset-password
  */
-export async function POST(req: NextRequest) {
+async function resetPasswordHandler(req: NextRequest) {
   try {
     const body = await req.json()
     const email = sanitize(body?.email)
@@ -90,4 +91,7 @@ export async function POST(req: NextRequest) {
     })
   }
 }
+
+// Exportar com rate limiting (auth: 5 requests per minute)
+export const POST = withRateLimit(resetPasswordHandler, 'auth')
 

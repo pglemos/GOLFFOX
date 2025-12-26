@@ -13,7 +13,7 @@ import { debug, warn, logError } from '@/lib/logger'
 function getRedisClient(): Redis | null {
   const upstashUrl = process.env.UPSTASH_REDIS_REST_URL
   const upstashToken = process.env.UPSTASH_REDIS_REST_TOKEN
-  
+
   const upstashEnabled = Boolean(upstashUrl && upstashToken)
 
   if (!upstashEnabled) {
@@ -38,7 +38,7 @@ class RedisCacheService {
   constructor() {
     this.redis = getRedisClient()
     this.enabled = this.redis !== null
-    
+
     if (this.enabled) {
       debug('Redis Cache Service inicializado', {}, 'RedisCache')
     } else {
@@ -56,13 +56,13 @@ class RedisCacheService {
 
     try {
       const value = await this.redis.get<T>(key)
-      
+
       if (value !== null) {
         debug('Cache hit', { key }, 'RedisCache')
       } else {
         debug('Cache miss', { key }, 'RedisCache')
       }
-      
+
       return value
     } catch (error) {
       logError('Erro ao obter do cache Redis', { error, key }, 'RedisCache')
@@ -107,6 +107,13 @@ class RedisCacheService {
   }
 
   /**
+   * Alias para invalidate (compatibilidade)
+   */
+  async del(key: string): Promise<boolean> {
+    return this.invalidate(key)
+  }
+
+  /**
    * Invalidar cache por padrão (tags)
    * 
    * Usa padrão de chaves: tag:value:key
@@ -118,15 +125,15 @@ class RedisCacheService {
     }
 
     try {
-      const pattern = value 
+      const pattern = value
         ? `${tag}:${value}:*`
         : `${tag}:*`
-      
+
       // Redis não suporta KEYS em produção (pode ser lento)
       // Usar SCAN para buscar chaves
       const keys: string[] = []
       let cursor: number = 0
-      
+
       do {
         const result: [string | number, string[]] = await this.redis.scan(cursor, { match: pattern, count: 100 })
         const nextCursor = typeof result[0] === 'string' ? parseInt(result[0], 10) : result[0]
@@ -156,17 +163,17 @@ class RedisCacheService {
   ): Promise<T> {
     // Tentar obter do cache
     const cached = await this.get<T>(key)
-    
+
     if (cached !== null) {
       return cached
     }
 
     // Calcular valor
     const value = await fn()
-    
+
     // Armazenar no cache
     await this.set(key, value, ttlSeconds)
-    
+
     return value
   }
 

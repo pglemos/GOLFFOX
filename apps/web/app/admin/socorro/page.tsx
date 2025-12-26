@@ -29,8 +29,17 @@ import {
 } from "@/components/ui/select"
 import { Label } from "@/components/ui/label"
 
-type AssistanceRequest = Database['public']['Tables']['gf_assistance_requests']['Row']
+type AssistanceRequestBase = Database['public']['Tables']['gf_assistance_requests']['Row']
 type AlertInsert = Database['public']['Tables']['gf_alerts']['Insert']
+
+// Interface estendida para incluir dados de relacionamento que vem da API
+interface AssistanceRequest extends AssistanceRequestBase {
+  routes?: { name?: string } | null
+  motoristas?: { name?: string; email?: string } | null
+  veiculos?: { plate?: string } | null
+  empresa_id?: string | null
+  dispatched_at?: string | null
+}
 
 export default function SocorroPage() {
   const router = useRouter()
@@ -461,7 +470,7 @@ export default function SocorroPage() {
                           <p>📍 {ocorrencia.address}</p>
                         )}
                         {ocorrencia.routes && (
-                          <p>🚌 Rota: {ocorrencia.routes.name || ocorrencia.route_id}</p>
+                          <p>🚌 Rota: {ocorrencia.routes.name || ocorrencia.rota_id}</p>
                         )}
                         {ocorrencia.motoristas && (
                           <p>
@@ -473,7 +482,7 @@ export default function SocorroPage() {
                         {ocorrencia.veiculos && (
                           <p>🚛 Veículo: {ocorrencia.veiculos.plate}</p>
                         )}
-                        <p>🕐 {new Date(ocorrencia.created_at).toLocaleString('pt-BR')}</p>
+                        <p>🕐 {ocorrencia.created_at ? new Date(ocorrencia.created_at).toLocaleString('pt-BR') : 'N/A'}</p>
                         {ocorrencia.status === 'open' && ocorrencia.created_at && (
                           <div className="flex items-center gap-1 mt-2">
                             <Clock className="h-3 w-3 text-brand" />
@@ -524,9 +533,9 @@ export default function SocorroPage() {
                                   veiculo_id: ocorrencia.veiculo_id || null,
                                   motorista_id: ocorrencia.motorista_id || null,
                                   severity: 'critical',
-                                  status: 'open',
+                                  is_resolved: false,
                                   message: `Ocorrência de socorro: ${ocorrencia.request_type} - ${ocorrencia.description || ''}`,
-                                  type: 'assistance_request'
+                                  alert_type: 'assistance_request'
                                 }
                                 await supabase.from('gf_alerts').insert(alertData)
                               }
@@ -552,8 +561,9 @@ export default function SocorroPage() {
                               if (error) throw error
 
                               // Calcular SLA
-                              const responseTime = new Date(ocorrencia.dispatched_at || Date.now()).getTime() - new Date(ocorrencia.created_at).getTime()
-                              const resolutionTime = Date.now() - new Date(ocorrencia.created_at).getTime()
+                              const createdTime = ocorrencia.created_at ? new Date(ocorrencia.created_at).getTime() : Date.now()
+                              const responseTime = new Date(ocorrencia.dispatched_at || Date.now()).getTime() - createdTime
+                              const resolutionTime = Date.now() - createdTime
 
                               notifySuccess('', { i18n: { ns: 'common', key: 'success.assistanceResolvedSLA', params: { response: Math.floor(responseTime / 60000), total: Math.floor(resolutionTime / 60000) } } })
                               loadOcorrencias()

@@ -5,6 +5,8 @@ import { logger, logError } from '@/lib/logger'
 import { withRateLimit } from '@/lib/rate-limit'
 import { getSupabaseAdmin } from '@/lib/supabase-server'
 import type { Database } from '@/types/supabase'
+import { validateWithSchema, seedCostCategoriesPostSchema } from '@/lib/validation/schemas'
+import { validationErrorResponse } from '@/lib/api-response'
 
 type GfCostCategoriesInsert = Database['public']['Tables']['gf_cost_categories']['Insert']
 
@@ -51,9 +53,18 @@ async function seedCostCategoriesHandler(request: NextRequest) {
   try {
     // Validar autenticação (apenas admin)
     const authErrorResponse = await requireAuth(request, 'admin')
-    if (authErrorResponse) {
-      return authErrorResponse
+    if (authErrorResponse) return authErrorResponse
+
+    const body = await request.json().catch(() => ({}))
+
+    // Validar corpo
+    const validation = validateWithSchema(seedCostCategoriesPostSchema, body)
+    if (!validation.success) {
+      return validationErrorResponse(validation.error)
     }
+
+    const { categories: customCategories } = validation.data
+    const categoriesToSeed = customCategories || ESSENTIAL_CATEGORIES
 
     const supabase = getSupabaseAdmin()
 
@@ -76,7 +87,7 @@ async function seedCostCategoriesHandler(request: NextRequest) {
 
     // Inserir categorias (upsert para evitar duplicatas)
     const results = []
-    for (const category of ESSENTIAL_CATEGORIES) {
+    for (const category of categoriesToSeed) {
       const { data, error } = await supabase
         .from('gf_cost_categories')
         .upsert(category as GfCostCategoriesInsert, { onConflict: 'id' })
@@ -103,7 +114,7 @@ async function seedCostCategoriesHandler(request: NextRequest) {
     return NextResponse.json({
       success: true,
       message: `${successCount} categorias inseridas/atualizadas com sucesso`,
-      total: ESSENTIAL_CATEGORIES.length,
+      total: categoriesToSeed.length,
       successCount,
       failCount,
       results,

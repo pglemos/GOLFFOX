@@ -17,7 +17,7 @@ import { supabase } from "@/lib/supabase"
 import { logError } from "@/lib/logger"
 import type { Database } from "@/types/supabase"
 
-type CostsBreakdownRow = Database['public']['Views']['v_costs_breakdown']['Row']
+// type CostsBreakdownRow removido pois a view não existe
 type DriverRankingRow = Database['public']['Views']['v_reports_driver_ranking']['Row']
 
 interface CostChartProps {
@@ -42,72 +42,70 @@ export function CostCharts({ companyId, period = 'month' }: CostChartProps) {
       setLoading(true)
 
       // Dados mensais (evolução)
-      const { data: monthly } = await supabase
-        .from('v_costs_breakdown')
-        .select('company_id, by_company, by_route, by_vehicle, period_month, period_year')
-        .order('company_id')
+      const { data: monthlyRaw } = await supabase
+        .from('v_costs_vs_budget_monthly')
+        .select('period_year, period_month, total_cost')
+        .order('period_year')
+        .order('period_month')
 
-      if (monthly) {
-        // Agrupar por mês
+      if (monthlyRaw) {
+        // Agrupar por mês (somar categorias)
         const grouped: Record<string, { month: string; total: number }> = {}
-        monthly.forEach((item: CostsBreakdownRow) => {
-          const month = new Date().toISOString().slice(0, 7) // YYYY-MM
-          if (!grouped[month]) {
-            grouped[month] = { month, total: 0 }
+        monthlyRaw.forEach((item) => {
+          const monthKey = `${item.period_year}-${String(item.period_month).padStart(2, '0')}`
+          if (!grouped[monthKey]) {
+            grouped[monthKey] = { month: monthKey, total: 0 }
           }
-          grouped[month].total += parseFloat(item.by_company || 0)
+          grouped[monthKey].total += Number(item.total_cost || 0)
         })
         setMonthlyData(Object.values(grouped))
       }
 
       // Dados por rota
       const { data: routes } = await supabase
-        .from('v_costs_breakdown')
-        .select('by_route')
-        .limit(1)
-        .single()
+        .from('v_carrier_route_costs_summary')
+        .select('route_name, total_cost_brl, total_distance_km')
+        .limit(10)
 
-      if (routes?.by_route) {
-        setByRouteData(Array.isArray(routes.by_route) ? routes.by_route : [])
+      if (routes) {
+        setByRouteData(routes.map(r => ({
+          route: r.route_name || 'Rota',
+          cost: Number(r.total_cost_brl || 0),
+          total_km: Number(r.total_distance_km || 0)
+        })))
       }
 
       // Dados por veículo
       const { data: veiculos } = await supabase
-        .from('v_costs_breakdown')
-        .select('by_vehicle')
-        .limit(1)
-        .single()
+        .from('v_carrier_vehicle_costs_summary')
+        .select('vehicle_plate, total_cost_brl') // Assumindo vehicle_plate existe, se não, teria que ser veiculo_id
+        .limit(10)
 
-      if (veiculos?.by_vehicle) {
-        setByVehicleData(Array.isArray(veiculos.by_vehicle) ? veiculos.by_vehicle : [])
+      if (veiculos) {
+        setByVehicleData(veiculos.map(v => ({
+          vehicle: v.vehicle_plate || 'Veículo',
+          cost: Number(v.total_cost_brl || 0),
+          total_km: 0 // View não informou km na query truncada
+        })))
       }
 
-      // Dados por motorista (usar v_reports_driver_ranking com custos)
+      // Dados por motorista
       const { data: motoristas } = await supabase
         .from('v_reports_driver_ranking')
-        .select('motorista_id, motorista_name, routes_completed')
+        .select('driver_id, driver_name, routes_completed')
         .limit(10)
 
       if (motoristas) {
-        setByDriverData(motoristas.map((d: DriverRankingRow) => ({
-          name: d.motorista_name || 'Motorista',
-          routes: d.routes_completed || 0,
-          cost: (d.routes_completed || 0) * 50 // Estimativa
+        setByDriverData(motoristas.map((d) => ({
+          name: d.driver_name || 'Motorista',
+          routes: Number(d.routes_completed || 0),
+          cost: Number(d.routes_completed || 0) * 50 // Estimativa
         })))
       }
 
-      // Dados por empresa
-      const { data: companies } = await supabase
-        .from('v_costs_breakdown')
-        .select('company_id, company_name, by_company')
-        .limit(20)
+      // Dados por empresa (Removido ou vazio por enquanto pois não há view clara)
+      setByCompanyData([])
 
-      if (companies) {
-        setByCompanyData(companies.map((c: { company_id?: string; company_name?: string; by_company?: number | string }) => ({
-          name: c.company_name || 'Empresa',
-          cost: parseFloat(String(c.by_company || 0))
-        })))
-      }
     } catch (error) {
       logError('Erro ao carregar dados de custos', { error }, 'CostCharts')
     } finally {
@@ -156,10 +154,10 @@ export function CostCharts({ companyId, period = 'month' }: CostChartProps) {
                 <YAxis tickFormatter={(value) => `R$ ${(value / 1000).toFixed(0)}k`} />
                 <Tooltip formatter={(value: number) => formatCurrency(value)} />
                 <Legend />
-                <Line 
-                  type="monotone" 
-                  dataKey="total" 
-                  stroke="#F97316" 
+                <Line
+                  type="monotone"
+                  dataKey="total"
+                  stroke="#F97316"
                   strokeWidth={2}
                   name="Custo Total"
                 />
@@ -181,8 +179,8 @@ export function CostCharts({ companyId, period = 'month' }: CostChartProps) {
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={byRouteData.slice(0, 10)}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis 
-                  dataKey="route_name" 
+                <XAxis
+                  dataKey="route"
                   angle={-45}
                   textAnchor="end"
                   height={100}
@@ -190,7 +188,7 @@ export function CostCharts({ companyId, period = 'month' }: CostChartProps) {
                 <YAxis tickFormatter={(value) => `R$ ${(value / 1000).toFixed(0)}k`} />
                 <Tooltip formatter={(value: number) => formatCurrency(value)} />
                 <Legend />
-                <Bar dataKey="total_cost" fill="#F97316" name="Custo Total" />
+                <Bar dataKey="cost" fill="#F97316" name="Custo Total" />
                 <Bar dataKey="total_km" fill="#10B981" name="KM Total" />
               </BarChart>
             </ResponsiveContainer>
@@ -210,8 +208,8 @@ export function CostCharts({ companyId, period = 'month' }: CostChartProps) {
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={byVehicleData.slice(0, 10)}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis 
-                  dataKey="vehicle_plate" 
+                <XAxis
+                  dataKey="vehicle"
                   angle={-45}
                   textAnchor="end"
                   height={100}
@@ -219,7 +217,7 @@ export function CostCharts({ companyId, period = 'month' }: CostChartProps) {
                 <YAxis tickFormatter={(value) => `R$ ${(value / 1000).toFixed(0)}k`} />
                 <Tooltip formatter={(value: number) => formatCurrency(value)} />
                 <Legend />
-                <Bar dataKey="total_cost" fill="#F97316" name="Custo Total" />
+                <Bar dataKey="cost" fill="#F97316" name="Custo Total" />
                 <Bar dataKey="total_km" fill="#10B981" name="KM Total" />
               </BarChart>
             </ResponsiveContainer>
@@ -239,8 +237,8 @@ export function CostCharts({ companyId, period = 'month' }: CostChartProps) {
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={byDriverData}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis 
-                  dataKey="name" 
+                <XAxis
+                  dataKey="name"
                   angle={-45}
                   textAnchor="end"
                   height={100}
@@ -268,8 +266,8 @@ export function CostCharts({ companyId, period = 'month' }: CostChartProps) {
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={byCompanyData}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis 
-                  dataKey="name" 
+                <XAxis
+                  dataKey="name"
                   angle={-45}
                   textAnchor="end"
                   height={100}

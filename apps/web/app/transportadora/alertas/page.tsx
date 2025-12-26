@@ -41,10 +41,10 @@ export default function AlertasPage() {
 
   // Contadores
   const alertCounts = {
-    veiculo_parado: alerts.filter((a: { alert_type?: string; is_resolved?: boolean }) => a.alert_type === "veiculo_parado" && !a.is_resolved).length,
-    critico: alerts.filter((a: { severity?: string; is_resolved?: boolean }) => a.severity === "critical" && !a.is_resolved).length,
-    aviso: alerts.filter((a: { severity?: string; is_resolved?: boolean }) => a.severity === "warning" && !a.is_resolved).length,
-    informativo: alerts.filter((a: { severity?: string; is_resolved?: boolean }) => a.severity === "info" && !a.is_resolved).length,
+    veiculo_parado: alerts.filter((a: unknown) => (a as { alert_type?: string }).alert_type === "veiculo_parado" && !(a as { is_resolved?: boolean }).is_resolved).length,
+    critico: alerts.filter((a: unknown) => (a as { severity?: string }).severity === "critical" && !(a as { is_resolved?: boolean }).is_resolved).length,
+    aviso: alerts.filter((a: unknown) => (a as { severity?: string }).severity === "warning" && !(a as { is_resolved?: boolean }).is_resolved).length,
+    informativo: alerts.filter((a: unknown) => (a as { severity?: string }).severity === "info" && !(a as { is_resolved?: boolean }).is_resolved).length,
   }
 
   const handleResolve = (alertId: string) => {
@@ -67,8 +67,16 @@ export default function AlertasPage() {
     }
   }
 
-  const filteredAlerts = alerts.filter((alert: { message?: string; alert_type?: string; severity?: string; is_read?: boolean; is_resolved?: boolean; metadata?: Record<string, unknown> }) => {
-    const meta = alert.metadata || {}
+  const filteredAlerts = alerts.filter((alertItem: unknown) => {
+    const alert = alertItem as {
+      message?: string;
+      alert_type?: string;
+      severity?: string;
+      is_read?: boolean;
+      is_resolved?: boolean;
+      metadata?: Record<string, unknown>
+    }
+    const meta = (alert.metadata || {}) as Record<string, string | undefined>
     const searchString = `${alert.message} ${alert.alert_type} ${meta.motorista_name || ''} ${meta.plate || ''}`.toLowerCase()
 
     const matchesSearch = searchString.includes(searchTerm.toLowerCase())
@@ -186,10 +194,20 @@ export default function AlertasPage() {
           </Card>
         ) : (
           <div className="space-y-3">
-            {filteredAlerts.map((alert: { id: string; message?: string; alert_type?: string; severity?: string; [key: string]: unknown }, index: number) => {
-              const cfg = getAlertTypeConfig(alert.alert_type, alert.severity)
+            {filteredAlerts.map((alertItem: unknown, index: number) => {
+              // Type assertion seguro
+              const alert = alertItem as {
+                id: string;
+                message: string;
+                alert_type: string;
+                severity: string;
+                created_at: string;
+                metadata?: Record<string, unknown>;
+              }
+
+              const cfg = getAlertTypeConfig(alert.alert_type || 'info', alert.severity || 'info')
               const Icon = cfg.icon
-              const meta = alert.metadata || {}
+              const meta = (alert.metadata || {}) as Record<string, string | undefined>
 
               return (
                 <motion.div
@@ -213,7 +231,7 @@ export default function AlertasPage() {
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-1">
                               {/* Titulo baseado no tipo ou mensagem */}
-                              <h3 className="font-semibold capitalize">{alert.alert_type.replace(/_/g, ' ')}</h3>
+                              <h3 className="font-semibold capitalize">{(alert.alert_type || 'Alerta').replace(/_/g, ' ')}</h3>
                               <Badge variant="outline" className={cn("text-xs", cfg.color)}>{cfg.label}</Badge>
                             </div>
                             <p className="text-sm text-ink-muted">{alert.message}</p>

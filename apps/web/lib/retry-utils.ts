@@ -16,34 +16,34 @@ import { debug, error as logError, warn } from './logger'
 export interface RetryOptions {
   /** Número máximo de tentativas (incluindo a primeira) */
   maxAttempts?: number
-  
+
   /** Delay inicial em ms (default: 1000) */
   initialDelay?: number
-  
+
   /** Fator de multiplicação do delay a cada tentativa (default: 2) */
   backoffFactor?: number
-  
+
   /** Delay máximo em ms (default: 30000) */
   maxDelay?: number
-  
+
   /** Jitter aleatório para evitar thundering herd (default: true) */
   jitter?: boolean
-  
+
   /** Fator de jitter (0-1, default: 0.1) */
   jitterFactor?: number
-  
+
   /** Função para determinar se deve fazer retry baseado no erro */
   shouldRetry?: (error: Error, attempt: number) => boolean
-  
+
   /** Callback antes de cada retry */
   onRetry?: (error: Error, attempt: number, delay: number) => void
-  
+
   /** Códigos HTTP que devem fazer retry (default: [408, 429, 500, 502, 503, 504]) */
   retryableStatusCodes?: number[]
-  
+
   /** Timeout para cada tentativa em ms (default: 30000) */
   timeout?: number
-  
+
   /** Nome da operação para logs */
   operationName?: string
 }
@@ -229,7 +229,7 @@ export async function withRetry<T>(
         jitterFactor
       )
 
-      logWarn(
+      warn(
         `${operationName || 'Operation'} failed, retrying in ${delay}ms (attempt ${attempt}/${maxAttempts})`,
         { error: lastError.message },
         'RetryUtils'
@@ -373,7 +373,7 @@ export function retryWithPersistence<T>(
     jitterFactor: 0.2,
     operationName,
     onRetry: (error, attempt, delay) => {
-      logWarn(`[${operationName}] Persistent retry ${attempt}: ${error.message}`, {}, 'RetryUtils')
+      warn(`[${operationName}] Persistent retry ${attempt}: ${error.message}`, {}, 'RetryUtils')
     },
   })
 }

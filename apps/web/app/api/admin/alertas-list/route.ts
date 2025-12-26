@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-import { createClient } from '@supabase/supabase-js'
-import type { SupabaseClient } from '@supabase/supabase-js'
-
 import { requireAuth } from '@/lib/api-auth'
+import { successResponse, errorResponse, validationErrorResponse } from '@/lib/api-response'
 import { redisCacheService, createCacheKey } from '@/lib/cache/redis-cache.service'
 import { logError } from '@/lib/logger'
+import { supabaseServiceRole } from '@/lib/supabase-server'
+import { validateWithSchema, alertListQuerySchema } from '@/lib/validation/schemas'
 import type { Database } from '@/types/supabase'
 
 type GfAlertsRow = Database['public']['Tables']['gf_alerts']['Row']
@@ -13,41 +13,37 @@ type EmpresasRow = Database['public']['Tables']['empresas']['Row']
 
 export const runtime = 'nodejs'
 
-function getSupabaseAdmin() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-  if (!url || !serviceKey) {
-    throw new Error('Supabase não configurado')
-  }
-  return createClient(url, serviceKey)
-}
-
 export async function GET(request: NextRequest) {
   try {
     const authErrorResponse = await requireAuth(request, 'admin')
-    if (authErrorResponse) {
-      return authErrorResponse
+    if (authErrorResponse) return authErrorResponse
+
+    const { searchParams } = new URL(request.url)
+    const queryParams = Object.fromEntries(searchParams.entries())
+
+    // Validar query params
+    const validation = validateWithSchema(alertListQuerySchema, queryParams)
+    if (!validation.success) {
+      return validationErrorResponse(validation.error)
     }
 
-    const supabaseAdmin = getSupabaseAdmin()
-    const { searchParams } = new URL(request.url)
-    const severity = searchParams.get('severity')
-    const status = searchParams.get('status')
+    const { severity, status, page = 1, limit = 20 } = validation.data
+    const offset = (page - 1) * limit
 
     // ✅ Cache Redis para alertas (TTL: 5 minutos)
-    const cacheKey = createCacheKey('alerts_v4', severity || 'all', status || 'all')
+    const cacheKey = createCacheKey('alerts_v4', severity || 'all', status || 'all', String(page))
 
-    const cachedAlerts = await redisCacheService.get<unknown[]>(cacheKey)
-    if (cachedAlerts) {
-      return NextResponse.json(cachedAlerts)
+    const cachedData = await redisCacheService.get<{ data: unknown[], count: number }>(cacheKey)
+    if (cachedData) {
+      return successResponse(cachedData.data, 200, { count: cachedData.count, limit, offset })
     }
 
     // Query principal sem join para evitar erros de relacionamento
-    let query = supabaseAdmin
+    // Colunas existentes: id, message, alert_type, severity, is_resolved, is_read, empresa_id, metadata, created_at, resolved_at, resolved_by, motorista_id, viagem_id, veiculo_id, rota_id, transportadora_id, passenger_id
+    let query = supabaseServiceRole
       .from('gf_alerts')
-      .select('id, message, title, alert_type, type, severity, is_resolved, assigned_to, empresa_id, company_id, details, metadata, created_at, resolved_at')
+      .select('id, message, alert_type, severity, is_resolved, is_read, empresa_id, metadata, created_at, resolved_at, resolved_by, motorista_id, viagem_id, veiculo_id, rota_id, transportadora_id, passenger_id', { count: 'exact' })
       .order('created_at', { ascending: false })
-      .limit(100)
 
     if (severity && severity !== 'all') {
       query = query.eq('severity', severity)
@@ -55,70 +51,38 @@ export async function GET(request: NextRequest) {
 
     if (status && status !== 'all') {
       if (status === 'open') {
-        // Simplificado para garantir que retorne dados mesmo se assigned_to não existir
         query = query.eq('is_resolved', false)
       } else if (status === 'resolved') {
         query = query.eq('is_resolved', true)
-      } else if (status === 'assigned') {
-        // Se a coluna não existir, isso daria erro. Vamos manter apenas o filtro básico ou tentar checar de forma segura?
-        // Por segurança, assumimos que 'assigned' é um subestado de open, mas se a coluna faltar, melhor não filtrar por ela.
-        query = query.eq('is_resolved', false).not('assigned_to', 'is', null)
       }
+      // Nota: 'assigned' não tem coluna no schema, então é tratado no frontend via metadata
     }
 
-    const { data, error } = await query
+    const { data, error, count } = await query.range(offset, offset + limit - 1)
 
     if (error) {
-      // Se der erro (ex: coluna missing), tentar query fallback mais simples
-      if (error.code === '42703') { // Undefined column
-        const { data: fallbackData, error: fallbackError } = await supabaseAdmin
-          .from('gf_alerts')
-          .select('id, message, title, alert_type, type, severity, is_resolved, assigned_to, empresa_id, company_id, details, metadata, created_at, resolved_at')
-          .order('created_at', { ascending: false })
-          .limit(100)
-
-        if (!fallbackError && fallbackData) {
-          // Continue com dados de fallback
-          const formattedFallbackData = await getFormattedAlertsArray(fallbackData, supabaseAdmin)
-          // Cache the fallback data (array)
-          await redisCacheService.set(cacheKey, formattedFallbackData, 300)
-          return NextResponse.json(formattedFallbackData)
-        }
-      }
-
       logError('Erro ao buscar alertas', { error, severity, status }, 'AlertsListAPI')
-      return NextResponse.json(
-        { error: 'Erro ao buscar alertas', message: error.message },
-        { status: 500 }
-      )
+      return errorResponse(error, 500, 'Erro ao buscar alertas')
     }
 
-    const formattedAlerts = await getFormattedAlertsArray(data || [], supabaseAdmin)
-    // ✅ Armazenar no cache (TTL: 5 minutos - 300 segundos)
-    await redisCacheService.set(cacheKey, formattedAlerts, 300)
+    const formattedAlerts = await getFormattedAlertsArray(data || [], supabaseServiceRole)
 
-    return NextResponse.json(formattedAlerts)
-  } catch (error: unknown) {
-    logError('Erro ao listar alertas', { error }, 'AlertsListAPI')
-    const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido'
-    return NextResponse.json(
-      { error: 'Erro ao listar alertas', message: errorMessage },
-      { status: 500 }
-    )
+    const result = { data: formattedAlerts, count: count || 0 }
+
+    // ✅ Armazenar no cache (TTL: 5 minutos - 300 segundos)
+    await redisCacheService.set(cacheKey, result, 300)
+
+    return successResponse(formattedAlerts, 200, { count: count || 0, limit, offset })
+  } catch (err) {
+    logError('Erro ao listar alertas', { error: err }, 'AlertsListAPI')
+    return errorResponse(err, 500, 'Erro ao listar alertas')
   }
 }
 
-import type { Database } from '@/types/supabase'
-import type { SupabaseClient } from '@supabase/supabase-js'
-
-type GfAlertsRow = Database['public']['Tables']['gf_alerts']['Row']
-type EmpresasRow = Database['public']['Tables']['empresas']['Row']
-
-// Função auxiliar para formatar resposta e lidar com mapeamento de colunas (empresa_id vs company_id)
-async function getFormattedAlertsArray(alertsData: GfAlertsRow[], supabaseAdmin: SupabaseClient<Database>) {
-  // Buscar empresas manualmente para enriquecer (evita erro de FK inexistente)
-  // Suporte para ambos empresa_id (schema BR) e company_id (legacy/mixed)
-  const companyIds = Array.from(new Set(alertsData.map((a: GfAlertsRow) => a.empresa_id || (a as { company_id?: string }).company_id).filter(Boolean)))
+// Função auxiliar para formatar resposta e lidar com mapeamento de colunas
+async function getFormattedAlertsArray(alertsData: GfAlertsRow[], supabaseAdmin: typeof supabaseServiceRole) {
+  // Buscar empresas manualmente para enriquecer
+  const companyIds = Array.from(new Set(alertsData.map((a: GfAlertsRow) => a.empresa_id).filter(Boolean))) as string[]
 
   let companyMap: Record<string, string> = {}
 
@@ -131,7 +95,7 @@ async function getFormattedAlertsArray(alertsData: GfAlertsRow[], supabaseAdmin:
 
       if (companies) {
         companyMap = companies.reduce((acc: Record<string, string>, curr: EmpresasRow) => {
-          acc[curr.id] = curr.name || ''
+          acc[curr.id!] = curr.name || ''
           return acc
         }, {})
       }
@@ -142,28 +106,30 @@ async function getFormattedAlertsArray(alertsData: GfAlertsRow[], supabaseAdmin:
 
   // Mapear dados para compatibilidade com o frontend
   return alertsData.map((alert: GfAlertsRow) => {
-    // Tentar extrair informações de detalhes se existirem
-    const details = alert.details || {}
-    const metadata = alert.metadata || {}
+    // Metadata pode conter informações adicionais
+    const metadata = (alert.metadata as Record<string, unknown>) || {}
 
-    const vehiclePlate = details.vehicle_plate || metadata.vehicle_plate || details.placa || metadata.placa
-    const routeName = details.route_name || metadata.route_name || details.rota || metadata.rota
-    const driverName = details.driver_name || metadata.driver_name || details.motorista || metadata.motorista
-    const driverEmail = details.driver_email || metadata.driver_email
+    const vehiclePlate = metadata.vehicle_plate || metadata.placa
+    const routeName = metadata.route_name || metadata.rota
+    const driverName = metadata.driver_name || metadata.motorista
+    const driverEmail = metadata.driver_email
+    const assignedTo = metadata.assigned_to
 
-    const companyId = alert.empresa_id || alert.company_id
+    const companyId = alert.empresa_id
     const companyName = companyId ? (companyMap[companyId] || 'Empresa não encontrada') : null
 
     return {
       id: alert.id,
-      message: alert.message || alert.title,
+      message: alert.message,
       description: alert.message,
-      type: alert.alert_type || alert.type, // Suporte a alert_type
+      type: alert.alert_type,
       severity: alert.severity,
-      status: alert.is_resolved ? 'resolved' : alert.assigned_to ? 'assigned' : 'open',
+      status: alert.is_resolved ? 'resolved' : assignedTo ? 'assigned' : 'open',
       created_at: alert.created_at,
       is_resolved: alert.is_resolved,
-      assigned_to: alert.assigned_to,
+      is_read: alert.is_read,
+      resolved_at: alert.resolved_at,
+      resolved_by: alert.resolved_by,
 
       // Mapear campos planos
       vehicle_plate: vehiclePlate,

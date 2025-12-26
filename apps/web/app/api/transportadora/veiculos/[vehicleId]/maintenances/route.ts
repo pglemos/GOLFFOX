@@ -1,26 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-import { z } from 'zod'
-
 import { requireAuth } from '@/lib/api-auth'
 import { supabaseServiceRole } from '@/lib/supabase-server'
+import { validateWithSchema, vehicleMaintenanceSchema, maintenanceQuerySchema, uuidSchema } from '@/lib/validation/schemas'
+import { validationErrorResponse } from '@/lib/api-response'
 
 export const runtime = 'nodejs'
-
-const maintenanceSchema = z.object({
-  maintenance_type: z.enum(['preventiva', 'corretiva', 'revisao', 'troca_oleo', 'pneus', 'freios', 'suspensao', 'eletrica', 'outra']),
-  scheduled_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional().nullable(),
-  completed_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional().nullable(),
-  next_maintenance_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional().nullable(),
-  odometer_km: z.number().int().positive().optional().nullable(),
-  description: z.string().min(1),
-  cost_parts_brl: z.number().min(0).default(0),
-  cost_labor_brl: z.number().min(0).default(0),
-  workshop_name: z.string().optional().nullable(),
-  mechanic_name: z.string().optional().nullable(),
-  status: z.enum(['scheduled', 'in_progress', 'completed', 'cancelled']).optional(),
-  notes: z.string().optional().nullable(),
-})
 
 export async function OPTIONS() {
   return new NextResponse(null, {
@@ -38,18 +23,38 @@ export async function GET(
   context: { params: Promise<{ vehicleId: string }> }
 ) {
   const params = await context.params
+  const { vehicleId } = params
 
   try {
     const authErrorResponse = await requireAuth(request, 'gestor_transportadora')
     if (authErrorResponse) return authErrorResponse
 
-    // Selecionar apenas colunas necessárias para listagem (otimização de performance)
-    const maintenanceColumns = 'id,veiculo_id,maintenance_type,scheduled_date,completed_date,next_maintenance_date,odometer_km,description,cost_parts_brl,cost_labor_brl,workshop_name,mechanic_name,status,notes,created_at,updated_at'
-    const { data, error } = await supabaseServiceRole
+    // Validar ID
+    const idValidation = uuidSchema.safeParse(vehicleId)
+    if (!idValidation.success) {
+      return validationErrorResponse('ID do veículo inválido')
+    }
+
+    const { searchParams } = new URL(request.url)
+    const queryParams = Object.fromEntries(searchParams.entries())
+
+    // Validar query params
+    const validation = validateWithSchema(maintenanceQuerySchema, queryParams)
+    if (!validation.success) {
+      return validationErrorResponse(validation.error)
+    }
+
+    const { status, type } = validation.data
+
+    let query = supabaseServiceRole
       .from('vehicle_maintenances')
-      .select(maintenanceColumns)
-      .eq('veiculo_id', params.vehicleId)
-      .order('created_at', { ascending: false })
+      .select('id, veiculo_id, maintenance_type, scheduled_date, completed_date, next_maintenance_date, odometer_km, description, cost_parts_brl, cost_labor_brl, workshop_name, mechanic_name, status, notes, created_at, updated_at')
+      .eq('veiculo_id', vehicleId)
+
+    if (status) query = query.eq('status', status)
+    if (type) query = query.eq('maintenance_type', type)
+
+    const { data, error } = await query.order('created_at', { ascending: false })
 
     if (error) {
       return NextResponse.json(
@@ -73,18 +78,32 @@ export async function POST(
   context: { params: Promise<{ vehicleId: string }> }
 ) {
   const params = await context.params
+  const { vehicleId } = params
 
   try {
     const authErrorResponse = await requireAuth(request, 'gestor_transportadora')
     if (authErrorResponse) return authErrorResponse
 
+    // Validar ID
+    const idValidation = uuidSchema.safeParse(vehicleId)
+    if (!idValidation.success) {
+      return validationErrorResponse('ID do veículo inválido')
+    }
+
     const body = await request.json()
-    const validated = maintenanceSchema.parse(body)
+
+    // Validar corpo
+    const validation = validateWithSchema(vehicleMaintenanceSchema, body)
+    if (!validation.success) {
+      return validationErrorResponse(validation.error)
+    }
+
+    const validated = validation.data
 
     const { data, error } = await supabaseServiceRole
       .from('vehicle_maintenances')
       .insert({
-        veiculo_id: params.vehicleId,
+        veiculo_id: vehicleId,
         ...validated,
         scheduled_date: validated.scheduled_date || null,
         completed_date: validated.completed_date || null,
@@ -102,12 +121,6 @@ export async function POST(
 
     return NextResponse.json(data, { status: 201 })
   } catch (err) {
-    if (err instanceof z.ZodError) {
-      return NextResponse.json(
-        { error: 'Dados inválidos', details: err.errors },
-        { status: 400 }
-      )
-    }
     const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'
     return NextResponse.json(
       { error: 'Erro ao processar requisição', message: errorMessage },

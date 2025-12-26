@@ -27,7 +27,8 @@ export async function register() {
       // Se Datadog não estiver configurado ou houver erro, continuar sem erro
       // Não logar em produção para evitar poluição de logs
       if (process.env.NODE_ENV === 'development') {
-        console.warn('Datadog APM não inicializado:', error instanceof Error ? error.message : String(error))
+        const { warn } = await import('@/lib/logger')
+        warn('Datadog APM não inicializado:', { error: error instanceof Error ? error.message : String(error) }, 'Instrumentation')
       }
     }
   }

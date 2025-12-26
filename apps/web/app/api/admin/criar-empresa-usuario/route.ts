@@ -4,9 +4,11 @@ import { createClient } from '@supabase/supabase-js'
 
 import { requireAuth } from '@/lib/api-auth'
 import { logError, logger } from '@/lib/logger'
+import { withRateLimit } from '@/lib/rate-limit'
 import { CompanyService } from '@/lib/services/server/company-service'
 import { UserService } from '@/lib/services/server/user-service'
 import type { Database } from '@/types/supabase'
+import { validateWithSchema, createCompanyUserSchema } from '@/lib/validation/schemas'
 
 type EmpresasRow = Database['public']['Tables']['empresas']['Row']
 
@@ -22,7 +24,7 @@ function getSupabaseAdmin() {
 }
 
 // OPTIONS handler para CORS
-export async function OPTIONS(request: NextRequest) {
+async function optionsHandler(request: NextRequest) {
   return new NextResponse(null, {
     status: 200,
     headers: {
@@ -33,31 +35,33 @@ export async function OPTIONS(request: NextRequest) {
   })
 }
 
-export async function POST(request: NextRequest) {
+async function criarEmpresaUsuarioHandler(request: NextRequest) {
   try {
     const supabaseAdmin = getSupabaseAdmin()
     const body = await request.json()
-
-    // Aceitar tanto snake_case quanto camelCase
-    const companyName = body?.company_name || body?.companyName
-    const companyId = body?.company_id || body?.companyId
-    const operatorEmail = body?.email || body?.operator_email || body?.operatorEmail || body?.responsibleEmail
-    const operatorPassword = body?.password || body?.operator_password || body?.operatorPassword || body?.responsiblePassword
-    const operatorPhone = body?.phone || body?.operator_phone || body?.operatorPhone || body?.responsiblePhone
-    const operatorName = body?.operator_name || body?.operatorName || body?.responsibleName
 
     // Validar autenticação (apenas admin)
     const authErrorResponse = await requireAuth(request, 'admin')
     if (authErrorResponse) return authErrorResponse
 
-    // Validar dados básicos
-    if (!companyId && !companyName) {
-      return NextResponse.json({ error: 'company_id ou company_name é obrigatório' }, { status: 400 })
+    // Validar dados com Zod
+    const validation = validateWithSchema(createCompanyUserSchema, body)
+    if (!validation.success) {
+      return NextResponse.json({
+        error: 'Dados inválidos',
+        details: validation.error.flatten()
+      }, { status: 400 })
     }
 
-    if (companyId && !companyName && !operatorEmail) {
-      return NextResponse.json({ error: 'email é obrigatório quando company_id é fornecido' }, { status: 400 })
-    }
+    const data = validation.data
+
+    // Mapear campos (suporta ambos os formatos via schema)
+    const companyId = data.company_id || data.companyId
+    const companyName = data.company_name || data.companyName
+    const operatorEmail = data.email || data.operatorEmail
+    const operatorPassword = data.password || data.operatorPassword
+    const operatorPhone = data.phone || data.operatorPhone
+    const operatorName = data.name || data.operatorName
 
     const isTestMode = request.headers.get('x-test-mode') === 'true'
     const isDevelopment = process.env.NODE_ENV === 'development'
@@ -73,11 +77,9 @@ export async function POST(request: NextRequest) {
           // Criar empresa mock para testes
           logger.log(`⚠️ Criando empresa mock para teste: ${companyId}`)
           try {
-            // Tenta criar com ID específico (bypass via repository direto seria melhor, mas service cria novo ID)
-            // Aqui usamos query direta para forçar ID se necessário ou criamos normal
-            const { data: newCompany } = await supabaseAdmin.from('companies').insert({
+            const { data: newCompany } = await supabaseAdmin.from('empresas').insert({
               id: companyId,
-              name: `Empresa Teste ${companyId.substring(0, 8)}`,
+              name: companyName || `Empresa Teste ${companyId.substring(0, 8)}`,
               is_active: true
             }).select().single()
             company = newCompany
@@ -85,25 +87,17 @@ export async function POST(request: NextRequest) {
         }
 
         if (!company) {
-          return NextResponse.json({ error: 'Empresa não encontrada com o company_id fornecido' }, { status: 404 })
+          return NextResponse.json({ error: 'Empresa não encontrada com o ID fornecido' }, { status: 404 })
         }
       }
-    } else {
+    } else if (companyName) {
       // Criar empresa via Service
       try {
         company = await CompanyService.createCompany({
           name: companyName,
-          cnpj: body.cnpj,
-          address: body.address,
-          phone: body.company_phone || body.companyPhone,
-          email: body.company_email || body.companyEmail,
-          address_zip_code: body.address_zip_code || body.zipCode || body.zip_code,
-          address_street: body.address_street || body.address,
-          address_number: body.address_number,
-          address_neighborhood: body.address_neighborhood,
-          address_complement: body.address_complement,
-          address_city: body.address_city || body.city,
-          address_state: body.address_state || body.state
+          cnpj: data.cnpj || undefined,
+          address: data.address || undefined,
+          phone: data.phone || data.operatorPhone || undefined,
         })
       } catch (err: unknown) {
         const error = err as { message?: string }
@@ -112,6 +106,8 @@ export async function POST(request: NextRequest) {
           message: error.message
         }, { status: 400 })
       }
+    } else {
+      return NextResponse.json({ error: 'company_id ou company_name é obrigatório' }, { status: 400 })
     }
 
     // 2. Criar Usuário Operador (se email fornecido)
@@ -119,7 +115,7 @@ export async function POST(request: NextRequest) {
     let userId: string | null = null
     let operatorUser: { id: string; email: string } | null = null
 
-    if (shouldCreateUser) {
+    if (shouldCreateUser && company) {
       // Em modo de teste, simular sucesso se usuário já existe
       if ((isTestMode || isDevelopment) && operatorEmail.includes('test')) {
         const { data: existingUsers } = await supabaseAdmin.auth.admin.listUsers()
@@ -142,17 +138,17 @@ export async function POST(request: NextRequest) {
         const newUser = await UserService.createUser({
           name: operatorName || operatorEmail.split('@')[0],
           email: operatorEmail,
-          password: operatorPassword || undefined, // UserService gera senha se undefined
+          password: operatorPassword || undefined,
           role: 'gestor_empresa',
           company_id: company.id,
-          phone: operatorPhone
+          phone: operatorPhone || null
         })
         userId = newUser.id
         operatorUser = newUser
       } catch (err: unknown) {
         const error = err as { message?: string }
         // Rollback da empresa APENAS se foi criada nesta requisição e não é teste
-        if (!companyId && !isTestMode) {
+        if (!companyId && !isTestMode && company) {
           await CompanyService.deleteCompany(company.id, true).catch(() => { })
         }
 
@@ -164,21 +160,16 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // 3. Audit Log (Simplified)
-    if (Object.keys(body).length > 0) { // Check dummy condition to keep var usage
-      // Auditoria implementada separadamente ou via triggers futuramente
-    }
-
     return NextResponse.json({
       success: true,
       userId: userId,
       created: true,
       email: operatorEmail,
       role: 'gestor_empresa',
-      companyId: company.id,
+      companyId: company?.id,
       company,
       operador: operatorUser,
-      message: shouldCreateUser ? undefined : 'Empresa criada com sucesso. Usuário não criado (email não fornecido).'
+      message: shouldCreateUser ? undefined : 'Empresa processada com sucesso. Usuário não criado (email não fornecido).'
     }, { status: 201 })
 
   } catch (err: unknown) {
@@ -190,4 +181,8 @@ export async function POST(request: NextRequest) {
     }, { status: 500 })
   }
 }
+
+// Exportar com rate limiting (sensitive: 10 requests per minute)
+export const OPTIONS = optionsHandler
+export const POST = withRateLimit(criarEmpresaUsuarioHandler, 'sensitive')
 

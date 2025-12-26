@@ -4,10 +4,10 @@ import { useEffect, useState, useCallback, useRef, memo } from "react"
 
 import { MarkerClusterer } from "@googlemaps/markerclusterer"
 import { motion, AnimatePresence } from "framer-motion"
-import { 
-  RefreshCw, 
-  Calendar, 
-  History, 
+import {
+  RefreshCw,
+  Calendar,
+  History,
   Layers,
   X,
   AlertCircle,
@@ -94,7 +94,7 @@ export const FleetMap = memo(function FleetMap({ companyId, transportadoraId, ro
   const shadowPolylineRef = useRef<google.maps.Polyline | null>(null)
   const clustererRef = useRef<MarkerClusterer | null>(null)
   const infoWindowsRef = useRef<Map<string, google.maps.InfoWindow>>(new Map())
-  
+
   const [selectedBus, setSelectedBus] = useState<Bus | null>(null)
   const [buses, setBuses] = useState<Bus[]>([])
   const [stops, setStops] = useState<Stop[]>([])
@@ -103,7 +103,7 @@ export const FleetMap = memo(function FleetMap({ companyId, transportadoraId, ro
   const [mapError, setMapError] = useState<string | null>(null)
   const [selectedStopId, setSelectedStopId] = useState<string | null>(null)
   const [hotspotPosition, setHotspotPosition] = useState<{ x: number; y: number } | null>(null)
-  
+
   // Filtros persistidos na URL
   const { filters, setFilters } = useUrlFilters({
     initialFilters: {
@@ -142,9 +142,9 @@ export const FleetMap = memo(function FleetMap({ companyId, transportadoraId, ro
   const loadMapData = useCallback(async (signal?: AbortSignal) => {
     try {
       const { data, error } = await supabase.rpc('gf_map_snapshot_full', {
-        p_company_id: filters.company || null,
-        p_transportadora_id: filters.transportadora || null,
-        p_route_id: filters.route || null
+        p_company_id: filters.company || undefined,
+        p_transportadora_id: filters.transportadora || undefined,
+        p_route_id: filters.route || undefined
       })
 
       // Verificar se foi abortado
@@ -170,39 +170,75 @@ export const FleetMap = memo(function FleetMap({ companyId, transportadoraId, ro
           return null
         }
 
-        const rawBuses: unknown[] = Array.isArray(data?.buses) ? data.buses : []
+        // Tipar os dados do RPC como objeto com arrays
+        type RpcData = {
+          buses?: Array<Record<string, unknown>>;
+          stops?: Array<Record<string, unknown>>;
+          routes?: Array<Record<string, unknown>>;
+        }
+        const typedData = data as RpcData
+
+        const rawBuses = Array.isArray(typedData?.buses) ? typedData.buses : []
         const normalizedBuses = rawBuses
-          .map((bus: Record<string, unknown>) => {
+          .map((bus) => {
             const lat = toNumber(bus?.lat)
             const lng = toNumber(bus?.lng)
             return {
-              ...bus,
-              lat,
-              lng,
-              heading: toNumber(bus?.heading) ?? 0,
-              speed: toNumber(bus?.speed) ?? 0,
-              passenger_count: Number.isFinite(Number(bus?.passenger_count)) ? Number(bus?.passenger_count) : 0,
+              id: bus?.id as string || '',
+              trip_id: bus?.trip_id as string || '',
+              route_id: bus?.route_id as string || '',
+              route_name: bus?.route_name as string || '',
+              veiculo_id: bus?.veiculo_id as string || '',
+              vehicle_plate: bus?.vehicle_plate as string || '',
+              vehicle_model: bus?.vehicle_model as string || '',
               capacity: Number.isFinite(Number(bus?.capacity)) ? Number(bus?.capacity) : undefined,
+              motorista_id: bus?.motorista_id as string || '',
+              motorista_name: bus?.motorista_name as string || '',
+              company_id: bus?.company_id as string || '',
+              company_name: bus?.company_name as string || '',
+              lat: lat ?? 0,
+              lng: lng ?? 0,
+              speed: toNumber(bus?.speed) ?? 0,
+              heading: toNumber(bus?.heading) ?? 0,
+              status: bus?.status as string || '',
+              color: (bus?.color as 'green' | 'yellow' | 'red' | 'blue') || 'blue',
+              passenger_count: Number.isFinite(Number(bus?.passenger_count)) ? Number(bus?.passenger_count) : 0,
+              last_update: bus?.last_update as string || '',
             }
           })
-          .filter((bus: { lat?: number; lng?: number }) => typeof bus?.lat === 'number' && typeof bus?.lng === 'number')
+          .filter((bus) => bus.lat !== 0 && bus.lng !== 0)
 
-        const rawStops: unknown[] = Array.isArray(data?.stops) ? data.stops : []
+        const rawStops = Array.isArray(typedData?.stops) ? typedData.stops : []
         const normalizedStops = rawStops
-          .map((stop: Record<string, unknown>) => {
+          .map((stop) => {
             const lat = toNumber(stop?.lat)
             const lng = toNumber(stop?.lng)
-            return { ...stop, lat, lng }
+            return {
+              id: stop?.id as string || '',
+              route_id: stop?.route_id as string || '',
+              stop_order: Number(stop?.stop_order) || 0,
+              lat: lat ?? 0,
+              lng: lng ?? 0,
+              address: stop?.address as string || '',
+              stop_name: stop?.stop_name as string || '',
+              passenger_name: stop?.passenger_name as string | undefined,
+              passageiro_id: stop?.passageiro_id as string | undefined,
+              estimated_arrival: stop?.estimated_arrival as string | undefined,
+            }
           })
-          .filter((stop: { lat?: number; lng?: number }) => typeof stop?.lat === 'number' && typeof stop?.lng === 'number')
+          .filter((stop) => stop.lat !== 0 && stop.lng !== 0)
 
-        const rawRoutes: unknown[] = Array.isArray(data?.routes) ? data.routes : []
-        const normalizedRoutes = rawRoutes.map((route: Record<string, unknown>) => {
-          const points: Array<Record<string, unknown>> = Array.isArray(route?.polyline_points) ? route.polyline_points : []
+        const rawRoutes = Array.isArray(typedData?.routes) ? typedData.routes : []
+        const normalizedRoutes = rawRoutes.map((route) => {
+          const points = Array.isArray(route?.polyline_points) ? route.polyline_points as Array<Record<string, unknown>> : []
           const normalizedPoints = points
-            .map((p: Record<string, unknown>) => ({ lat: toNumber(p?.lat), lng: toNumber(p?.lng) }))
-            .filter((p: { lat?: number; lng?: number }) => typeof p.lat === 'number' && typeof p.lng === 'number')
-          return { ...route, polyline_points: normalizedPoints }
+            .map((p) => ({ lat: toNumber(p?.lat), lng: toNumber(p?.lng) }))
+            .filter((p): p is { lat: number; lng: number } => p.lat !== null && p.lng !== null)
+          return {
+            id: route?.id as string || '',
+            name: route?.name as string || '',
+            polyline_points: normalizedPoints,
+          }
         })
 
         setBuses(normalizedBuses)
@@ -220,7 +256,7 @@ export const FleetMap = memo(function FleetMap({ companyId, transportadoraId, ro
   // Função para obter a API Key
   const getGoogleMapsApiKey = () => {
     const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
-    
+
     if (!apiKey) {
       setMapError('API Key do Google Maps não configurada.')
       return null
@@ -252,7 +288,7 @@ export const FleetMap = memo(function FleetMap({ companyId, transportadoraId, ro
 
       try {
         await loadGoogleMapsAPI(apiKey)
-        
+
         const defaultCenter = { lat: -19.916681, lng: -43.934493 }
         const map = new google.maps.Map(mapRef.current, {
           center: initialCenter || defaultCenter,
@@ -299,7 +335,7 @@ export const FleetMap = memo(function FleetMap({ companyId, transportadoraId, ro
     markersRef.current.clear()
     infoWindowsRef.current.forEach(infoWindow => infoWindow.close())
     infoWindowsRef.current.clear()
-    
+
     // Limpar polylines
     if (polylineRef.current) {
       polylineRef.current.setMap(null)
@@ -325,14 +361,14 @@ export const FleetMap = memo(function FleetMap({ companyId, transportadoraId, ro
 
       // Criar marcadores
       const markers: google.maps.Marker[] = []
-      
+
       filteredBuses.forEach(bus => {
         const icon = getBusIcon(busColors[bus.color], bus.heading)
         if (!icon) return
-        
+
         // ✅ Acessibilidade: título descritivo para screen readers
         const markerTitle = `Veículo ${bus.vehicle_plate} - Rota ${bus.route_name} - Status: ${bus.status} - ${bus.passenger_count || 0} passageiros`
-        
+
         const marker = new google.maps.Marker({
           position: { lat: bus.lat, lng: bus.lng },
           map: null, // Não adicionar ao mapa diretamente (clusterer vai fazer isso)
@@ -396,8 +432,8 @@ export const FleetMap = memo(function FleetMap({ companyId, transportadoraId, ro
 
       // Criar clusterer
       if (markers.length > 0) {
-        clustererRef.current = new MarkerClusterer({ 
-          map, 
+        clustererRef.current = new MarkerClusterer({
+          map,
           markers
         })
       }
@@ -407,27 +443,27 @@ export const FleetMap = memo(function FleetMap({ companyId, transportadoraId, ro
         const routeStops = stops
           .filter(stop => !selectedBus || stop.route_id === selectedBus.route_id)
           .sort((a, b) => a.stop_order - b.stop_order)
-        
+
         // Criar marcadores de parada
         routeStops.forEach((stop, index) => {
           const isPickup = index === 0 || index % 2 === 0
           const markerSize = 32
           const svgMarkup = isPickup
             ? `<svg width="${markerSize}" height="${markerSize}" xmlns="http://www.w3.org/2000/svg">
-                 <circle cx="${markerSize/2}" cy="${markerSize/2}" r="${markerSize/2 - 2}" fill="#10B981" stroke="#FFFFFF" stroke-width="2"/>
+                 <circle cx="${markerSize / 2}" cy="${markerSize / 2}" r="${markerSize / 2 - 2}" fill="#10B981" stroke="#FFFFFF" stroke-width="2"/>
                  <text x="50%" y="50%" text-anchor="middle" dominant-baseline="central" fill="#FFFFFF" font-size="14" font-weight="bold">${index + 1}</text>
                </svg>`
             : `<svg width="${markerSize}" height="${markerSize}" xmlns="http://www.w3.org/2000/svg">
                  <rect x="2" y="2" width="${markerSize - 4}" height="${markerSize - 4}" fill="#F59E0B" stroke="#FFFFFF" stroke-width="2" rx="4"/>
                  <text x="50%" y="50%" text-anchor="middle" dominant-baseline="central" fill="#FFFFFF" font-size="14" font-weight="bold">${index + 1}</text>
                </svg>`
-          
+
           const icon = {
             url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svgMarkup),
             scaledSize: new google.maps.Size(markerSize, markerSize),
-            anchor: new google.maps.Point(markerSize/2, markerSize/2)
+            anchor: new google.maps.Point(markerSize / 2, markerSize / 2)
           }
-          
+
           const stopMarker = new google.maps.Marker({
             position: { lat: stop.lat, lng: stop.lng },
             map,
@@ -470,7 +506,7 @@ export const FleetMap = memo(function FleetMap({ companyId, transportadoraId, ro
           .filter(route => !selectedBus || route.id === selectedBus.route_id)
           .forEach(route => {
             let path: google.maps.LatLng[] = []
-            
+
             if (route.polyline_points && route.polyline_points.length > 0) {
               path = route.polyline_points.map(p => new google.maps.LatLng(p.lat, p.lng))
             } else {
@@ -478,7 +514,7 @@ export const FleetMap = memo(function FleetMap({ companyId, transportadoraId, ro
               const routeStops = stops
                 .filter(stop => stop.route_id === route.id)
                 .sort((a, b) => a.stop_order - b.stop_order)
-              
+
               if (routeStops.length > 1) {
                 path = routeStops.map(stop => new google.maps.LatLng(stop.lat, stop.lng))
               }
@@ -640,8 +676,8 @@ export const FleetMap = memo(function FleetMap({ companyId, transportadoraId, ro
       )}
 
       {/* Mapa */}
-      <div 
-        ref={mapRef} 
+      <div
+        ref={mapRef}
         className={`w-full ${(selectedBus || filters.route) && formattedStops.length > 0 ? 'h-[calc(100vh-450px)]' : 'h-[calc(100vh-300px)]'}`}
       />
 
@@ -662,7 +698,7 @@ export const FleetMap = memo(function FleetMap({ companyId, transportadoraId, ro
             <AlertCircle className="h-16 w-16 text-error mx-auto mb-4" />
             <h3 className="text-xl font-semibold mb-2 text-ink">Erro no Mapa</h3>
             <p className="text-ink-muted mb-6">{mapError}</p>
-            <Button 
+            <Button
               onClick={() => {
                 setMapError(null)
                 setLoading(true)
@@ -751,10 +787,10 @@ export const FleetMap = memo(function FleetMap({ companyId, transportadoraId, ro
                   <h3 className="font-bold text-lg sm:text-xl truncate">{selectedBus.vehicle_plate}</h3>
                   <p className="text-sm text-ink-muted truncate">{selectedBus.vehicle_model}</p>
                 </div>
-                <Button 
-                  size="icon" 
-                  variant="ghost" 
-                  onClick={() => setSelectedBus(null)} 
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  onClick={() => setSelectedBus(null)}
                   className="hover:bg-bg-hover"
                   aria-label="Fechar detalhes do veículo"
                 >
@@ -773,17 +809,17 @@ export const FleetMap = memo(function FleetMap({ companyId, transportadoraId, ro
                 </div>
                 <div>
                   <span className="text-ink-muted block mb-2">Status:</span>
-                  <Badge 
+                  <Badge
                     variant={
-                      (selectedBus.color === 'green' ? 'default' : 
-                      selectedBus.color === 'red' ? 'destructive' : 
-                      selectedBus.color === 'yellow' ? 'outline' : 'default') as 'default' | 'destructive' | 'outline' | 'secondary'
+                      (selectedBus.color === 'green' ? 'default' :
+                        selectedBus.color === 'red' ? 'destructive' :
+                          selectedBus.color === 'yellow' ? 'outline' : 'default') as 'default' | 'destructive' | 'outline' | 'secondary'
                     }
                     className={selectedBus.color === 'green' ? 'bg-success-light0 text-white' : selectedBus.color === 'yellow' ? 'border-warning text-warning' : ''}
                   >
-                    {selectedBus.color === 'green' ? 'Em Movimento' : 
-                     selectedBus.color === 'yellow' ? 'Parado' :
-                     selectedBus.color === 'red' ? 'Parado (>3min)' : 'Garagem'}
+                    {selectedBus.color === 'green' ? 'Em Movimento' :
+                      selectedBus.color === 'yellow' ? 'Parado' :
+                        selectedBus.color === 'red' ? 'Parado (>3min)' : 'Garagem'}
                   </Badge>
                 </div>
                 <div className="flex items-center gap-4 pt-2 border-t border-border">

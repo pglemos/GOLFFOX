@@ -4,58 +4,43 @@ import { requireAuth } from '@/lib/api-auth'
 import { validationErrorResponse, errorResponse, successResponse } from '@/lib/api-response'
 import { logger, logError } from '@/lib/logger'
 import { invalidateEntityCache } from '@/lib/next-cache'
+import { withRateLimit } from '@/lib/rate-limit'
 import { getSupabaseAdmin } from '@/lib/supabase-client'
+import { validateWithSchema, idQuerySchema } from '@/lib/validation/schemas'
 import type { Database } from '@/types/supabase'
 
 type UserUpdate = Database['public']['Tables']['users']['Update']
 
 export const runtime = 'nodejs'
 
-// Aceitar tanto DELETE quanto POST para compatibilidade
-export async function DELETE(request: NextRequest) {
-  return handleDelete(request)
-}
-
-export async function POST(request: NextRequest) {
-  return handleDelete(request)
-}
+// ✅ SEGURANÇA: Rate limiting para proteção contra abuso
+export const DELETE = withRateLimit((request: NextRequest) => handleDelete(request), 'sensitive')
+export const POST = withRateLimit((request: NextRequest) => handleDelete(request), 'sensitive')
 
 async function handleDelete(request: NextRequest) {
   try {
     const authErrorResponse = await requireAuth(request, 'admin')
-    if (authErrorResponse) {
-      return authErrorResponse
-    }
+    if (authErrorResponse) return authErrorResponse
 
-    // Aceitar tanto query param quanto body
     const { searchParams } = new URL(request.url)
-    let companyId = searchParams.get('id')
+    const queryParams = Object.fromEntries(searchParams.entries())
 
-    // Se não estiver na query, tentar no body
-    if (!companyId) {
-      try {
-        const body = await request.json()
-        companyId = body.id || body.company_id
-      } catch (e) {
-        // Body vazio ou inválido, continuar com null
-      }
+    // Validar query params
+    const validation = validateWithSchema(idQuerySchema, queryParams)
+    if (!validation.success) {
+      return validationErrorResponse(validation.error)
     }
 
-    if (!companyId) {
-      return NextResponse.json(
-        { error: 'ID da empresa é obrigatório' },
-        { status: 400 }
-      )
-    }
+    const { id: companyId } = validation.data
 
     const supabaseAdmin = getSupabaseAdmin()
 
     logger.log(`🗑️ Tentando excluir empresa permanentemente: ${companyId}`)
 
     // ORDEM CRÍTICA DE EXCLUSÃO:
-    // 1. Atualizar users para setar company_id = NULL (pode não ter ON DELETE SET NULL)
+    // 1. Atualizar users para setar company_id = NULL
     logger.log('   1. Atualizando users (setando company_id para NULL)...')
-    const { error: usersUpdateError } = await (supabaseAdmin
+    const { error: usersUpdateError } = await supabaseAdmin
       .from('users')
       .update({ empresa_id: null } as UserUpdate)
       .eq('company_id', companyId)
@@ -66,21 +51,18 @@ async function handleDelete(request: NextRequest) {
     }
     logger.log('   ✅ Users atualizados')
 
-    // 2. Excluir dependências que podem ter CASCADE mas vamos excluir explicitamente para garantir
+    // 2. Excluir dependências
     logger.log('   2. Excluindo dependências...')
 
     // Excluir routes (e suas dependências serão excluídas via CASCADE)
-    const { error: routesError } = await (supabaseAdmin
+    const { error: routesError } = await supabaseAdmin
       .from('rotas')
       .delete()
       .eq('empresa_id', companyId)
 
     if (routesError && routesError.code !== '42P01') {
       logError('Erro ao excluir routes', { error: routesError, companyId }, 'CompaniesDeleteAPI')
-      return NextResponse.json(
-        { error: 'Erro ao excluir rotas da empresa', message: routesError.message },
-        { status: 500 }
-      )
+      return errorResponse(routesError, 500, 'Erro ao excluir rotas da empresa')
     }
 
     // Excluir outras dependências
@@ -92,11 +74,10 @@ async function handleDelete(request: NextRequest) {
       'gf_costs',
       'gf_budgets',
       'gf_company_branding',
-      'gf_service_requests' // Pode usar empresa_id ou company_id
+      'gf_service_requests'
     ]
 
     for (const table of dependentTables) {
-      // Algumas tabelas podem usar empresa_id em vez de company_id
       const columnName = table === 'gf_service_requests' ? 'empresa_id' : 'company_id'
 
       const { error: depError } = await supabaseAdmin
@@ -106,7 +87,6 @@ async function handleDelete(request: NextRequest) {
 
       if (depError && depError.code !== '42P01' && depError.code !== '42703') {
         logError(`Erro ao excluir ${table}`, { error: depError, table, companyId }, 'CompaniesDeleteAPI')
-        // Não retornar erro fatal, algumas tabelas podem não existir
       }
     }
     logger.log('   ✅ Dependências excluídas')
@@ -120,14 +100,14 @@ async function handleDelete(request: NextRequest) {
       .select()
 
     if (error) {
-      logError('Erro ao excluir empresa', { error, companyId, errorDetails: JSON.stringify(error, null, 2) }, 'CompaniesDeleteAPI')
+      logError('Erro ao excluir empresa', { error, companyId }, 'CompaniesDeleteAPI')
       return errorResponse(error, 500, 'Erro ao excluir empresa')
     }
 
     // Invalidar cache após exclusão
     await invalidateEntityCache('company', companyId)
 
-    logger.log(`✅ Empresa excluída com sucesso: ${companyId}`, data)
+    logger.log(`✅ Empresa excluída com sucesso: ${companyId}`)
 
     return successResponse(null, 200, { message: 'Empresa excluída com sucesso' })
   } catch (err) {

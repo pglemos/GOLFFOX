@@ -6,9 +6,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 
 import { requireAuth } from '@/lib/api-auth'
-import { successResponse, errorResponse } from '@/lib/api-response'
+import { successResponse, errorResponse, validationErrorResponse } from '@/lib/api-response'
 import { logError } from '@/lib/logger'
 import { getSupabaseAdmin } from '@/lib/supabase-client'
+import { validateWithSchema, carrierListQuerySchema } from '@/lib/validation/schemas'
 
 export const runtime = 'nodejs'
 
@@ -18,15 +19,19 @@ export async function GET(request: NextRequest) {
     const authError = await requireAuth(request, 'admin')
     if (authError) return authError
 
-    const supabase = getSupabaseAdmin()
-    const searchParams = request.nextUrl.searchParams
+    const { searchParams } = new URL(request.url)
+    const queryParams = Object.fromEntries(searchParams.entries())
 
-    // Filtros opcionais
-    const page = parseInt(searchParams.get('page') || '1')
-    const limit = parseInt(searchParams.get('limit') || '100')
+    // Validar query params
+    const validation = validateWithSchema(carrierListQuerySchema, queryParams)
+    if (!validation.success) {
+      return validationErrorResponse(validation.error)
+    }
+
+    const { page, limit, search, status } = validation.data
     const offset = (page - 1) * limit
-    const search = searchParams.get('search') || undefined
-    const isActive = searchParams.get('is_active')
+
+    const supabase = getSupabaseAdmin()
 
     let query = supabase
       .from('transportadoras')
@@ -38,8 +43,8 @@ export async function GET(request: NextRequest) {
       query = query.or(`name.ilike.%${search}%,email.ilike.%${search}%,cnpj.ilike.%${search}%`)
     }
 
-    if (isActive !== null && isActive !== undefined) {
-      query = query.eq('is_active', isActive === 'true')
+    if (status) {
+      query = query.eq('is_active', status === 'active')
     }
 
     // Paginação
@@ -49,7 +54,7 @@ export async function GET(request: NextRequest) {
 
     if (error) {
       logError('Erro ao listar transportadoras', { error }, 'TransportadorasAPI')
-      return errorResponse('Erro ao listar transportadoras', 500)
+      return errorResponse(error, 500, 'Erro ao listar transportadoras')
     }
 
     // Contar total (para paginação)
@@ -61,8 +66,8 @@ export async function GET(request: NextRequest) {
       countQuery = countQuery.or(`name.ilike.%${search}%,email.ilike.%${search}%,cnpj.ilike.%${search}%`)
     }
 
-    if (isActive !== null && isActive !== undefined) {
-      countQuery = countQuery.eq('is_active', isActive === 'true')
+    if (status) {
+      countQuery = countQuery.eq('is_active', status === 'active')
     }
 
     const { count } = await countQuery

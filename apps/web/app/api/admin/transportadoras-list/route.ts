@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 
 import { requireAuth } from '@/lib/api-auth'
-import { successResponse, errorResponse } from '@/lib/api-response'
-import { redisCacheService, createCacheKey, withRedisCache } from '@/lib/cache/redis-cache.service'
+import { successResponse, errorResponse, validationErrorResponse } from '@/lib/api-response'
+import { createCacheKey, withRedisCache } from '@/lib/cache/redis-cache.service'
 import { logError } from '@/lib/logger'
 import { supabaseServiceRole } from '@/lib/supabase-server'
+import { validateWithSchema, carrierListQuerySchema } from '@/lib/validation/schemas'
 
 export const runtime = 'nodejs'
 
@@ -24,9 +25,18 @@ export async function GET(req: NextRequest) {
     const authErrorResponse = await requireAuth(req, 'admin')
     if (authErrorResponse) return authErrorResponse
 
+    const { searchParams } = new URL(req.url)
+    const queryParams = Object.fromEntries(searchParams.entries())
+
+    // Validar query params
+    const validation = validateWithSchema(carrierListQuerySchema, queryParams)
+    if (!validation.success) {
+      return validationErrorResponse(validation.error)
+    }
+
     // ✅ Cache Redis para lista de transportadoras (TTL: 5 minutos)
     const cacheKey = createCacheKey('transportadoras', 'list')
-    
+
     const data = await withRedisCache(
       cacheKey,
       async () => {
@@ -51,4 +61,3 @@ export async function GET(req: NextRequest) {
     return errorResponse(err, 500, 'Erro ao processar requisição')
   }
 }
-

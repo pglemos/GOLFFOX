@@ -1,24 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-import { z } from 'zod'
-
 import { requireAuth, validateAuth } from '@/lib/api-auth'
 import { supabaseServiceRole } from '@/lib/supabase-server'
+import { validateWithSchema, vehicleCostSchema, vehicleCostQuerySchema } from '@/lib/validation/schemas'
+import { validationErrorResponse } from '@/lib/api-response'
 
 export const runtime = 'nodejs'
-
-const vehicleCostSchema = z.object({
-  veiculo_id: z.string().uuid(),
-  cost_category: z.enum(['combustivel', 'manutencao', 'seguro', 'ipva', 'depreciacao', 'pneus', 'lavagem', 'pedagio', 'multas', 'outros']),
-  cost_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-  amount_brl: z.number().positive(),
-  quantity: z.number().positive().optional().nullable(),
-  unit_measure: z.string().optional().nullable(),
-  odometer_km: z.number().int().positive().optional().nullable(),
-  description: z.string().optional().nullable(),
-  invoice_number: z.string().optional().nullable(),
-  supplier: z.string().optional().nullable(),
-})
 
 export async function OPTIONS() {
   return new NextResponse(null, {
@@ -41,9 +28,17 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
     }
 
-    const vehicleId = req.nextUrl.searchParams.get('veiculo_id')
-    const startDate = req.nextUrl.searchParams.get('start_date')
-    const endDate = req.nextUrl.searchParams.get('end_date')
+    const { searchParams } = new URL(req.url)
+    const queryParams = Object.fromEntries(searchParams.entries())
+
+    // Validar query params
+    const validation = validateWithSchema(vehicleCostQuerySchema, queryParams)
+    if (!validation.success) {
+      return validationErrorResponse(validation.error)
+    }
+
+    const { veiculo_id, vehicle_id, start_date, end_date } = validation.data
+    const targetVehicleId = veiculo_id || vehicle_id
 
     // Buscar transportadora_id do usuário
     const { data: userData } = await supabaseServiceRole
@@ -59,13 +54,9 @@ export async function GET(req: NextRequest) {
         veiculos(plate, model, transportadora_id)
       `)
 
-    // Filtrar apenas veículos da transportadora do usuário
-    // Nota: O filtro será feito após o join através da relação veiculo_id
-    // Verificar se o veículo pertence à transportadora ao processar resultados
-
-    if (vehicleId) query = query.eq('veiculo_id', vehicleId)
-    if (startDate) query = query.gte('cost_date', startDate)
-    if (endDate) query = query.lte('cost_date', endDate)
+    if (targetVehicleId) query = query.eq('veiculo_id', targetVehicleId)
+    if (start_date) query = query.gte('cost_date', start_date)
+    if (end_date) query = query.lte('cost_date', end_date)
 
     const { data, error } = await query.order('cost_date', { ascending: false })
 
@@ -77,7 +68,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Filtrar apenas veículos da transportadora do usuário após buscar
-    const filteredData = (data || []).filter((cost: { veiculos?: { transportadora_id?: string } | null; [key: string]: unknown }) => {
+    const filteredData = (data || []).filter((cost: any) => {
       if (!userData?.transportadora_id) return false
       const veiculo = cost.veiculos
       if (!veiculo) return false
@@ -86,8 +77,9 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(filteredData)
   } catch (error: unknown) {
+    const err = error as { message?: string }
     return NextResponse.json(
-      { error: 'Erro ao processar requisição', message: error.message },
+      { error: 'Erro ao processar requisição', message: err.message },
       { status: 500 }
     )
   }
@@ -104,13 +96,20 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json()
-    const validated = vehicleCostSchema.parse(body)
+
+    // Validar corpo
+    const validation = validateWithSchema(vehicleCostSchema, body)
+    if (!validation.success) {
+      return validationErrorResponse(validation.error)
+    }
+
+    const data = validation.data
 
     // Verificar se o veículo pertence à transportadora do usuário
     const { data: veiculo } = await supabaseServiceRole
       .from('veiculos')
       .select('transportadora_id')
-      .eq('id', validated.veiculo_id)
+      .eq('id', data.veiculo_id)
       .single()
 
     if (!veiculo) {
@@ -133,10 +132,10 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    const { data, error } = await supabaseServiceRole
+    const { data: createdData, error } = await supabaseServiceRole
       .from('vehicle_costs')
       .insert({
-        ...validated,
+        ...data,
         created_by: user.id,
       })
       .select()
@@ -149,16 +148,11 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    return NextResponse.json(data, { status: 201 })
+    return NextResponse.json(createdData, { status: 201 })
   } catch (error: unknown) {
-    if (error instanceof z.ZodError) {
-      return NextResponse.json(
-        { error: 'Dados inválidos', details: error.errors },
-        { status: 400 }
-      )
-    }
+    const err = error as { message?: string }
     return NextResponse.json(
-      { error: 'Erro ao processar requisição', message: error.message },
+      { error: 'Erro ao processar requisição', message: err.message },
       { status: 500 }
     )
   }

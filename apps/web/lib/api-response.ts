@@ -4,6 +4,7 @@
  */
 
 import { NextResponse } from 'next/server'
+import { ZodError } from 'zod'
 
 import { formatError } from './error-utils'
 
@@ -58,18 +59,31 @@ export function errorResponse(
   return NextResponse.json(response, { status })
 }
 
+
 /**
  * Resposta de validação (400)
  */
 export function validationErrorResponse(
-  message: string,
+  messageOrError: string | ZodError,
   details?: Record<string, unknown>
 ): NextResponse<ApiResponse> {
+  let message: string
+  let errorDetails: Record<string, unknown> | undefined = details
+
+  if (messageOrError instanceof ZodError) {
+    // Extrair mensagens de erro do ZodError
+    const issues = messageOrError.errors.map(e => `${e.path.join('.')}: ${e.message}`).join('; ')
+    message = issues || 'Erro de validação'
+    errorDetails = { ...details, zodErrors: messageOrError.errors }
+  } else {
+    message = messageOrError
+  }
+
   const response: ApiResponse = {
     success: false,
     error: 'Erro de validação',
     message,
-    ...details
+    ...errorDetails
   }
 
   return NextResponse.json(response, { status: 400 })

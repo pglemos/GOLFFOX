@@ -4,36 +4,31 @@ import { requireAuth } from '@/lib/api-auth'
 import { logger, logError } from '@/lib/logger'
 import { invalidateEntityCache } from '@/lib/next-cache'
 import { getSupabaseAdmin } from '@/lib/supabase-client'
+import { validateWithSchema, idQuerySchema } from '@/lib/validation/schemas'
+import { validationErrorResponse } from '@/lib/api-response'
 
 export const runtime = 'nodejs'
 
 export async function DELETE(request: NextRequest) {
   try {
     const authErrorResponse = await requireAuth(request, 'admin')
-    if (authErrorResponse) {
-      return authErrorResponse
-    }
+    if (authErrorResponse) return authErrorResponse
 
     const { searchParams } = new URL(request.url)
-    const vehicleId = searchParams.get('id')
+    const queryParams = Object.fromEntries(searchParams.entries())
 
-    if (!vehicleId) {
-      return NextResponse.json(
-        { error: 'ID do veículo é obrigatório' },
-        { status: 400 }
-      )
+    // Validar query params
+    const validation = validateWithSchema(idQuerySchema, queryParams)
+    if (!validation.success) {
+      return validationErrorResponse(validation.error)
     }
 
+    const { id: vehicleId } = validation.data
     const supabaseAdmin = getSupabaseAdmin()
-
-    // Excluir permanentemente o veículo do banco de dados
-    // Primeiro, precisamos tratar as foreign keys:
-    // - trips.veiculo_id tem ON DELETE SET NULL, mas precisamos setar manualmente para evitar erro
-    // - Outras tabelas com CASCADE serão excluídas automaticamente
 
     logger.log(`🗑️ Tentando excluir veículo: ${vehicleId}`)
 
-    // Primeiro, setar vehicle_id para NULL em trips (mesmo que seja SET NULL, fazemos explicitamente)
+    // Primeiro, setar vehicle_id para NULL em viagens
     await supabaseAdmin
       .from('viagens')
       .update({ veiculo_id: null })
@@ -47,7 +42,7 @@ export async function DELETE(request: NextRequest) {
       .select()
 
     if (error) {
-      logError('Erro ao excluir veículo', { error, vehicleId, errorDetails: JSON.stringify(error, null, 2) }, 'VehiclesDeleteAPI')
+      logError('Erro ao excluir veículo', { error, vehicleId }, 'VehiclesDeleteAPI')
       return NextResponse.json(
         {
           error: 'Erro ao excluir veículo',
@@ -69,10 +64,10 @@ export async function DELETE(request: NextRequest) {
       message: 'Veículo excluído com sucesso'
     })
   } catch (error: unknown) {
-    const err = error as { message?: string }
-    logError('Erro ao excluir veículo', { error: err, vehicleId: request.nextUrl.searchParams.get('id') }, 'VehiclesDeleteAPI')
+    logError('Erro ao excluir veículo', { error }, 'VehiclesDeleteAPI')
+    const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido'
     return NextResponse.json(
-      { error: 'Erro ao excluir veículo', message: err.message },
+      { error: 'Erro ao excluir veículo', message: errorMessage },
       { status: 500 }
     )
   }

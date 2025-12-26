@@ -3,24 +3,34 @@ import { NextRequest, NextResponse } from 'next/server'
 import { requireAuth } from '@/lib/api-auth'
 import { logError } from '@/lib/logger'
 import { UserService } from '@/lib/services/server/user-service'
+import { validateWithSchema, userListQuerySchema } from '@/lib/validation/schemas'
+import { validationErrorResponse } from '@/lib/api-response'
 
 export const runtime = 'nodejs'
 
 export async function GET(request: NextRequest) {
   try {
     const authErrorResponse = await requireAuth(request, 'admin')
-    if (authErrorResponse) {
-      return authErrorResponse
-    }
+    if (authErrorResponse) return authErrorResponse
 
     const { searchParams } = new URL(request.url)
-    const role = searchParams.get('role') || undefined
-    const status = searchParams.get('status') || undefined
-    const companyId = searchParams.get('company_id') || undefined
+    const queryParams = Object.fromEntries(searchParams.entries())
 
-    const users = await UserService.listUsers({ role, status, companyId })
+    // Validar query params
+    const validation = validateWithSchema(userListQuerySchema, queryParams)
+    if (!validation.success) {
+      return validationErrorResponse(validation.error)
+    }
 
-    // Retornar no formato esperado pelo frontend
+    const { role, status, company_id, empresa_id } = validation.data
+    const targetCompanyId = empresa_id || company_id
+
+    const users = await UserService.listUsers({
+      role,
+      status,
+      companyId: targetCompanyId
+    })
+
     return NextResponse.json({
       success: true,
       users: users

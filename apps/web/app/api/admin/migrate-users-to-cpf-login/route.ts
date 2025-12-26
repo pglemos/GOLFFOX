@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
 import { debug, logError } from '@/lib/logger'
+import { withRateLimit } from '@/lib/rate-limit'
 
 // API para migrar usuários antigos para o novo formato de login com CPF
 // POST /api/admin/migrate-users-to-cpf-login
@@ -16,7 +17,7 @@ function getSupabaseAdmin() {
     return createClient(url, serviceKey)
 }
 
-export async function POST(request: NextRequest) {
+async function migrateUsersToCPFHandler(request: NextRequest) {
     try {
         const supabase = getSupabaseAdmin()
 
@@ -122,7 +123,7 @@ export async function POST(request: NextRequest) {
 }
 
 // GET para ver status
-export async function GET(request: NextRequest) {
+async function getMigrationStatusHandler(request: NextRequest) {
     try {
         const supabase = getSupabaseAdmin()
 
