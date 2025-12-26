@@ -18,15 +18,17 @@ import {
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card"
 
 interface CategoryDataPoint {
-    category: string
-    amount: number
+    name: string
+    value: number
+    color?: string
     [key: string]: unknown
 }
 
 interface BudgetVsActualDataPoint {
-    month: string
-    budget: number
+    name: string
+    budgeted: number
     actual: number
+    variance?: number
     [key: string]: unknown
 }
 

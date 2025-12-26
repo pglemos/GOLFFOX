@@ -43,13 +43,29 @@ import { RouteCreateModal } from "./route-create-modal"
 
 import Link from "next/link"
 
+interface RouteData {
+  id: string
+  name: string
+  description?: string
+  company_id?: string
+  companies?: { name: string } | null
+  status?: string
+  is_active?: boolean
+  estimated_duration?: number
+  distance?: number
+  stops?: unknown[]
+  origin_lat?: number
+  origin_lng?: number
+  [key: string]: unknown
+}
+
 export function RotasPageContent() {
   const router = useRouter()
   const { TransitionOverlay } = useAdvancedNavigation()
   const { user, loading } = useAuth()
-  const [rotas, setRotas] = useState<Array<{ id: string; name: string; [key: string]: unknown }>>([])
+  const [rotas, setRotas] = useState<RouteData[]>([])
   const [searchQuery, setSearchQuery] = useState("")
-  const [selectedRoute, setSelectedRoute] = useState<{ id: string; name: string; [key: string]: unknown } | null>(null)
+  const [selectedRoute, setSelectedRoute] = useState<RouteData | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [filterValues, setFilterValues] = useState<Record<string, string>>({
     company: "",
